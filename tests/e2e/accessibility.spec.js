@@ -1,0 +1,365 @@
+const path = require('node:path');
+const { test, expect, chromium } = require('@playwright/test');
+const AxeBuilder = require('@axe-core/playwright').default;
+
+let context;
+let extensionId;
+const frenchMessages = Object.fromEntries(Object.entries(require('../../_locales/fr/messages.json'))
+  .map(([key, value]) => [key, value.message]));
+
+async function prepareFullPageHarness(page, html) {
+  await page.setViewportSize({ width: 800, height: 600 });
+  await page.setContent(html);
+  await page.evaluate(() => {
+    globalThis.__capturePositions = [];
+    globalThis.__captureVisibility = [];
+    globalThis.__openedCapture = null;
+    globalThis.chrome = {
+      runtime: {
+        onMessage: {
+          addListener(listener) { globalThis.__captureListener = listener; }
+        },
+        sendMessage(message, callback) {
+          if (message.action === 'CAPTURE_VISIBLE_TAB') {
+            const surface = document.querySelector('[data-scroll-surface]');
+            globalThis.__capturePositions.push({
+              windowX: Math.round(globalThis.scrollX),
+              windowY: Math.round(globalThis.scrollY),
+              surfaceX: surface ? Math.round(surface.scrollLeft) : null,
+              surfaceY: surface ? Math.round(surface.scrollTop) : null
+            });
+            globalThis.__captureVisibility.push(document.querySelector('header')?.style.visibility || '');
+            const canvas = document.createElement('canvas');
+            canvas.width = globalThis.innerWidth;
+            canvas.height = globalThis.innerHeight;
+            const context2d = canvas.getContext('2d');
+            const offset = surface
+              ? surface.scrollLeft + surface.scrollTop
+              : globalThis.scrollX + globalThis.scrollY;
+            context2d.fillStyle = `rgb(${offset % 255}, 180, 220)`;
+            context2d.fillRect(0, 0, canvas.width, canvas.height);
+            callback({ success: true, dataUrl: canvas.toDataURL('image/png') });
+          } else if (message.action === 'OPEN_EDITOR') {
+            globalThis.__openedCapture = message;
+            callback({ success: true });
+          }
+        }
+      }
+    };
+  });
+  await page.addScriptTag({ path: path.resolve(__dirname, '../../capture-utils.js') });
+  await page.addScriptTag({ path: path.resolve(__dirname, '../../content.js') });
+}
+
+async function startFullPageCapture(page) {
+  return page.evaluate(localizedMessages => new Promise(resolve => {
+    globalThis.__captureListener({
+      action: 'START_FULL_PAGE_CAPTURE',
+      language: 'fr',
+      messages: localizedMessages
+    }, {}, resolve);
+  }), frenchMessages);
+}
+
+async function readOpenedCapture(page) {
+  await page.waitForFunction(() => Boolean(globalThis.__openedCapture));
+  return page.evaluate(() => new Promise((resolve, reject) => {
+    const image = new globalThis.Image();
+    image.onload = () => resolve({
+      width: image.width,
+      height: image.height,
+      positions: globalThis.__capturePositions,
+      visibility: globalThis.__captureVisibility
+    });
+    image.onerror = reject;
+    image.src = globalThis.__openedCapture.dataUrl;
+  }));
+}
+
+test.beforeAll(async () => {
+  const extensionPath = path.resolve(__dirname, '../..');
+  context = await chromium.launchPersistentContext('', {
+    channel: 'chromium',
+    headless: true,
+    args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`]
+  });
+  let worker = context.serviceWorkers()[0];
+  if (!worker) worker = await context.waitForEvent('serviceworker');
+  extensionId = new URL(worker.url()).host;
+});
+
+test.afterAll(async () => {
+  await context.close();
+});
+
+test('popup has an accessible language menu and no serious axe violations', async () => {
+  const page = await context.newPage();
+  await page.goto(`chrome-extension://${extensionId}/popup.html`);
+  await expect(page.locator('#txt-full-title')).not.toBeEmpty();
+  await expect(page.locator('#txt-scrolling-title')).not.toBeEmpty();
+  await page.locator('#language-button').click();
+  await expect(page.locator('#language-menu')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#language-menu')).toBeHidden();
+  const results = await new AxeBuilder({ page }).analyze();
+  expect(results.violations.filter(item => ['serious', 'critical'].includes(item.impact))).toEqual([]);
+});
+
+test('full-page capture assembles a long document and restores its position', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, `<!doctype html><html lang="fr"><title>Longue page</title><style>
+    html, body { margin: 0; }
+    body { min-height: 2600px; background: linear-gradient(#fff, #dbeafe); }
+    header { position: fixed; inset: 0 0 auto; height: 48px; background: #075985; }
+  </style><header>En-tête fixe</header><main>Contenu long</main></html>`);
+  await page.evaluate(() => globalThis.scrollTo(0, 180));
+  await expect.poll(() => page.evaluate(() => Math.round(globalThis.scrollY))).toBe(180);
+
+  expect(await startFullPageCapture(page)).toEqual({ status: 'started' });
+  const result = await readOpenedCapture(page);
+  expect({ width: result.width, height: result.height }).toEqual({ width: 800, height: 2600 });
+  expect(result.positions.map(position => position.windowY)).toEqual([0, 600, 1200, 1800, 2000]);
+  expect(result.visibility).toEqual(['', 'hidden', 'hidden', 'hidden', 'hidden']);
+  expect(await page.evaluate(() => ({ scrollY: Math.round(globalThis.scrollY), fixed: document.querySelector('header').style.visibility })))
+    .toEqual({ scrollY: 180, fixed: '' });
+  await page.close();
+});
+
+test('full-page capture detects and crops an internal vertical scroll surface', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, `<!doctype html><html lang="fr"><style>
+    html, body { width: 100%; height: 600px; margin: 0; overflow: hidden; }
+    #app { width: 800px; height: 600px; overflow: auto; }
+    #content { height: 2600px; background: linear-gradient(#fff, #dbeafe); }
+  </style><div id="app" data-scroll-surface><div id="content"></div></div></html>`);
+  await page.evaluate(() => { document.querySelector('#app').scrollTop = 200; });
+
+  expect(await startFullPageCapture(page)).toEqual({ status: 'started' });
+  const result = await readOpenedCapture(page);
+  expect({ width: result.width, height: result.height }).toEqual({ width: 800, height: 2600 });
+  expect(result.positions.map(position => position.surfaceY)).toEqual([0, 600, 1200, 1800, 2000]);
+  expect(result.positions.every(position => position.windowY === 0)).toBe(true);
+  expect(await page.evaluate(() => document.querySelector('#app').scrollTop)).toBe(200);
+  await page.close();
+});
+
+test('full-page capture assembles a wide and tall internal scroll surface', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, `<!doctype html><html lang="fr"><style>
+    html, body { width: 100%; height: 600px; margin: 0; overflow: hidden; }
+    #app { width: 800px; height: 600px; overflow: auto; }
+    #content { width: 1600px; height: 1400px; background: linear-gradient(90deg, #fff, #dbeafe); }
+  </style><div id="app" data-scroll-surface><div id="content"></div></div></html>`);
+
+  expect(await startFullPageCapture(page)).toEqual({ status: 'started' });
+  const result = await readOpenedCapture(page);
+  expect({ width: result.width, height: result.height }).toEqual({ width: 1600, height: 1400 });
+  expect(result.positions.map(position => [position.surfaceX, position.surfaceY])).toEqual([
+    [0, 0], [800, 0], [0, 600], [800, 600], [0, 800], [800, 800]
+  ]);
+  expect(await page.evaluate(() => {
+    const app = document.querySelector('#app');
+    return { scrollLeft: app.scrollLeft, scrollTop: app.scrollTop };
+  })).toEqual({ scrollLeft: 0, scrollTop: 0 });
+  await page.close();
+});
+
+test('full-page capture reports when the selected surface cannot scroll', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, `<!doctype html><html lang="fr"><style>
+    html, body { width: 100%; height: 600px; margin: 0; overflow: hidden; }
+    #app { width: 800px; height: 600px; overflow: auto; }
+    #content { height: 1600px; }
+  </style><div id="app" data-scroll-surface><div id="content"></div></div></html>`);
+  await page.evaluate(() => {
+    const app = document.querySelector('#app');
+    Object.defineProperty(app, 'scrollTop', {
+      configurable: true,
+      get() { return 0; },
+      set() {}
+    });
+  });
+
+  const dialogPromise = page.waitForEvent('dialog');
+  expect(await startFullPageCapture(page)).toEqual({ status: 'started' });
+  const dialog = await dialogPromise;
+  expect(dialog.message()).toContain(frenchMessages.fullScrollError);
+  await dialog.dismiss();
+  expect(await page.evaluate(() => Boolean(globalThis.__openedCapture))).toBe(false);
+  await page.close();
+});
+
+test('scrolling-area overlay supports pointer, keyboard and exact multi-screen capture', async () => {
+  const page = await context.newPage();
+  await page.setViewportSize({ width: 800, height: 600 });
+  await page.setContent(`<!doctype html><html lang="fr"><title>Longue page</title><style>
+    body { margin: 0; min-height: 2600px; background: linear-gradient(#fff, #dbeafe); }
+    header { position: fixed; inset: 0 0 auto; height: 48px; background: #075985; color: white; }
+  </style><header>En-tête fixe</header><main style="padding:80px 20px">Contenu long</main></html>`);
+  await page.evaluate(() => {
+    globalThis.__captureVisibility = [];
+    globalThis.chrome.runtime = {
+      onMessage: {
+        addListener(listener) { globalThis.__captureListener = listener; }
+      },
+      sendMessage(message, callback) {
+        if (message.action === 'CAPTURE_VISIBLE_TAB') {
+          globalThis.__captureVisibility.push(document.querySelector('header').style.visibility);
+          const canvas = document.createElement('canvas');
+          canvas.width = globalThis.innerWidth;
+          canvas.height = globalThis.innerHeight;
+          const context2d = canvas.getContext('2d');
+          context2d.fillStyle = '#ffffff';
+          context2d.fillRect(0, 0, canvas.width, canvas.height);
+          callback({ success: true, dataUrl: canvas.toDataURL('image/png') });
+        } else if (message.action === 'OPEN_EDITOR') {
+          globalThis.__openedCapture = message;
+          callback({ success: true });
+        }
+      }
+    };
+  });
+  await page.addScriptTag({ path: path.resolve(__dirname, '../../capture-utils.js') });
+  await page.addScriptTag({ path: path.resolve(__dirname, '../../content.js') });
+  const messages = Object.fromEntries(Object.entries(require('../../_locales/fr/messages.json'))
+    .map(([key, value]) => [key, value.message]));
+  await page.evaluate(localizedMessages => new Promise(resolve => {
+    globalThis.__captureListener({
+      action: 'START_SCROLLING_ZONE_CAPTURE',
+      language: 'fr',
+      messages: localizedMessages
+    }, {}, resolve);
+  }), messages);
+
+  const overlay = page.locator('[data-scionos-capture="scrolling-selection"]');
+  await expect(overlay).toBeVisible();
+  const busyResponse = await page.evaluate(localizedMessages => new Promise(resolve => {
+    globalThis.__captureListener({
+      action: 'START_SCROLLING_ZONE_CAPTURE', messages: localizedMessages
+    }, {}, resolve);
+  }), messages);
+  expect(busyResponse).toEqual({ status: 'busy' });
+  await page.mouse.click(80, 300);
+  await expect(page.locator('[data-scionos-capture="scrolling-controls"]')).toContainText('Premier point défini');
+  await page.locator('[data-scionos-capture="scrolling-controls"] button', { hasText: 'Recommencer' }).click();
+  await expect(page.locator('[data-scionos-capture="scrolling-controls"]')).toContainText('premier coin');
+  await overlay.focus();
+  await page.keyboard.press('PageDown');
+  await expect.poll(() => page.evaluate(() => globalThis.scrollY)).toBeGreaterThan(0);
+  const axeResults = await new AxeBuilder({ page }).analyze();
+  expect(axeResults.violations.filter(item => ['serious', 'critical'].includes(item.impact))).toEqual([]);
+  await page.keyboard.press('Escape');
+  await expect(overlay).toBeHidden();
+  await expect.poll(() => page.evaluate(() => globalThis.scrollY)).toBe(0);
+
+  const captureStart = await page.evaluate(localizedMessages => new Promise(resolve => {
+    globalThis.__captureListener({
+      action: 'START_SCROLLING_ZONE_CAPTURE', language: 'fr', messages: localizedMessages
+    }, {}, resolve);
+  }), messages);
+  expect(captureStart).toEqual({ status: 'started' });
+  await expect(overlay).toBeVisible();
+
+  await page.locator('input[name="x"]').fill('20');
+  await page.locator('input[name="y"]').fill('100');
+  await page.locator('input[name="width"]').fill('240');
+  await page.locator('input[name="height"]').fill('1600');
+  await page.locator('[data-scionos-capture="scrolling-controls"] button', { hasText: 'Capturer' }).click();
+  await page.waitForFunction(() => Boolean(globalThis.__openedCapture));
+  const result = await page.evaluate(() => new Promise((resolve, reject) => {
+    const image = new globalThis.Image();
+    image.onload = () => resolve({
+      width: image.width,
+      height: image.height,
+      visibility: globalThis.__captureVisibility
+    });
+    image.onerror = reject;
+    image.src = globalThis.__openedCapture.dataUrl;
+  }));
+  expect(result.width).toBe(240);
+  expect(result.height).toBe(1600);
+  expect(result.visibility).toEqual(['', 'hidden', 'hidden']);
+
+  await page.evaluate(() => {
+    let captureCount = 0;
+    globalThis.chrome.runtime.sendMessage = (message, callback) => {
+      if (message.action === 'CAPTURE_VISIBLE_TAB') {
+        captureCount += 1;
+        if (captureCount === 2) {
+          callback({ success: false, errorCode: 'TAB_CHANGED', error: 'forced tab change' });
+          return;
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = globalThis.innerWidth;
+        canvas.height = globalThis.innerHeight;
+        callback({ success: true, dataUrl: canvas.toDataURL('image/png') });
+      } else {
+        callback({ success: true });
+      }
+    };
+    globalThis.scrollTo(0, 200);
+  });
+  await expect.poll(() => page.evaluate(() => globalThis.scrollY)).toBe(200);
+  const errorCaptureStart = await page.evaluate(localizedMessages => new Promise(resolve => {
+    globalThis.__captureListener({
+      action: 'START_SCROLLING_ZONE_CAPTURE', language: 'fr', messages: localizedMessages
+    }, {}, resolve);
+  }), messages);
+  expect(errorCaptureStart).toEqual({ status: 'started' });
+  await page.locator('input[name="x"]').fill('20');
+  await page.locator('input[name="y"]').fill('200');
+  await page.locator('input[name="width"]').fill('240');
+  await page.locator('input[name="height"]').fill('1000');
+  const dialogPromise = page.waitForEvent('dialog');
+  await page.locator('[data-scionos-capture="scrolling-controls"] button', { hasText: 'Capturer' }).click();
+  const dialog = await dialogPromise;
+  expect(dialog.message()).toContain(messages.tabChangedError);
+  await dialog.dismiss();
+  await expect.poll(() => page.evaluate(() => globalThis.scrollY)).toBe(200);
+  await expect(page.locator('header')).toHaveCSS('visibility', 'visible');
+  await expect(page.locator('[data-scionos-capture="motion"]')).toHaveCount(0);
+});
+
+test('editor empty state remains accessible at a narrow viewport', async () => {
+  const page = await context.newPage();
+  await page.setViewportSize({ width: 760, height: 720 });
+  await page.goto(`chrome-extension://${extensionId}/editor.html`);
+  await expect(page.locator('#empty-state')).toBeVisible();
+  const results = await new AxeBuilder({ page }).analyze();
+  expect(results.violations.filter(item => ['serious', 'critical'].includes(item.impact))).toEqual([]);
+});
+
+test('editor zoom, crop, undo and redo keep the complete canvas reachable', async () => {
+  const page = await context.newPage();
+  await page.goto(`chrome-extension://${extensionId}/editor.html`);
+  await page.evaluate(async () => {
+    const source = document.createElement('canvas');
+    source.width = 640;
+    source.height = 480;
+    const sourceContext = source.getContext('2d');
+    sourceContext.fillStyle = '#ffffff';
+    sourceContext.fillRect(0, 0, 640, 480);
+    sourceContext.fillStyle = '#075985';
+    sourceContext.fillRect(40, 40, 200, 120);
+    const blob = await new Promise(resolve => source.toBlob(resolve, 'image/png'));
+    await CaptureStore.putCapture({
+      id: 'e2e-capture', blob, title: 'E2E', url: 'https://example.com',
+      timestamp: new Date().toISOString(), scale: 1, createdAt: Date.now()
+    });
+  });
+  await page.goto(`chrome-extension://${extensionId}/editor.html?capture=e2e-capture`);
+  await expect(page.locator('#main-canvas')).toHaveAttribute('width', '640');
+  await page.locator('#zoom-in').click();
+  await expect(page.locator('#canvas-container')).toHaveCSS('width', '736px');
+  await page.locator('#tool-crop').click();
+  await page.locator('#geometry-x').fill('10');
+  await page.locator('#geometry-y').fill('10');
+  await page.locator('#geometry-width').fill('320');
+  await page.locator('#geometry-height').fill('240');
+  await page.locator('#geometry-apply').click();
+  await expect(page.locator('#main-canvas')).toHaveAttribute('width', '320');
+  await page.locator('#btn-undo').click();
+  await expect(page.locator('#main-canvas')).toHaveAttribute('width', '640');
+  await page.locator('#btn-redo').click();
+  await expect(page.locator('#main-canvas')).toHaveAttribute('width', '320');
+});

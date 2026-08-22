@@ -1,0 +1,32 @@
+name: Publish GitHub release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run verify
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          gh release create "${GITHUB_REF_NAME}" \
+            "dist/scionos-capture-${GITHUB_REF_NAME}.zip" \
+            "dist/scionos-capture-${GITHUB_REF_NAME}.zip.sha256" \
+            --title "Scionos Capture ${VERSION}" \
+            --notes-file RELEASE_NOTES.md \
+            --verify-tag

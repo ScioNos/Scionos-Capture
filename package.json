@@ -1,0 +1,29 @@
+{
+  "name": "scionos-capture",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Extension Manifest V3 de capture d’écran locale pour Chrome et Edge.",
+  "scripts": {
+    "check": "node --check background.js && node --check capture-utils.js && node --check capture-store.js && node --check content.js && node --check editor.js && node --check i18n.js && node --check popup.js",
+    "lint": "eslint . && html-validate popup.html editor.html",
+    "validate": "node scripts/validate-package.mjs",
+    "test": "node --test tests/*.test.js",
+    "test:e2e": "playwright test",
+    "package": "node scripts/package.mjs",
+    "verify:core": "npm run check && npm run lint && npm test && npm run validate && npm run package",
+    "verify": "npm run verify:core && npm run test:e2e"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
+    "@eslint/js": "^9.39.5",
+    "@playwright/test": "^1.62.1",
+    "archiver": "^7.0.1",
+    "eslint": "^9.39.5",
+    "fake-indexeddb": "^6.2.5",
+    "html-validate": "^9.7.1"
+  }
+}

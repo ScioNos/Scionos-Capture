@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Éditeur — Scionos Capture</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #07111f;
+      --workspace: #050b14;
+      --panel: #101d2f;
+      --panel-2: #172942;
+      --line: #31435b;
+      --text: #f8fafc;
+      --muted: #a9bad0;
+      --cyan: #38bdf8;
+      --cyan-dark: #075985;
+      --amber: #fbbf24;
+      --danger: #fb7185;
+      --success: #34d399;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; }
+    body {
+      margin: 0;
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr);
+      overflow: hidden;
+      font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+      background: var(--ink);
+      color: var(--text);
+    }
+    button, input, select { font: inherit; }
+    button:focus-visible, input:focus-visible, select:focus-visible, canvas:focus-visible {
+      outline: 3px solid var(--amber);
+      outline-offset: 2px;
+    }
+    [hidden] { display: none !important; }
+
+    header {
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(105deg, var(--panel), #0b1727 70%);
+      z-index: 30;
+    }
+    .brand { min-width: 0; display: flex; align-items: center; gap: 11px; flex: 1 1 280px; }
+    .brand-mark { position: relative; width: 38px; height: 38px; display: grid; place-items: center; flex: 0 0 auto; }
+    .brand-mark::before, .brand-mark::after { content: ""; position: absolute; inset: 0; border: 2px solid var(--cyan); }
+    .brand-mark::before { clip-path: polygon(0 0, 38% 0, 38% 2px, 2px 2px, 2px 38%, 0 38%); }
+    .brand-mark::after { transform: rotate(180deg); clip-path: polygon(0 0, 38% 0, 38% 2px, 2px 2px, 2px 38%, 0 38%); }
+    .brand-mark img { width: 26px; height: 26px; }
+    .title-wrap { min-width: 0; }
+    .title-wrap h1 { margin: 0; overflow: hidden; color: var(--text); font-size: 15px; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
+    .title-wrap p { margin: 2px 0 0; overflow: hidden; color: var(--muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+    .capture-notice { display: block; margin-top: 3px; color: var(--amber); font-size: 11px; }
+    .capture-notice:empty { display: none; }
+
+    .header-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex: 1 1 auto; }
+    .action-button, .tool-button, .compact-button {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 7px 11px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--text);
+      cursor: pointer;
+    }
+    .action-button:hover, .tool-button:hover, .compact-button:hover { border-color: var(--cyan); background: var(--panel-2); }
+    .action-button.primary { border-color: #0c6c9e; background: #075985; }
+    .action-button.primary:hover { background: #0c4a6e; }
+    button:disabled { opacity: 0.46; cursor: not-allowed; }
+    .icon { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    .language-switcher { position: relative; }
+    .language-button { min-width: 58px; padding-inline: 9px; }
+    .language-button img, .language-option img { width: 24px; height: 16px; border-radius: 2px; }
+    .language-code { font: 700 11px ui-monospace, monospace; }
+    .language-menu {
+      position: absolute; z-index: 50; top: calc(100% + 7px); right: 0; width: 230px; padding: 6px;
+      border: 1px solid var(--line); border-radius: 10px; background: #0c1828; box-shadow: 0 18px 42px rgba(0,0,0,.5);
+    }
+    .language-option {
+      width: 100%; min-height: 40px; display: grid; grid-template-columns: 26px 1fr 18px; align-items: center; gap: 9px;
+      padding: 7px 9px; border: 0; border-radius: 7px; background: transparent; color: var(--text); text-align: left; cursor: pointer;
+    }
+    .language-option:hover, .language-option:focus-visible { background: var(--panel-2); }
+    .auto-icon, .language-check { color: var(--cyan); text-align: center; font-weight: 800; }
+    .language-label { font-size: 12px; }
+
+    .toolbar {
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--line);
+      background: #0b1626;
+      scrollbar-width: thin;
+    }
+    .tool-group { display: flex; align-items: center; gap: 6px; padding-right: 10px; border-right: 1px solid var(--line); flex: 0 0 auto; }
+    .tool-group:last-child { border-right: 0; }
+    .tool-button { min-height: 36px; padding: 6px 9px; color: var(--muted); }
+    .tool-button[aria-pressed="true"] { border-color: var(--cyan); background: var(--cyan-dark); color: #fff; }
+    .field { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 11px; white-space: nowrap; }
+    select, input[type="number"] { height: 34px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--text); padding: 4px 7px; }
+    input[type="number"] { width: 72px; }
+    input[type="range"] { width: 82px; accent-color: var(--cyan); }
+    input[type="color"] { width: 34px; height: 34px; padding: 2px; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); }
+    .warning { max-width: 240px; color: var(--amber); font-size: 10px; line-height: 1.25; }
+
+    .geometry-panel {
+      position: fixed; z-index: 40; left: 50%; bottom: 18px; transform: translateX(-50%);
+      display: flex; align-items: end; gap: 8px; max-width: calc(100vw - 180px); padding: 10px;
+      overflow-x: auto; border: 1px solid var(--cyan-dark); border-radius: 11px; background: #0c1828;
+      box-shadow: 0 16px 40px rgba(0,0,0,.55);
+    }
+    .geometry-panel h2 { margin: 0 5px 0 0; align-self: center; font-size: 12px; white-space: nowrap; }
+    .geometry-panel .field { display: grid; gap: 3px; }
+    .geometry-panel .field label { font-size: 10px; }
+    .compact-button.apply { border-color: #047857; background: #065f46; }
+
+    .workspace {
+      min-width: 0; min-height: 0; position: relative; display: flex; align-items: flex-start; justify-content: flex-start;
+      overflow: auto; padding: 30px; background:
+        linear-gradient(45deg, rgba(255,255,255,.025) 25%, transparent 25%, transparent 75%, rgba(255,255,255,.025) 75%),
+        linear-gradient(45deg, rgba(255,255,255,.025) 25%, transparent 25%, transparent 75%, rgba(255,255,255,.025) 75%),
+        var(--workspace);
+      background-position: 0 0, 10px 10px; background-size: 20px 20px;
+    }
+    .canvas-container { position: relative; flex: 0 0 auto; margin: auto; background: #fff; box-shadow: 0 22px 60px rgba(0,0,0,.72); }
+    canvas { display: block; touch-action: none; }
+    .empty-state { margin: auto; max-width: 430px; padding: 30px; color: var(--muted); text-align: center; line-height: 1.55; }
+
+    .zoom-bar {
+      position: fixed; z-index: 35; right: 18px; bottom: 18px; display: flex; align-items: center; gap: 5px;
+      padding: 6px; border: 1px solid var(--line); border-radius: 999px; background: #0c1828; box-shadow: 0 12px 30px rgba(0,0,0,.5);
+    }
+    .zoom-button { width: 34px; height: 34px; padding: 0; border-radius: 50%; }
+    .zoom-text { min-width: 48px; color: var(--muted); text-align: center; font: 700 11px ui-monospace, monospace; }
+
+    .toast {
+      position: fixed; z-index: 60; top: 78px; left: 50%; transform: translate(-50%, -12px); max-width: min(520px, calc(100vw - 30px));
+      padding: 10px 14px; border: 1px solid var(--cyan-dark); border-radius: 8px; background: #0c1828; color: var(--text);
+      opacity: 0; pointer-events: none; transition: opacity 150ms ease, transform 150ms ease;
+    }
+    .toast.visible { opacity: 1; transform: translate(-50%, 0); }
+    .toast.error { border-color: #9f1239; color: #fecdd3; }
+
+    @media (max-width: 1000px) {
+      header { align-items: flex-start; flex-wrap: wrap; }
+      .brand { flex-basis: calc(100% - 72px); }
+      .header-actions { width: 100%; justify-content: flex-start; overflow-x: auto; padding-bottom: 2px; }
+      .language-switcher { position: absolute; top: 12px; right: 14px; }
+      .action-label { display: none; }
+      .toolbar { align-items: flex-start; }
+      .geometry-panel { max-width: calc(100vw - 24px); right: 12px; left: 12px; transform: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; } }
+
+    @media print {
+      header, .toolbar, .zoom-bar, .geometry-panel, .toast { display: none !important; }
+      body, .workspace { display: block; height: auto; overflow: visible; padding: 0; background: #fff; }
+      .canvas-container { width: auto !important; height: auto !important; margin: 0; box-shadow: none; }
+      canvas { width: 100% !important; height: auto !important; }
+    }
+  </style>
+</head>
+<body aria-busy="true">
+  <header>
+    <div class="brand">
+      <div class="brand-mark"><img src="images/icon48.png" alt=""></div>
+      <div class="title-wrap">
+        <h1 id="page-title"></h1>
+        <p id="page-meta"></p>
+        <span id="capture-notice" class="capture-notice" role="status"></span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="language-switcher">
+        <button id="language-button" class="action-button language-button" type="button" aria-haspopup="menu" aria-expanded="false"><img id="language-flag" src="images/flags/fr.svg" alt=""><span id="language-code" class="language-code">FR</span><span aria-hidden="true">▼</span></button>
+        <div id="language-menu" class="language-menu" role="menu" hidden>
+          <button class="language-option" type="button" role="menuitemradio" data-language-mode="auto"><span class="auto-icon" aria-hidden="true">◎</span><span class="language-label" data-i18n="languageAuto"></span><span class="language-check"></span></button>
+          <button class="language-option" type="button" role="menuitemradio" data-language-mode="fr"><img src="images/flags/fr.svg" alt=""><span class="language-label">Français</span><span class="language-check"></span></button>
+          <button class="language-option" type="button" role="menuitemradio" data-language-mode="en"><img src="images/flags/en.svg" alt=""><span class="language-label">English</span><span class="language-check"></span></button>
+          <button class="language-option" type="button" role="menuitemradio" data-language-mode="es"><img src="images/flags/es.svg" alt=""><span class="language-label">Español</span><span class="language-check"></span></button>
+          <button class="language-option" type="button" role="menuitemradio" data-language-mode="de"><img src="images/flags/de.svg" alt=""><span class="language-label">Deutsch</span><span class="language-check"></span></button>
+        </div>
+      </div>
+      <button id="btn-copy" class="action-button" type="button" disabled><svg class="icon" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg><span id="txt-copy" class="action-label"></span></button>
+      <button id="btn-pdf" class="action-button" type="button" disabled><svg class="icon" viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg><span id="txt-pdf" class="action-label"></span></button>
+      <button id="btn-html" class="action-button" type="button" disabled><svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="m10 13-2 2 2 2m4-4 2 2-2 2"/></svg><span id="txt-html" class="action-label"></span></button>
+      <button id="btn-download" class="action-button primary" type="button" disabled><svg class="icon" viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 19h16"/></svg><span id="txt-png" class="action-label"></span></button>
+    </div>
+  </header>
+
+  <div class="toolbar" id="editor-toolbar" role="toolbar">
+    <div id="primary-tool-group" class="tool-group">
+      <button id="tool-select" class="tool-button" type="button" aria-pressed="true" data-tool="select"><svg class="icon" viewBox="0 0 24 24"><path d="m5 3 14 9-6 2-3 6z"/></svg><span id="txt-tool-select"></span></button>
+      <button id="tool-draw" class="tool-button" type="button" aria-pressed="false" data-tool="draw"><svg class="icon" viewBox="0 0 24 24"><path d="m4 20 4-1 11-11-3-3L5 16zM14 7l3 3"/></svg><span id="txt-tool-draw"></span></button>
+      <button id="tool-censor" class="tool-button" type="button" aria-pressed="false" data-tool="censor"><svg class="icon" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="m7 9 2-2m-2 6 6-6m-6 10L17 7m-6 10 6-6m-2 6 2-2"/></svg><span id="txt-tool-censor"></span></button>
+      <button id="tool-crop" class="tool-button" type="button" aria-pressed="false" data-tool="crop"><svg class="icon" viewBox="0 0 24 24"><path d="M6 2v16a2 2 0 0 0 2 2h14M2 6h16a2 2 0 0 1 2 2v14"/></svg><span id="txt-tool-crop"></span></button>
+    </div>
+
+    <div id="draw-controls" class="tool-group" hidden>
+      <label class="field" for="draw-size"><span id="label-draw-size"></span><select id="draw-size"><option value="4"></option><option value="8" selected></option><option value="16"></option><option value="32"></option></select></label>
+      <label class="field" for="draw-color"><span id="label-draw-color"></span><input type="color" id="draw-color" value="#ef4444"></label>
+    </div>
+
+    <div id="censor-controls" class="tool-group" hidden>
+      <label class="field" for="censor-type"><span id="label-mode"></span><select id="censor-type"><option value="color" selected></option><option value="blur"></option></select></label>
+      <label class="field" for="censor-shape"><span id="label-shape"></span><select id="censor-shape"><option value="rect" selected></option><option value="circle"></option><option value="free"></option></select></label>
+      <label id="censor-size-field" class="field" for="censor-size" hidden><span id="label-censor-size"></span><select id="censor-size"><option value="4"></option><option value="8" selected></option><option value="16"></option><option value="32"></option></select></label>
+      <label id="censor-color-field" class="field" for="censor-color"><span id="label-censor-color"></span><input type="color" id="censor-color" value="#000000"></label>
+      <label id="blur-field" class="field" for="blur-intensity" hidden><span id="label-blur"></span><input type="range" id="blur-intensity" min="3" max="40" value="14"><output id="blur-intensity-val" for="blur-intensity">14px</output></label>
+      <span id="blur-warning" class="warning" hidden></span>
+    </div>
+
+    <div class="tool-group">
+      <button id="btn-undo" class="tool-button" type="button" disabled><svg class="icon" viewBox="0 0 24 24"><path d="M9 7 4 12l5 5M5 12h8a6 6 0 1 1 0 12"/></svg><span id="txt-undo"></span></button>
+      <button id="btn-redo" class="tool-button" type="button" disabled><svg class="icon" viewBox="0 0 24 24"><path d="m15 7 5 5-5 5m4-5h-8a6 6 0 1 0 0 12"/></svg><span id="txt-redo"></span></button>
+    </div>
+  </div>
+
+  <main class="workspace" id="workspace">
+    <div id="empty-state" class="empty-state"></div>
+    <div class="canvas-container" id="canvas-container" hidden><canvas id="main-canvas" tabindex="0"></canvas></div>
+  </main>
+
+  <section id="geometry-panel" class="geometry-panel" aria-labelledby="geometry-title" hidden>
+    <h2 id="geometry-title"></h2>
+    <div class="field"><label id="label-x" for="geometry-x"></label><input id="geometry-x" type="number" min="0" value="0"></div>
+    <div class="field"><label id="label-y" for="geometry-y"></label><input id="geometry-y" type="number" min="0" value="0"></div>
+    <div class="field"><label id="label-width" for="geometry-width"></label><input id="geometry-width" type="number" min="1" value="100"></div>
+    <div class="field"><label id="label-height" for="geometry-height"></label><input id="geometry-height" type="number" min="1" value="100"></div>
+    <button id="geometry-apply" class="compact-button apply" type="button"></button>
+    <button id="geometry-cancel" class="compact-button" type="button"></button>
+  </section>
+
+  <div class="zoom-bar">
+    <button id="zoom-out" class="compact-button zoom-button" type="button">−</button>
+    <span id="zoom-text" class="zoom-text" aria-live="polite">100%</span>
+    <button id="zoom-in" class="compact-button zoom-button" type="button">+</button>
+    <button id="zoom-reset" class="compact-button zoom-button" type="button"><svg class="icon" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2-5.3L4 9m0-5v5h5"/></svg></button>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="capture-store.js"></script>
+  <script src="i18n.js"></script>
+  <script src="editor.js"></script>
+</body>
+</html>
