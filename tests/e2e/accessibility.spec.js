@@ -14,35 +14,44 @@ async function prepareFullPageHarness(page, html) {
     globalThis.__capturePositions = [];
     globalThis.__captureVisibility = [];
     globalThis.__openedCapture = null;
+    globalThis.__transfer = { chunks: [], metadata: null };
+    globalThis.__handleCaptureTransfer = (message, callback) => {
+      if (message.action === 'BEGIN_CAPTURE_TRANSFER') {
+        globalThis.__transfer = { chunks: [], metadata: message };
+        callback({ success: true, transferId: 'e2e-transfer', chunkBytes: 524288 });
+      } else if (message.action === 'APPEND_CAPTURE_CHUNK') {
+        const binary = globalThis.atob(message.data);
+        const bytes = Uint8Array.from(binary, character => character.charCodeAt(0));
+        globalThis.__transfer.chunks[message.index] = bytes;
+        callback({ success: true, nextIndex: message.index + 1 });
+      } else if (message.action === 'COMPLETE_CAPTURE_TRANSFER') {
+        const reader = new globalThis.FileReader();
+        reader.onload = () => {
+          globalThis.__openedCapture = Object.assign({}, globalThis.__transfer.metadata, { dataUrl: reader.result });
+          callback({ success: true, captureId: 'e2e-capture' });
+        };
+        reader.readAsDataURL(new Blob(globalThis.__transfer.chunks, { type: 'image/png' }));
+      } else if (message.action === 'ABORT_CAPTURE_TRANSFER') callback({ success: true });
+    };
     globalThis.chrome = {
       runtime: {
-        onMessage: {
-          addListener(listener) { globalThis.__captureListener = listener; }
-        },
+        onMessage: { addListener(listener) { globalThis.__captureListener = listener; } },
         sendMessage(message, callback) {
           if (message.action === 'CAPTURE_VISIBLE_TAB') {
             const surface = document.querySelector('[data-scroll-surface]');
             globalThis.__capturePositions.push({
-              windowX: Math.round(globalThis.scrollX),
-              windowY: Math.round(globalThis.scrollY),
-              surfaceX: surface ? Math.round(surface.scrollLeft) : null,
-              surfaceY: surface ? Math.round(surface.scrollTop) : null
+              windowX: Math.round(globalThis.scrollX), windowY: Math.round(globalThis.scrollY),
+              surfaceX: surface ? Math.round(surface.scrollLeft) : null, surfaceY: surface ? Math.round(surface.scrollTop) : null
             });
             globalThis.__captureVisibility.push(document.querySelector('header')?.style.visibility || '');
             const canvas = document.createElement('canvas');
-            canvas.width = globalThis.innerWidth;
-            canvas.height = globalThis.innerHeight;
+            canvas.width = globalThis.innerWidth; canvas.height = globalThis.innerHeight;
             const context2d = canvas.getContext('2d');
-            const offset = surface
-              ? surface.scrollLeft + surface.scrollTop
-              : globalThis.scrollX + globalThis.scrollY;
-            context2d.fillStyle = `rgb(${offset % 255}, 180, 220)`;
+            const offset = surface ? surface.scrollLeft + surface.scrollTop : globalThis.scrollX + globalThis.scrollY;
+            context2d.fillStyle = 'rgb(' + (offset % 255) + ', 180, 220)';
             context2d.fillRect(0, 0, canvas.width, canvas.height);
             callback({ success: true, dataUrl: canvas.toDataURL('image/png') });
-          } else if (message.action === 'OPEN_EDITOR') {
-            globalThis.__openedCapture = message;
-            callback({ success: true });
-          }
+          } else globalThis.__handleCaptureTransfer(message, callback);
         }
       }
     };
@@ -189,6 +198,68 @@ test('full-page capture reports when the selected surface cannot scroll', async 
   await page.close();
 });
 
+test('@windows-scaling keeps fractional-DPR geometry and deduplicates sticky headers', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, `<!doctype html><html lang="en"><title>Scaled layout</title><style>
+    html, body { margin: 0; }
+    html { scrollbar-gutter: stable; }
+    ::-webkit-scrollbar { width: 17px; height: 17px; }
+    body { min-height: 1800px; font-size: 150%; background: linear-gradient(#fff, #bfdbfe); }
+    header { position: sticky; top: 0; height: 64px; background: #111827; color: white; }
+  </style><header>Sticky navigation</header><main>Scaled timeline</main></html>`);
+  await page.evaluate(() => {
+    const original = globalThis.chrome.runtime.sendMessage;
+    globalThis.chrome.runtime.sendMessage = (message, callback) => {
+      if (message.action !== 'CAPTURE_VISIBLE_TAB') { original(message, callback); return; }
+      globalThis.__capturePositions.push({ windowX: Math.round(globalThis.scrollX), windowY: Math.round(globalThis.scrollY), surfaceX: null, surfaceY: null, innerWidth: globalThis.innerWidth, clientWidth: document.scrollingElement.clientWidth, scrollWidth: document.scrollingElement.scrollWidth });
+      globalThis.__captureVisibility.push(document.querySelector('header').style.visibility || '');
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(globalThis.innerWidth * 1.25);
+      canvas.height = Math.round(globalThis.innerHeight * 1.25);
+      canvas.getContext('2d').fillRect(0, 0, canvas.width, canvas.height);
+      callback({ success: true, dataUrl: canvas.toDataURL('image/png') });
+    };
+  });
+  const expected = await page.evaluate(() => ({
+    width: Math.ceil(Math.max(document.scrollingElement.scrollWidth, document.scrollingElement.clientWidth) * 1.25),
+    height: Math.ceil(document.scrollingElement.scrollHeight * 1.25),
+    clientWidth: document.documentElement.clientWidth,
+    innerWidth: globalThis.innerWidth
+  }));
+  expect(await startFullPageCapture(page)).toEqual({ status: 'started' });
+  const result = await readOpenedCapture(page);
+  expect(result.width).toBe(expected.width);
+  expect(result.height).toBe(expected.height);
+  expect(expected.clientWidth).toBeLessThanOrEqual(expected.innerWidth);
+  expect(result.visibility[0]).toBe('');
+  expect(result.visibility.slice(1).every(value => value === 'hidden')).toBe(true);
+  await page.close();
+});
+
+test('scrolling-area capture targets and restores an internal container', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, `<!doctype html><html><style>
+    html, body { margin: 0; height: 100%; overflow: hidden; }
+    [data-scroll-surface] { position: absolute; left: 40px; top: 80px; width: 300px; height: 300px; overflow: auto; border: 4px solid #111827; }
+    .content { width: 300px; height: 1200px; background: linear-gradient(#fff, #60a5fa); }
+  </style><div data-scroll-surface><div class="content">Internal timeline</div></div></html>`);
+  const response = await page.evaluate(localizedMessages => new Promise(resolve => {
+    globalThis.__captureListener({ action: 'START_SCROLLING_ZONE_CAPTURE', language: 'fr', messages: localizedMessages }, {}, resolve);
+  }), frenchMessages);
+  expect(response).toEqual({ status: 'started' });
+  await page.locator('[data-scionos-capture="scrolling-selection"]').click({ position: { x: 100, y: 120 } });
+  await page.locator('input[name="x"]').fill('20');
+  await page.locator('input[name="y"]').fill('20');
+  await page.locator('input[name="width"]').fill('200');
+  await page.locator('input[name="height"]').fill('900');
+  await page.locator('[data-scionos-capture="scrolling-controls"] button', { hasText: 'Capturer' }).click();
+  const result = await readOpenedCapture(page);
+  expect({ width: result.width, height: result.height }).toEqual({ width: 200, height: 900 });
+  expect(result.positions.map(item => item.surfaceY)).toEqual([20, 320, 620]);
+  await expect.poll(() => page.locator('[data-scroll-surface]').evaluate(element => element.scrollTop)).toBe(0);
+  await page.close();
+});
+
 test('scrolling-area overlay supports pointer, keyboard and exact multi-screen capture', async () => {
   const page = await context.newPage();
   await page.setViewportSize({ width: 800, height: 600 });
@@ -198,24 +269,35 @@ test('scrolling-area overlay supports pointer, keyboard and exact multi-screen c
   </style><header>En-tête fixe</header><main style="padding:80px 20px">Contenu long</main></html>`);
   await page.evaluate(() => {
     globalThis.__captureVisibility = [];
+    globalThis.__openedCapture = null;
+    globalThis.__transfer = { chunks: [], metadata: null };
+    globalThis.__handleCaptureTransfer = (message, callback) => {
+      if (message.action === 'BEGIN_CAPTURE_TRANSFER') {
+        globalThis.__transfer = { chunks: [], metadata: message };
+        callback({ success: true, transferId: 'scroll-transfer' });
+      } else if (message.action === 'APPEND_CAPTURE_CHUNK') {
+        const binary = globalThis.atob(message.data);
+        globalThis.__transfer.chunks[message.index] = Uint8Array.from(binary, character => character.charCodeAt(0));
+        callback({ success: true });
+      } else if (message.action === 'COMPLETE_CAPTURE_TRANSFER') {
+        const reader = new globalThis.FileReader();
+        reader.onload = () => {
+          globalThis.__openedCapture = Object.assign({}, globalThis.__transfer.metadata, { dataUrl: reader.result });
+          callback({ success: true });
+        };
+        reader.readAsDataURL(new Blob(globalThis.__transfer.chunks, { type: 'image/png' }));
+      } else callback({ success: true });
+    };
     globalThis.chrome.runtime = {
-      onMessage: {
-        addListener(listener) { globalThis.__captureListener = listener; }
-      },
+      onMessage: { addListener(listener) { globalThis.__captureListener = listener; } },
       sendMessage(message, callback) {
         if (message.action === 'CAPTURE_VISIBLE_TAB') {
           globalThis.__captureVisibility.push(document.querySelector('header').style.visibility);
           const canvas = document.createElement('canvas');
-          canvas.width = globalThis.innerWidth;
-          canvas.height = globalThis.innerHeight;
-          const context2d = canvas.getContext('2d');
-          context2d.fillStyle = '#ffffff';
-          context2d.fillRect(0, 0, canvas.width, canvas.height);
+          canvas.width = globalThis.innerWidth; canvas.height = globalThis.innerHeight;
+          const context2d = canvas.getContext('2d'); context2d.fillStyle = '#ffffff'; context2d.fillRect(0, 0, canvas.width, canvas.height);
           callback({ success: true, dataUrl: canvas.toDataURL('image/png') });
-        } else if (message.action === 'OPEN_EDITOR') {
-          globalThis.__openedCapture = message;
-          callback({ success: true });
-        }
+        } else globalThis.__handleCaptureTransfer(message, callback);
       }
     };
   });

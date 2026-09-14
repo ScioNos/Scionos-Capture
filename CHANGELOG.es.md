@@ -4,6 +4,20 @@
 
 ## [Sin publicar]
 
+## [1.1.0] - 2026-08-23
+
+### Añadido
+
+- Transferencia persistente por fragmentos para capturas grandes, compatible con Manifest V3.
+- Captura de áreas desplazables en contenedores internos y validación específica para Windows.
+
+### Corregido
+
+- Desalineación con escalado de Windows, zoom fraccionario y barras de desplazamiento clásicas.
+- Encabezados fijos o adhesivos repetidos, uniones visibles y cambios de diseño durante la captura.
+- Limpieza tras cargar el editor, transferencias interrumpidas, idioma de reserva y páginas no compatibles.
+
+
 ## [1.0.0] - 2026-08-22
 
 ### Añadido
@@ -17,5 +31,7 @@
 - Soporte completo en 4 idiomas: francés, inglés, español y alemán.
 - Accesibilidad total (WCAG, alto contraste, navegación por teclado, lectores de pantalla).
 
-[Sin publicar]: https://github.com/ScioNos/Scionos-Capture/compare/v1.0.0...HEAD
+[Sin publicar]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...HEAD
 [1.0.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0
+
+[1.1.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0

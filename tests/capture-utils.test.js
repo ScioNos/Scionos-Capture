@@ -8,6 +8,10 @@ const {
   normalizeScrollingRegion,
   buildRegionCapturePlan,
   computeOutputDimensions,
+  computeCaptureViewportMetrics,
+  computeTileDestination,
+  computePayloadReductionScale,
+  MAX_TRANSFER_BYTES,
   isRestrictedUrl,
   escapeHtml,
   sanitizeUrl,
@@ -138,3 +142,29 @@ test('builds a standalone HTML report with embedded image and safe metadata', ()
   assert.ok(html.includes('id="btn-print"'));
 });
 
+
+test('excludes classic Windows scrollbars while preserving fractional DPR scaling', () => {
+  const metrics = computeCaptureViewportMetrics({
+    bitmapWidth: 2400, bitmapHeight: 1500, innerWidth: 1920, innerHeight: 1200,
+    contentWidth: 1903, contentHeight: 1183
+  });
+  assert.equal(metrics.scaleX, 1.25);
+  assert.equal(metrics.scaleY, 1.25);
+  assert.equal(metrics.scrollbarWidth, 17);
+  assert.equal(metrics.scrollbarHeight, 17);
+  assert.deepEqual(metrics.crop, { x: 0, y: 0, width: 2379, height: 1479 });
+});
+
+test('rounds tile edges without accumulating fractional-DPR seams', () => {
+  const first = computeTileDestination(0, 0, 1001, 751, 1.25, 1.25, 0.8);
+  const second = computeTileDestination(800.8, 600.8, 1001, 751, 1.25, 1.25, 0.8);
+  assert.equal(first.width, 801);
+  assert.equal(second.x, first.width);
+  assert.equal(second.y, first.height);
+});
+
+test('computes a bounded adaptive reduction for oversized PNG payloads', () => {
+  assert.equal(computePayloadReductionScale(MAX_TRANSFER_BYTES), 1);
+  const scale = computePayloadReductionScale(MAX_TRANSFER_BYTES * 2);
+  assert.ok(scale >= 0.1 && scale < 1);
+});

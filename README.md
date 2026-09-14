@@ -4,7 +4,7 @@
 
 Extension Chrome et Edge de capture d’écran entièrement locale. Capturez la zone visible, une sélection, une zone défilante ou une page complète, puis dessinez, masquez, rognez et exportez en PNG, HTML interactif ou PDF.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue) ![Manifest](https://img.shields.io/badge/Manifest-V3-4285F4) ![Licence](https://img.shields.io/badge/licence-MIT-green)
+![Version](https://img.shields.io/badge/version-1.1.0-blue) ![Manifest](https://img.shields.io/badge/Manifest-V3-4285F4) ![Licence](https://img.shields.io/badge/licence-MIT-green)
 
 ## Fonctionnalités
 
@@ -20,7 +20,7 @@ Extension Chrome et Edge de capture d’écran entièrement locale. Capturez la 
 
 ### Depuis la release GitHub
 
-1. Téléchargez `scionos-capture-v1.0.0.zip` depuis la [release v1.0.0](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0).
+1. Téléchargez `scionos-capture-v1.1.0.zip` depuis la [release v1.1.0](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0).
 2. Vérifiez éventuellement le fichier `.sha256`, puis extrayez le ZIP.
 3. Ouvrez `chrome://extensions` ou `edge://extensions`.
 4. Activez le **Mode développeur**, choisissez **Charger l’extension non empaquetée** et sélectionnez le dossier extrait.
@@ -42,7 +42,7 @@ Dans l’éditeur, les raccourcis `V`, `D`, `M`, `C` sélectionnent les outils; 
 - `unlimitedStorage` : conserver localement les grandes captures sans échec de quota.
 - `alarms` : supprimer les captures temporaires expirées.
 
-Une capture reste dans IndexedDB jusqu’à la fermeture de l’éditeur, avec une durée maximale d’une heure. Si le navigateur est fermé à l’échéance, elle est purgée au prochain réveil. Consultez [PRIVACY.md](PRIVACY.md) et [SECURITY.md](SECURITY.md).
+Les fragments de transfert restent uniquement dans IndexedDB local et sont supprimés après assemblage ou sous quinze minutes. La capture finale est supprimée dès son décodage par l’éditeur; une expiration d’une heure protège seulement contre les captures orphelines. Consultez [PRIVACY.md](PRIVACY.md) et [SECURITY.md](SECURITY.md).
 
 ## Limites connues
 

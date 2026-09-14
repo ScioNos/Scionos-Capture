@@ -26,3 +26,27 @@ test('purges only records older than the requested TTL', async () => {
   assert.equal((await CaptureStore.getCapture(freshId)).id, freshId);
   await CaptureStore.deleteCapture(freshId);
 });
+
+test('persists ordered transfer chunks and cleans them atomically', async () => {
+  const now = Date.now();
+  const transfer = { id: 'transfer-' + now, ownerTabId: 7, expiresAt: now + 60_000 };
+  await CaptureStore.putTransfer(transfer);
+  await CaptureStore.putTransferChunk({ transferId: transfer.id, index: 1, blob: new Blob(['b']), size: 1 });
+  await CaptureStore.putTransferChunk({ transferId: transfer.id, index: 0, blob: new Blob(['a']), size: 1 });
+  assert.equal((await CaptureStore.getTransfer(transfer.id)).ownerTabId, 7);
+  assert.deepEqual((await CaptureStore.listTransferChunks(transfer.id)).map(chunk => chunk.index), [0, 1]);
+  assert.equal((await CaptureStore.listTransfersByOwner(7))[0].id, transfer.id);
+  await CaptureStore.deleteTransfer(transfer.id);
+  assert.equal(await CaptureStore.getTransfer(transfer.id), undefined);
+  assert.deepEqual(await CaptureStore.listTransferChunks(transfer.id), []);
+});
+
+test('purges expired transfer metadata and chunks', async () => {
+  const now = Date.now();
+  const id = 'expired-transfer-' + now;
+  await CaptureStore.putTransfer({ id, ownerTabId: 9, expiresAt: now - 1 });
+  await CaptureStore.putTransferChunk({ transferId: id, index: 0, blob: new Blob(['x']), size: 1 });
+  assert.deepEqual(await CaptureStore.purgeExpiredTransfers(now), [id]);
+  assert.equal(await CaptureStore.getTransfer(id), undefined);
+  assert.deepEqual(await CaptureStore.listTransferChunks(id), []);
+});

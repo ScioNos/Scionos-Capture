@@ -61,12 +61,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  function hasFileAccess() {
+    return new Promise(resolve => {
+      if (!chrome.extension || typeof chrome.extension.isAllowedFileSchemeAccess !== 'function') {
+        resolve(false);
+        return;
+      }
+      chrome.extension.isAllowedFileSchemeAccess(resolve);
+    });
+  }
+
+  async function assertCapturableTab(tab) {
+    if (ScionosCaptureUtils.isRestrictedUrl(tab.url)) throw new Error(getI18nText('unsupportedPage'));
+    if (new URL(tab.url).protocol === 'file:' && !(await hasFileAccess())) throw new Error(getI18nText('unsupportedPage'));
+  }
+
   async function startCapture(action, statusKey) {
     setBusy(true);
     showStatus(getI18nText(statusKey));
     try {
       const tab = await getActiveTab();
-      if (ScionosCaptureUtils.isRestrictedUrl(tab.url)) throw new Error(getI18nText('unsupportedPage'));
+      await assertCapturableTab(tab);
 
       await chrome.scripting.executeScript({
         target: { tabId: tab.id },
@@ -79,7 +94,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         'scrollingInstructionStart', 'scrollingInstructionEnd', 'scrollingPointSet',
         'scrollingInvalidRegion', 'scrollingCapture', 'scrollingRestart', 'scrollingCancel',
         'coordinateX', 'coordinateY', 'coordinateWidth', 'coordinateHeight',
-        'btnScrollingTitle', 'tabChangedError', 'captureAlreadyRunning'
+        'btnScrollingTitle', 'tabChangedError', 'captureAlreadyRunning',
+        'layoutChangedError', 'captureTooLargeError'
       ];
       const response = await chrome.tabs.sendMessage(tab.id, {
         action,

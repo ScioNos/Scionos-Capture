@@ -11,6 +11,10 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, () => {
   const MAX_OUTPUT_PIXELS = 16_000_000;
   const MAX_CANVAS_DIMENSION = 16_384;
+  const MAX_SINGLE_MESSAGE_BYTES = 8 * 1024 * 1024;
+  const MAX_TRANSFER_BYTES = 48 * 1024 * 1024;
+  const TARGET_TRANSFER_BYTES = 40 * 1024 * 1024;
+  const TRANSFER_CHUNK_BYTES = 512 * 1024;
 
   function buildScrollPositions(fullHeight, viewportHeight) {
     const safeViewportHeight = Math.max(1, Math.floor(viewportHeight));
@@ -104,16 +108,59 @@
     };
   }
 
+  function computeCaptureViewportMetrics(options = {}) {
+    const bitmapWidth = Math.max(1, Number(options.bitmapWidth) || 1);
+    const bitmapHeight = Math.max(1, Number(options.bitmapHeight) || 1);
+    const innerWidth = Math.max(1, Number(options.innerWidth) || 1);
+    const innerHeight = Math.max(1, Number(options.innerHeight) || 1);
+    const contentWidth = Math.max(1, Math.min(innerWidth, Number(options.contentWidth) || innerWidth));
+    const contentHeight = Math.max(1, Math.min(innerHeight, Number(options.contentHeight) || innerHeight));
+    const contentLeft = Math.max(0, Number(options.contentLeft) || 0);
+    const contentTop = Math.max(0, Number(options.contentTop) || 0);
+    const scaleX = bitmapWidth / innerWidth;
+    const scaleY = bitmapHeight / innerHeight;
+    const sourceLeft = Math.max(0, Math.min(bitmapWidth - 1, Math.round(contentLeft * scaleX)));
+    const sourceTop = Math.max(0, Math.min(bitmapHeight - 1, Math.round(contentTop * scaleY)));
+    const sourceRight = Math.max(sourceLeft + 1, Math.min(bitmapWidth, Math.round((contentLeft + contentWidth) * scaleX)));
+    const sourceBottom = Math.max(sourceTop + 1, Math.min(bitmapHeight, Math.round((contentTop + contentHeight) * scaleY)));
+    return {
+      bitmapWidth, bitmapHeight, innerWidth, innerHeight, contentWidth, contentHeight,
+      scrollbarWidth: Math.max(0, innerWidth - contentWidth),
+      scrollbarHeight: Math.max(0, innerHeight - contentHeight),
+      scaleX, scaleY,
+      crop: { x: sourceLeft, y: sourceTop, width: sourceRight - sourceLeft, height: sourceBottom - sourceTop }
+    };
+  }
+
+  function computeTileDestination(actualX, actualY, cropWidth, cropHeight, captureScaleX, captureScaleY, outputScale) {
+    const safeScaleX = Math.max(0.01, Number(captureScaleX) || 1);
+    const safeScaleY = Math.max(0.01, Number(captureScaleY) || safeScaleX);
+    const safeOutputScale = Math.max(0.01, Number(outputScale) || 1);
+    const x = Math.max(0, Number(actualX) || 0);
+    const y = Math.max(0, Number(actualY) || 0);
+    const cssWidth = Math.max(0, Number(cropWidth) || 0) / safeScaleX;
+    const cssHeight = Math.max(0, Number(cropHeight) || 0) / safeScaleY;
+    const left = Math.round(x * safeScaleX * safeOutputScale);
+    const top = Math.round(y * safeScaleY * safeOutputScale);
+    const right = Math.round((x + cssWidth) * safeScaleX * safeOutputScale);
+    const bottom = Math.round((y + cssHeight) * safeScaleY * safeOutputScale);
+    return { x: left, y: top, width: Math.max(1, right - left), height: Math.max(1, bottom - top) };
+  }
+
+  function computePayloadReductionScale(size, maximumBytes = MAX_TRANSFER_BYTES, targetBytes = TARGET_TRANSFER_BYTES) {
+    const safeSize = Math.max(0, Number(size) || 0);
+    const safeMaximum = Math.max(1, Number(maximumBytes) || MAX_TRANSFER_BYTES);
+    const safeTarget = Math.max(1, Math.min(safeMaximum, Number(targetBytes) || safeMaximum));
+    if (safeSize <= safeMaximum) return 1;
+    return Math.max(0.1, Math.min(0.95, Math.sqrt(safeTarget / safeSize) * 0.95));
+  }
+
   function isRestrictedUrl(url) {
     if (!url) return true;
     try {
       const parsed = new URL(url);
-      const forbiddenProtocols = new Set([
-        'about:', 'chrome:', 'chrome-extension:', 'devtools:', 'edge:',
-        'javascript:', 'data:', 'blob:', 'view-source:'
-      ]);
-      if (forbiddenProtocols.has(parsed.protocol)) return true;
-      return /^(?:chromewebstore\.google\.com|microsoftedge\.microsoft\.com)$/i.test(parsed.hostname);
+      if (!['http:', 'https:', 'file:'].includes(parsed.protocol)) return true;
+      return /^(?:chromewebstore\.google\.com|chrome\.google\.com|microsoftedge\.microsoft\.com)$/i.test(parsed.hostname);
     } catch {
       return true;
     }
@@ -563,11 +610,18 @@
   return {
     MAX_OUTPUT_PIXELS,
     MAX_CANVAS_DIMENSION,
+    MAX_SINGLE_MESSAGE_BYTES,
+    MAX_TRANSFER_BYTES,
+    TARGET_TRANSFER_BYTES,
+    TRANSFER_CHUNK_BYTES,
     buildScrollPositions,
     buildCaptureGrid,
     normalizeScrollingRegion,
     buildRegionCapturePlan,
     computeOutputDimensions,
+    computeCaptureViewportMetrics,
+    computeTileDestination,
+    computePayloadReductionScale,
     isRestrictedUrl,
     escapeHtml,
     sanitizeUrl,

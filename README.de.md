@@ -15,7 +15,7 @@ Vollständig lokale Screenshot-Erweiterung für Chrome und Edge. Sichtbaren, aus
 
 ## Installation
 
-`scionos-capture-v1.0.0.zip` aus dem [Release v1.0.0](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0) herunterladen, optional `.sha256` prüfen und entpacken. `chrome://extensions` oder `edge://extensions` öffnen, **Entwicklermodus** aktivieren, **Entpackte Erweiterung laden** wählen und den Ordner auswählen.
+`scionos-capture-v1.1.0.zip` aus dem [Release v1.1.0](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0) herunterladen, optional `.sha256` prüfen und entpacken. `chrome://extensions` oder `edge://extensions` öffnen, **Entwicklermodus** aktivieren, **Entpackte Erweiterung laden** wählen und den Ordner auswählen.
 
 Aus dem Quellcode: Repository klonen, `npm ci` ausführen und die Projektwurzel als entpackte Erweiterung laden.
 
@@ -23,7 +23,7 @@ Aus dem Quellcode: Repository klonen, `npm ci` ausführen und die Projektwurzel 
 
 **Ganze Seite**, **Sichtbarer Bereich**, **Ausgewählter Bereich** oder **Scrollbereich** wählen. Beim Scrollbereich die erste Ecke anklicken, vertikal scrollen und die gegenüberliegende Ecke wählen. `Escape` bricht ab, **Neu beginnen** löscht den ersten Punkt; X/Y/Breite/Höhe ermöglichen die Tastaturbedienung. Vorgeschlagen ist `Alt+Shift+P`; das Popup zeigt die tatsächliche Belegung. Im Editor steuern `V`, `D`, `M`, `C`, `Strg+Z`, `Strg+Y`, `+`, `-` und `0` Werkzeuge, Verlauf und Zoom. Für Geheimnisse eine volle Abdeckung verwenden.
 
-`activeTab` und `scripting` reagieren nur auf eine ausdrückliche Aktion; `storage` speichert Sprache und temporäre Zuordnung; `unlimitedStorage` verhindert lokale Quotenfehler; `alarms` lässt Aufnahmen ablaufen. Die Aufnahme wird beim Schließen des Editors oder spätestens nach einer Stunde gelöscht; bei schlafendem Browser beim nächsten Aufwachen. Siehe [PRIVACY.de.md](PRIVACY.de.md) und [SECURITY.de.md](SECURITY.de.md).
+`activeTab` und `scripting` reagieren nur auf eine ausdrückliche Aktion; `storage` speichert Sprache und temporäre Zuordnung; `unlimitedStorage` verhindert lokale Quotenfehler; `alarms` lässt Aufnahmen ablaufen. Übertragungsfragmente verbleiben nur im lokalen IndexedDB und werden nach dem Zusammensetzen oder innerhalb von fünfzehn Minuten gelöscht. Die endgültige Aufnahme wird nach dem Dekodieren durch den Editor gelöscht; die einstündige Frist schützt nur verwaiste Aufnahmen. Siehe [PRIVACY.de.md](PRIVACY.de.md) und [SECURITY.de.md](SECURITY.de.md).
 
 ## Grenzen und Entwicklung
 

@@ -99,5 +99,7 @@
   "reportZoomFit": { "message": "Ajustar" },
   "reportZoomReset": { "message": "100%" },
   "reportCopied": { "message": "Imagen copiada al portapapeles." },
-  "printOpened": { "message": "Se abrió el diálogo de impresión." }
+  "printOpened": { "message": "Se abrió el diálogo de impresión." },
+  "layoutChangedError": { "message": "El diseño de la página cambió durante la captura. Espera a que termine de cargar y vuelve a intentarlo." },
+  "captureTooLargeError": { "message": "La captura sigue siendo demasiado grande para procesarla de forma segura." }
 }

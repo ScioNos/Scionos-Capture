@@ -8,6 +8,7 @@
   let currentLang = 'fr';
   let currentMode = 'auto';
   let messages = {};
+  let localeRequestVersion = 0;
 
   function browserLanguage() {
     const language = (navigator.language || chrome.i18n.getUILanguage() || 'fr').slice(0, 2).toLowerCase();
@@ -36,22 +37,34 @@
   }
 
   async function applyMode(mode) {
-    currentMode = LANGUAGE_MODES.includes(mode) ? mode : 'auto';
-    currentLang = currentMode === 'auto' ? browserLanguage() : currentMode;
+    const requestVersion = ++localeRequestVersion;
+    const nextMode = LANGUAGE_MODES.includes(mode) ? mode : 'auto';
+    let nextLanguage = nextMode === 'auto' ? browserLanguage() : nextMode;
+    let nextMessages = {};
     try {
-      messages = await loadLocale(currentLang);
+      nextMessages = await loadLocale(nextLanguage);
     } catch (error) {
       console.error('Locale loading failed:', error);
-      currentLang = 'fr';
-      messages = await loadLocale('fr');
+      nextLanguage = 'fr';
+      try { nextMessages = await loadLocale('fr'); } catch { nextMessages = {}; }
     }
+    if (requestVersion !== localeRequestVersion) return false;
+    currentMode = nextMode;
+    currentLang = nextLanguage;
+    messages = nextMessages;
     globalScope.currentLang = currentLang;
     globalScope.languageMode = currentMode;
     document.documentElement.lang = currentLang;
+    return true;
   }
 
   function getStorage(keys) {
-    return new Promise(resolve => chrome.storage.local.get(keys, resolve));
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get(keys, values => {
+        if (chrome.runtime.lastError) reject(new Error(chrome.runtime.lastError.message));
+        else resolve(values);
+      });
+    });
   }
 
   function setStorage(values) {
@@ -64,20 +77,27 @@
   }
 
   function removeStorage(keys) {
-    return new Promise(resolve => chrome.storage.local.remove(keys, resolve));
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.remove(keys, () => {
+        if (chrome.runtime.lastError) reject(new Error(chrome.runtime.lastError.message));
+        else resolve();
+      });
+    });
   }
 
   async function initI18n(onLoaded) {
-    const stored = await getStorage(['languageMode', 'userLang']);
+    let stored = {};
+    try { stored = await getStorage(['languageMode', 'userLang']); }
+    catch (error) { console.warn('Language preference unavailable:', error); }
     const migratedMode = LANGUAGE_MODES.includes(stored.languageMode)
       ? stored.languageMode
       : (SUPPORTED_LANGUAGES.includes(stored.userLang) ? stored.userLang : 'auto');
-
     if (!stored.languageMode || stored.userLang) {
-      await setStorage({ languageMode: migratedMode });
-      await removeStorage('userLang');
+      try {
+        await setStorage({ languageMode: migratedMode });
+        if (stored.userLang) await removeStorage('userLang');
+      } catch (error) { console.warn('Language preference migration failed:', error); }
     }
-
     await applyMode(migratedMode);
     if (typeof onLoaded === 'function') onLoaded(currentLang, currentMode);
     return { language: currentLang, mode: currentMode };
@@ -85,8 +105,10 @@
 
   async function setLanguageMode(mode, callback) {
     if (!LANGUAGE_MODES.includes(mode)) return;
-    await setStorage({ languageMode: mode });
-    await applyMode(mode);
+    try { await setStorage({ languageMode: mode }); }
+    catch (error) { console.warn('Language preference save failed:', error); }
+    const applied = await applyMode(mode);
+    if (!applied) return;
     globalScope.dispatchEvent(new CustomEvent('scionos-language-change', {
       detail: { language: currentLang, mode: currentMode }
     }));
@@ -94,7 +116,8 @@
   }
 
   function getI18nText(key, params = {}) {
-    return interpolate(messages[key] || key, params);
+    const extensionFallback = chrome.i18n && typeof chrome.i18n.getMessage === 'function' ? chrome.i18n.getMessage(key) : '';
+    return interpolate(messages[key] || extensionFallback || key, params);
   }
 
   function getMessageBundle(keys) {

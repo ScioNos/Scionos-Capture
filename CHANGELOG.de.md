@@ -4,6 +4,20 @@
 
 ## [Unveröffentlicht]
 
+## [1.1.0] - 2026-08-23
+
+### Hinzugefügt
+
+- Persistente, segmentierte Übertragung großer Aufnahmen, kompatibel mit Manifest V3.
+- Scrollbereich-Aufnahme in internen Containern und eigene Windows-Prüfung.
+
+### Behoben
+
+- Verschiebungen bei Windows-Skalierung, gebrochenem Zoom und klassischen Scrollleisten.
+- Wiederholte feste oder klebende Kopfzeilen, Kachelnähte und Layoutänderungen während der Aufnahme.
+- Bereinigung nach dem Laden, abgebrochene Übertragungen, Sprach-Fallback und nicht unterstützte Seiten.
+
+
 ## [1.0.0] - 2026-08-22
 
 ### Hinzugefügt
@@ -17,5 +31,7 @@
 - Vollständige 4-Sprachen-Unterstützung: Französisch, Englisch, Spanisch und Deutsch.
 - Volle Barrierefreiheit (WCAG, hohe Kontraste, Tastaturnavigation, Screenreader).
 
-[Unveröffentlicht]: https://github.com/ScioNos/Scionos-Capture/compare/v1.0.0...HEAD
+[Unveröffentlicht]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...HEAD
 [1.0.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0
+
+[1.1.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0

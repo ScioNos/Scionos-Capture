@@ -46,7 +46,7 @@
     try {
       const response = await captureVisibleTab();
       const prepared = await prepareDataUrlForEditor(response.dataUrl);
-      await openEditor(prepared.dataUrl, prepared.scale);
+      await openEditor(prepared.blob, prepared.scale);
     } catch (error) {
       console.error('Visible capture failed:', error);
       alert(text('visibleError') + error.message);
@@ -61,11 +61,16 @@
       element,
       isDocument: true,
       getMetrics() {
+        const viewportWidth = Math.max(1, element.clientWidth);
+        const viewportHeight = Math.max(1, element.clientHeight);
+        const scrollbarWidth = Math.max(0, window.innerWidth - viewportWidth);
+        const scrollbarHeight = Math.max(0, window.innerHeight - viewportHeight);
+        const measuredWidth = Math.max(element.scrollWidth, viewportWidth);
+        const measuredHeight = Math.max(element.scrollHeight, viewportHeight);
         return {
-          fullWidth: Math.max(element.scrollWidth, element.clientWidth),
-          fullHeight: Math.max(element.scrollHeight, element.clientHeight),
-          viewportWidth: Math.max(1, window.innerWidth),
-          viewportHeight: Math.max(1, window.innerHeight)
+          fullWidth: measuredWidth - viewportWidth <= scrollbarWidth + 2 ? viewportWidth : measuredWidth,
+          fullHeight: measuredHeight - viewportHeight <= scrollbarHeight + 2 ? viewportHeight : measuredHeight,
+          viewportWidth, viewportHeight
         };
       },
       getPosition() {
@@ -75,7 +80,7 @@
         window.scrollTo(x, y);
       },
       getCaptureRect() {
-        return { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
+        return { left: 0, top: 0, width: element.clientWidth, height: element.clientHeight };
       }
     };
   }
@@ -149,6 +154,19 @@
     return candidates[0] ? candidates[0].surface : documentSurface;
   }
 
+  function findScrollSurfaceAtPoint(clientX, clientY) {
+    const elements = document.elementsFromPoint(clientX, clientY);
+    for (const element of elements) {
+      if (element.closest && element.closest('[data-scionos-capture]')) continue;
+      let candidate = element;
+      while (candidate && candidate !== document.body && candidate !== document.documentElement) {
+        if (isVisibleScrollCandidate(candidate)) return getElementScrollSurface(candidate);
+        candidate = candidate.parentElement;
+      }
+    }
+    return getDocumentScrollSurface();
+  }
+
   function getSurfaceMaxScroll(surface) {
     return {
       x: Math.max(0, surface.element.scrollWidth - surface.element.clientWidth),
@@ -167,28 +185,41 @@
     return { x: Math.round(actual.x), y: Math.round(actual.y) };
   }
 
+  async function settleVisibleResources() {
+    if (document.fonts && document.fonts.ready) {
+      await Promise.race([document.fonts.ready, Utils.delay(2000)]).catch(() => undefined);
+    }
+    const images = Array.from(document.images).filter(image => {
+      const rect = image.getBoundingClientRect();
+      return rect.bottom > 0 && rect.right > 0 && rect.top < window.innerHeight && rect.left < window.innerWidth;
+    });
+    await Promise.race([
+      Promise.all(images.map(image => image.complete ? Promise.resolve() : image.decode().catch(() => undefined))),
+      Utils.delay(2000)
+    ]);
+  }
+
   async function stabilizePageDimensions(surface) {
-    let previousHeight = 0;
-    let previousWidth = 0;
+    await settleVisibleResources();
+    const startedAt = Date.now();
+    let previous = surface.getMetrics();
     let stablePasses = 0;
-    for (let pass = 0; pass < 3 && stablePasses < 2; pass += 1) {
-      const metrics = surface.getMetrics();
-      const positions = Utils.buildScrollPositions(metrics.fullHeight, metrics.viewportHeight);
+    for (let pass = 0; pass < 4 && stablePasses < 2 && Date.now() - startedAt < 5000; pass += 1) {
+      const positions = Utils.buildScrollPositions(previous.fullHeight, previous.viewportHeight);
       const originalX = surface.getPosition().x;
       for (const y of positions) {
         surface.scrollTo(originalX, y);
         await Utils.waitForPaint();
-        await Utils.delay(70);
+        await Utils.delay(100);
         assertSurfacePosition(surface, { x: originalX, y });
       }
-      const nextMetrics = surface.getMetrics();
-      stablePasses = Math.abs(nextMetrics.fullHeight - previousHeight) <= 2
-        && Math.abs(nextMetrics.fullWidth - previousWidth) <= 2
-        ? stablePasses + 1
-        : 0;
-      previousHeight = nextMetrics.fullHeight;
-      previousWidth = nextMetrics.fullWidth;
+      const next = surface.getMetrics();
+      stablePasses = Math.abs(next.fullHeight - previous.fullHeight) <= 2
+        && Math.abs(next.fullWidth - previous.fullWidth) <= 2
+        ? stablePasses + 1 : 0;
+      previous = next;
     }
+    return previous;
   }
 
   function suspendPageMotion() {
@@ -206,10 +237,67 @@
     return () => style.remove();
   }
 
-  function collectFixedElements() {
-    return Array.from(document.querySelectorAll('body *'))
-      .filter(element => !element.dataset.scionosCapture && getComputedStyle(element).position === 'fixed')
-      .map(element => ({ element, visibility: element.style.visibility }));
+  function createAnchoredElementManager(surface) {
+    const seen = new WeakSet();
+    let hidden = [];
+    const surfaceRect = () => surface.isDocument
+      ? { left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight }
+      : surface.getCaptureRect();
+    const isAnchored = element => {
+      if (!element.isConnected || element.closest('[data-scionos-capture]')) return false;
+      const styles = getComputedStyle(element);
+      if (!['fixed', 'sticky'].includes(styles.position)) return false;
+      const rect = element.getBoundingClientRect();
+      if (rect.width < 1 || rect.height < 1 || rect.bottom <= 0 || rect.right <= 0) return false;
+      if (styles.position === 'fixed') return true;
+      const bounds = surfaceRect();
+      const top = Number.parseFloat(styles.top);
+      const bottom = Number.parseFloat(styles.bottom);
+      const left = Number.parseFloat(styles.left);
+      const right = Number.parseFloat(styles.right);
+      return (Number.isFinite(top) && Math.abs(rect.top - (bounds.top + top)) <= 3)
+        || (Number.isFinite(bottom) && Math.abs(rect.bottom - (bounds.bottom - bottom)) <= 3)
+        || (Number.isFinite(left) && Math.abs(rect.left - (bounds.left + left)) <= 3)
+        || (Number.isFinite(right) && Math.abs(rect.right - (bounds.right - right)) <= 3);
+    };
+    return {
+      prepare() {
+        hidden = [];
+        for (const element of document.querySelectorAll('body *')) {
+          if (!isAnchored(element) || !seen.has(element)) continue;
+          hidden.push({ element, value: element.style.getPropertyValue('visibility'), priority: element.style.getPropertyPriority('visibility') });
+          element.style.setProperty('visibility', 'hidden', 'important');
+        }
+      },
+      remember() {
+        for (const element of document.querySelectorAll('body *')) if (isAnchored(element)) seen.add(element);
+      },
+      restore() {
+        hidden.forEach(({ element, value, priority }) => {
+          if (!element.isConnected) return;
+          if (value) element.style.setProperty('visibility', value, priority);
+          else element.style.removeProperty('visibility');
+        });
+        hidden = [];
+      }
+    };
+  }
+
+  function layoutChangedError() {
+    const error = new Error(text('layoutChangedError'));
+    error.code = 'LAYOUT_CHANGED';
+    return error;
+  }
+
+  function assertStableMetrics(surface, baseline) {
+    const current = surface.getMetrics();
+    if (Math.abs(current.fullWidth - baseline.fullWidth) > 2
+        || Math.abs(current.fullHeight - baseline.fullHeight) > 2
+        || Math.abs(current.viewportWidth - baseline.viewportWidth) > 2
+        || Math.abs(current.viewportHeight - baseline.viewportHeight) > 2) {
+      throw layoutChangedError();
+    }
+    return current;
   }
 
   async function executeFullPageCapture() {
@@ -217,8 +305,6 @@
     const originalScrollBehavior = root.style.scrollBehavior;
     let progress;
     let restoreMotion = () => {};
-    let fixedElements = [];
-    let outputScale = 1;
     let surface;
     let originalPosition = { x: 0, y: 0 };
 
@@ -228,70 +314,23 @@
       progress = createProgressIndicator();
       surface = findScrollSurface();
       originalPosition = surface.getPosition();
-      await stabilizePageDimensions(surface);
 
-      const metrics = surface.getMetrics();
-      const { fullWidth, fullHeight, viewportWidth, viewportHeight } = metrics;
-      const grid = Utils.buildCaptureGrid(fullWidth, fullHeight, viewportWidth, viewportHeight);
-      fixedElements = collectFixedElements();
-
-      let canvas;
-      let context;
-      for (let index = 0; index < grid.length; index += 1) {
-        const target = grid[index];
-        surface.scrollTo(target.x, target.y);
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        const baseline = await stabilizePageDimensions(surface);
+        surface.scrollTo(0, 0);
         await Utils.waitForPaint();
-        await Utils.delay(120);
-
-        const actual = assertSurfacePosition(surface, target);
-        const percent = Math.round(((index + 1) / grid.length) * 100);
-        updateProgress(progress, percent, outputScale < 0.9999);
-
-        progress.style.visibility = 'hidden';
-        if (index > 0) fixedElements.forEach(item => { item.element.style.visibility = 'hidden'; });
-        await Utils.waitForPaint();
-        const response = await captureVisibleTab();
-        progress.style.visibility = 'visible';
-
-        const image = await loadImage(response.dataUrl);
-        const captureScaleX = image.width / Math.max(1, window.innerWidth);
-        const captureScaleY = image.height / Math.max(1, window.innerHeight);
-        const crop = getSurfaceCaptureCrop(surface, image, captureScaleX, captureScaleY);
-
-        if (!canvas) {
-          const dimensions = Utils.computeOutputDimensions(fullWidth, fullHeight, captureScaleX, captureScaleY);
-          canvas = document.createElement('canvas');
-          canvas.width = dimensions.width;
-          canvas.height = dimensions.height;
-          context = canvas.getContext('2d', { alpha: false });
-          context.fillStyle = '#ffffff';
-          context.fillRect(0, 0, canvas.width, canvas.height);
-          outputScale = dimensions.scale;
-          updateProgress(progress, percent, dimensions.reduced);
+        try {
+          const prepared = await captureFullPageAttempt(surface, baseline, progress);
+          await openEditor(prepared.blob, prepared.scale);
+          return;
+        } catch (error) {
+          if (error.code !== 'LAYOUT_CHANGED' || attempt > 0) throw error;
         }
-
-        const drawX = Math.round(actual.x * captureScaleX * outputScale);
-        const drawY = Math.round(actual.y * captureScaleY * outputScale);
-        context.drawImage(
-          image,
-          crop.x,
-          crop.y,
-          crop.width,
-          crop.height,
-          drawX,
-          drawY,
-          Math.round(crop.width * outputScale),
-          Math.round(crop.height * outputScale)
-        );
       }
-
-      const finalDataUrl = await canvasToDataUrl(canvas);
-      await openEditor(finalDataUrl, outputScale);
     } catch (error) {
       console.error('Full-page capture failed:', error);
       alert(text('fullError') + error.message);
     } finally {
-      fixedElements.forEach(item => { item.element.style.visibility = item.visibility; });
       restoreMotion();
       root.style.scrollBehavior = originalScrollBehavior;
       if (surface) surface.scrollTo(originalPosition.x, originalPosition.y);
@@ -299,24 +338,90 @@
     }
   }
 
-  function getSurfaceCaptureCrop(surface, image, captureScaleX, captureScaleY) {
+  async function captureFullPageAttempt(surface, baseline, progress) {
+    const { fullWidth, fullHeight, viewportWidth, viewportHeight } = baseline;
+    const grid = Utils.buildCaptureGrid(fullWidth, fullHeight, viewportWidth, viewportHeight);
+    const anchored = createAnchoredElementManager(surface);
+    let canvas;
+    let context;
+    let outputScale = 1;
+    let bitmapSize;
+
+    for (let index = 0; index < grid.length; index += 1) {
+      const target = grid[index];
+      surface.scrollTo(target.x, target.y);
+      await Utils.waitForPaint();
+      await Utils.delay(120);
+      assertStableMetrics(surface, baseline);
+      const actual = assertSurfacePosition(surface, target);
+      const percent = Math.round(((index + 1) / grid.length) * 100);
+      updateProgress(progress, percent, outputScale < 0.9999);
+
+      anchored.prepare();
+      progress.style.visibility = 'hidden';
+      let image;
+      try {
+        await Utils.waitForPaint();
+        const response = await captureVisibleTab();
+        image = await loadImage(response.dataUrl);
+      } finally {
+        progress.style.visibility = 'visible';
+        anchored.restore();
+      }
+      anchored.remember();
+
+      if (bitmapSize && (bitmapSize.width !== image.width || bitmapSize.height !== image.height)) throw layoutChangedError();
+      bitmapSize = { width: image.width, height: image.height };
+      const capture = getSurfaceCaptureCrop(surface, image);
+
+      if (!canvas) {
+        const dimensions = Utils.computeOutputDimensions(fullWidth, fullHeight, capture.scaleX, capture.scaleY);
+        canvas = document.createElement('canvas');
+        canvas.width = dimensions.width;
+        canvas.height = dimensions.height;
+        context = canvas.getContext('2d', { alpha: false });
+        context.fillStyle = '#ffffff';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        outputScale = dimensions.scale;
+        updateProgress(progress, percent, dimensions.reduced);
+      }
+
+      const destination = Utils.computeTileDestination(
+        actual.x, actual.y, capture.crop.width, capture.crop.height,
+        capture.scaleX, capture.scaleY, outputScale
+      );
+      context.drawImage(
+        image, capture.crop.x, capture.crop.y, capture.crop.width, capture.crop.height,
+        destination.x, destination.y, destination.width, destination.height
+      );
+    }
+
+    return prepareCanvasForEditor(canvas, outputScale);
+  }
+
+  function getSurfaceCaptureCrop(surface, image) {
     if (surface.isDocument) {
-      return { x: 0, y: 0, width: image.width, height: image.height };
+      const element = surface.element;
+      const scrollbarWidth = Math.max(0, window.innerWidth - element.clientWidth);
+      const rootLeft = document.documentElement.getBoundingClientRect().left;
+      const contentLeft = rootLeft > 0 && rootLeft <= scrollbarWidth + 1 ? rootLeft : 0;
+      return Utils.computeCaptureViewportMetrics({
+        bitmapWidth: image.width, bitmapHeight: image.height,
+        innerWidth: window.innerWidth, innerHeight: window.innerHeight,
+        contentWidth: element.clientWidth, contentHeight: element.clientHeight, contentLeft
+      });
     }
 
     const rect = surface.getCaptureRect();
-    const x = Math.max(0, Math.round(rect.left * captureScaleX));
-    const y = Math.max(0, Math.round(rect.top * captureScaleY));
-    const width = Math.min(
-      Math.round(rect.width * captureScaleX),
-      image.width - x
-    );
-    const height = Math.min(
-      Math.round(rect.height * captureScaleY),
-      image.height - y
-    );
-    if (width < 1 || height < 1) throw new Error(text('fullScrollError'));
-    return { x, y, width, height };
+    const metrics = Utils.computeCaptureViewportMetrics({
+      bitmapWidth: image.width, bitmapHeight: image.height,
+      innerWidth: window.innerWidth, innerHeight: window.innerHeight
+    });
+    const left = Math.max(0, Math.round(rect.left * metrics.scaleX));
+    const top = Math.max(0, Math.round(rect.top * metrics.scaleY));
+    const right = Math.max(left + 1, Math.min(image.width, Math.round((rect.left + rect.width) * metrics.scaleX)));
+    const bottom = Math.max(top + 1, Math.min(image.height, Math.round((rect.top + rect.height) * metrics.scaleY)));
+    return { ...metrics, crop: { x: left, y: top, width: right - left, height: bottom - top } };
   }
 
   function executeZoneCapture() {
@@ -414,7 +519,7 @@
             0, 0, canvas.width, canvas.height
           );
           const prepared = await prepareCanvasForEditor(canvas);
-          await openEditor(await canvasToDataUrl(prepared.canvas), prepared.scale);
+          await openEditor(prepared.blob, prepared.scale);
         } catch (error) {
           console.error('Selection capture failed:', error);
           alert(text('zoneError') + error.message);
@@ -430,111 +535,106 @@
   async function executeScrollingZoneCapture() {
     const root = document.documentElement;
     const previousFocus = document.activeElement;
-    const original = {
-      x: window.scrollX,
-      y: window.scrollY,
-      scrollBehavior: root.style.scrollBehavior
-    };
+    const originalDocument = { x: window.scrollX, y: window.scrollY, scrollBehavior: root.style.scrollBehavior };
     let progress;
     let restoreMotion = () => {};
-    let fixedElements = [];
+    let selected;
 
     try {
       root.style.scrollBehavior = 'auto';
-      const region = await selectScrollingRegion(original.x);
-      if (!region) return;
-
+      selected = await selectScrollingRegion(originalDocument.x);
+      if (!selected) return;
       restoreMotion = suspendPageMotion();
       progress = createProgressIndicator();
-      fixedElements = collectFixedElements();
-      const documentHeight = getDocumentHeight();
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-      const plan = Utils.buildRegionCapturePlan(region.y, region.height, viewportHeight, documentHeight);
-      let canvas;
-      let context;
-      let outputScale = 1;
 
-      for (let index = 0; index < plan.length; index += 1) {
-        const tile = plan[index];
-        window.scrollTo(original.x, tile.scrollY);
-        await Utils.waitForPaint();
-        await Utils.delay(140);
-
-        const actualX = Math.round(window.scrollX);
-        const actualY = Math.round(window.scrollY);
-        const percent = Math.round(((index + 1) / plan.length) * 100);
-        updateProgress(progress, percent, outputScale < 0.9999);
-        progress.style.visibility = 'hidden';
-        if (index > 0) fixedElements.forEach(item => { item.element.style.visibility = 'hidden'; });
-        await Utils.waitForPaint();
-
-        const response = await captureVisibleTab();
-        progress.style.visibility = 'visible';
-        const image = await loadImage(response.dataUrl);
-        const captureScaleX = image.width / Math.max(1, viewportWidth);
-        const captureScaleY = image.height / Math.max(1, viewportHeight);
-
-        if (!canvas) {
-          const dimensions = Utils.computeOutputDimensions(
-            region.width,
-            region.height,
-            captureScaleX,
-            captureScaleY
-          );
-          canvas = document.createElement('canvas');
-          canvas.width = dimensions.width;
-          canvas.height = dimensions.height;
-          context = canvas.getContext('2d', { alpha: false });
-          context.fillStyle = '#ffffff';
-          context.fillRect(0, 0, canvas.width, canvas.height);
-          outputScale = dimensions.scale;
-          updateProgress(progress, percent, dimensions.reduced);
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        const baseline = await stabilizePageDimensions(selected.surface);
+        try {
+          const prepared = await captureScrollingRegionAttempt(selected.surface, selected.region, baseline, progress);
+          await openEditor(prepared.blob, prepared.scale);
+          return;
+        } catch (error) {
+          if (error.code !== 'LAYOUT_CHANGED' || attempt > 0) throw error;
         }
-
-        const sourceX = Math.round((region.x - actualX) * captureScaleX);
-        const sourceY = Math.round((region.y + tile.destinationTop - actualY) * captureScaleY);
-        const sourceWidth = Math.round(region.width * captureScaleX);
-        const sourceHeight = Math.round(tile.sourceHeight * captureScaleY);
-        const destinationY = Math.round(tile.destinationTop * captureScaleY * outputScale);
-        const destinationWidth = Math.round(region.width * captureScaleX * outputScale);
-        const destinationHeight = Math.round(tile.sourceHeight * captureScaleY * outputScale);
-        context.drawImage(
-          image,
-          sourceX,
-          sourceY,
-          sourceWidth,
-          sourceHeight,
-          0,
-          destinationY,
-          destinationWidth,
-          destinationHeight
-        );
       }
-
-      const finalDataUrl = await canvasToDataUrl(canvas);
-      await openEditor(finalDataUrl, outputScale);
     } catch (error) {
       console.error('Scrolling-area capture failed:', error);
       alert(text('scrollingError') + error.message);
     } finally {
-      fixedElements.forEach(item => { item.element.style.visibility = item.visibility; });
       restoreMotion();
-      root.style.scrollBehavior = original.scrollBehavior;
-      window.scrollTo(original.x, original.y);
-      removeProgressIndicator(progress);
-      if (previousFocus && typeof previousFocus.focus === 'function' && previousFocus.isConnected) {
-        previousFocus.focus();
+      root.style.scrollBehavior = originalDocument.scrollBehavior;
+      window.scrollTo(originalDocument.x, originalDocument.y);
+      if (selected && selected.surface && !selected.surface.isDocument) {
+        selected.surface.scrollTo(selected.originalPosition.x, selected.originalPosition.y);
       }
+      removeProgressIndicator(progress);
+      if (previousFocus && typeof previousFocus.focus === 'function' && previousFocus.isConnected) previousFocus.focus();
     }
   }
 
-  function getDocumentHeight() {
-    return Math.max(
-      document.documentElement.scrollHeight,
-      document.body.scrollHeight,
-      document.documentElement.clientHeight
-    );
+  async function captureScrollingRegionAttempt(surface, region, baseline, progress) {
+    const plan = Utils.buildRegionCapturePlan(region.y, region.height, baseline.viewportHeight, baseline.fullHeight);
+    if (!plan.length) throw new Error(text('scrollingInvalidRegion'));
+    const anchored = createAnchoredElementManager(surface);
+    let canvas;
+    let context;
+    let outputScale = 1;
+    let bitmapSize;
+
+    for (let index = 0; index < plan.length; index += 1) {
+      const tile = plan[index];
+      surface.scrollTo(region.x, tile.scrollY);
+      await Utils.waitForPaint();
+      await Utils.delay(140);
+      assertStableMetrics(surface, baseline);
+      const actual = assertSurfacePosition(surface, { x: region.x, y: tile.scrollY });
+      const percent = Math.round(((index + 1) / plan.length) * 100);
+      updateProgress(progress, percent, outputScale < 0.9999);
+
+      anchored.prepare();
+      progress.style.visibility = 'hidden';
+      let image;
+      try {
+        await Utils.waitForPaint();
+        const response = await captureVisibleTab();
+        image = await loadImage(response.dataUrl);
+      } finally {
+        progress.style.visibility = 'visible';
+        anchored.restore();
+      }
+      anchored.remember();
+      if (bitmapSize && (bitmapSize.width !== image.width || bitmapSize.height !== image.height)) throw layoutChangedError();
+      bitmapSize = { width: image.width, height: image.height };
+      const capture = getSurfaceCaptureCrop(surface, image);
+
+      if (!canvas) {
+        const dimensions = Utils.computeOutputDimensions(region.width, region.height, capture.scaleX, capture.scaleY);
+        canvas = document.createElement('canvas');
+        canvas.width = dimensions.width;
+        canvas.height = dimensions.height;
+        context = canvas.getContext('2d', { alpha: false });
+        context.fillStyle = '#ffffff';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        outputScale = dimensions.scale;
+        updateProgress(progress, percent, dimensions.reduced);
+      }
+
+      const sourceLeft = capture.crop.x + Math.round((region.x - actual.x) * capture.scaleX);
+      const sourceTop = capture.crop.y + Math.round((region.y + tile.destinationTop - actual.y) * capture.scaleY);
+      const sourceRight = Math.min(capture.crop.x + capture.crop.width, sourceLeft + Math.round(region.width * capture.scaleX));
+      const sourceBottom = Math.min(capture.crop.y + capture.crop.height, sourceTop + Math.round(tile.sourceHeight * capture.scaleY));
+      const sourceWidth = sourceRight - sourceLeft;
+      const sourceHeight = sourceBottom - sourceTop;
+      if (sourceLeft < capture.crop.x || sourceTop < capture.crop.y || sourceWidth < 1 || sourceHeight < 1) throw new Error(text('fullScrollError'));
+      const destinationTop = Math.round(tile.destinationTop * capture.scaleY * outputScale);
+      const destinationBottom = Math.round((tile.destinationTop + sourceHeight / capture.scaleY) * capture.scaleY * outputScale);
+      const destinationWidth = Math.round(sourceWidth * outputScale);
+      context.drawImage(
+        image, sourceLeft, sourceTop, sourceWidth, sourceHeight,
+        0, destinationTop, destinationWidth, Math.max(1, destinationBottom - destinationTop)
+      );
+    }
+    return prepareCanvasForEditor(canvas, outputScale);
   }
 
   function selectScrollingRegion(lockedScrollX) {
@@ -547,259 +647,149 @@
       overlay.setAttribute('aria-label', text('scrollingDialogLabel'));
       Object.assign(overlay.style, {
         position: 'fixed', inset: '0', zIndex: '2147483647', cursor: 'crosshair',
-        background: 'rgba(3, 10, 20, 0.18)', userSelect: 'none', touchAction: 'pan-y'
+        background: 'rgba(3, 10, 20, 0.18)', userSelect: 'none', touchAction: 'none'
       });
 
       const selectionBox = document.createElement('div');
       selectionBox.dataset.scionosCapture = 'scrolling-box';
       Object.assign(selectionBox.style, {
         position: 'fixed', display: 'none', border: '2px solid #38bdf8',
-        background: 'rgba(56, 189, 248, 0.08)', boxShadow: '0 0 0 9999px rgba(3, 10, 20, 0.24)',
-        pointerEvents: 'none'
+        background: 'rgba(56, 189, 248, 0.08)', boxShadow: '0 0 0 9999px rgba(3, 10, 20, 0.24)', pointerEvents: 'none'
       });
-
-      const measure = document.createElement('div');
-      Object.assign(measure.style, {
-        position: 'fixed', display: 'none', zIndex: '2', padding: '5px 8px',
-        border: '1px solid #38bdf8', borderRadius: '6px', background: '#07111f',
-        color: '#e0f2fe', font: '700 12px/1.2 ui-monospace, monospace', pointerEvents: 'none'
-      });
-
       const panel = document.createElement('form');
       panel.dataset.scionosCapture = 'scrolling-controls';
       panel.setAttribute('aria-label', text('scrollingGeometry'));
       Object.assign(panel.style, {
-        position: 'fixed', top: '16px', right: '16px', width: '292px', zIndex: '3',
-        padding: '14px', border: '1px solid #38bdf8', borderRadius: '10px',
-        background: '#07111f', color: '#f8fafc', boxShadow: '0 18px 42px rgba(0,0,0,.5)',
-        cursor: 'default', font: '13px/1.35 system-ui, sans-serif', userSelect: 'text'
+        position: 'fixed', top: '16px', right: '16px', width: '292px', zIndex: '3', padding: '14px',
+        border: '1px solid #38bdf8', borderRadius: '10px', background: '#07111f', color: '#f8fafc',
+        boxShadow: '0 18px 42px rgba(0,0,0,.5)', cursor: 'default', font: '13px/1.35 system-ui, sans-serif'
       });
-
-      const focusStyles = document.createElement('style');
-      focusStyles.textContent = `
-        [data-scionos-capture="scrolling-controls"] button:focus-visible,
-        [data-scionos-capture="scrolling-controls"] input:focus-visible,
-        [data-scionos-capture="scrolling-selection"]:focus-visible {
-          outline: 3px solid #fbbf24 !important;
-          outline-offset: 2px !important;
-        }
-      `;
-
       const title = document.createElement('strong');
       title.textContent = text('btnScrollingTitle');
-      Object.assign(title.style, { display: 'block', marginBottom: '5px', fontSize: '15px' });
       const instructions = document.createElement('p');
       instructions.textContent = text('scrollingInstructionStart');
-      Object.assign(instructions.style, { margin: '0 0 10px', color: '#bae6fd' });
       const status = document.createElement('div');
       status.setAttribute('role', 'status');
       status.setAttribute('aria-live', 'polite');
-      Object.assign(status.style, { minHeight: '18px', marginBottom: '10px', color: '#fbbf24' });
-
+      Object.assign(status.style, { minHeight: '18px', color: '#fbbf24' });
       const fields = document.createElement('div');
-      Object.assign(fields.style, {
-        display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '8px'
-      });
+      Object.assign(fields.style, { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '8px', marginTop: '8px' });
       const inputs = {};
-      const fieldDefinitions = [
-        ['x', 'coordinateX', Math.round(lockedScrollX)],
-        ['y', 'coordinateY', Math.round(window.scrollY)],
-        ['width', 'coordinateWidth', Math.max(5, Math.round(window.innerWidth / 2))],
-        ['height', 'coordinateHeight', Math.max(5, Math.round(window.innerHeight))]
-      ];
-
-      fieldDefinitions.forEach(([name, labelKey, value]) => {
+      [['x', 'coordinateX', lockedScrollX], ['y', 'coordinateY', window.scrollY],
+        ['width', 'coordinateWidth', Math.max(5, document.documentElement.clientWidth / 2)],
+        ['height', 'coordinateHeight', Math.max(5, document.documentElement.clientHeight)]].forEach(([name, key, value]) => {
         const label = document.createElement('label');
+        label.textContent = text(key);
         Object.assign(label.style, { display: 'grid', gap: '3px', color: '#a9bad0', fontSize: '11px' });
-        label.textContent = text(labelKey);
         const input = document.createElement('input');
-        input.type = 'number';
-        input.name = name;
-        input.min = '0';
-        input.step = '1';
-        input.value = String(value);
-        Object.assign(input.style, {
-          width: '100%', height: '34px', padding: '0 7px', border: '1px solid #31435b',
-          borderRadius: '6px', background: '#101d2f', color: '#f8fafc', font: 'inherit'
-        });
-        label.appendChild(input);
-        fields.appendChild(label);
-        inputs[name] = input;
+        input.type = 'number'; input.name = name; input.min = '0'; input.step = '1'; input.value = String(Math.round(value));
+        Object.assign(input.style, { width: '100%', height: '34px', padding: '0 7px', border: '1px solid #31435b', borderRadius: '6px', background: '#101d2f', color: '#f8fafc' });
+        label.appendChild(input); fields.appendChild(label); inputs[name] = input;
       });
-
       const actions = document.createElement('div');
-      Object.assign(actions.style, { display: 'flex', flexWrap: 'wrap', gap: '7px', marginTop: '11px' });
-      const makeButton = (labelKey, type = 'button') => {
-        const button = document.createElement('button');
-        button.type = type;
-        button.textContent = text(labelKey);
-        Object.assign(button.style, {
-          minHeight: '36px', padding: '6px 10px', border: '1px solid #31435b',
-          borderRadius: '7px', background: '#101d2f', color: '#f8fafc', cursor: 'pointer', font: 'inherit'
-        });
+      Object.assign(actions.style, { display: 'flex', gap: '7px', marginTop: '11px' });
+      const makeButton = (key, type = 'button') => {
+        const button = document.createElement('button'); button.type = type; button.textContent = text(key);
+        Object.assign(button.style, { minHeight: '36px', padding: '6px 10px', border: '1px solid #31435b', borderRadius: '7px', background: '#101d2f', color: '#f8fafc' });
         return button;
       };
       const captureButton = makeButton('scrollingCapture', 'submit');
-      captureButton.style.borderColor = '#38bdf8';
       const restartButton = makeButton('scrollingRestart');
       const cancelButton = makeButton('scrollingCancel');
       restartButton.disabled = true;
       actions.append(captureButton, restartButton, cancelButton);
       panel.append(title, instructions, status, fields, actions);
-      overlay.append(focusStyles, selectionBox, measure, panel);
+      overlay.append(selectionBox, panel);
       document.body.appendChild(overlay);
 
       let firstPoint = null;
-      let lastPointer = { x: Math.round(window.innerWidth / 2), y: Math.round(window.innerHeight / 2) };
+      let selectedSurface = getDocumentScrollSurface();
+      let originalPosition = selectedSurface.getPosition();
+      let lastPointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
       let settled = false;
-      let lockingHorizontalScroll = false;
 
+      const surfacePoint = (surface, clientX, clientY) => {
+        const position = surface.getPosition();
+        if (surface.isDocument) return { x: position.x + clientX, y: position.y + clientY };
+        const rect = surface.getCaptureRect();
+        return { x: position.x + clientX - rect.left, y: position.y + clientY - rect.top };
+      };
+      const pointToClient = (surface, point) => {
+        const position = surface.getPosition();
+        if (surface.isDocument) return { x: point.x - position.x, y: point.y - position.y };
+        const rect = surface.getCaptureRect();
+        return { x: rect.left + point.x - position.x, y: rect.top + point.y - position.y };
+      };
+      const normalize = (first, second) => {
+        const metrics = selectedSurface.getMetrics();
+        const position = selectedSurface.getPosition();
+        return Utils.normalizeScrollingRegion(first, second, { x: position.x, width: metrics.viewportWidth }, metrics.fullHeight);
+      };
       const cleanup = () => {
         overlay.remove();
         window.removeEventListener('keydown', onKeyDown, true);
-        window.removeEventListener('scroll', onScroll, true);
+        window.removeEventListener('scroll', updatePreview, true);
       };
-      const settle = region => {
-        if (settled) return;
-        settled = true;
-        cleanup();
-        resolve(region);
-      };
-      const showError = message => {
-        status.textContent = message;
-        status.setAttribute('role', 'alert');
-      };
+      const settle = value => { if (!settled) { settled = true; cleanup(); resolve(value); } };
       const finish = region => {
-        if (!region || region.width < 5 || region.height < 5) {
-          showError(text('scrollingInvalidRegion'));
-          return;
-        }
-        settle(region);
+        if (!region || region.width < 5 || region.height < 5) { status.textContent = text('scrollingInvalidRegion'); status.setAttribute('role', 'alert'); return; }
+        settle({ region, surface: selectedSurface, originalPosition });
       };
       const reset = () => {
-        firstPoint = null;
-        selectionBox.style.display = 'none';
-        measure.style.display = 'none';
-        instructions.textContent = text('scrollingInstructionStart');
-        status.textContent = '';
-        status.setAttribute('role', 'status');
-        restartButton.disabled = true;
-        overlay.focus();
+        firstPoint = null; selectedSurface = getDocumentScrollSurface(); originalPosition = selectedSurface.getPosition();
+        selectionBox.style.display = 'none'; instructions.textContent = text('scrollingInstructionStart');
+        status.textContent = ''; restartButton.disabled = true; overlay.focus();
       };
-      const currentDocumentPoint = () => ({
-        x: lockedScrollX + lastPointer.x,
-        y: window.scrollY + lastPointer.y
-      });
-      const updatePreview = () => {
+      function updatePreview() {
         if (!firstPoint) return;
-        const current = currentDocumentPoint();
-        const region = Utils.normalizeScrollingRegion(
-          firstPoint,
-          current,
-          { x: lockedScrollX, width: window.innerWidth },
-          getDocumentHeight()
-        );
-        const firstClientY = firstPoint.y - window.scrollY;
-        const top = Math.min(firstClientY, lastPointer.y);
-        const left = region.x - lockedScrollX;
+        const current = surfacePoint(selectedSurface, lastPointer.x, lastPointer.y);
+        const region = normalize(firstPoint, current);
+        const firstClient = pointToClient(selectedSurface, firstPoint);
         Object.assign(selectionBox.style, {
-          display: 'block', left: `${left}px`, top: `${top}px`,
-          width: `${region.width}px`, height: `${Math.abs(lastPointer.y - firstClientY)}px`
+          display: 'block', left: Math.min(firstClient.x, lastPointer.x) + 'px', top: Math.min(firstClient.y, lastPointer.y) + 'px',
+          width: Math.abs(lastPointer.x - firstClient.x) + 'px', height: Math.abs(lastPointer.y - firstClient.y) + 'px'
         });
-        Object.assign(measure.style, {
-          display: 'block', left: `${Math.min(window.innerWidth - 150, Math.max(8, lastPointer.x + 12))}px`,
-          top: `${Math.min(window.innerHeight - 34, Math.max(8, lastPointer.y + 12))}px`
-        });
-        measure.textContent = `${region.width} × ${region.height} px`;
-        inputs.x.value = String(region.x);
-        inputs.y.value = String(region.y);
-        inputs.width.value = String(region.width);
-        inputs.height.value = String(region.height);
-      };
-      const onScroll = () => {
-        if (!lockingHorizontalScroll && Math.abs(window.scrollX - lockedScrollX) > 0.5) {
-          lockingHorizontalScroll = true;
-          window.scrollTo(lockedScrollX, window.scrollY);
-          lockingHorizontalScroll = false;
+        inputs.x.value = String(region.x); inputs.y.value = String(region.y);
+        inputs.width.value = String(region.width); inputs.height.value = String(region.height);
+      }
+      function onKeyDown(event) {
+        if (event.key === 'Escape') { event.preventDefault(); settle(null); return; }
+        if (event.key === 'Backspace' && firstPoint && !event.target.closest('input')) { event.preventDefault(); reset(); return; }
+        if (event.target.closest('input, button')) return;
+        const amounts = { ArrowDown: 48, ArrowUp: -48, PageDown: Math.round(window.innerHeight * 0.8), PageUp: -Math.round(window.innerHeight * 0.8) };
+        if (event.key in amounts) {
+          event.preventDefault(); const position = selectedSurface.getPosition(); selectedSurface.scrollTo(position.x, position.y + amounts[event.key]); updatePreview();
         }
-        updatePreview();
-      };
-      const onKeyDown = event => {
-        if (event.key === 'Escape') {
-          event.preventDefault();
-          settle(null);
-          return;
-        }
-        const targetIsInput = event.target && typeof event.target.closest === 'function'
-          && Boolean(event.target.closest('input'));
-        if (event.key === 'Backspace' && firstPoint && !targetIsInput) {
-          event.preventDefault();
-          reset();
-          return;
-        }
-        if (event.target && typeof event.target.closest === 'function'
-          && event.target.closest('input, button')) return;
-        const scrollAmounts = {
-          ArrowDown: 48,
-          ArrowUp: -48,
-          PageDown: Math.round(window.innerHeight * 0.8),
-          PageUp: -Math.round(window.innerHeight * 0.8)
-        };
-        if (event.key in scrollAmounts) {
-          event.preventDefault();
-          window.scrollBy(0, scrollAmounts[event.key]);
-        } else if (event.key === 'Home') {
-          event.preventDefault();
-          window.scrollTo(lockedScrollX, 0);
-        } else if (event.key === 'End') {
-          event.preventDefault();
-          window.scrollTo(lockedScrollX, getDocumentHeight());
-        }
-      };
-
-      overlay.addEventListener('pointermove', event => {
-        if (panel.contains(event.target)) return;
-        lastPointer = { x: event.clientX, y: event.clientY };
-        updatePreview();
-      });
+      }
+      overlay.addEventListener('pointermove', event => { if (!panel.contains(event.target)) { lastPointer = { x: event.clientX, y: event.clientY }; updatePreview(); } });
       overlay.addEventListener('click', event => {
         if (panel.contains(event.target)) return;
         lastPointer = { x: event.clientX, y: event.clientY };
-        const point = currentDocumentPoint();
         if (!firstPoint) {
-          firstPoint = point;
-          instructions.textContent = text('scrollingInstructionEnd');
-          status.textContent = text('scrollingPointSet');
-          restartButton.disabled = false;
-          updatePreview();
-          return;
+          selectedSurface = findScrollSurfaceAtPoint(event.clientX, event.clientY);
+          originalPosition = selectedSurface.getPosition();
+          firstPoint = surfacePoint(selectedSurface, event.clientX, event.clientY);
+          instructions.textContent = text('scrollingInstructionEnd'); status.textContent = text('scrollingPointSet'); restartButton.disabled = false; updatePreview(); return;
         }
-        finish(Utils.normalizeScrollingRegion(
-          firstPoint,
-          point,
-          { x: lockedScrollX, width: window.innerWidth },
-          getDocumentHeight()
-        ));
+        finish(normalize(firstPoint, surfacePoint(selectedSurface, event.clientX, event.clientY)));
       });
+      overlay.addEventListener('wheel', event => {
+        if (!firstPoint) return;
+        event.preventDefault();
+        const position = selectedSurface.getPosition();
+        selectedSurface.scrollTo(position.x + event.deltaX, position.y + event.deltaY);
+        updatePreview();
+      }, { passive: false });
       panel.addEventListener('click', event => event.stopPropagation());
-      panel.addEventListener('pointerdown', event => event.stopPropagation());
       panel.addEventListener('submit', event => {
         event.preventDefault();
-        const x = Number(inputs.x.value);
-        const y = Number(inputs.y.value);
-        const width = Number(inputs.width.value);
-        const height = Number(inputs.height.value);
-        finish(Utils.normalizeScrollingRegion(
-          { x, y },
-          { x: x + width, y: y + height },
-          { x: lockedScrollX, width: window.innerWidth },
-          getDocumentHeight()
-        ));
+        const x = Number(inputs.x.value), y = Number(inputs.y.value), width = Number(inputs.width.value), height = Number(inputs.height.value);
+        finish(normalize({ x, y }, { x: x + width, y: y + height }));
       });
       restartButton.addEventListener('click', reset);
       cancelButton.addEventListener('click', () => settle(null));
       window.addEventListener('keydown', onKeyDown, true);
-      window.addEventListener('scroll', onScroll, true);
+      window.addEventListener('scroll', updatePreview, true);
       overlay.focus();
     });
   }
@@ -813,11 +803,39 @@
     return response;
   }
 
-  async function openEditor(dataUrl, scale) {
-    const response = await sendMessage({
-      action: 'OPEN_EDITOR', dataUrl, title: document.title, url: location.href, scale
+  async function openEditor(blob, scale) {
+    if (!(blob instanceof Blob) || blob.size < 1) throw new Error('Invalid capture image.');
+    const expectedChunks = Math.ceil(blob.size / Utils.TRANSFER_CHUNK_BYTES);
+    const begin = await sendMessage({
+      action: 'BEGIN_CAPTURE_TRANSFER', expectedBytes: blob.size, expectedChunks,
+      title: document.title, url: location.href, scale
     });
-    if (!response || !response.success) throw new Error(response && response.error ? response.error : 'Editor unavailable.');
+    if (!begin || !begin.success || !begin.transferId) {
+      throw new Error(begin && begin.error ? begin.error : 'Editor unavailable.');
+    }
+    const transferId = begin.transferId;
+    try {
+      for (let index = 0; index < expectedChunks; index += 1) {
+        const chunk = blob.slice(index * Utils.TRANSFER_CHUNK_BYTES, (index + 1) * Utils.TRANSFER_CHUNK_BYTES);
+        const data = await blobToBase64(chunk);
+        let response;
+        let lastError;
+        for (const retryDelay of [0, 250, 500]) {
+          if (retryDelay) await Utils.delay(retryDelay);
+          try {
+            response = await sendMessage({ action: 'APPEND_CAPTURE_CHUNK', transferId, index, data });
+            if (response && response.success) break;
+            lastError = new Error(response && response.error ? response.error : 'Capture chunk rejected.');
+          } catch (error) { lastError = error; }
+        }
+        if (!response || !response.success) throw lastError || new Error('Capture chunk failed.');
+      }
+      const completed = await sendMessage({ action: 'COMPLETE_CAPTURE_TRANSFER', transferId });
+      if (!completed || !completed.success) throw new Error(completed && completed.error ? completed.error : 'Editor unavailable.');
+    } catch (error) {
+      await sendMessage({ action: 'ABORT_CAPTURE_TRANSFER', transferId }).catch(() => undefined);
+      throw error;
+    }
   }
 
   function sendMessage(message) {
@@ -832,36 +850,53 @@
   async function prepareDataUrlForEditor(dataUrl) {
     const image = await loadImage(dataUrl);
     const dimensions = Utils.computeOutputDimensions(image.width, image.height, 1, 1);
-    if (!dimensions.reduced) return { dataUrl, scale: 1 };
     const canvas = document.createElement('canvas');
     canvas.width = dimensions.width;
     canvas.height = dimensions.height;
     canvas.getContext('2d').drawImage(image, 0, 0, dimensions.width, dimensions.height);
-    return { dataUrl: await canvasToDataUrl(canvas), scale: dimensions.scale };
+    return prepareCanvasForEditor(canvas, dimensions.scale);
   }
 
-  async function prepareCanvasForEditor(sourceCanvas) {
+  async function prepareCanvasForEditor(sourceCanvas, baseScale = 1) {
     const dimensions = Utils.computeOutputDimensions(sourceCanvas.width, sourceCanvas.height, 1, 1);
-    if (!dimensions.reduced) return { canvas: sourceCanvas, scale: 1 };
-    const canvas = document.createElement('canvas');
-    canvas.width = dimensions.width;
-    canvas.height = dimensions.height;
-    canvas.getContext('2d').drawImage(sourceCanvas, 0, 0, dimensions.width, dimensions.height);
-    return { canvas, scale: dimensions.scale };
+    let canvas = sourceCanvas;
+    let scale = Math.max(0.01, Number(baseScale) || 1);
+    if (dimensions.reduced) {
+      canvas = document.createElement('canvas');
+      canvas.width = dimensions.width;
+      canvas.height = dimensions.height;
+      canvas.getContext('2d').drawImage(sourceCanvas, 0, 0, dimensions.width, dimensions.height);
+      scale *= dimensions.scale;
+    }
+
+    let blob = await canvasToBlob(canvas);
+    for (let pass = 0; blob.size > Utils.MAX_TRANSFER_BYTES && pass < 4; pass += 1) {
+      const factor = Utils.computePayloadReductionScale(blob.size);
+      if (factor >= 0.999 || scale * factor < 0.1) break;
+      const reduced = document.createElement('canvas');
+      reduced.width = Math.max(1, Math.floor(canvas.width * factor));
+      reduced.height = Math.max(1, Math.floor(canvas.height * factor));
+      reduced.getContext('2d').drawImage(canvas, 0, 0, reduced.width, reduced.height);
+      canvas = reduced;
+      scale *= factor;
+      blob = await canvasToBlob(canvas);
+    }
+    if (blob.size > Utils.MAX_TRANSFER_BYTES) throw new Error(text('captureTooLargeError'));
+    return { blob, scale };
   }
 
-  function canvasToDataUrl(canvas) {
+  function canvasToBlob(canvas) {
     return new Promise((resolve, reject) => {
-      canvas.toBlob(blob => {
-        if (!blob) {
-          reject(new Error('Image preparation failed.'));
-          return;
-        }
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = () => reject(reader.error || new Error('Image reading failed.'));
-        reader.readAsDataURL(blob);
-      }, 'image/png');
+      canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Image preparation failed.')), 'image/png');
+    });
+  }
+
+  function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result).slice(String(reader.result).indexOf(',') + 1));
+      reader.onerror = () => reject(reader.error || new Error('Image reading failed.'));
+      reader.readAsDataURL(blob);
     });
   }
 

@@ -2,7 +2,7 @@
 
 [Français](PRIVACY.md) · [English](PRIVACY.en.md) · [Español](PRIVACY.es.md) · [Deutsch](PRIVACY.de.md)
 
-Last updated: August 22, 2026.
+Last updated: August 23, 2026.
 
 **Publisher:** eyelo SA (UID: CHE-108.174.302), Vaud, Switzerland — Brand **ScioNos** ([scionos.ch](https://scionos.ch)) — Contact: info@eyelo.ch
 
@@ -12,7 +12,7 @@ Scrolling-area capture processes several visible portions of the same page and s
 
 No screenshot, URL, or browsing data is sent to eyelo SA, ScioNos, or any third party. The extension has no account, telemetry, advertising, or remote library.
 
-The capture is temporarily stored in IndexedDB so the editor can open and reload. It is deleted when the editor tab closes or after one hour, whichever comes first. If the browser is closed or suspended at expiry, it is removed on the extension's next wake.
+The capture and the chunks required for transfer are temporarily stored in IndexedDB. Chunks are deleted after assembly or within fifteen minutes. The final capture is deleted as soon as the editor decodes it, with a one-hour expiry retained only as a safety fallback.
 
 The selected language is kept in `chrome.storage.local`. The editor-tab mapping uses `chrome.storage.session` and ends with the browser session. Users can remove all local data from the extension management page or by uninstalling the extension.
 

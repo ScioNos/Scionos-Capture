@@ -99,5 +99,7 @@
   "reportZoomFit": { "message": "Adapter" },
   "reportZoomReset": { "message": "100 %" },
   "reportCopied": { "message": "Image copiée dans le presse-papiers." },
-  "printOpened": { "message": "Fenêtre d’impression ouverte." }
+  "printOpened": { "message": "Fenêtre d’impression ouverte." },
+  "layoutChangedError": { "message": "La mise en page a changé pendant la capture. Attendez la fin du chargement puis réessayez." },
+  "captureTooLargeError": { "message": "La capture reste trop volumineuse pour être traitée en toute sécurité." }
 }

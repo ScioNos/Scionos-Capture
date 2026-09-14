@@ -99,5 +99,7 @@
   "reportZoomFit": { "message": "Fit" },
   "reportZoomReset": { "message": "100%" },
   "reportCopied": { "message": "Image copied to the clipboard." },
-  "printOpened": { "message": "Print dialog opened." }
+  "printOpened": { "message": "Print dialog opened." },
+  "layoutChangedError": { "message": "The page layout changed during capture. Wait for the page to finish loading and try again." },
+  "captureTooLargeError": { "message": "The capture is still too large to process safely." }
 }

@@ -99,5 +99,7 @@
   "reportZoomFit": { "message": "Anpassen" },
   "reportZoomReset": { "message": "100 %" },
   "reportCopied": { "message": "Bild in die Zwischenablage kopiert." },
-  "printOpened": { "message": "Druckdialog geöffnet." }
+  "printOpened": { "message": "Druckdialog geöffnet." },
+  "layoutChangedError": { "message": "Das Seitenlayout hat sich während der Aufnahme geändert. Warten Sie, bis die Seite geladen ist, und versuchen Sie es erneut." },
+  "captureTooLargeError": { "message": "Die Aufnahme ist weiterhin zu groß, um sicher verarbeitet zu werden." }
 }

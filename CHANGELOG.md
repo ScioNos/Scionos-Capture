@@ -6,6 +6,20 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-23
+
+### Ajouté
+
+- Transfert segmenté et persistant des captures volumineuses, compatible Manifest V3.
+- Prise en charge des zones défilantes dans les conteneurs internes et validation Windows dédiée.
+
+### Corrigé
+
+- Décalages avec mise à l’échelle Windows, zoom fractionnaire et barres de défilement classiques.
+- Répétition des en-têtes fixes ou collants, coutures entre tuiles et pages changeant pendant la capture.
+- Nettoyage des captures après décodage, transferts interrompus, fallback de langue et détection des pages non supportées.
+
+
 ## [1.0.0] - 2026-08-22
 
 ### Ajouté
@@ -31,5 +45,7 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 - Descriptions localisées dépassant la limite de 132 caractères.
 - Conservation temporaire plus longue que celle annoncée et perte au rechargement de l’éditeur.
 
-[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...HEAD
 [1.0.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0
+
+[1.1.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0

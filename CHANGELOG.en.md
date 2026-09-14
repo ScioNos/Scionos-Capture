@@ -6,6 +6,20 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-23
+
+### Added
+
+- Persistent chunked transfer for large screenshots, compatible with Manifest V3.
+- Scrolling-area capture inside internal containers and dedicated Windows validation.
+
+### Fixed
+
+- Misalignment with Windows scaling, fractional zoom, and classic scrollbars.
+- Repeated fixed or sticky headers, tile seams, and layouts changing during capture.
+- Cleanup after editor decoding, interrupted transfers, language fallback, and unsupported-page detection.
+
+
 ## [1.0.0] - 2026-08-22
 
 ### Added
@@ -26,5 +40,7 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Canvas-clipping zoom, non-responsive toolbar, incomplete translations, hard-coded shortcut, contrast, and accessible names.
 - Locale descriptions above 132 characters, editor reload data loss, and inaccurate retention wording.
 
-[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...HEAD
 [1.0.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0
+
+[1.1.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0

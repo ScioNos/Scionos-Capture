@@ -2,7 +2,7 @@
 
 [Français](PRIVACY.md) · [English](PRIVACY.en.md) · [Español](PRIVACY.es.md) · [Deutsch](PRIVACY.de.md)
 
-Dernière mise à jour : 22 août 2026.
+Dernière mise à jour : 23 août 2026.
 
 **Éditeur responsable :** eyelo SA (IDE : CHE-108.174.302), Vaud, Suisse — Marque **ScioNos** ([scionos.ch](https://scionos.ch)) — Contact : info@eyelo.ch
 
@@ -12,7 +12,7 @@ La capture de zone défilante traite plusieurs portions visibles de la même pag
 
 L’extension n’envoie aucune capture, URL ou donnée de navigation à eyelo SA, ScioNos ou à un tiers. Elle ne contient ni compte, ni télémétrie, ni publicité, ni bibliothèque distante.
 
-La capture est stockée temporairement dans IndexedDB afin d’ouvrir et de recharger l’éditeur. Elle est supprimée lorsque l’onglet éditeur est fermé ou après une heure, selon la première échéance. Si le navigateur est fermé ou suspendu à cet instant, elle est supprimée au prochain réveil de l’extension.
+La capture et les fragments nécessaires à son transfert sont stockés temporairement dans IndexedDB. Les fragments sont supprimés après assemblage ou au plus tard après quinze minutes. La capture finale est supprimée dès que l’éditeur l’a décodée, avec une expiration d’une heure uniquement comme filet de sécurité.
 
 La langue choisie est conservée dans `chrome.storage.local`. La correspondance entre l’onglet éditeur et la capture utilise `chrome.storage.session` et disparaît avec la session du navigateur.
 

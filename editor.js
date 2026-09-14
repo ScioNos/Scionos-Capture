@@ -455,6 +455,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!record || !record.blob) throw new Error(getI18nText('captureLoadError'));
       captureRecord = record;
       baseImage = await createImageBitmap(record.blob);
+      chrome.runtime.sendMessage({ action: 'ACK_CAPTURE_LOADED', captureId }, () => {
+        if (chrome.runtime.lastError) console.warn('Capture cleanup acknowledgement failed:', chrome.runtime.lastError.message);
+      });
       rebuildCommittedSurface();
       container.hidden = false;
       emptyState.hidden = true;
