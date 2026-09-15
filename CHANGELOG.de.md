@@ -4,6 +4,8 @@
 
 ## [Unveröffentlicht]
 
+## [1.1.1] - 2026-09-15
+
 ### Behoben
 
 - Lebensdauer verwaister Aufnahmen von einer Stunde auf fünfzehn Minuten reduziert.
@@ -38,7 +40,7 @@
 - Vollständige 4-Sprachen-Unterstützung: Französisch, Englisch, Spanisch und Deutsch.
 - Volle Barrierefreiheit (WCAG, hohe Kontraste, Tastaturnavigation, Screenreader).
 
-[Unveröffentlicht]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...HEAD
-[1.0.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0
-
+[Unveröffentlicht]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0
+[1.0.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0

@@ -6,6 +6,8 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-09-15
+
 ### Corrigé
 
 - Durée de vie des captures orphelines réduite d’une heure à quinze minutes.
@@ -52,7 +54,7 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 - Descriptions localisées dépassant la limite de 132 caractères.
 - Conservation temporaire plus longue que celle annoncée et perte au rechargement de l’éditeur.
 
-[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...HEAD
-[1.0.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0
-
+[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0
+[1.0.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0

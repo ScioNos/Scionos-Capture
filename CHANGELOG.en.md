@@ -6,6 +6,8 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-09-15
+
 ### Fixed
 
 - Orphaned capture lifetime reduced from one hour to fifteen minutes.
@@ -47,7 +49,7 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Canvas-clipping zoom, non-responsive toolbar, incomplete translations, hard-coded shortcut, contrast, and accessible names.
 - Locale descriptions above 132 characters, editor reload data loss, and inaccurate retention wording.
 
-[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...HEAD
-[1.0.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0
-
+[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0
+[1.0.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0

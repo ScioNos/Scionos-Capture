@@ -4,6 +4,8 @@
 
 ## [Sin publicar]
 
+## [1.1.1] - 2026-09-15
+
 ### Corregido
 
 - Reducción del tiempo de vida de capturas huérfanas de una hora a quince minutos.
@@ -38,7 +40,7 @@
 - Soporte completo en 4 idiomas: francés, inglés, español y alemán.
 - Accesibilidad total (WCAG, alto contraste, navegación por teclado, lectores de pantalla).
 
-[Sin publicar]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...HEAD
-[1.0.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0
-
+[Sin publicar]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0
+[1.0.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0

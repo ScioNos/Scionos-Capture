@@ -15,7 +15,7 @@ Vollständig lokale Screenshot-Erweiterung für Chrome und Edge. Sichtbaren, aus
 
 ## Installation
 
-`scionos-capture-v1.1.0.zip` aus dem [Release v1.1.0](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0) herunterladen, optional `.sha256` prüfen und entpacken. `chrome://extensions` oder `edge://extensions` öffnen, **Entwicklermodus** aktivieren, **Entpackte Erweiterung laden** wählen und den Ordner auswählen.
+`scionos-capture-v1.1.1.zip` aus dem [Release v1.1.1](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.1) herunterladen, optional `.sha256` prüfen und entpacken. `chrome://extensions` oder `edge://extensions` öffnen, **Entwicklermodus** aktivieren, **Entpackte Erweiterung laden** wählen und den Ordner auswählen.
 
 Aus dem Quellcode: Repository klonen, `npm ci` ausführen und die Projektwurzel als entpackte Erweiterung laden.
 
