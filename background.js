@@ -2,7 +2,7 @@
 importScripts('capture-utils.js', 'capture-store.js');
 
 const CAPTURE_INTERVAL_MS = 550;
-const CAPTURE_TTL_MS = 60 * 60 * 1000;
+const CAPTURE_TTL_MS = 15 * 60 * 1000;
 const TRANSFER_TTL_MS = 15 * 60 * 1000;
 const CAPTURE_ALARM_PREFIX = 'capture-expiry:';
 const TRANSFER_ALARM_PREFIX = 'capture-transfer-expiry:';
@@ -88,15 +88,6 @@ function safeMetadata(value, fallback = '') {
   return typeof value === 'string' ? value.slice(0, MAX_METADATA_LENGTH) : fallback;
 }
 
-async function dataUrlToBlob(dataUrl) {
-  if (typeof dataUrl !== 'string' || !/^data:image\/png;base64,/i.test(dataUrl)) throw new Error('Invalid capture payload.');
-  const response = await fetch(dataUrl);
-  if (!response.ok) throw new Error('Capture conversion failed.');
-  const blob = await response.blob();
-  if (blob.type !== 'image/png' || blob.size === 0) throw new Error('Invalid capture image.');
-  return blob;
-}
-
 function decodeChunk(base64) {
   const maximumLength = Math.ceil(ScionosCaptureUtils.TRANSFER_CHUNK_BYTES * 4 / 3) + 16;
   if (typeof base64 !== 'string' || base64.length > maximumLength || !/^[A-Za-z0-9+/]*={0,2}$/.test(base64)) {
@@ -143,12 +134,6 @@ async function openEditorFromBlob(blob, metadata = {}) {
     throw error;
   }
   return { success: true, captureId: id };
-}
-
-async function openLegacyEditor(message) {
-  const blob = await dataUrlToBlob(message.dataUrl);
-  if (blob.size > ScionosCaptureUtils.MAX_SINGLE_MESSAGE_BYTES) throw new Error('Capture payload is too large for the legacy transfer.');
-  return openEditorFromBlob(blob, message);
 }
 
 async function beginTransfer(message, senderTab) {
@@ -238,7 +223,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (!message || typeof message.action !== 'string' || !isTrustedTabSender(sender)) return;
   let operation;
   if (message.action === 'CAPTURE_VISIBLE_TAB') operation = enqueueVisibleCapture(sender.tab).then(dataUrl => ({ success: true, dataUrl }));
-  else if (message.action === 'OPEN_EDITOR') operation = openLegacyEditor(message);
   else if (message.action === 'BEGIN_CAPTURE_TRANSFER') operation = beginTransfer(message, sender.tab);
   else if (message.action === 'APPEND_CAPTURE_CHUNK') operation = appendTransferChunk(message, sender.tab);
   else if (message.action === 'COMPLETE_CAPTURE_TRANSFER') operation = completeTransfer(message, sender.tab);

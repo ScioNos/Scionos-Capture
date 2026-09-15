@@ -42,7 +42,7 @@ Dans l’éditeur, les raccourcis `V`, `D`, `M`, `C` sélectionnent les outils; 
 - `unlimitedStorage` : conserver localement les grandes captures sans échec de quota.
 - `alarms` : supprimer les captures temporaires expirées.
 
-Les fragments de transfert restent uniquement dans IndexedDB local et sont supprimés après assemblage ou sous quinze minutes. La capture finale est supprimée dès son décodage par l’éditeur; une expiration d’une heure protège seulement contre les captures orphelines. Consultez [PRIVACY.md](PRIVACY.md) et [SECURITY.md](SECURITY.md).
+Les fragments de transfert restent uniquement dans IndexedDB local et sont supprimés après assemblage ou sous quinze minutes. La capture finale est supprimée dès son décodage par l’éditeur; une expiration de quinze minutes protège seulement contre les captures orphelines. Consultez [PRIVACY.md](PRIVACY.md) et [SECURITY.md](SECURITY.md).
 
 ## Limites connues
 

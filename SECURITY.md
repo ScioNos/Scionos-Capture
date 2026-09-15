@@ -14,4 +14,4 @@ Un accusé de réception est visé sous 3 jours ouvrés et une première évalua
 
 ## Modèle de sécurité
 
-Les captures, y compris les tuiles d’une zone défilante, restent dans l’origine locale de l’extension. Aucun script distant n’est exécuté et la zone défilante n’ajoute aucune permission. Les captures orphelines expirent après une heure et sont purgées au prochain réveil si le navigateur était suspendu. Le masquage solide doit être utilisé pour les secrets; le flou ne constitue pas une suppression cryptographique de l’information.
+Les captures, y compris les tuiles d’une zone défilante, restent dans l’origine locale de l’extension. Aucun script distant n’est exécuté et la zone défilante n’ajoute aucune permission. Les captures orphelines expirent après quinze minutes et sont purgées au prochain réveil si le navigateur était suspendu. Le masquage solide doit être utilisé pour les secrets; le flou ne constitue pas une suppression cryptographique de l’information.

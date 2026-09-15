@@ -12,6 +12,6 @@ La captura de área desplazable procesa varias partes visibles de la misma pági
 
 No se envía ninguna captura, URL ni dato de navegación a eyelo SA, ScioNos o a terceros. No existen cuenta, telemetría, publicidad ni bibliotecas remotas.
 
-La captura y los fragmentos necesarios para transferirla se almacenan temporalmente en IndexedDB. Los fragmentos se eliminan después del ensamblado o en un máximo de quince minutos. La captura final se elimina cuando el editor la decodifica; la caducidad de una hora solo actúa como medida de seguridad.
+La captura y los fragmentos necesarios para transferirla se almacenan temporalmente en IndexedDB. Los fragmentos se eliminan después del ensamblado o en un máximo de quince minutos. La captura final se elimina cuando el editor la decodifica; la caducidad de quince minutos solo actúa como medida de seguridad.
 
 El idioma se guarda en `chrome.storage.local` y el vínculo temporal del editor en `chrome.storage.session`. El usuario puede borrar los datos desde la gestión de extensiones o desinstalando. Contacto de privacidad: info@eyelo.ch. Para vulnerabilidades, consulta [SECURITY.es.md](SECURITY.es.md).

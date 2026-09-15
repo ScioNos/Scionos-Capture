@@ -23,7 +23,7 @@ Desde el código fuente: clona el repositorio, ejecuta `npm ci` y carga la raíz
 
 Elige **Página completa**, **Área visible**, **Zona seleccionada** o **Área desplazable**. Para esta última, haz clic en la primera esquina, desplázate verticalmente y elige la opuesta. `Escape` cancela, **Reiniciar** borra el primer punto y los campos X/Y/ancho/alto permiten usar el teclado. El atajo sugerido es `Alt+Shift+P`, pero el popup muestra la configuración real. En el editor, `V`, `D`, `M`, `C`, `Ctrl+Z`, `Ctrl+Y`, `+`, `-` y `0` controlan herramientas, historial y zoom. Usa una máscara sólida para secretos.
 
-`activeTab` y `scripting` actúan solo tras una acción explícita; `storage` conserva idioma y vínculo temporal; `unlimitedStorage` evita fallos con imágenes grandes; `alarms` caduca las capturas. Los fragmentos permanecen solo en IndexedDB local y se eliminan después del ensamblado o en un máximo de quince minutos. La captura final se elimina cuando el editor la decodifica; la caducidad de una hora solo protege las capturas huérfanas. Consulta [PRIVACY.es.md](PRIVACY.es.md) y [SECURITY.es.md](SECURITY.es.md).
+`activeTab` y `scripting` actúan solo tras una acción explícita; `storage` conserva idioma y vínculo temporal; `unlimitedStorage` evita fallos con imágenes grandes; `alarms` caduca las capturas. Los fragmentos permanecen solo en IndexedDB local y se eliminan después del ensamblado o en un máximo de quince minutos. La captura final se elimina cuando el editor la decodifica; la caducidad de quince minutos solo protege las capturas huérfanas. Consulta [PRIVACY.es.md](PRIVACY.es.md) y [SECURITY.es.md](SECURITY.es.md).
 
 ## Límites y desarrollo
 

@@ -4,6 +4,13 @@
 
 ## [Unveröffentlicht]
 
+### Behoben
+
+- Lebensdauer verwaister Aufnahmen von einer Stunde auf fünfzehn Minuten reduziert.
+- Nicht verwendete und undokumentierte Legacy-Service-Worker-Aktion `OPEN_EDITOR` entfernt.
+- Zuverlässige Erkennung interner scrollbarer Container (z. B. Facebook Messenger-Chatfenster) bei der Bereichsaufnahme, ohne die Hintergrundseite zu scrollen.
+- Schutz verankerter schwebender Docks (`position: fixed` / `position: sticky`), um versehentliches Ausblenden beim internen Scrollen zu verhindern.
+
 ## [1.1.0] - 2026-09-14
 
 ### Hinzugefügt

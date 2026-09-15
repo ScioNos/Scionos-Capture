@@ -12,7 +12,7 @@ La capture de zone défilante traite plusieurs portions visibles de la même pag
 
 L’extension n’envoie aucune capture, URL ou donnée de navigation à eyelo SA, ScioNos ou à un tiers. Elle ne contient ni compte, ni télémétrie, ni publicité, ni bibliothèque distante.
 
-La capture et les fragments nécessaires à son transfert sont stockés temporairement dans IndexedDB. Les fragments sont supprimés après assemblage ou au plus tard après quinze minutes. La capture finale est supprimée dès que l’éditeur l’a décodée, avec une expiration d’une heure uniquement comme filet de sécurité.
+La capture et les fragments nécessaires à son transfert sont stockés temporairement dans IndexedDB. Les fragments sont supprimés après assemblage ou au plus tard après quinze minutes. La capture finale est supprimée dès que l’éditeur l’a décodée, avec une expiration de quinze minutes uniquement comme filet de sécurité.
 
 La langue choisie est conservée dans `chrome.storage.local`. La correspondance entre l’onglet éditeur et la capture utilise `chrome.storage.session` et disparaît avec la session du navigateur.
 

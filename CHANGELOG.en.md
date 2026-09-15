@@ -6,6 +6,13 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Fixed
+
+- Orphaned capture lifetime reduced from one hour to fifteen minutes.
+- Removed unused and undocumented legacy `OPEN_EDITOR` service worker action.
+- Robust detection of internal scrolling containers (e.g., Facebook Messenger chat windows) during scrolling zone capture, preventing parent page background scrolling.
+- Anchored floating dock protection (`position: fixed` / `position: sticky`) to prevent accidental hiding during internal surface scrolling.
+
 ## [1.1.0] - 2026-09-14
 
 ### Added

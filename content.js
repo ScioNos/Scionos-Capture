@@ -103,6 +103,11 @@
       scrollTo(x, y) {
         element.scrollLeft = x;
         element.scrollTop = y;
+        if (typeof element.scrollTo === 'function') {
+          try {
+            element.scrollTo({ left: x, top: y, behavior: 'instant' });
+          } catch (_error) { void _error; }
+        }
       },
       getCaptureRect() {
         const rect = element.getBoundingClientRect();
@@ -133,10 +138,30 @@
     const rect = element.getBoundingClientRect();
     return rect.width > 0
       && rect.height > 0
-      && rect.left >= -1
-      && rect.top >= -1
-      && rect.right <= window.innerWidth + 1
-      && rect.bottom <= window.innerHeight + 1;
+      && rect.left >= -8
+      && rect.top >= -8
+      && rect.right <= window.innerWidth + 8
+      && rect.bottom <= window.innerHeight + 8;
+  }
+
+  function isScrollableElement(element) {
+    if (!element || element === document.documentElement || element === document.body) return false;
+    if (element.closest && element.closest('[data-scionos-capture]')) return false;
+    const styles = getComputedStyle(element);
+    if (styles.display === 'none' || styles.visibility === 'hidden') return false;
+    const canScrollX = element.scrollWidth > element.clientWidth + 2
+      && SCROLLABLE_OVERFLOW_VALUES.has(styles.overflowX);
+    const canScrollY = element.scrollHeight > element.clientHeight + 2
+      && SCROLLABLE_OVERFLOW_VALUES.has(styles.overflowY);
+    if (!canScrollX && !canScrollY) return false;
+
+    const rect = element.getBoundingClientRect();
+    return rect.width > 0
+      && rect.height > 0
+      && rect.bottom > 0
+      && rect.top < window.innerHeight
+      && rect.right > 0
+      && rect.left < window.innerWidth;
   }
 
   function findScrollSurface() {
@@ -155,15 +180,52 @@
   }
 
   function findScrollSurfaceAtPoint(clientX, clientY) {
-    const elements = document.elementsFromPoint(clientX, clientY);
+    const rawElements = document.elementsFromPoint(clientX, clientY);
+    const elements = rawElements.filter(el => !el.closest || !el.closest('[data-scionos-capture]'));
+
+    // Strategy 1: Check elements under cursor and their ancestor chain
     for (const element of elements) {
-      if (element.closest && element.closest('[data-scionos-capture]')) continue;
       let candidate = element;
       while (candidate && candidate !== document.body && candidate !== document.documentElement) {
-        if (isVisibleScrollCandidate(candidate)) return getElementScrollSurface(candidate);
+        if (isScrollableElement(candidate)) return getElementScrollSurface(candidate);
         candidate = candidate.parentElement;
       }
     }
+
+    // Strategy 2: If clicked on a header, border or non-scrollable wrapper (e.g. Messenger chat header/dock),
+    // inspect enclosing container cards/dialogs under the point for scrollable descendants
+    for (const element of elements) {
+      let container = element;
+      while (container && container !== document.body && container !== document.documentElement) {
+        const scrollableChildren = Array.from(container.querySelectorAll('*')).filter(isScrollableElement);
+        if (scrollableChildren.length > 0) {
+          scrollableChildren.sort((first, second) => {
+            const scoreFirst = (first.scrollHeight - first.clientHeight) * Math.max(1, first.clientWidth);
+            const scoreSecond = (second.scrollHeight - second.clientHeight) * Math.max(1, second.clientWidth);
+            return scoreSecond - scoreFirst;
+          });
+          return getElementScrollSurface(scrollableChildren[0]);
+        }
+        container = container.parentElement;
+      }
+    }
+
+    // Strategy 3: Probe downward in case a top header was clicked
+    for (const offset of [35, 70]) {
+      const probeY = Math.min(window.innerHeight - 10, clientY + offset);
+      if (probeY !== clientY) {
+        const probeElements = document.elementsFromPoint(clientX, probeY)
+          .filter(el => !el.closest || !el.closest('[data-scionos-capture]'));
+        for (const element of probeElements) {
+          let candidate = element;
+          while (candidate && candidate !== document.body && candidate !== document.documentElement) {
+            if (isScrollableElement(candidate)) return getElementScrollSurface(candidate);
+            candidate = candidate.parentElement;
+          }
+        }
+      }
+    }
+
     return getDocumentScrollSurface();
   }
 
@@ -245,11 +307,12 @@
       : surface.getCaptureRect();
     const isAnchored = element => {
       if (!element.isConnected || element.closest('[data-scionos-capture]')) return false;
+      if (!surface.isDocument && (element === surface.element || element.contains(surface.element))) return false;
       const styles = getComputedStyle(element);
       if (!['fixed', 'sticky'].includes(styles.position)) return false;
       const rect = element.getBoundingClientRect();
       if (rect.width < 1 || rect.height < 1 || rect.bottom <= 0 || rect.right <= 0) return false;
-      if (styles.position === 'fixed') return true;
+      if (styles.position === 'fixed') return surface.isDocument || surface.element.contains(element);
       const bounds = surfaceRect();
       const top = Number.parseFloat(styles.top);
       const bottom = Number.parseFloat(styles.bottom);
@@ -448,7 +511,7 @@
       });
       selectionBox.appendChild(label);
       overlay.appendChild(selectionBox);
-      document.body.appendChild(overlay);
+      (document.fullscreenElement || document.documentElement).appendChild(overlay);
       overlay.focus();
 
       let startX = 0;
@@ -508,8 +571,10 @@
           await Utils.waitForPaint();
           const response = await captureVisibleTab();
           const image = await loadImage(response.dataUrl);
-          const scaleX = image.width / Math.max(1, window.innerWidth);
-          const scaleY = image.height / Math.max(1, window.innerHeight);
+          const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
+          const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
+          const scaleX = image.width / Math.max(1, viewportWidth);
+          const scaleY = image.height / Math.max(1, viewportHeight);
           const canvas = document.createElement('canvas');
           canvas.width = Math.round(cropWidth * scaleX);
           canvas.height = Math.round(cropHeight * scaleY);
@@ -544,6 +609,9 @@
       root.style.scrollBehavior = 'auto';
       selected = await selectScrollingRegion(originalDocument.x);
       if (!selected) return;
+      if (selected.surface && !selected.surface.isDocument && selected.surface.element) {
+        selected.surface.element.style.scrollBehavior = 'auto';
+      }
       restoreMotion = suspendPageMotion();
       progress = createProgressIndicator();
 
@@ -564,7 +632,8 @@
       restoreMotion();
       root.style.scrollBehavior = originalDocument.scrollBehavior;
       window.scrollTo(originalDocument.x, originalDocument.y);
-      if (selected && selected.surface && !selected.surface.isDocument) {
+      if (selected && selected.surface && !selected.surface.isDocument && selected.surface.element) {
+        selected.surface.element.style.scrollBehavior = '';
         selected.surface.scrollTo(selected.originalPosition.x, selected.originalPosition.y);
       }
       removeProgressIndicator(progress);
@@ -700,7 +769,7 @@
       actions.append(captureButton, restartButton, cancelButton);
       panel.append(title, instructions, status, fields, actions);
       overlay.append(selectionBox, panel);
-      document.body.appendChild(overlay);
+      (document.fullscreenElement || document.documentElement).appendChild(overlay);
 
       let firstPoint = null;
       let selectedSurface = getDocumentScrollSurface();
@@ -761,7 +830,32 @@
           event.preventDefault(); const position = selectedSurface.getPosition(); selectedSurface.scrollTo(position.x, position.y + amounts[event.key]); updatePreview();
         }
       }
-      overlay.addEventListener('pointermove', event => { if (!panel.contains(event.target)) { lastPointer = { x: event.clientX, y: event.clientY }; updatePreview(); } });
+      let pointerDownPos = null;
+      overlay.addEventListener('pointerdown', event => {
+        if (panel.contains(event.target) || event.button !== 0) return;
+        pointerDownPos = { x: event.clientX, y: event.clientY };
+      });
+      overlay.addEventListener('pointermove', event => {
+        if (!panel.contains(event.target)) {
+          lastPointer = { x: event.clientX, y: event.clientY };
+          if (pointerDownPos && !firstPoint) {
+            const distance = Math.hypot(event.clientX - pointerDownPos.x, event.clientY - pointerDownPos.y);
+            if (distance > 6) {
+              selectedSurface = findScrollSurfaceAtPoint(pointerDownPos.x, pointerDownPos.y);
+              originalPosition = selectedSurface.getPosition();
+              firstPoint = surfacePoint(selectedSurface, pointerDownPos.x, pointerDownPos.y);
+              instructions.textContent = text('scrollingInstructionEnd');
+              status.textContent = text('scrollingPointSet');
+              restartButton.disabled = false;
+            }
+          }
+          updatePreview();
+        }
+      });
+      overlay.addEventListener('pointerup', event => {
+        if (panel.contains(event.target)) return;
+        pointerDownPos = null;
+      });
       overlay.addEventListener('click', event => {
         if (panel.contains(event.target)) return;
         lastPointer = { x: event.clientX, y: event.clientY };
@@ -774,7 +868,15 @@
         finish(normalize(firstPoint, surfacePoint(selectedSurface, event.clientX, event.clientY)));
       });
       overlay.addEventListener('wheel', event => {
-        if (!firstPoint) return;
+        if (!firstPoint) {
+          const hoverSurface = findScrollSurfaceAtPoint(event.clientX, event.clientY);
+          if (hoverSurface && !hoverSurface.isDocument) {
+            event.preventDefault();
+            const position = hoverSurface.getPosition();
+            hoverSurface.scrollTo(position.x + event.deltaX, position.y + event.deltaY);
+          }
+          return;
+        }
         event.preventDefault();
         const position = selectedSurface.getPosition();
         selectedSurface.scrollTo(position.x + event.deltaX, position.y + event.deltaY);

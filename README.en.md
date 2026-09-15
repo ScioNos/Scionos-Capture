@@ -29,7 +29,7 @@ In the editor, `V`, `D`, `M`, and `C` select tools; `Ctrl+Z`/`Ctrl+Y` undo and r
 
 `activeTab` and `scripting` capture only after an explicit action; `storage` keeps language and temporary editor mapping; `unlimitedStorage` prevents quota failures for large local images; `alarms` expires temporary captures.
 
-Transfer chunks remain only in local IndexedDB and are deleted after assembly or within fifteen minutes. The final capture is deleted as soon as the editor decodes it; a one-hour expiry only protects against orphaned captures. See [PRIVACY.en.md](PRIVACY.en.md) and [SECURITY.en.md](SECURITY.en.md).
+Transfer chunks remain only in local IndexedDB and are deleted after assembly or within fifteen minutes. The final capture is deleted as soon as the editor decodes it; a fifteen-minute expiry only protects against orphaned captures. See [PRIVACY.en.md](PRIVACY.en.md) and [SECURITY.en.md](SECURITY.en.md).
 
 ## Known limitations
 

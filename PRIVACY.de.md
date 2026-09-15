@@ -12,6 +12,6 @@ Die Scrollbereich-Aufnahme verarbeitet mehrere sichtbare Teile derselben Seite u
 
 Keine Aufnahme, URL oder Browserdaten werden an eyelo SA, ScioNos oder Dritte gesendet. Es gibt kein Konto, keine Telemetrie, Werbung oder externe Bibliothek.
 
-Die Aufnahme und die für die Übertragung benötigten Fragmente werden vorübergehend in IndexedDB gespeichert. Fragmente werden nach dem Zusammensetzen oder spätestens nach fünfzehn Minuten gelöscht. Die endgültige Aufnahme wird gelöscht, sobald der Editor sie dekodiert hat; die einstündige Frist dient nur als Sicherheitsnetz.
+Die Aufnahme und die für die Übertragung benötigten Fragmente werden vorübergehend in IndexedDB gespeichert. Fragmente werden nach dem Zusammensetzen oder spätestens nach fünfzehn Minuten gelöscht. Die endgültige Aufnahme wird gelöscht, sobald der Editor sie dekodiert hat; die fünfzehnminütige Frist dient nur als Sicherheitsnetz.
 
 Die Sprache liegt in `chrome.storage.local`, die temporäre Editor-Zuordnung in `chrome.storage.session`. Alle lokalen Daten können über die Erweiterungsverwaltung oder Deinstallation entfernt werden. Datenschutz-Kontakt: info@eyelo.ch. Für Schwachstellen siehe [SECURITY.de.md](SECURITY.de.md).

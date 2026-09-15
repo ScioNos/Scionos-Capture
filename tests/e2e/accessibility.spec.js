@@ -260,6 +260,69 @@ test('scrolling-area capture targets and restores an internal container', async 
   await page.close();
 });
 
+test('scrolling-area capture targets a chat dock container on a long scrollable page without scrolling background', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, `<!doctype html><html lang="fr"><style>
+    html, body { margin: 0; min-height: 3500px; background: linear-gradient(#fff, #cbd5e1); }
+    .chat-dock { position: fixed; left: 60px; bottom: 0; width: 320px; height: 460px; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; flex-direction: column; }
+    .chat-header { height: 48px; background: #0284c7; color: white; padding: 12px; font-weight: bold; flex-shrink: 0; }
+    .chat-messages { flex: 1 1 auto; overflow-y: auto; height: 360px; }
+    .chat-inner { height: 1600px; background: linear-gradient(#fff, #93c5fd); padding: 10px; }
+    .chat-footer { height: 52px; background: #f1f5f9; flex-shrink: 0; }
+  </style>
+  <main><h1>Page Facebook avec fil d'actualité</h1></main>
+  <div class="chat-dock" role="dialog">
+    <div class="chat-header">Discussion avec Ami</div>
+    <div class="chat-messages" data-scroll-surface><div class="chat-inner">Messages de la conversation...</div></div>
+    <div class="chat-footer">Saisir un message...</div>
+  </div></html>`);
+  const response = await page.evaluate(localizedMessages => new Promise(resolve => {
+    globalThis.__captureListener({ action: 'START_SCROLLING_ZONE_CAPTURE', language: 'fr', messages: localizedMessages }, {}, resolve);
+  }), frenchMessages);
+  expect(response).toEqual({ status: 'started' });
+
+  // Click on the chat dock header (simulating user clicking the top corner of the chat window)
+  // Chat dock is at left: 60px, bottom: 0 (viewport 800x600 -> left: 60, top: 140, right: 380, bottom: 600)
+  await page.locator('[data-scionos-capture="scrolling-selection"]').click({ position: { x: 100, y: 160 } });
+  await page.locator('input[name="x"]').fill('10');
+  await page.locator('input[name="y"]').fill('20');
+  await page.locator('input[name="width"]').fill('280');
+  await page.locator('input[name="height"]').fill('1000');
+  await page.locator('[data-scionos-capture="scrolling-controls"] button', { hasText: 'Capturer' }).click();
+
+  const result = await readOpenedCapture(page);
+  expect({ width: result.width, height: result.height }).toEqual({ width: 280, height: 1000 });
+  // The internal surface was scrolled, NOT the background window!
+  expect(result.positions.every(item => item.windowY === 0)).toBe(true);
+  expect(result.positions.map(item => item.surfaceY)).toEqual([20, 356, 692]);
+  await expect.poll(() => page.locator('[data-scroll-surface]').evaluate(element => element.scrollTop)).toBe(0);
+  await page.close();
+});
+
+test('zone capture crops a static visible selection', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, `<!doctype html><html lang="fr"><style>
+    html, body { margin: 0; min-height: 2000px; background: linear-gradient(#fff, #e2e8f0); }
+  </style><main style="padding: 40px;"><h1>Page avec sélection</h1></main></html>`);
+  const response = await page.evaluate(localizedMessages => new Promise(resolve => {
+    globalThis.__captureListener({ action: 'START_ZONE_CAPTURE', language: 'fr', messages: localizedMessages }, {}, resolve);
+  }), frenchMessages);
+  expect(response).toEqual({ status: 'started' });
+
+  const overlay = page.locator('[data-scionos-capture="selection"]');
+  await expect(overlay).toBeVisible();
+
+  // Drag from (100, 100) to (400, 350)
+  await page.mouse.move(100, 100);
+  await page.mouse.down();
+  await page.mouse.move(400, 350);
+  await page.mouse.up();
+
+  const result = await readOpenedCapture(page);
+  expect({ width: result.width, height: result.height }).toEqual({ width: 300, height: 250 });
+  await page.close();
+});
+
 test('scrolling-area overlay supports pointer, keyboard and exact multi-screen capture', async () => {
   const page = await context.newPage();
   await page.setViewportSize({ width: 800, height: 600 });

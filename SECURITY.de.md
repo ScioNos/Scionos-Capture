@@ -8,4 +8,4 @@ Für ausnutzbare Schwachstellen kein öffentliches Issue öffnen. Nutzen Sie die
 
 Eine Bestätigung wird innerhalb von 3 Arbeitstagen, eine erste Bewertung innerhalb von 7 Arbeitstagen angestrebt. Koordinierte Offenlegung erfolgt nach Bereitstellung einer Korrektur.
 
-Aufnahmen einschließlich Scrollbereich-Kacheln bleiben lokal. Es laufen keine externen Skripte und der neue Modus fügt keine Berechtigung hinzu. Verwaiste Aufnahmen laufen nach einer Stunde ab. Für Geheimnisse eine volle Abdeckung verwenden; Unschärfe ist keine kryptografische Löschung.
+Aufnahmen einschließlich Scrollbereich-Kacheln bleiben lokal. Es laufen keine externen Skripte und der neue Modus fügt keine Berechtigung hinzu. Verwaiste Aufnahmen laufen nach fünfzehn Minuten ab. Für Geheimnisse eine volle Abdeckung verwenden; Unschärfe ist keine kryptografische Löschung.

@@ -12,7 +12,7 @@ Scrolling-area capture processes several visible portions of the same page and s
 
 No screenshot, URL, or browsing data is sent to eyelo SA, ScioNos, or any third party. The extension has no account, telemetry, advertising, or remote library.
 
-The capture and the chunks required for transfer are temporarily stored in IndexedDB. Chunks are deleted after assembly or within fifteen minutes. The final capture is deleted as soon as the editor decodes it, with a one-hour expiry retained only as a safety fallback.
+The capture and the chunks required for transfer are temporarily stored in IndexedDB. Chunks are deleted after assembly or within fifteen minutes. The final capture is deleted as soon as the editor decodes it, with a fifteen-minute expiry retained only as a safety fallback.
 
 The selected language is kept in `chrome.storage.local`. The editor-tab mapping uses `chrome.storage.session` and ends with the browser session. Users can remove all local data from the extension management page or by uninstalling the extension.
 

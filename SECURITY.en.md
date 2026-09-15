@@ -12,4 +12,4 @@ Do not open a public issue for a security vulnerability. Use [private GitHub vul
 
 We aim to acknowledge reports within 3 business days and provide an initial assessment within 7 business days. Coordinated disclosure follows the availability of a fix.
 
-Captures, including scrolling-area tiles, remain in the local extension origin. No remote script runs and scrolling capture adds no permission. Orphaned captures expire after one hour and are purged on the next wake if the browser was suspended. Use a solid mask for secrets; blur is not cryptographic deletion.
+Captures, including scrolling-area tiles, remain in the local extension origin. No remote script runs and scrolling capture adds no permission. Orphaned captures expire after fifteen minutes and are purged on the next wake if the browser was suspended. Use a solid mask for secrets; blur is not cryptographic deletion.

@@ -4,6 +4,13 @@
 
 ## [Sin publicar]
 
+### Corregido
+
+- Reducción del tiempo de vida de capturas huérfanas de una hora a quince minutos.
+- Eliminación de la acción obsoleta `OPEN_EDITOR` del service worker, en desuso y no documentada.
+- Detección robusta de contenedores internos con desplazamiento (ej. ventanas de chat de Facebook Messenger) evitando desplazar la página de fondo.
+- Protección de elementos flotantes anclados (`position: fixed` / `position: sticky`) para evitar que se oculten durante el desplazamiento interno.
+
 ## [1.1.0] - 2026-09-14
 
 ### Añadido

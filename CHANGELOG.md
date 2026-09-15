@@ -6,6 +6,13 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 
 ## [Unreleased]
 
+### Corrigé
+
+- Durée de vie des captures orphelines réduite d’une heure à quinze minutes.
+- Suppression de l’action de service-worker legacy `OPEN_EDITOR`, inutilisée et non documentée.
+- Détection des conteneurs défilants internes (ex. fenêtres de discussion Messenger Facebook) lors de la sélection de zone au lieu de faire défiler la page parente.
+- Protection des fenêtres flottantes ancrées (`position: fixed` / `position: sticky`) pour éviter leur masquage intempestif pendant le défilement interne.
+
 ## [1.1.0] - 2026-09-14
 
 ### Ajouté
