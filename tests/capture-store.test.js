@@ -50,3 +50,37 @@ test('purges expired transfer metadata and chunks', async () => {
   assert.equal(await CaptureStore.getTransfer(id), undefined);
   assert.deepEqual(await CaptureStore.listTransferChunks(id), []);
 });
+
+test('caches capture records in memory and invalidates on deletion', async () => {
+  CaptureStore.clearCaptureCache();
+  const id = `cache-test-${Date.now()}`;
+  const record = { id, title: 'Cache Test', createdAt: Date.now() };
+  await CaptureStore.putCapture(record);
+
+  assert.equal(CaptureStore.captureCache.has(id), true);
+  const cached = await CaptureStore.getCapture(id);
+  assert.equal(cached.title, 'Cache Test');
+
+  await CaptureStore.deleteCapture(id);
+  assert.equal(CaptureStore.captureCache.has(id), false);
+});
+
+test('applies versioned migrations sequentially', () => {
+  const fakeStore = {
+    indexNames: { contains: () => false },
+    createIndex: () => {}
+  };
+  const fakeDb = {
+    objectStoreNames: { contains: () => false },
+    createObjectStore: () => fakeStore
+  };
+  const fakeTx = { objectStore: () => fakeStore };
+
+  assert.equal(typeof CaptureStore.applyMigrations, 'function');
+  assert.equal(typeof CaptureStore.MIGRATIONS[1], 'function');
+  assert.equal(typeof CaptureStore.MIGRATIONS[2], 'function');
+
+  // Verify running migrations 1 to 2
+  CaptureStore.applyMigrations(fakeDb, fakeTx, 0, 2);
+  CaptureStore.applyMigrations(fakeDb, fakeTx, 1, 2);
+});

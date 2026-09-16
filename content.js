@@ -5,6 +5,7 @@
 
   const Utils = ScionosCaptureUtils;
   const ACTIONS = new Set([
+    'PING',
     'START_FULL_PAGE_CAPTURE',
     'START_VISIBLE_CAPTURE',
     'START_ZONE_CAPTURE',
@@ -15,6 +16,10 @@
 
   chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     if (!request || !ACTIONS.has(request.action)) return;
+    if (request.action === 'PING') {
+      sendResponse({ loaded: true });
+      return;
+    }
     if (captureRunning) {
       sendResponse({ status: 'busy' });
       return;

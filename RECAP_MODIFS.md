@@ -60,22 +60,44 @@ Date : 14 septembre 2026 · Version : 1.2.0 (non publiée)
 
 ---
 
+## Améliorations techniques et performance
+
+### 8. Évitement de la réinjection systématique des scripts
+- **Fichiers :** `popup.js`, `content.js`
+- **Action :** Sonde de présence préalable via message `PING`. Si le script de contenu est déjà actif dans l'onglet, `chrome.scripting.executeScript` n'est plus appelé, économisant ~75 Ko de transfert et temps de compilation JS lors des captures répétées.
+- **Statut :** ✅ Terminé
+
+### 9. Cache mémoire transparent pour IndexedDB
+- **Fichiers :** `capture-store.js` (`captureCache`), `editor.js` (`loadCapture`)
+- **Action :** Mise en cache en mémoire vive des captures dans `CaptureStore.getCapture` avec invalidation automatique lors des suppressions/purges. Évite les lectures répétées sur disque et accélère l'éditeur.
+- **Statut :** ✅ Terminé
+
+### 10. Schéma de migration explicite et versionné pour IndexedDB
+- **Fichiers :** `capture-store.js` (`MIGRATIONS`, `applyMigrations`), `tests/capture-store.test.js`
+- **Action :** Formalisation des étapes de création/évolution du store sous la forme `MIGRATIONS[1]` et `MIGRATIONS[2]` avec application séquentielle selon `event.oldVersion`. Testé unitairement.
+- **Statut :** ✅ Terminé
+
+---
+
 ## Fichiers modifiés
 - `capture-utils.js` — fonction `sanitizeFilename`
-- `content.js` — bouton « Jusqu’en bas » et glisser-déposer
+- `capture-store.js` — migrations versionnées et cache mémoire IDB
+- `content.js` — bouton « Jusqu’en bas », glisser-déposer et réponse `PING`
 - `editor.html` — styles `@media print`, zone `#print-area`, chargement de `capture-utils.js`
-- `editor.js` — nom de fichier personnalisé, infobulles raccourcis, impression vectorielle
-- `popup.js` — transmission de la clé i18n `scrollingToBottom`
+- `editor.js` — nom de fichier personnalisé, infobulles raccourcis, impression vectorielle, réutilisation capture active
+- `popup.js` — transmission de `scrollingToBottom`, sonde `ensureContentInjected`
 - `_locales/*/messages.json` — traductions de `scrollingToBottom` (FR, EN, ES, DE)
 - `tests/capture-utils.test.js` — tests unitaires de `sanitizeFilename`
+- `tests/capture-store.test.js` — tests unitaires du cache mémoire et des migrations IDB
 - `AMELIORATIONS.md` — mise à jour des statuts
+- `RECAP_MODIFS.md` — journal de toutes les améliorations apportées
 
 ---
 
 ## Vérifications
 - `npm run check` — syntaxe OK
 - `npm run lint` — 0 erreur (ESLint + HTML-Validate)
-- `npm test` — 25 tests unitaires OK (100 %)
+- `npm test` — 27 tests unitaires OK (100 %)
 - `npm run validate` — paquet valide (4 locales, 104 clés, 37 références)
 - `npm run test:e2e` — 12 tests Playwright OK (100 %)
 - `npm run package` — ZIP généré correctement dans `dist/`

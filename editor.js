@@ -472,6 +472,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       showLoadError(getI18nText('captureLoadError'));
       return;
     }
+    if (captureRecord && captureRecord.id === captureId && baseImage) {
+      container.hidden = false;
+      emptyState.hidden = true;
+      updateRecordMetadata();
+      setEditorReady(true);
+      return;
+    }
     try {
       const record = await CaptureStore.getCapture(captureId);
       if (!record || !record.blob) throw new Error(getI18nText('captureLoadError'));

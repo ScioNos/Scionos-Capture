@@ -76,6 +76,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (new URL(tab.url).protocol === 'file:' && !(await hasFileAccess())) throw new Error(getI18nText('unsupportedPage'));
   }
 
+  async function ensureContentInjected(tabId) {
+    try {
+      const ping = await chrome.tabs.sendMessage(tabId, { action: 'PING' });
+      if (ping && ping.loaded) return;
+    } catch {
+      // Script not loaded in tab yet, proceed to inject
+    }
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      files: ['capture-utils.js', 'content.js']
+    });
+  }
+
   async function startCapture(action, statusKey) {
     setBusy(true);
     showStatus(getI18nText(statusKey));
@@ -83,10 +96,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const tab = await getActiveTab();
       await assertCapturableTab(tab);
 
-      await chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        files: ['capture-utils.js', 'content.js']
-      });
+      await ensureContentInjected(tab.id);
 
       const messageKeys = [
         'progress', 'reduced', 'visibleError', 'fullError', 'fullScrollError', 'zoneError',

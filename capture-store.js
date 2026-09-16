@@ -10,26 +10,52 @@
   const TRANSFER_STORE = 'transfers';
   const CHUNK_STORE = 'captureChunks';
 
+  const MIGRATIONS = {
+    1: (database, transaction) => {
+      const captures = database.objectStoreNames.contains(CAPTURE_STORE)
+        ? transaction.objectStore(CAPTURE_STORE)
+        : database.createObjectStore(CAPTURE_STORE, { keyPath: 'id' });
+      if (!captures.indexNames.contains('createdAt')) {
+        captures.createIndex('createdAt', 'createdAt', { unique: false });
+      }
+    },
+    2: (database, transaction) => {
+      const transfers = database.objectStoreNames.contains(TRANSFER_STORE)
+        ? transaction.objectStore(TRANSFER_STORE)
+        : database.createObjectStore(TRANSFER_STORE, { keyPath: 'id' });
+      if (!transfers.indexNames.contains('expiresAt')) {
+        transfers.createIndex('expiresAt', 'expiresAt', { unique: false });
+      }
+      if (!transfers.indexNames.contains('ownerTabId')) {
+        transfers.createIndex('ownerTabId', 'ownerTabId', { unique: false });
+      }
+
+      const chunks = database.objectStoreNames.contains(CHUNK_STORE)
+        ? transaction.objectStore(CHUNK_STORE)
+        : database.createObjectStore(CHUNK_STORE, { keyPath: ['transferId', 'index'] });
+      if (!chunks.indexNames.contains('transferId')) {
+        chunks.createIndex('transferId', 'transferId', { unique: false });
+      }
+    }
+  };
+
+  function applyMigrations(database, transaction, oldVersion, newVersion) {
+    for (let version = oldVersion + 1; version <= newVersion; version += 1) {
+      if (typeof MIGRATIONS[version] === 'function') {
+        MIGRATIONS[version](database, transaction);
+      }
+    }
+  }
+
   function openDatabase() {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(DATABASE_NAME, DATABASE_VERSION);
-      request.onupgradeneeded = () => {
+      request.onupgradeneeded = event => {
         const database = request.result;
-        const captures = database.objectStoreNames.contains(CAPTURE_STORE)
-          ? request.transaction.objectStore(CAPTURE_STORE)
-          : database.createObjectStore(CAPTURE_STORE, { keyPath: 'id' });
-        if (!captures.indexNames.contains('createdAt')) captures.createIndex('createdAt', 'createdAt', { unique: false });
-
-        const transfers = database.objectStoreNames.contains(TRANSFER_STORE)
-          ? request.transaction.objectStore(TRANSFER_STORE)
-          : database.createObjectStore(TRANSFER_STORE, { keyPath: 'id' });
-        if (!transfers.indexNames.contains('expiresAt')) transfers.createIndex('expiresAt', 'expiresAt', { unique: false });
-        if (!transfers.indexNames.contains('ownerTabId')) transfers.createIndex('ownerTabId', 'ownerTabId', { unique: false });
-
-        const chunks = database.objectStoreNames.contains(CHUNK_STORE)
-          ? request.transaction.objectStore(CHUNK_STORE)
-          : database.createObjectStore(CHUNK_STORE, { keyPath: ['transferId', 'index'] });
-        if (!chunks.indexNames.contains('transferId')) chunks.createIndex('transferId', 'transferId', { unique: false });
+        const transaction = request.transaction;
+        const oldVersion = (event && event.oldVersion) || 0;
+        const newVersion = (event && event.newVersion) || DATABASE_VERSION;
+        applyMigrations(database, transaction, oldVersion, newVersion);
       };
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error || new Error('Impossible d’ouvrir le stockage temporaire.'));
@@ -49,9 +75,29 @@
     }));
   }
 
-  const putCapture = record => runRequest(CAPTURE_STORE, 'readwrite', store => store.put(record));
-  const getCapture = id => runRequest(CAPTURE_STORE, 'readonly', store => store.get(id));
-  const deleteCapture = id => runRequest(CAPTURE_STORE, 'readwrite', store => store.delete(id));
+  const captureCache = new Map();
+
+  function clearCaptureCache() {
+    captureCache.clear();
+  }
+
+  const putCapture = async record => {
+    const result = await runRequest(CAPTURE_STORE, 'readwrite', store => store.put(record));
+    if (record && record.id) captureCache.set(record.id, record);
+    return result;
+  };
+
+  const getCapture = async id => {
+    if (captureCache.has(id)) return captureCache.get(id);
+    const record = await runRequest(CAPTURE_STORE, 'readonly', store => store.get(id));
+    if (record) captureCache.set(id, record);
+    return record;
+  };
+
+  const deleteCapture = async id => {
+    captureCache.delete(id);
+    return runRequest(CAPTURE_STORE, 'readwrite', store => store.delete(id));
+  };
   const listCaptures = () => runRequest(CAPTURE_STORE, 'readonly', store => store.getAll());
   const putTransfer = record => runRequest(TRANSFER_STORE, 'readwrite', store => store.put(record));
   const getTransfer = id => runRequest(TRANSFER_STORE, 'readonly', store => store.get(id));
@@ -128,7 +174,9 @@
   }
 
   async function purgeExpiredCaptures(maxAgeMs, now = Date.now()) {
-    return (await purgeByIndex(CAPTURE_STORE, 'createdAt', now - maxAgeMs)).length;
+    const deleted = await purgeByIndex(CAPTURE_STORE, 'createdAt', now - maxAgeMs);
+    deleted.forEach(id => captureCache.delete(id));
+    return deleted.length;
   }
 
   async function purgeExpiredTransfers(now = Date.now()) {
@@ -150,6 +198,7 @@
   return {
     putCapture, getCapture, listCaptures, deleteCapture, purgeExpiredCaptures,
     putTransfer, getTransfer, listTransfers, putTransferChunk, getTransferChunk,
-    listTransferChunks, deleteTransfer, purgeExpiredTransfers, listTransfersByOwner
+    listTransferChunks, deleteTransfer, purgeExpiredTransfers, listTransfersByOwner,
+    applyMigrations, MIGRATIONS, clearCaptureCache, captureCache
   };
 });

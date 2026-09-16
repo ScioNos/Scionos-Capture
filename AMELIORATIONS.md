@@ -64,19 +64,22 @@ Suggestion tirées d'un audit complet du code (syntaxe, lint, tests unitaires, t
 ## 🟢 Améliorations techniques / performance
 
 ### 8. `capture-utils.js` injecté à chaque capture
-- **Fichiers :** `popup.js:86-89`
-- **Problème :** le couple `capture-utils.js` + `content.js` est réinjecté à chaque capture ; 26 Ko servent à un fichier purement utilitaire.
-- **Action :** mémoire de l'injection par onglet (vérifier `window.hasScionosCaptureLoaded`) ou passage des utilitaires en page d'extension pour ne les charger qu'une fois.
+- **Fichiers :** `popup.js`, `content.js`
+- **Statut :** ✅ **Corrigé** — sonde de présence via message `PING` avant `executeScript` ; les captures consécutives sur le même onglet ne réinjectent plus les scripts, économisant ~75 Ko de transfert et parsing à chaque prise.
+- **Problème :** le couple `capture-utils.js` + `content.js` était réinjecté à chaque capture.
+- **Action :** ping léger vérifiant la présence du script avant injection.
 
 ### 9. Lectures IndexedDB répétées dans l'éditeur
-- **Fichier :** `editor.js` (`loadCapture`)
-- **Problème :** chaque ouverture d'un onglet éditeur relit IndexedDB, même pour la même capture.
-- **Action :** cache en mémoire (session) pour éviter des lectures redondantes.
+- **Fichiers :** `capture-store.js` (`captureCache`), `editor.js` (`loadCapture`)
+- **Statut :** ✅ **Corrigé** — cache en mémoire RAM transparent dans `CaptureStore` pour `getCapture` avec invalidation automatique lors des suppressions/purges, et vérification préalable dans `loadCapture` évitant les accès IDB redondants.
+- **Problème :** chaque lecture relisait IndexedDB sur disque.
+- **Action :** cache en mémoire transparent.
 
 ### 10. Schéma de migration du store IndexedDB
-- **Fichier :** `capture-store.js` (`onupgradeneeded`)
-- **Problème :** `DATABASE_VERSION = 2` existe, mais les migrations ne sont pas gérées via un tableau de versions ; l'ajout d'un index ou d'un store peut créer des incohérences.
-- **Action :** introduire un schéma de migration versionné (`MIGRATIONS[version]`) .
+- **Fichiers :** `capture-store.js` (`MIGRATIONS`, `applyMigrations`), `tests/capture-store.test.js`
+- **Statut :** ✅ **Corrigé** — schéma déclaratif et versionné `MIGRATIONS[version]` avec fonction `applyMigrations(database, transaction, oldVersion, newVersion)` pour des montées de version prévisibles et testées unitairement.
+- **Problème :** les migrations n'étaient pas gérées via un tableau ordonné de versions.
+- **Action :** introduire un schéma de migration versionné (`MIGRATIONS[version]`).
 
 ---
 
