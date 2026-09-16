@@ -41,6 +41,7 @@
   "scrollingPointSet": { "message": "Premier point défini. Faites défiler la page." },
   "scrollingInvalidRegion": { "message": "La zone doit mesurer au moins 5 × 5 px et rester dans la largeur visible." },
   "scrollingCapture": { "message": "Capturer" },
+  "scrollingToBottom": { "message": "Jusqu’en bas" },
   "scrollingRestart": { "message": "Recommencer" },
   "scrollingCancel": { "message": "Annuler" },
   "tabChangedError": { "message": "La capture a été interrompue car l’onglet actif a changé." },

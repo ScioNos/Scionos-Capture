@@ -98,6 +98,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     zoomOutButton.setAttribute('aria-label', getI18nText('zoomOut'));
     zoomInButton.setAttribute('aria-label', getI18nText('zoomIn'));
     zoomResetButton.setAttribute('aria-label', getI18nText('zoomFit'));
+
+    const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/i.test(navigator.platform || navigator.userAgent);
+    const ctrlKey = isMac ? '⌘' : 'Ctrl';
+    const toolSelect = document.getElementById('tool-select');
+    const toolDraw = document.getElementById('tool-draw');
+    const toolCensor = document.getElementById('tool-censor');
+    const toolCrop = document.getElementById('tool-crop');
+
+    if (toolSelect) toolSelect.title = `${getI18nText('toolCursor')} (V)`;
+    if (toolDraw) toolDraw.title = `${getI18nText('toolDraw')} (D)`;
+    if (toolCensor) toolCensor.title = `${getI18nText('toolCensor')} (M)`;
+    if (toolCrop) toolCrop.title = `${getI18nText('toolCrop')} (C)`;
+    if (undoButton) undoButton.title = `${getI18nText('toolUndo')} (${ctrlKey}+Z)`;
+    if (redoButton) redoButton.title = `${getI18nText('toolRedo')} (${ctrlKey}+Y)`;
+    if (zoomInButton) zoomInButton.title = `${getI18nText('zoomIn')} (+)`;
+    if (zoomOutButton) zoomOutButton.title = `${getI18nText('zoomOut')} (-)`;
+    if (zoomResetButton) zoomResetButton.title = `${getI18nText('zoomFit')} (0)`;
+    if (copyButton) copyButton.title = getI18nText('btnCopy');
+    if (printButton) printButton.title = getI18nText('btnPrint');
+    if (htmlButton) htmlButton.title = getI18nText('btnHtml');
+    if (downloadButton) downloadButton.title = getI18nText('btnPng');
+
     if (!captureRecord) emptyState.textContent = getI18nText('loadingCapture');
     updateRecordMetadata();
     updateControlVisibility();
@@ -628,7 +650,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const blob = await canvasToBlob();
       const link = document.createElement('a');
-      link.download = `Scionos_Capture_${new Date().toISOString().slice(0, 10)}.png`;
+      const title = captureRecord && captureRecord.title ? captureRecord.title : '';
+      const baseName = ScionosCaptureUtils.sanitizeFilename(title, 'Scionos_Capture');
+      const dateStr = new Date().toISOString().slice(0, 10);
+      link.download = `${baseName}_${dateStr}.png`;
       link.href = URL.createObjectURL(blob);
       link.click();
       setTimeout(() => URL.revokeObjectURL(link.href), 5000);
@@ -665,7 +690,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
       const link = document.createElement('a');
-      link.download = `Scionos_Capture_${new Date().toISOString().slice(0, 10)}.html`;
+      const title = captureRecord && captureRecord.title ? captureRecord.title : '';
+      const baseName = ScionosCaptureUtils.sanitizeFilename(title, 'Scionos_Capture');
+      const dateStr = new Date().toISOString().slice(0, 10);
+      link.download = `${baseName}_${dateStr}.html`;
       link.href = URL.createObjectURL(blob);
       link.click();
       setTimeout(() => URL.revokeObjectURL(link.href), 5000);
@@ -676,6 +704,31 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   printButton.addEventListener('click', () => {
     cancelDraft();
+    if (!committedSurface) return;
+    const printArea = document.getElementById('print-area');
+    if (printArea) {
+      const title = captureRecord && captureRecord.title ? captureRecord.title : getI18nText('captureTitle');
+      const safeUrl = ScionosCaptureUtils.sanitizeUrl(captureRecord && captureRecord.url ? captureRecord.url : '');
+      const rawUrl = captureRecord && captureRecord.url ? captureRecord.url : '';
+      const dateFormatted = captureRecord && captureRecord.timestamp
+        ? new Date(captureRecord.timestamp).toLocaleString(ScionosI18n.language)
+        : new Date().toLocaleString(ScionosI18n.language);
+      const dataUrl = committedSurface.toDataURL('image/png');
+
+      printArea.innerHTML = `
+        <div class="print-header">
+          <h1>${ScionosCaptureUtils.escapeHtml(title)}</h1>
+          <div class="print-meta">
+            ${rawUrl ? `<span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportSource'))} :</strong> <a href="${ScionosCaptureUtils.escapeHtml(safeUrl)}">${ScionosCaptureUtils.escapeHtml(rawUrl)}</a></span>` : ''}
+            <span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportDate'))} :</strong> ${ScionosCaptureUtils.escapeHtml(dateFormatted)}</span>
+            <span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportDimensions'))} :</strong> ${committedSurface.width} × ${committedSurface.height} px</span>
+          </div>
+        </div>
+        <div class="print-image-wrap">
+          <img src="${dataUrl}" alt="${ScionosCaptureUtils.escapeHtml(title)}">
+        </div>
+      `;
+    }
     showToast(getI18nText('printOpened'));
     window.print();
   });

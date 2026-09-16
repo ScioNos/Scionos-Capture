@@ -41,6 +41,7 @@
   "scrollingPointSet": { "message": "Erster Punkt gesetzt. Scrollen Sie durch die Seite." },
   "scrollingInvalidRegion": { "message": "Der Bereich muss mindestens 5 × 5 px groß sein und in der sichtbaren Breite liegen." },
   "scrollingCapture": { "message": "Erfassen" },
+  "scrollingToBottom": { "message": "Bis nach unten" },
   "scrollingRestart": { "message": "Neu beginnen" },
   "scrollingCancel": { "message": "Abbrechen" },
   "tabChangedError": { "message": "Die Aufnahme wurde beendet, weil der aktive Tab gewechselt hat." },

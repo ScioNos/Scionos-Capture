@@ -15,6 +15,7 @@ const {
   isRestrictedUrl,
   escapeHtml,
   sanitizeUrl,
+  sanitizeFilename,
   buildHtmlReport
 } = require('../capture-utils.js');
 
@@ -167,4 +168,16 @@ test('computes a bounded adaptive reduction for oversized PNG payloads', () => {
   assert.equal(computePayloadReductionScale(MAX_TRANSFER_BYTES), 1);
   const scale = computePayloadReductionScale(MAX_TRANSFER_BYTES * 2);
   assert.ok(scale >= 0.1 && scale < 1);
+});
+
+test('sanitizes titles into safe and valid filenames', () => {
+  assert.equal(sanitizeFilename('Article: L\'avenir du Web ?'), 'Article_Lavenir_du_Web');
+  assert.equal(sanitizeFilename('Test / Slash \\ Backslash * Asterisk : Colon'), 'Test_Slash_Backslash_Asterisk_Colon');
+  assert.equal(sanitizeFilename(''), 'Scionos_Capture');
+  assert.equal(sanitizeFilename(null), 'Scionos_Capture');
+  assert.equal(sanitizeFilename('   '), 'Scionos_Capture');
+  assert.equal(sanitizeFilename('Screenshot'), 'Scionos_Capture');
+  assert.equal(sanitizeFilename('Capture'), 'Scionos_Capture');
+  assert.equal(sanitizeFilename('A'.repeat(100)).length <= 45, true);
+  assert.equal(sanitizeFilename('   __Titre  avec   espaces__   '), 'Titre_avec_espaces');
 });

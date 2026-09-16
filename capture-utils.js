@@ -189,6 +189,25 @@
     return '';
   }
 
+  function sanitizeFilename(title, fallback = 'Scionos_Capture', maxLength = 45) {
+    if (typeof title !== 'string' || !title.trim()) return fallback;
+    const normalized = title.normalize('NFKD');
+    let printable = '';
+    for (let i = 0; i < normalized.length; i += 1) {
+      const code = normalized.charCodeAt(i);
+      if (code >= 32 && code !== 127) {
+        printable += normalized[i];
+      }
+    }
+    const clean = printable
+      .replace(/[<>:"/\\|?*'`]/g, '')
+      .replace(/[\s\t\r\n]+/g, '_')
+      .replace(/_+/g, '_')
+      .replace(/^_+|_+$/g, '');
+    if (!clean || clean.toLowerCase() === 'screenshot' || clean.toLowerCase() === 'capture') return fallback;
+    return clean.slice(0, maxLength).replace(/_+$/, '') || fallback;
+  }
+
   function buildHtmlReport(options = {}) {
     const title = options.title || 'Scionos Capture';
     const rawUrl = options.url || '';
@@ -625,6 +644,7 @@
     isRestrictedUrl,
     escapeHtml,
     sanitizeUrl,
+    sanitizeFilename,
     buildHtmlReport,
     delay,
     waitForPaint

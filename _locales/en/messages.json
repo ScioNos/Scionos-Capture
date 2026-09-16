@@ -41,6 +41,7 @@
   "scrollingPointSet": { "message": "First point set. Scroll through the page." },
   "scrollingInvalidRegion": { "message": "The area must be at least 5 × 5 px and remain within the visible width." },
   "scrollingCapture": { "message": "Capture" },
+  "scrollingToBottom": { "message": "To bottom" },
   "scrollingRestart": { "message": "Start over" },
   "scrollingCancel": { "message": "Cancel" },
   "tabChangedError": { "message": "Capture stopped because the active tab changed." },

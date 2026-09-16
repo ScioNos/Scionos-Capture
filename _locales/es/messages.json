@@ -41,6 +41,7 @@
   "scrollingPointSet": { "message": "Primer punto definido. Desplázate por la página." },
   "scrollingInvalidRegion": { "message": "El área debe medir al menos 5 × 5 px y permanecer dentro del ancho visible." },
   "scrollingCapture": { "message": "Capturar" },
+  "scrollingToBottom": { "message": "Hasta el final" },
   "scrollingRestart": { "message": "Reiniciar" },
   "scrollingCancel": { "message": "Cancelar" },
   "tabChangedError": { "message": "La captura se detuvo porque cambió la pestaña activa." },

@@ -756,17 +756,18 @@
         label.appendChild(input); fields.appendChild(label); inputs[name] = input;
       });
       const actions = document.createElement('div');
-      Object.assign(actions.style, { display: 'flex', gap: '7px', marginTop: '11px' });
+      Object.assign(actions.style, { display: 'flex', flexWrap: 'wrap', gap: '7px', marginTop: '11px' });
       const makeButton = (key, type = 'button') => {
         const button = document.createElement('button'); button.type = type; button.textContent = text(key);
         Object.assign(button.style, { minHeight: '36px', padding: '6px 10px', border: '1px solid #31435b', borderRadius: '7px', background: '#101d2f', color: '#f8fafc' });
         return button;
       };
       const captureButton = makeButton('scrollingCapture', 'submit');
+      const toBottomButton = makeButton('scrollingToBottom');
       const restartButton = makeButton('scrollingRestart');
       const cancelButton = makeButton('scrollingCancel');
       restartButton.disabled = true;
-      actions.append(captureButton, restartButton, cancelButton);
+      actions.append(captureButton, toBottomButton, restartButton, cancelButton);
       panel.append(title, instructions, status, fields, actions);
       overlay.append(selectionBox, panel);
       (document.fullscreenElement || document.documentElement).appendChild(overlay);
@@ -809,6 +810,27 @@
         selectionBox.style.display = 'none'; instructions.textContent = text('scrollingInstructionStart');
         status.textContent = ''; restartButton.disabled = true; overlay.focus();
       };
+      function extendToBottom() {
+        const metrics = selectedSurface.getMetrics();
+        const position = selectedSurface.getPosition();
+        if (!firstPoint) {
+          firstPoint = { x: position.x, y: position.y };
+          restartButton.disabled = false;
+          instructions.textContent = text('scrollingInstructionEnd');
+          status.textContent = text('scrollingPointSet');
+        }
+        const width = Number(inputs.width.value) || metrics.viewportWidth;
+        const bottomPoint = {
+          x: firstPoint.x + width,
+          y: metrics.fullHeight
+        };
+        const region = normalize(firstPoint, bottomPoint);
+        inputs.x.value = String(region.x);
+        inputs.y.value = String(region.y);
+        inputs.width.value = String(region.width);
+        inputs.height.value = String(region.height);
+        finish(region);
+      }
       function updatePreview() {
         if (!firstPoint) return;
         const current = surfacePoint(selectedSurface, lastPointer.x, lastPointer.y);
@@ -824,6 +846,11 @@
       function onKeyDown(event) {
         if (event.key === 'Escape') { event.preventDefault(); settle(null); return; }
         if (event.key === 'Backspace' && firstPoint && !event.target.closest('input')) { event.preventDefault(); reset(); return; }
+        if ((event.key.toLowerCase() === 'b' || event.key === 'End') && !event.target.closest('input')) {
+          event.preventDefault();
+          extendToBottom();
+          return;
+        }
         if (event.target.closest('input, button')) return;
         const amounts = { ArrowDown: 48, ArrowUp: -48, PageDown: Math.round(window.innerHeight * 0.8), PageUp: -Math.round(window.innerHeight * 0.8) };
         if (event.key in amounts) {
@@ -831,9 +858,14 @@
         }
       }
       let pointerDownPos = null;
+      let isDragging = false;
+      let dragSettled = false;
+
       overlay.addEventListener('pointerdown', event => {
         if (panel.contains(event.target) || event.button !== 0) return;
         pointerDownPos = { x: event.clientX, y: event.clientY };
+        isDragging = false;
+        dragSettled = false;
       });
       overlay.addEventListener('pointermove', event => {
         if (!panel.contains(event.target)) {
@@ -841,6 +873,7 @@
           if (pointerDownPos && !firstPoint) {
             const distance = Math.hypot(event.clientX - pointerDownPos.x, event.clientY - pointerDownPos.y);
             if (distance > 6) {
+              isDragging = true;
               selectedSurface = findScrollSurfaceAtPoint(pointerDownPos.x, pointerDownPos.y);
               originalPosition = selectedSurface.getPosition();
               firstPoint = surfacePoint(selectedSurface, pointerDownPos.x, pointerDownPos.y);
@@ -854,10 +887,22 @@
       });
       overlay.addEventListener('pointerup', event => {
         if (panel.contains(event.target)) return;
+        if (isDragging && firstPoint && pointerDownPos) {
+          const deltaX = Math.abs(event.clientX - pointerDownPos.x);
+          const deltaY = Math.abs(event.clientY - pointerDownPos.y);
+          if (deltaX > 10 && deltaY > 10) {
+            dragSettled = true;
+            finish(normalize(firstPoint, surfacePoint(selectedSurface, event.clientX, event.clientY)));
+            pointerDownPos = null;
+            isDragging = false;
+            return;
+          }
+        }
         pointerDownPos = null;
+        isDragging = false;
       });
       overlay.addEventListener('click', event => {
-        if (panel.contains(event.target)) return;
+        if (panel.contains(event.target) || dragSettled || settled) return;
         lastPointer = { x: event.clientX, y: event.clientY };
         if (!firstPoint) {
           selectedSurface = findScrollSurfaceAtPoint(event.clientX, event.clientY);
@@ -888,6 +933,7 @@
         const x = Number(inputs.x.value), y = Number(inputs.y.value), width = Number(inputs.width.value), height = Number(inputs.height.value);
         finish(normalize({ x, y }, { x: x + width, y: y + height }));
       });
+      toBottomButton.addEventListener('click', extendToBottom);
       restartButton.addEventListener('click', reset);
       cancelButton.addEventListener('click', () => settle(null));
       window.addEventListener('keydown', onKeyDown, true);

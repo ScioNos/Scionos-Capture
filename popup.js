@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'progress', 'reduced', 'visibleError', 'fullError', 'fullScrollError', 'zoneError',
         'scrollingError', 'scrollingDialogLabel', 'scrollingGeometry',
         'scrollingInstructionStart', 'scrollingInstructionEnd', 'scrollingPointSet',
-        'scrollingInvalidRegion', 'scrollingCapture', 'scrollingRestart', 'scrollingCancel',
+        'scrollingInvalidRegion', 'scrollingCapture', 'scrollingToBottom', 'scrollingRestart', 'scrollingCancel',
         'coordinateX', 'coordinateY', 'coordinateWidth', 'coordinateHeight',
         'btnScrollingTitle', 'tabChangedError', 'captureAlreadyRunning',
         'layoutChangedError', 'captureTooLargeError'
