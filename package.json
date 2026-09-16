@@ -5,6 +5,8 @@
   "license": "MIT",
   "description": "Extension Manifest V3 de capture d’écran locale pour Chrome et Edge.",
   "scripts": {
+    "clean": "node scripts/clean.mjs",
+    "version:sync": "node scripts/update-readme-version.mjs",
     "check": "node --check background.js && node --check capture-utils.js && node --check capture-store.js && node --check content.js && node --check editor.js && node --check i18n.js && node --check popup.js",
     "lint": "eslint . && html-validate popup.html editor.html",
     "validate": "node scripts/validate-package.mjs",

@@ -86,17 +86,20 @@ Suggestion tirées d'un audit complet du code (syntaxe, lint, tests unitaires, t
 ## 📚 Documentation / process
 
 ### 11. Version du README mise à jour à la main
-- **Fichiers :** `README*.md`, `RELEASE_NOTES.md`, `CHANGELOG.md`
+- **Fichiers :** `scripts/update-readme-version.mjs`, `package.json` (`npm run version:sync`), `README*.md`, `RELEASE_NOTES.md`
+- **Statut :** ✅ **Corrigé** — script ESM dédié `scripts/update-readme-version.mjs` et commande `npm run version:sync` pour synchroniser automatiquement les numéros de version, tags et noms d'archives dans tous les fichiers `README*.md` et `RELEASE_NOTES.md`.
 - **Problème :** `validate-package.mjs` exige que le README référence la version courante (ligne 73), mais rien ne la met à jour automatiquement.
 - **Action :** ajouter un script `scripts/update-readme-version.mjs` exécuté au release.
 
 ### 12. Tests E2E et cache Chromium en CI
 - **Fichier :** `.github/workflows/ci.yml`
+- **Statut :** ✅ **Corrigé** — étape `actions/cache@v4` ajoutée pour les binaires Playwright Chromium sous Ubuntu (`~/.cache/ms-playwright`) et Windows (`~\AppData\Local\ms-playwright`), avec installation conditionnelle des dépendances système (`install-deps` vs `install --with-deps`).
 - **Problème :** chaque run télécharge Chromium ; les PR lourdes deviennent coûteuses.
 - **Action :** cacher les binaires Playwright (`actions/cache`) ou limiter le plein E2E aux push sur `main`.
 
 ### 13. Pas de script de nettoyage
-- **Fichier :** `package.json`
+- **Fichiers :** `scripts/clean.mjs`, `package.json` (`npm run clean`)
+- **Statut :** ✅ **Corrigé** — script de nettoyage portable `scripts/clean.mjs` (utilisant `fs.rmSync` natif sans dépendance externe) et commande `npm run clean` pour supprimer `dist/`, `test-results/`, `playwright-report/` et `coverage/`.
 - **Problème :** `dist/` et `test-results/` s'accumulent localement.
 - **Action :** ajouter `npm run clean` (suppression de `dist/`, `test-results/`, `playwright-report/`).
 

@@ -39,7 +39,18 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - name: Cache Playwright Chromium binaries
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+      - name: Install Chromium with system dependencies
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - name: Install Chromium system dependencies only (cache hit)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
       - run: npm run test:e2e
 
   windows-scaling:
@@ -52,5 +63,13 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npx playwright install chromium
+      - name: Cache Playwright Chromium binaries
+        uses: actions/cache@v4
+        id: playwright-cache-windows
+        with:
+          path: ~\AppData\Local\ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+      - name: Install Chromium
+        if: steps.playwright-cache-windows.outputs.cache-hit != 'true'
+        run: npx playwright install chromium
       - run: npx playwright test --grep "@windows-scaling"

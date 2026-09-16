@@ -79,18 +79,41 @@ Date : 14 septembre 2026 · Version : 1.2.0 (non publiée)
 
 ---
 
-## Fichiers modifiés
+## Documentation et Process CI
+
+### 11. Synchronisation automatique des versions de documentation
+- **Fichiers :** `scripts/update-readme-version.mjs`, `package.json` (`npm run version:sync`)
+- **Action :** Script ESM propageant la version cible (depuis argument CLI ou `package.json`) dans les badges shields.io, les URLs GitHub Release, les liens Markdown et les noms d'archives `.zip` de `README.md`, `README.en.md`, `README.es.md`, `README.de.md` et `RELEASE_NOTES.md`.
+- **Statut :** ✅ Terminé
+
+### 12. Cache binaire Playwright Chromium en CI
+- **Fichier :** `.github/workflows/ci.yml`
+- **Action :** Mise en cache via `actions/cache@v4` des binaires Chromium (`~/.cache/ms-playwright` sur Ubuntu, `~\AppData\Local\ms-playwright` sur Windows) indexée sur `package-lock.json`, évitant le re-téléchargement systématique de ~100 Mo par run.
+- **Statut :** ✅ Terminé
+
+### 13. Script de nettoyage local multiplateforme
+- **Fichiers :** `scripts/clean.mjs`, `package.json` (`npm run clean`)
+- **Action :** Script portable Node.js natif (`fs.rmSync`) sans dépendance externe purgeant `dist/`, `test-results/`, `playwright-report/` et `coverage/`.
+- **Statut :** ✅ Terminé
+
+---
+
+## Fichiers modifiés et créés
 - `capture-utils.js` — fonction `sanitizeFilename`
 - `capture-store.js` — migrations versionnées et cache mémoire IDB
 - `content.js` — bouton « Jusqu’en bas », glisser-déposer et réponse `PING`
 - `editor.html` — styles `@media print`, zone `#print-area`, chargement de `capture-utils.js`
 - `editor.js` — nom de fichier personnalisé, infobulles raccourcis, impression vectorielle, réutilisation capture active
 - `popup.js` — transmission de `scrollingToBottom`, sonde `ensureContentInjected`
+- `package.json` — ajout des scripts `clean` et `version:sync`
+- `.github/workflows/ci.yml` — cache des binaires Playwright Chromium
+- `scripts/clean.mjs` — script de purge des dossiers de build et tests
+- `scripts/update-readme-version.mjs` — script de synchronisation des versions dans la documentation
 - `_locales/*/messages.json` — traductions de `scrollingToBottom` (FR, EN, ES, DE)
 - `tests/capture-utils.test.js` — tests unitaires de `sanitizeFilename`
 - `tests/capture-store.test.js` — tests unitaires du cache mémoire et des migrations IDB
-- `AMELIORATIONS.md` — mise à jour des statuts
-- `RECAP_MODIFS.md` — journal de toutes les améliorations apportées
+- `AMELIORATIONS.md` — mise à jour des statuts (100 % complété : 13 / 13)
+- `RECAP_MODIFS.md` — journal complet de toutes les améliorations apportées
 
 ---
 
@@ -101,3 +124,5 @@ Date : 14 septembre 2026 · Version : 1.2.0 (non publiée)
 - `npm run validate` — paquet valide (4 locales, 104 clés, 37 références)
 - `npm run test:e2e` — 12 tests Playwright OK (100 %)
 - `npm run package` — ZIP généré correctement dans `dist/`
+- `npm run clean` — purge fonctionnelle et idempotente de `dist/`, `test-results/`, etc.
+- `npm run version:sync` — validation et synchronisation documentaire validées
