@@ -29,3 +29,7 @@ dist/
 Thumbs.db
 Desktop.ini
 .codegraph/
+
+# Local internal roadmaps and planning
+ROADMAP*.md
+
