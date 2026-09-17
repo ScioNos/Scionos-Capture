@@ -42,39 +42,43 @@ Ce document récapitule l'ensemble des améliorations déjà implémentées pour
    - **Fichiers :** `editor.html`, `editor.js`
    - **Description :** Zone `#print-area` dédiée avec styles CSS `@media print` garantissant l'absence de coupure ou rognage du canvas sur formats A4/Letter. L'en-tête de page contient un véritable texte vectoriel indexable (`h1` titre, lien hypertexte cliquable de l'URL source, horodatage localisé et dimensions en pixels).
 
+6. **Raccourci mnémonique `Alt+Shift+C` et configuration interactive depuis la popup :**
+   - **Fichiers :** `manifest.json`, `popup.html`, `popup.js`, `_locales/*/messages.json`, `README*.md`
+   - **Description :** Remplacement de l'ancien raccourci par défaut `Alt+Shift+P` par `Alt+Shift+C` (ergonomique à une seule main gauche, mnémonique **C**apture, sans aucun conflit Chromium/Windows) avec touche dédiée macOS (`MacCtrl+Command+C`). Dans la popup, l'indicateur de raccourci est désormais un bouton accessible cliquable ouvrant directement les paramètres d'extensions du navigateur (`chrome://extensions/shortcuts` ou `edge://extensions/shortcuts`), avec état stylisé en pointillé ambré si le raccourci n'est pas encore attribué par l'utilisateur.
+
 ---
 
 ### B. Robustesse technique & Performance
 
-6. **Sonde de présence pour éviter la réinjection systématique :**
+7. **Sonde de présence pour éviter la réinjection systématique :**
    - **Fichiers :** `popup.js`, `content.js`
    - **Description :** Avant tout appel à `chrome.scripting.executeScript`, une sonde légère envoie un message `PING`. Si `content.js` est déjà présent dans l'onglet, l'injection est ignorée, économisant ~75 Ko de transfert et temps d'analyse JS à chaque capture répétée sur le même onglet.
 
-7. **Cache mémoire transparent pour IndexedDB :**
+8. **Cache mémoire transparent pour IndexedDB :**
    - **Fichiers :** `capture-store.js`, `editor.js`, `tests/capture-store.test.js`
    - **Description :** `CaptureStore` intègre une Map en mémoire vive (`captureCache`) évitant les transactions disques répétées lors des appels `getCapture`. Le cache est automatiquement invalidé lors des suppressions (`deleteCapture`) et des nettoyages (`purgeExpiredCaptures`). `editor.js` réutilise également la capture active déjà chargée.
 
-8. **Schéma de migrations déclaratif et versionné :**
+9. **Schéma de migrations déclaratif et versionné :**
    - **Fichiers :** `capture-store.js`, `tests/capture-store.test.js`
    - **Description :** Les montées de version du schéma de base de données locale sont formalisées sous un objet `MIGRATIONS[v]` et orchestrées séquentiellement par `applyMigrations(database, transaction, oldVersion, newVersion)`. Un test unitaire valide la séquence des migrations.
 
-9. **Purge sécurisée des captures orphelines :**
-   - **Fichier :** `background.js`
-   - **Description :** Le délai de rétention de sécurité des captures non acquittées (`CAPTURE_TTL_MS`) a été réduit de 1 heure à 15 minutes, limitant l'empreinte disque locale en cas de fermeture inattendue de l'onglet d'édition.
+10. **Purge sécurisée des captures orphelines :**
+    - **Fichier :** `background.js`
+    - **Description :** Le délai de rétention de sécurité des captures non acquittées (`CAPTURE_TTL_MS`) a été réduit de 1 heure à 15 minutes, limitant l'empreinte disque locale en cas de fermeture inattendue de l'onglet d'édition.
 
 ---
 
 ### C. Outillage, CI & Process de développement
 
-10. **Cache binaire Playwright Chromium en CI :**
+11. **Cache binaire Playwright Chromium en CI :**
     - **Fichier :** `.github/workflows/ci.yml`
     - **Description :** Utilisation de `actions/cache@v4` indexée sur `package-lock.json` pour mettre en cache les binaires Chromium (`~/.cache/ms-playwright` sur Ubuntu et `~\AppData\Local\ms-playwright` sur Windows). Évite de télécharger ~100 Mo à chaque exécution du workflow.
 
-11. **Script de nettoyage local multiplateforme (`npm run clean`) :**
+12. **Script de nettoyage local multiplateforme (`npm run clean`) :**
     - **Fichiers :** `scripts/clean.mjs`, `package.json`
     - **Description :** Script utilisant `fs.rmSync` natif sans aucune dépendance externe, purgeant proprement `dist/`, `test-results/`, `playwright-report/` et `coverage/`.
 
-12. **Script de synchronisation automatique de version (`npm run version:sync`) :**
+13. **Script de synchronisation automatique de version (`npm run version:sync`) :**
     - **Fichiers :** `scripts/update-readme-version.mjs`, `package.json`
     - **Description :** Script ESM capable de propager un nouveau numéro de version SemVer dans `package.json`, `manifest.json`, les 4 README (`README.md`, `README.en.md`, `README.es.md`, `README.de.md`) et `RELEASE_NOTES.md`.
 

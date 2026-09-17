@@ -180,11 +180,29 @@
       margin-top: 14px;
       padding-top: 11px;
       border-top: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
       color: var(--muted);
-      text-align: center;
       font-size: 11px;
     }
+    .shortcut-button {
+      display: inline-flex;
+      align-items: center;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .shortcut-button:focus-visible {
+      outline: 2px solid var(--amber);
+      outline-offset: 2px;
+    }
     kbd {
+      display: inline-block;
       padding: 2px 6px;
       border: 1px solid var(--line);
       border-bottom-width: 2px;
@@ -192,6 +210,20 @@
       background: var(--panel);
       color: var(--text);
       font: 700 10px/1.2 ui-monospace, monospace;
+      transition: border-color 150ms ease, color 150ms ease;
+    }
+    .shortcut-button:hover kbd {
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+    .shortcut-button.unconfigured kbd {
+      border-color: var(--amber);
+      border-style: dashed;
+      color: var(--amber);
+    }
+    .shortcut-button.unconfigured:hover kbd {
+      border-color: var(--cyan);
+      color: var(--cyan);
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -239,7 +271,7 @@
     </button>
   </main>
 
-  <footer class="footer"><span id="shortcut-label"></span> <kbd id="shortcut-value"></kbd></footer>
+  <footer class="footer"><span id="shortcut-label"></span><button id="shortcut-button" class="shortcut-button" type="button"><kbd id="shortcut-value"></kbd></button></footer>
 
   <script src="capture-utils.js"></script>
   <script src="i18n.js"></script>

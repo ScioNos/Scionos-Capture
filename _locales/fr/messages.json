@@ -20,6 +20,7 @@
   "btnScrollingDesc": { "message": "Choisir une zone sur plusieurs écrans" },
   "shortcutText": { "message": "Raccourci" },
   "shortcutUnavailable": { "message": "Non configuré" },
+  "shortcutConfigure": { "message": "Configurer le raccourci dans le navigateur" },
   "statusFull": { "message": "Préparation de la page entière…" },
   "statusVisible": { "message": "Capture de la zone visible…" },
   "statusZone": { "message": "Tracez la zone à capturer." },

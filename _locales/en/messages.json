@@ -20,6 +20,7 @@
   "btnScrollingDesc": { "message": "Choose an area across several screens" },
   "shortcutText": { "message": "Shortcut" },
   "shortcutUnavailable": { "message": "Not configured" },
+  "shortcutConfigure": { "message": "Configure shortcut in browser" },
   "statusFull": { "message": "Preparing the full page…" },
   "statusVisible": { "message": "Capturing the visible area…" },
   "statusZone": { "message": "Draw the area to capture." },

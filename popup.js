@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('btn-scrolling')
   ];
   const status = document.getElementById('status');
+  const shortcutButton = document.getElementById('shortcut-button');
+  const shortcutValue = document.getElementById('shortcut-value');
 
   function updateTexts() {
     const mappings = {
@@ -28,11 +30,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function updateShortcut() {
+    if (!chrome.commands || typeof chrome.commands.getAll !== 'function') {
+      shortcutValue.textContent = getI18nText('shortcutUnavailable');
+      shortcutButton.classList.add('unconfigured');
+      return;
+    }
     chrome.commands.getAll(commands => {
-      const command = commands.find(item => item.name === '_execute_action');
-      document.getElementById('shortcut-value').textContent = command && command.shortcut
+      const command = (commands || []).find(item => item.name === '_execute_action');
+      const isConfigured = Boolean(command && command.shortcut);
+      shortcutValue.textContent = isConfigured
         ? command.shortcut.replaceAll('+', ' + ')
         : getI18nText('shortcutUnavailable');
+      shortcutButton.classList.toggle('unconfigured', !isConfigured);
+      shortcutButton.title = getI18nText('shortcutConfigure');
+      shortcutButton.setAttribute(
+        'aria-label',
+        `${getI18nText('shortcutText')} : ${shortcutValue.textContent}. ${getI18nText('shortcutConfigure')}`
+      );
     });
   }
 
@@ -139,6 +153,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateTexts();
     updateShortcut();
     languageMenu.update();
+  });
+
+  shortcutButton.addEventListener('click', () => {
+    const isEdge = navigator.userAgent.includes('Edg/');
+    const shortcutsUrl = isEdge ? 'edge://extensions/shortcuts' : 'chrome://extensions/shortcuts';
+    chrome.tabs.create({ url: shortcutsUrl });
   });
 
   captureButtons[0].addEventListener('click', () => startCapture('START_FULL_PAGE_CAPTURE', 'statusFull'));

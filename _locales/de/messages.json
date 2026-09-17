@@ -20,6 +20,7 @@
   "btnScrollingDesc": { "message": "Bereich über mehrere Ansichten wählen" },
   "shortcutText": { "message": "Tastenkürzel" },
   "shortcutUnavailable": { "message": "Nicht konfiguriert" },
+  "shortcutConfigure": { "message": "Tastenkürzel im Browser konfigurieren" },
   "statusFull": { "message": "Ganze Seite wird vorbereitet…" },
   "statusVisible": { "message": "Sichtbarer Bereich wird aufgenommen…" },
   "statusZone": { "message": "Ziehen Sie den Aufnahmebereich auf." },

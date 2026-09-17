@@ -31,7 +31,7 @@ Clonez le dépôt, exécutez `npm ci` puis chargez la racine du projet comme ext
 
 ## Utilisation
 
-Ouvrez Scionos Capture et choisissez **Page entière**, **Zone visible**, **Zone sélectionnée** ou **Zone défilante**. Pour cette dernière, cliquez sur le premier coin, faites défiler verticalement, puis cliquez sur le coin opposé. `Échap` annule, « Recommencer » efface le premier point et les champs X/Y/largeur/hauteur offrent une utilisation entièrement au clavier. Le raccourci suggéré est `Alt+Shift+P`; le menu affiche toujours le raccourci réellement configuré par le navigateur.
+Ouvrez Scionos Capture et choisissez **Page entière**, **Zone visible**, **Zone sélectionnée** ou **Zone défilante**. Pour cette dernière, cliquez sur le premier coin, faites défiler verticalement, puis cliquez sur le coin opposé. `Échap` annule, « Recommencer » efface le premier point et les champs X/Y/largeur/hauteur offrent une utilisation entièrement au clavier. Le raccourci suggéré est `Alt+Shift+C`; le menu affiche toujours le raccourci réellement configuré par le navigateur.
 
 Dans l’éditeur, les raccourcis `V`, `D`, `M`, `C` sélectionnent les outils; `Ctrl+Z` et `Ctrl+Y` annulent/refont; `+`, `-` et `0` contrôlent le zoom. Le masquage solide est recommandé pour les secrets : le flou est uniquement visuel.
 

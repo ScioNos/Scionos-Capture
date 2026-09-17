@@ -20,6 +20,7 @@
   "btnScrollingDesc": { "message": "Elegir un área en varias pantallas" },
   "shortcutText": { "message": "Atajo" },
   "shortcutUnavailable": { "message": "No configurado" },
+  "shortcutConfigure": { "message": "Configurar atajo en el navegador" },
   "statusFull": { "message": "Preparando la página completa…" },
   "statusVisible": { "message": "Capturando el área visible…" },
   "statusZone": { "message": "Dibuja el área que deseas capturar." },

@@ -21,7 +21,7 @@ To work from source, clone the repository, run `npm ci`, and load the project ro
 
 ## Usage and shortcuts
 
-Choose **Full page**, **Visible area**, **Selected area**, or **Scrolling area**. For a scrolling area, click the first corner, scroll vertically, and click the opposite corner. `Escape` cancels, **Start over** clears the first point, and X/Y/width/height fields provide a keyboard alternative. The suggested browser shortcut is `Alt+Shift+P`; the popup displays the shortcut actually configured.
+Choose **Full page**, **Visible area**, **Selected area**, or **Scrolling area**. For a scrolling area, click the first corner, scroll vertically, and click the opposite corner. `Escape` cancels, **Start over** clears the first point, and X/Y/width/height fields provide a keyboard alternative. The suggested browser shortcut is `Alt+Shift+C`; the popup displays the shortcut actually configured.
 
 In the editor, `V`, `D`, `M`, and `C` select tools; `Ctrl+Z`/`Ctrl+Y` undo and redo; `+`, `-`, and `0` control zoom. Use a solid mask for secrets—blur is visual only.
 
