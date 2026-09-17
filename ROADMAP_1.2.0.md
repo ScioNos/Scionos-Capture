@@ -66,19 +66,23 @@ Ce document récapitule l'ensemble des améliorations déjà implémentées pour
     - **Fichier :** `background.js`
     - **Description :** Le délai de rétention de sécurité des captures non acquittées (`CAPTURE_TTL_MS`) a été réduit de 1 heure à 15 minutes, limitant l'empreinte disque locale en cas de fermeture inattendue de l'onglet d'édition.
 
+11. **Masquage intelligent des barres de saisie (composers) et éléments stationnaires :**
+    - **Fichier :** `content.js`
+    - **Description :** Élargissement de `createAnchoredElementManager` pour détecter les éléments stationnaires (y compris en `position: absolute` hors conteneur défilant comme sur ChatGPT, Discord, Notion). Les éléments sont classifiés en `'top'` (en-tête conservé sur la première tuile) et `'bottom'` (barre de saisie masquée sur toutes les tuiles intermédiaires et visible uniquement sur la dernière tuile). Raccordement effectif du paramètre `range` dans `stabilizePageDimensions`.
+
 ---
 
 ### C. Outillage, CI & Process de développement
 
-11. **Cache binaire Playwright Chromium en CI :**
+12. **Cache binaire Playwright Chromium en CI :**
     - **Fichier :** `.github/workflows/ci.yml`
     - **Description :** Utilisation de `actions/cache@v4` indexée sur `package-lock.json` pour mettre en cache les binaires Chromium (`~/.cache/ms-playwright` sur Ubuntu et `~\AppData\Local\ms-playwright` sur Windows). Évite de télécharger ~100 Mo à chaque exécution du workflow.
 
-12. **Script de nettoyage local multiplateforme (`npm run clean`) :**
+13. **Script de nettoyage local multiplateforme (`npm run clean`) :**
     - **Fichiers :** `scripts/clean.mjs`, `package.json`
     - **Description :** Script utilisant `fs.rmSync` natif sans aucune dépendance externe, purgeant proprement `dist/`, `test-results/`, `playwright-report/` et `coverage/`.
 
-13. **Script de synchronisation automatique de version (`npm run version:sync`) :**
+14. **Script de synchronisation automatique de version (`npm run version:sync`) :**
     - **Fichiers :** `scripts/update-readme-version.mjs`, `package.json`
     - **Description :** Script ESM capable de propager un nouveau numéro de version SemVer dans `package.json`, `manifest.json`, les 4 README (`README.md`, `README.en.md`, `README.es.md`, `README.de.md`) et `RELEASE_NOTES.md`.
 

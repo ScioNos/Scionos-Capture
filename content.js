@@ -266,18 +266,26 @@
     ]);
   }
 
-  async function stabilizePageDimensions(surface) {
+  async function stabilizePageDimensions(surface, range) {
     await settleVisibleResources();
     const startedAt = Date.now();
     let previous = surface.getMetrics();
     let stablePasses = 0;
     for (let pass = 0; pass < 4 && stablePasses < 2 && Date.now() - startedAt < 5000; pass += 1) {
-      const positions = Utils.buildScrollPositions(previous.fullHeight, previous.viewportHeight);
+      let positions = Utils.buildScrollPositions(previous.fullHeight, previous.viewportHeight);
+      if (range) {
+        const rangeTop = typeof range.top === 'number' ? range.top : (Number(range.y) || 0);
+        const rangeBottom = typeof range.bottom === 'number'
+          ? range.bottom
+          : (rangeTop + (Number(range.height) || previous.viewportHeight));
+        const scoped = positions.filter(y => y + previous.viewportHeight > rangeTop && y < rangeBottom);
+        if (scoped.length) positions = scoped;
+      }
       const originalX = surface.getPosition().x;
       for (const y of positions) {
         surface.scrollTo(originalX, y);
         await Utils.waitForPaint();
-        await Utils.delay(100);
+        await Utils.delay(120);
         assertSurfacePosition(surface, { x: originalX, y });
       }
       const next = surface.getMetrics();
@@ -304,41 +312,75 @@
     return () => style.remove();
   }
 
-  function createAnchoredElementManager(surface) {
-    const seen = new WeakSet();
+  function createAnchoredElementManager(surface, captureBounds) {
     let hidden = [];
-    const surfaceRect = () => surface.isDocument
+    const bounds = captureBounds || (surface.isDocument
       ? { left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight }
-      : surface.getCaptureRect();
-    const isAnchored = element => {
-      if (!element.isConnected || element.closest('[data-scionos-capture]')) return false;
-      if (!surface.isDocument && (element === surface.element || element.contains(surface.element))) return false;
+      : surface.getCaptureRect());
+
+    const classifyElement = element => {
+      if (!element.isConnected || element.closest('[data-scionos-capture]')) return null;
+      if (!surface.isDocument && (element === surface.element || element.contains(surface.element))) return null;
+
       const styles = getComputedStyle(element);
-      if (!['fixed', 'sticky'].includes(styles.position)) return false;
+      const isFixedOrSticky = ['fixed', 'sticky'].includes(styles.position);
+      const isExternalAbsolute = !surface.isDocument
+        && styles.position === 'absolute'
+        && !surface.element.contains(element);
+
+      if (!isFixedOrSticky && !isExternalAbsolute) return null;
+
       const rect = element.getBoundingClientRect();
-      if (rect.width < 1 || rect.height < 1 || rect.bottom <= 0 || rect.right <= 0) return false;
-      if (styles.position === 'fixed') return surface.isDocument || surface.element.contains(element);
-      const bounds = surfaceRect();
+      if (rect.width < 1 || rect.height < 1 || rect.bottom <= 0 || rect.right <= 0) return null;
+
+      const overlapsHorizontally = rect.right > bounds.left && rect.left < bounds.right;
+      const overlapsVertically = rect.bottom > bounds.top && rect.top < bounds.bottom;
+      if (!overlapsHorizontally || !overlapsVertically) return null;
+
+      if (surface.isDocument && styles.position === 'fixed') {
+        const viewportCenter = window.innerHeight / 2;
+        const isBottom = rect.top > viewportCenter || (Number.parseFloat(styles.bottom) <= 10 && rect.bottom >= window.innerHeight - 15);
+        return isBottom ? 'bottom' : 'top';
+      }
+
+      const surfaceRect = surface.isDocument
+        ? { left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight }
+        : surface.getCaptureRect();
+
       const top = Number.parseFloat(styles.top);
       const bottom = Number.parseFloat(styles.bottom);
-      const left = Number.parseFloat(styles.left);
-      const right = Number.parseFloat(styles.right);
-      return (Number.isFinite(top) && Math.abs(rect.top - (bounds.top + top)) <= 3)
-        || (Number.isFinite(bottom) && Math.abs(rect.bottom - (bounds.bottom - bottom)) <= 3)
-        || (Number.isFinite(left) && Math.abs(rect.left - (bounds.left + left)) <= 3)
-        || (Number.isFinite(right) && Math.abs(rect.right - (bounds.right - right)) <= 3);
+      const isAnchoredTop = Number.isFinite(top) && Math.abs(rect.top - (surfaceRect.top + top)) <= 4;
+      const isAnchoredBottom = Number.isFinite(bottom) && Math.abs(rect.bottom - (surfaceRect.bottom - bottom)) <= 4;
+
+      if (isAnchoredTop) return 'top';
+      if (isAnchoredBottom) return 'bottom';
+
+      const midY = (bounds.top + bounds.bottom) / 2;
+      return rect.top >= midY ? 'bottom' : 'top';
     };
+
     return {
-      prepare() {
+      prepare(tileIndex = 0, totalTiles = 1) {
         hidden = [];
         for (const element of document.querySelectorAll('body *')) {
-          if (!isAnchored(element) || !seen.has(element)) continue;
-          hidden.push({ element, value: element.style.getPropertyValue('visibility'), priority: element.style.getPropertyPriority('visibility') });
-          element.style.setProperty('visibility', 'hidden', 'important');
+          const anchorType = classifyElement(element);
+          if (!anchorType) continue;
+
+          const shouldHide = (anchorType === 'top' && tileIndex > 0)
+            || (anchorType === 'bottom' && tileIndex < totalTiles - 1 && totalTiles > 1);
+
+          if (shouldHide) {
+            hidden.push({
+              element,
+              value: element.style.getPropertyValue('visibility'),
+              priority: element.style.getPropertyPriority('visibility')
+            });
+            element.style.setProperty('visibility', 'hidden', 'important');
+          }
         }
       },
       remember() {
-        for (const element of document.querySelectorAll('body *')) if (isAnchored(element)) seen.add(element);
+        // Maintenu pour compatibilité
       },
       restore() {
         hidden.forEach(({ element, value, priority }) => {
@@ -425,7 +467,7 @@
       const percent = Math.round(((index + 1) / grid.length) * 100);
       updateProgress(progress, percent, outputScale < 0.9999);
 
-      anchored.prepare();
+      anchored.prepare(index, grid.length);
       progress.style.visibility = 'hidden';
       let image;
       try {
@@ -621,7 +663,7 @@
       progress = createProgressIndicator();
 
       for (let attempt = 0; attempt < 2; attempt += 1) {
-        const baseline = await stabilizePageDimensions(selected.surface);
+        const baseline = await stabilizePageDimensions(selected.surface, selected.region);
         try {
           const prepared = await captureScrollingRegionAttempt(selected.surface, selected.region, baseline, progress);
           await openEditor(prepared.blob, prepared.scale);
@@ -665,7 +707,7 @@
       const percent = Math.round(((index + 1) / plan.length) * 100);
       updateProgress(progress, percent, outputScale < 0.9999);
 
-      anchored.prepare();
+      anchored.prepare(index, plan.length);
       progress.style.visibility = 'hidden';
       let image;
       try {
