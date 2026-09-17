@@ -4,6 +4,22 @@
 
 ## [Unveröffentlicht]
 
+## [1.2.0] - 2026-09-17
+
+### Hinzugefügt
+
+- Standard-Tastaturkürzel auf `Alt+Shift+C` aktualisiert mit Direktlink zur Tastaturkürzel-Verwaltung im Popup.
+- Bereichsauswahl per Ziehen mit Schnellaktion „Bis ganz nach unten“ zum sofortigen Erweitern bis zum Containerende.
+- Automatische Dateinamen inklusive Seitentitel und präzisem Zeitstempel.
+- Mehrseitiger A4/PDF-Druck mit sauberem seitenweisen Bildzuschnitt.
+- IndexedDB-Speichercaching (LRU) und Ping-Injektionssonde zur Vermeidung überflüssiger Skriptinjektionen.
+- Versionssynchronisierungsskripte, strikte Paketvalidierung und Playwright-Caching in CI.
+
+### Behoben
+
+- Dynamisches Ausblenden stationärer Eingabeleisten (z. B. ChatGPT, Claude, Notion, Messenger) mit `position: absolute` außerhalb des Scrollcontainers, nur noch auf der letzten Kachel sichtbar.
+- Bereichsstabilisierung auf den Scrollbereich (`range`) begrenzt, um Verschiebungen im Gesamtseitenlayout zu vermeiden.
+
 ## [1.1.1] - 2026-09-15
 
 ### Behoben
@@ -40,7 +56,8 @@
 - Vollständige 4-Sprachen-Unterstützung: Französisch, Englisch, Spanisch und Deutsch.
 - Volle Barrierefreiheit (WCAG, hohe Kontraste, Tastaturnavigation, Screenreader).
 
-[Unveröffentlicht]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.1...HEAD
+[Unveröffentlicht]: https://github.com/ScioNos/Scionos-Capture/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0
 [1.0.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0

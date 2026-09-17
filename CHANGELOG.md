@@ -6,6 +6,22 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-09-17
+
+### Ajouté
+
+- Raccourci clavier par défaut `Alt+Shift+C` et bouton de configuration directe des raccourcis navigateur depuis la popup.
+- Sélection par glisser-déposer enrichie d’une action rapide « Jusqu’en bas » pour étendre instantanément la zone au pied du conteneur.
+- Nommage automatique des fichiers exportés incluant le titre de la page et un horodatage précis.
+- Impression et export PDF multi-pages A4 avec découpage intelligent évitant les césures brutales.
+- Cache mémoire IndexedDB (LRU) et sonde ping d’injection prévenant les réinjections superflues du script de contenu.
+- Scripts de synchronisation de version, validation stricte d’archive et mise en cache des navigateurs Playwright en CI.
+
+### Corrigé
+
+- Masquage dynamique des barres de saisie stationnaires (ex. ChatGPT, Claude, Notion, Messenger) en `position: absolute` hors du conteneur défilant, n’apparaissant plus qu’une seule fois sur la dernière tuile.
+- Stabilisation des dimensions de la page circonscrite à la zone défilante (`range`) évitant les sauts de mise en page.
+
 ## [1.1.1] - 2026-09-15
 
 ### Corrigé
@@ -54,7 +70,8 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 - Descriptions localisées dépassant la limite de 132 caractères.
 - Conservation temporaire plus longue que celle annoncée et perte au rechargement de l’éditeur.
 
-[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0
 [1.0.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0

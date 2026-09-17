@@ -4,7 +4,7 @@
 
 Extension Chrome et Edge de capture d’écran entièrement locale. Capturez la zone visible, une sélection, une zone défilante ou une page complète, puis dessinez, masquez, rognez et exportez en PNG, HTML interactif ou PDF.
 
-![Version](https://img.shields.io/badge/version-1.1.1-blue) ![Manifest](https://img.shields.io/badge/Manifest-V3-4285F4) ![Licence](https://img.shields.io/badge/licence-MIT-green)
+![Version](https://img.shields.io/badge/version-1.2.0-blue) ![Manifest](https://img.shields.io/badge/Manifest-V3-4285F4) ![Licence](https://img.shields.io/badge/licence-MIT-green)
 
 ## Fonctionnalités
 
@@ -20,7 +20,7 @@ Extension Chrome et Edge de capture d’écran entièrement locale. Capturez la 
 
 ### Depuis la release GitHub
 
-1. Téléchargez `scionos-capture-v1.1.1.zip` depuis la [release v1.1.1](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.1).
+1. Téléchargez `scionos-capture-v1.2.0.zip` depuis la [release v1.2.0](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.2.0).
 2. Vérifiez éventuellement le fichier `.sha256`, puis extrayez le ZIP.
 3. Ouvrez `chrome://extensions` ou `edge://extensions`.
 4. Activez le **Mode développeur**, choisissez **Charger l’extension non empaquetée** et sélectionnez le dossier extrait.

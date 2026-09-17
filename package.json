@@ -1,6 +1,6 @@
 {
   "name": "scionos-capture",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "private": true,
   "license": "MIT",
   "description": "Extension Manifest V3 de capture d’écran locale pour Chrome et Edge.",

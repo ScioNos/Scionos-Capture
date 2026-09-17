@@ -6,6 +6,22 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-09-17
+
+### Added
+
+- Default keyboard shortcut updated to `Alt+Shift+C` with a direct shortcut settings button in the extension popup.
+- Drag-to-select selection overlay with a "To bottom" quick action to instantly expand selection to the bottom of the container.
+- Automatic page title inclusion in exported filenames with precise timestamps.
+- Multi-page A4/PDF paged printing with clean slice computation avoiding abrupt page cuts.
+- IndexedDB memory cache (LRU) and injection ping probe preventing redundant content script re-injections.
+- Version synchronization scripts, strict release packaging validation, and Playwright browser caching in CI.
+
+### Fixed
+
+- Dynamic hiding of stationary input bars (e.g., ChatGPT, Claude, Notion, Messenger) positioned with `position: absolute` outside the scrolling container, visible only on the final tile.
+- Scoped page dimension stabilization restricted to the scrolling zone (`range`) to avoid whole-page layout shifts.
+
 ## [1.1.1] - 2026-09-15
 
 ### Fixed
@@ -49,7 +65,8 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Canvas-clipping zoom, non-responsive toolbar, incomplete translations, hard-coded shortcut, contrast, and accessible names.
 - Locale descriptions above 132 characters, editor reload data loss, and inaccurate retention wording.
 
-[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0
 [1.0.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0

@@ -30,6 +30,27 @@ export async function updateReadmeVersion(targetVersion) {
     updatedFiles.push('package.json');
   }
 
+  // 1b. Mettre à jour package-lock.json si présent
+  const packageLockPath = path.join(root, 'package-lock.json');
+  try {
+    const packageLock = JSON.parse(await fs.readFile(packageLockPath, 'utf8'));
+    let lockChanged = false;
+    if (packageLock.version !== version) {
+      packageLock.version = version;
+      lockChanged = true;
+    }
+    if (packageLock.packages?.[''] && packageLock.packages[''].version !== version) {
+      packageLock.packages[''].version = version;
+      lockChanged = true;
+    }
+    if (lockChanged) {
+      await fs.writeFile(packageLockPath, JSON.stringify(packageLock, null, 2) + '\n', 'utf8');
+      updatedFiles.push('package-lock.json');
+    }
+  } catch {
+    // Fichier package-lock.json absent ou ignoré
+  }
+
   // 2. Mettre à jour manifest.json si nécessaire
   const manifestPath = path.join(root, 'manifest.json');
   const manifest = JSON.parse(await fs.readFile(manifestPath, 'utf8'));

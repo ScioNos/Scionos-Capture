@@ -1,25 +1,25 @@
-# Scionos Capture 1.1.1
+# Scionos Capture 1.2.0
 
 ## Français
 
-Cette version 1.1.1 apporte des correctifs majeurs pour la capture de zones défilantes dans les conteneurs internes (tels que les fenêtres de discussion Messenger sur Facebook), évitant le défilement intempestif de la page d’arrière-plan. Elle protège les fenêtres flottantes ancrées (`position: fixed`), améliore la sélection par glisser-déposer et réduit la durée de rétention des captures orphelines à 15 minutes.
+La version 1.2.0 résout définitivement la répétition de la barre de saisie (composer ChatGPT, Claude, Messenger, Notion) lors des captures de zone défilante grâce à une détection intelligente des éléments flottants et une stabilisation ciblée. Elle introduit le raccourci unifié `Alt+Shift+C` (avec bouton d’accès direct aux raccourcis dans la popup), la sélection intuitive par glisser-déposer avec option « Jusqu’en bas », le nommage automatique des fichiers avec le titre de la page, l’impression paginée multi-pages A4/PDF, ainsi qu’un cache mémoire IndexedDB et une sonde ping d’injection pour des performances optimales.
 
-Téléchargez `scionos-capture-v1.1.1.zip`, vérifiez le fichier SHA-256, extrayez-le puis chargez le dossier dans Chrome ou Edge.
+Téléchargez `scionos-capture-v1.2.0.zip`, vérifiez le fichier SHA-256, extrayez-le puis chargez le dossier dans Chrome ou Edge.
 
 ## English
 
-Release 1.1.1 brings key fixes for scrolling-area capture inside internal containers (such as Facebook Messenger chat docks), preventing unwanted scrolling of the background feed. It safeguards anchored floating docks (`position: fixed`), adds drag-to-select support, and reduces orphaned capture retention to 15 minutes.
+Release 1.2.0 permanently resolves repeated composer/input bars on ChatGPT, Claude, Messenger, and Notion during scrolling-zone captures through intelligent floating-element detection and scoped stabilization. It introduces the unified `Alt+Shift+C` shortcut (with direct shortcut settings button in the popup), drag-to-select with a "To bottom" quick action, automatic page title inclusion in exported filenames, paged multi-page A4/PDF printing, as well as an IndexedDB memory cache and injection ping probe for peak performance.
 
-Download `scionos-capture-v1.1.1.zip`, verify the SHA-256 file, extract it, and load the folder in Chrome or Edge.
+Download `scionos-capture-v1.2.0.zip`, verify the SHA-256 file, extract it, and load the folder in Chrome or Edge.
 
 ## Español
 
-La versión 1.1.1 soluciona problemas de captura en áreas desplazables internas (como los chats flotantes de Facebook Messenger), evitando desplazar la página de fondo. Protege los elementos flotantes anclados (`position: fixed`), añade selección mediante arrastrar y reduce la retención de capturas huérfanas a 15 minutos.
+La versión 1.2.0 soluciona de forma definitiva la repetición de la barra de entrada de texto (ChatGPT, Claude, Messenger, Notion) en capturas de zona desplazable mediante detección inteligente de elementos flotantes y estabilización acotada. Introduce el atajo unificado `Alt+Shift+C` (con botón de acceso a la configuración de atajos en la ventana emergente), selección por arrastrar con acción rápida «Hasta abajo», nombres de archivo automáticos con el título de la página, impresión paginada multipágina A4/PDF, además de caché en memoria IndexedDB y sonda ping de inyección para un rendimiento óptimo.
 
-Descarga `scionos-capture-v1.1.1.zip`, comprueba el archivo SHA-256 y cárgalo en Chrome o Edge.
+Descarga `scionos-capture-v1.2.0.zip`, comprueba el archivo SHA-256 y cárgalo en Chrome o Edge.
 
 ## Deutsch
 
-Version 1.1.1 behebt Probleme bei der Erfassung interner Scrollbereiche (wie Facebook Messenger-Chatfenster) und verhindert das versehentliche Scrollen der Hintergrundseite. Verankerte schwebende Docks (`position: fixed`) werden geschützt, die Auswahl per Ziehen unterstützt und die Aufbewahrungsdauer verwaister Aufnahmen auf 15 Minuten verkürzt.
+Version 1.2.0 behebt die wiederholte Eingabeleiste (ChatGPT, Claude, Messenger, Notion) bei Scrollbereich-Aufnahmen durch intelligente Erkennung schwebender Elemente und gezielte Bereichsstabilisierung. Sie führt das einheitliche Tastaturkürzel `Alt+Shift+C` ein (mit Direkttaste zur Tastaturkürzel-Verwaltung im Popup), Auswahl per Ziehen mit Schnellaktion „Bis ganz nach unten“, automatische Dateinamen mit dem Seitentitel, mehrseitigen A4/PDF-Druck sowie IndexedDB-Speichercaching und Ping-Injektionssonde für maximale Leistung.
 
-Laden Sie `scionos-capture-v1.1.1.zip` herunter, prüfen Sie die SHA-256-Datei und laden Sie den Ordner in Chrome oder Edge.
+Laden Sie `scionos-capture-v1.2.0.zip` herunter, prüfen Sie die SHA-256-Datei und laden Sie den Ordner in Chrome oder Edge.

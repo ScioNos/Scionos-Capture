@@ -15,7 +15,7 @@ A fully local Chrome and Edge screenshot extension. Capture the viewport, a sele
 
 ## Installation
 
-Download `scionos-capture-v1.1.1.zip` from the [v1.1.1 release](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.1), optionally verify the `.sha256` file, and extract it. Open `chrome://extensions` or `edge://extensions`, enable **Developer mode**, choose **Load unpacked**, and select the extracted folder.
+Download `scionos-capture-v1.2.0.zip` from the [v1.2.0 release](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.2.0), optionally verify the `.sha256` file, and extract it. Open `chrome://extensions` or `edge://extensions`, enable **Developer mode**, choose **Load unpacked**, and select the extracted folder.
 
 To work from source, clone the repository, run `npm ci`, and load the project root as an unpacked extension.
 

@@ -4,6 +4,22 @@
 
 ## [Sin publicar]
 
+## [1.2.0] - 2026-09-17
+
+### Añadido
+
+- Atajo de teclado predeterminado actualizado a `Alt+Shift+C` con botón de acceso directo a la configuración de atajos en la ventana emergente.
+- Selección por arrastrar con acción rápida «Hasta abajo» para extender instantáneamente el área seleccionada al fondo del contenedor.
+- Nombres de archivo automáticos con el título de la página y marca de tiempo precisa.
+- Impresión y exportación a PDF multipágina A4 con corte limpio de tramas.
+- Caché en memoria IndexedDB (LRU) y sonda ping de inyección para evitar reinyecciones innecesarias del script de contenido.
+- Scripts de sincronización de versiones, validación estricta de paquetes y almacenamiento en caché de Playwright en CI.
+
+### Corregido
+
+- Ocultación dinámica de barras de entrada de texto fijas (ej. ChatGPT, Claude, Notion, Messenger) con `position: absolute` fuera del contenedor, mostrándose únicamente en la última tesela.
+- Estabilización acotada de la página a la zona desplazable (`range`) para evitar saltos globales de maquetación.
+
 ## [1.1.1] - 2026-09-15
 
 ### Corregido
@@ -40,7 +56,8 @@
 - Soporte completo en 4 idiomas: francés, inglés, español y alemán.
 - Accesibilidad total (WCAG, alto contraste, navegación por teclado, lectores de pantalla).
 
-[Sin publicar]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.1...HEAD
+[Sin publicar]: https://github.com/ScioNos/Scionos-Capture/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0
 [1.0.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0

@@ -15,7 +15,7 @@ Extensión totalmente local para capturas en Chrome y Edge. Captura el área vis
 
 ## Instalación
 
-Descarga `scionos-capture-v1.1.1.zip` de la [versión v1.1.1](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.1), verifica si quieres el archivo `.sha256` y extrae el ZIP. Abre `chrome://extensions` o `edge://extensions`, activa el **Modo de desarrollador**, elige **Cargar descomprimida** y selecciona la carpeta extraída.
+Descarga `scionos-capture-v1.2.0.zip` de la [versión v1.2.0](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.2.0), verifica si quieres el archivo `.sha256` y extrae el ZIP. Abre `chrome://extensions` o `edge://extensions`, activa el **Modo de desarrollador**, elige **Cargar descomprimida** y selecciona la carpeta extraída.
 
 Desde el código fuente: clona el repositorio, ejecuta `npm ci` y carga la raíz del proyecto como extensión descomprimida.
 
