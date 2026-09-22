@@ -6,7 +6,7 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 
 ## [Unreleased]
 
-## [1.2.0] - 2026-09-17
+## [1.2.0] - 2026-09-22
 
 ### Ajouté
 
