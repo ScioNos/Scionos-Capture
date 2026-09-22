@@ -105,6 +105,22 @@
   const putTransferChunk = record => runRequest(CHUNK_STORE, 'readwrite', store => store.put(record));
   const getTransferChunk = (transferId, index) => runRequest(CHUNK_STORE, 'readonly', store => store.get([transferId, index]));
 
+  async function appendTransferChunk(transfer, chunk) {
+    const database = await openDatabase();
+    try {
+      await new Promise((resolve, reject) => {
+        const transaction = database.transaction([TRANSFER_STORE, CHUNK_STORE], 'readwrite');
+        transaction.objectStore(CHUNK_STORE).put(chunk);
+        transaction.objectStore(TRANSFER_STORE).put(transfer);
+        transaction.oncomplete = resolve;
+        transaction.onerror = () => reject(transaction.error || new Error('Écriture du fragment impossible.'));
+        transaction.onabort = () => reject(transaction.error || new Error('Écriture du fragment annulée.'));
+      });
+    } finally {
+      database.close();
+    }
+  }
+
   async function listTransferChunks(transferId) {
     const database = await openDatabase();
     try {
@@ -197,7 +213,7 @@
 
   return {
     putCapture, getCapture, listCaptures, deleteCapture, purgeExpiredCaptures,
-    putTransfer, getTransfer, listTransfers, putTransferChunk, getTransferChunk,
+    putTransfer, getTransfer, listTransfers, putTransferChunk, getTransferChunk, appendTransferChunk,
     listTransferChunks, deleteTransfer, purgeExpiredTransfers, listTransfersByOwner,
     applyMigrations, MIGRATIONS, clearCaptureCache, captureCache
   };

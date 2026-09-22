@@ -21,6 +21,11 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 - Dynamic hiding of stationary input bars (e.g., ChatGPT, Claude, Notion, Messenger) positioned with `position: absolute` outside the scrolling container, visible only on the final tile.
 - Scoped page dimension stabilization restricted to the scrolling zone (`range`) to avoid whole-page layout shifts.
+- Fixed selection cropping with classic scrollbars and fractional display scaling.
+- Reliably restore scroll positions and `scroll-behavior` styles after capture cancellation, restart, or failure.
+- Atomically persist IndexedDB chunks and transfer metadata to prevent partially persisted transfer states.
+- Added incremental editor rasterization and asynchronous HTML/print exports with a size guard.
+- Added strict Chrome version validation, synchronized security policies, and explicit asset-generator failures.
 
 ## [1.1.1] - 2026-09-15
 

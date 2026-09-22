@@ -57,6 +57,7 @@ async function prepareFullPageHarness(page, html) {
     };
   });
   await page.addScriptTag({ path: path.resolve(__dirname, '../../capture-utils.js') });
+  await page.addScriptTag({ path: path.resolve(__dirname, '../../capture-content-utils.js') });
   await page.addScriptTag({ path: path.resolve(__dirname, '../../content.js') });
 }
 
@@ -260,6 +261,57 @@ test('scrolling-area capture targets and restores an internal container', async 
   await page.close();
 });
 
+test('scrolling-area cancellation and restart restore nested scroll state and inline priority', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, `<!doctype html><html><style>
+    html, body { margin: 0; height: 600px; overflow: hidden; }
+    [data-scroll-surface] { position: absolute; left: 40px; top: 80px; width: 300px; height: 300px; overflow: auto; border: 4px solid #111827; scroll-behavior: smooth !important; }
+    .content { width: 300px; height: 1600px; background: linear-gradient(#fff, #60a5fa); }
+  </style><div data-scroll-surface><div class="content">Internal timeline</div></div></html>`);
+  await page.locator('[data-scroll-surface]').evaluate(element => { element.scrollTop = 120; });
+  await page.locator('[data-scroll-surface]').evaluate(element => element.style.setProperty('scroll-behavior', 'smooth', 'important'));
+  await expect.poll(() => page.locator('[data-scroll-surface]').evaluate(element => element.scrollTop)).toBe(120);
+  const messages = frenchMessages;
+
+  const start = await page.evaluate(localizedMessages => new Promise(resolve => {
+    globalThis.__captureListener({ action: 'START_SCROLLING_ZONE_CAPTURE', language: 'fr', messages: localizedMessages }, {}, resolve);
+  }), messages);
+  expect(start).toEqual({ status: 'started' });
+  const overlay = page.locator('[data-scionos-capture="scrolling-selection"]');
+  await page.mouse.click(100, 150);
+  await page.mouse.wheel(0, 220);
+  await expect.poll(() => page.locator('[data-scroll-surface]').evaluate(element => element.scrollTop)).toBeGreaterThan(120);
+  await page.locator('[data-scionos-capture="scrolling-controls"] button', { hasText: 'Recommencer' }).click();
+  await expect.poll(() => page.locator('[data-scroll-surface]').evaluate(element => element.scrollTop)).toBe(120);
+  await overlay.focus();
+  await page.keyboard.press('Escape');
+  await expect(overlay).toBeHidden();
+  await expect.poll(() => page.locator('[data-scroll-surface]').evaluate(element => element.scrollTop)).toBe(120);
+  expect(await page.locator('[data-scroll-surface]').evaluate(element => ({
+    behavior: element.style.getPropertyValue('scroll-behavior'),
+    priority: element.style.getPropertyPriority('scroll-behavior')
+  }))).toEqual({ behavior: 'smooth', priority: 'important' });
+
+  await page.evaluate(() => { globalThis.__openedCapture = null; });
+  const secondStart = await page.evaluate(localizedMessages => new Promise(resolve => {
+    globalThis.__captureListener({ action: 'START_SCROLLING_ZONE_CAPTURE', language: 'fr', messages: localizedMessages }, {}, resolve);
+  }), messages);
+  expect(secondStart).toEqual({ status: 'started' });
+  await page.locator('[data-scionos-capture="scrolling-selection"]').click({ position: { x: 100, y: 120 } });
+  await page.locator('input[name="x"]').fill('20');
+  await page.locator('input[name="y"]').fill('20');
+  await page.locator('input[name="width"]').fill('200');
+  await page.locator('input[name="height"]').fill('900');
+  await page.locator('[data-scionos-capture="scrolling-controls"] button', { hasText: 'Capturer' }).click();
+  await readOpenedCapture(page);
+  await expect.poll(() => page.locator('[data-scroll-surface]').evaluate(element => element.scrollTop)).toBe(120);
+  expect(await page.locator('[data-scroll-surface]').evaluate(element => ({
+    behavior: element.style.getPropertyValue('scroll-behavior'),
+    priority: element.style.getPropertyPriority('scroll-behavior')
+  }))).toEqual({ behavior: 'smooth', priority: 'important' });
+  await page.close();
+});
+
 test('scrolling-area capture targets a chat dock container on a long scrollable page without scrolling background', async () => {
   const page = await context.newPage();
   await prepareFullPageHarness(page, `<!doctype html><html lang="fr"><style>
@@ -323,6 +375,28 @@ test('zone capture crops a static visible selection', async () => {
   await page.close();
 });
 
+test('zone capture uses viewport pixels when classic scrollbars reduce the content box', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, `<!doctype html><html lang="fr"><style>
+    html { scrollbar-gutter: stable; }
+    html, body { margin: 0; }
+    body { min-height: 2000px; background: linear-gradient(#fff, #e2e8f0); }
+  </style><main>Page avec scrollbar classique</main></html>`);
+  const response = await page.evaluate(localizedMessages => new Promise(resolve => {
+    globalThis.__captureListener({ action: 'START_ZONE_CAPTURE', language: 'fr', messages: localizedMessages }, {}, resolve);
+  }), frenchMessages);
+  expect(response).toEqual({ status: 'started' });
+
+  await page.mouse.move(100, 100);
+  await page.mouse.down();
+  await page.mouse.move(400, 350);
+  await page.mouse.up();
+
+  const result = await readOpenedCapture(page);
+  expect({ width: result.width, height: result.height }).toEqual({ width: 300, height: 250 });
+  await page.close();
+});
+
 test('scrolling-area overlay supports pointer, keyboard and exact multi-screen capture', async () => {
   const page = await context.newPage();
   await page.setViewportSize({ width: 800, height: 600 });
@@ -365,6 +439,7 @@ test('scrolling-area overlay supports pointer, keyboard and exact multi-screen c
     };
   });
   await page.addScriptTag({ path: path.resolve(__dirname, '../../capture-utils.js') });
+  await page.addScriptTag({ path: path.resolve(__dirname, '../../capture-content-utils.js') });
   await page.addScriptTag({ path: path.resolve(__dirname, '../../content.js') });
   const messages = Object.fromEntries(Object.entries(require('../../_locales/fr/messages.json'))
     .map(([key, value]) => [key, value.message]));

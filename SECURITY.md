@@ -4,7 +4,7 @@
 
 ## Versions prises en charge
 
-La dernière release publiée reçoit les correctifs de sécurité. La ligne actuellement prise en charge est `1.0.x`.
+La dernière release publiée reçoit les correctifs de sécurité. La ligne actuellement prise en charge est `1.2.x` (publication `1.2.0` en préparation).
 
 ## Signaler une vulnérabilité
 

@@ -41,6 +41,17 @@ test('persists ordered transfer chunks and cleans them atomically', async () => 
   assert.deepEqual(await CaptureStore.listTransferChunks(transfer.id), []);
 });
 
+test('appends a chunk and advances transfer metadata in one transaction', async () => {
+  const id = 'atomic-transfer-' + Date.now();
+  const transfer = { id, ownerTabId: 12, expectedBytes: 1, expectedChunks: 1, receivedBytes: 1, nextIndex: 1, expiresAt: Date.now() + 60_000 };
+  const chunk = { transferId: id, index: 0, blob: new Blob(['x']), size: 1 };
+  await CaptureStore.putTransfer({ ...transfer, receivedBytes: 0, nextIndex: 0 });
+  await CaptureStore.appendTransferChunk(transfer, chunk);
+  assert.deepEqual(await CaptureStore.getTransfer(id), transfer);
+  assert.equal((await CaptureStore.getTransferChunk(id, 0)).size, 1);
+  await CaptureStore.deleteTransfer(id);
+});
+
 test('purges expired transfer metadata and chunks', async () => {
   const now = Date.now();
   const id = 'expired-transfer-' + now;

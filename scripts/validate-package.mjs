@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { assertChromeVersion, chromeSupportedLine } from './version.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const supportedLocales = ['fr', 'en', 'es', 'de'];
@@ -24,7 +25,7 @@ export async function validatePackage() {
   const packageJson = await readJson('package.json');
   const packageLock = await readJson('package-lock.json');
   assert(manifest.manifest_version === 3, 'manifest_version must be 3');
-  assert(/^\d+\.\d+\.\d+$/.test(manifest.version), 'manifest version must use semantic versioning');
+  assertChromeVersion(manifest.version);
   assert(packageJson.version === manifest.version, 'manifest and package versions must match');
   assert(packageLock.version === manifest.version, 'manifest and package-lock versions must match');
   assert(packageLock.packages[''].version === manifest.version, 'package-lock root version must match');
@@ -47,7 +48,7 @@ export async function validatePackage() {
     manifest.action.default_popup,
     ...Object.values(manifest.icons),
     manifest.action.default_icon,
-    'editor.html', 'capture-utils.js', 'capture-store.js', 'content.js', 'editor.js', 'i18n.js', 'popup.js'
+    'editor.html', 'capture-utils.js', 'capture-content-utils.js', 'capture-store.js', 'content.js', 'editor.js', 'i18n.js', 'popup.js'
   ];
   await Promise.all(referencedFiles.map(async relativePath => {
     const stat = await fs.stat(path.join(root, relativePath));
@@ -72,6 +73,12 @@ export async function validatePackage() {
   const releaseNotes = await fs.readFile(path.join(root, 'RELEASE_NOTES.md'), 'utf8');
   assert(readme.includes(`scionos-capture-v${manifest.version}.zip`), 'README release archive version is stale');
   assert(releaseNotes.includes(`# Scionos Capture ${manifest.version}`), 'Release notes version is stale');
+
+  const supportedLine = chromeSupportedLine(manifest.version);
+  await Promise.all(['SECURITY.md', 'SECURITY.en.md', 'SECURITY.es.md', 'SECURITY.de.md'].map(async relativePath => {
+    const content = await fs.readFile(path.join(root, relativePath), 'utf8');
+    assert(content.includes(supportedLine), `Security policy version is stale: ${relativePath}`);
+  }));
 
   return { locales: supportedLocales.length, keys: referenceKeys.length, files: referencedFiles.length + documentFiles.length };
 }

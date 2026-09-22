@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     await chrome.scripting.executeScript({
       target: { tabId },
-      files: ['capture-utils.js', 'content.js']
+      files: ['capture-utils.js', 'capture-content-utils.js', 'content.js']
     });
   }
 

@@ -19,6 +19,11 @@
 
 - Ocultación dinámica de barras de entrada de texto fijas (ej. ChatGPT, Claude, Notion, Messenger) con `position: absolute` fuera del contenedor, mostrándose únicamente en la última tesela.
 - Estabilización acotada de la página a la zona desplazable (`range`) para evitar saltos globales de maquetación.
+- Corrección del recorte de selecciones con barras de desplazamiento clásicas y escalado fraccionario.
+- Restauración fiable de las posiciones de desplazamiento y de los estilos `scroll-behavior` tras cancelar, reiniciar o fallar una captura.
+- Persistencia atómica en IndexedDB de fragmentos y metadatos de transferencia para evitar estados parciales.
+- Rasterización incremental del editor y exportaciones HTML/impresión asíncronas con límite de tamaño.
+- Validación estricta de versiones Chrome, políticas de seguridad sincronizadas y fallos explícitos en los generadores de recursos.
 
 ## [1.1.1] - 2026-09-15
 

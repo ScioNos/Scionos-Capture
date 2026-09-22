@@ -144,7 +144,7 @@ async function beginTransfer(message, senderTab) {
   if (!Number.isInteger(expectedChunks) || expectedChunks !== calculatedChunks) throw new Error('Invalid capture chunk count.');
   const createdAt = Date.now();
   const record = {
-    id: crypto.randomUUID(), ownerTabId: senderTab.id, ownerWindowId: senderTab.windowId,
+    id: crypto.randomUUID(), ownerTabId: senderTab.id,
     expectedBytes, expectedChunks, receivedBytes: 0, nextIndex: 0,
     title: safeMetadata(message.title, 'Screenshot'), url: safeMetadata(message.url),
     scale: Number.isFinite(Number(message.scale)) ? Math.max(0.01, Math.min(1, Number(message.scale))) : 1,
@@ -180,11 +180,13 @@ async function appendTransferChunk(message, senderTab) {
   if ((!isLast && blob.size !== ScionosCaptureUtils.TRANSFER_CHUNK_BYTES) || blob.size < 1 || transfer.receivedBytes + blob.size > transfer.expectedBytes) {
     throw new Error('Invalid capture chunk size.');
   }
-  await CaptureStore.putTransferChunk({ transferId: transfer.id, index, blob, size: blob.size });
   transfer.receivedBytes += blob.size;
   transfer.nextIndex += 1;
   transfer.expiresAt = Date.now() + TRANSFER_TTL_MS;
-  await CaptureStore.putTransfer(transfer);
+  await CaptureStore.appendTransferChunk(
+    transfer,
+    { transferId: transfer.id, index, blob, size: blob.size }
+  );
   await scheduleTransferExpiry(transfer);
   return { success: true, nextIndex: transfer.nextIndex };
 }

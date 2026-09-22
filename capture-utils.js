@@ -11,10 +11,10 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, () => {
   const MAX_OUTPUT_PIXELS = 16_000_000;
   const MAX_CANVAS_DIMENSION = 16_384;
-  const MAX_SINGLE_MESSAGE_BYTES = 8 * 1024 * 1024;
   const MAX_TRANSFER_BYTES = 48 * 1024 * 1024;
   const TARGET_TRANSFER_BYTES = 40 * 1024 * 1024;
   const TRANSFER_CHUNK_BYTES = 512 * 1024;
+  const MAX_HTML_EXPORT_BYTES = 64 * 1024 * 1024;
 
   function buildScrollPositions(fullHeight, viewportHeight) {
     const safeViewportHeight = Math.max(1, Math.floor(viewportHeight));
@@ -626,13 +626,26 @@
     });
   }
 
+  function blobToDataUrl(blob) {
+    return new Promise((resolve, reject) => {
+      if (!(blob instanceof Blob)) {
+        reject(new TypeError('Expected a Blob.'));
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = () => reject(reader.error || new Error('Unable to read the image blob.'));
+      reader.readAsDataURL(blob);
+    });
+  }
+
   return {
     MAX_OUTPUT_PIXELS,
     MAX_CANVAS_DIMENSION,
-    MAX_SINGLE_MESSAGE_BYTES,
     MAX_TRANSFER_BYTES,
     TARGET_TRANSFER_BYTES,
     TRANSFER_CHUNK_BYTES,
+    MAX_HTML_EXPORT_BYTES,
     buildScrollPositions,
     buildCaptureGrid,
     normalizeScrollingRegion,
@@ -646,6 +659,7 @@
     sanitizeUrl,
     sanitizeFilename,
     buildHtmlReport,
+    blobToDataUrl,
     delay,
     waitForPaint
   };

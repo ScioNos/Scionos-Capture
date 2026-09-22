@@ -292,17 +292,22 @@ const slide2Html = `<!DOCTYPE html>
 
 async function generateScreenshots() {
   const browser = await chromium.launch();
-  const page = await browser.newPage();
-  await page.setViewportSize({ width: 1280, height: 800 });
+  try {
+    const page = await browser.newPage();
+    await page.setViewportSize({ width: 1280, height: 800 });
 
-  await page.setContent(slide1Html);
-  await page.screenshot({ path: path.join(storeDir, 'screenshot-1-editor.png') });
+    await page.setContent(slide1Html);
+    await page.screenshot({ path: path.join(storeDir, 'screenshot-1-editor.png') });
 
-  await page.setContent(slide2Html);
-  await page.screenshot({ path: path.join(storeDir, 'screenshot-2-features.png') });
-
-  await browser.close();
-  console.log('Store screenshots generated in store-assets/');
+    await page.setContent(slide2Html);
+    await page.screenshot({ path: path.join(storeDir, 'screenshot-2-features.png') });
+    console.log('Store screenshots generated in store-assets/');
+  } finally {
+    await browser.close();
+  }
 }
 
-generateScreenshots().catch(console.error);
+generateScreenshots().catch(error => {
+  console.error('Store asset generation failed:', error);
+  process.exitCode = 1;
+});

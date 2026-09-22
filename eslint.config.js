@@ -5,7 +5,7 @@ const browserGlobals = Object.fromEntries([
   'cancelAnimationFrame', 'chrome', 'confirm', 'console', 'crypto', 'document', 'fetch', 'indexedDB',
   'navigator', 'requestAnimationFrame', 'setTimeout', 'clearTimeout', 'window', 'alert', 'location',
   'createImageBitmap', 'getComputedStyle', 'importScripts', 'module',
-  'ScionosCaptureUtils', 'CaptureStore', 'ScionosI18n', 'getI18nText', 'initI18n'
+  'ScionosCaptureUtils', 'ScionosContentUtils', 'CaptureStore', 'ScionosI18n', 'getI18nText', 'initI18n'
 ].map(name => [name, 'readonly']));
 
 module.exports = [

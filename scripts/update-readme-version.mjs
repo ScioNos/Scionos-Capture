@@ -1,9 +1,9 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { assertChromeVersion, chromeSupportedLine } from './version.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const semverRegex = /^\d+\.\d+\.\d+(-[\w.]+)?$/;
 
 /**
  * Synchronise la version du projet dans package.json, manifest.json,
@@ -17,9 +17,7 @@ export async function updateReadmeVersion(targetVersion) {
   const packageJson = JSON.parse(await fs.readFile(packagePath, 'utf8'));
 
   const version = targetVersion || packageJson.version;
-  if (!semverRegex.test(version)) {
-    throw new Error(`Version invalide : "${version}". Doit respecter le format SemVer (ex: 1.1.2).`);
-  }
+  assertChromeVersion(version);
 
   const updatedFiles = [];
 
@@ -66,8 +64,13 @@ export async function updateReadmeVersion(targetVersion) {
     'README.en.md',
     'README.es.md',
     'README.de.md',
-    'RELEASE_NOTES.md'
+    'RELEASE_NOTES.md',
+    'SECURITY.md',
+    'SECURITY.en.md',
+    'SECURITY.es.md',
+    'SECURITY.de.md'
   ];
+  const supportedLine = chromeSupportedLine(version);
 
   for (const relPath of docFiles) {
     const fullPath = path.join(root, relPath);
@@ -101,6 +104,14 @@ export async function updateReadmeVersion(targetVersion) {
       /\[v[\d.]+(-[\w.]+)?\s+release\]/g,
       `[v${version} release]`
     );
+
+    if (relPath.startsWith('SECURITY')) {
+      const marker = String.fromCharCode(96);
+      content = content.replace(
+        new RegExp(marker + '\\d+\\.\\d+\\.x' + marker, 'g'),
+        marker + supportedLine + marker
+      );
+    }
 
     // Titre principal dans RELEASE_NOTES.md
     if (relPath === 'RELEASE_NOTES.md') {

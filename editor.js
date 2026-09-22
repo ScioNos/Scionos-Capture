@@ -308,6 +308,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderCanvas();
   }
 
+  function applyCommittedOperation(operation) {
+    if (!committedSurface) return;
+    committedSurface = applyOperation(committedSurface, operation);
+    renderCanvas();
+  }
+
   function renderCanvas() {
     if (!committedSurface) return;
     canvas.width = committedSurface.width;
@@ -347,7 +353,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     redoOperations = [];
     draftOperation = null;
     geometryPanel.hidden = true;
-    rebuildCommittedSurface();
+    applyCommittedOperation(operation);
 
     if (operations.length >= MAX_OPERATIONS) {
       try {
@@ -356,7 +362,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         baseImage = replacement;
         operations = [];
         redoOperations = [];
-        rebuildCommittedSurface();
         showToast(getI18nText('historyFlattened'));
       } catch (error) {
         showToast(getI18nText('exportError') + error.message, true);
@@ -669,10 +674,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       showToast(getI18nText('exportError') + error.message, true);
     }
   });
-  htmlButton.addEventListener('click', () => {
+  htmlButton.addEventListener('click', async () => {
     try {
       if (!committedSurface) return;
-      const dataUrl = committedSurface.toDataURL('image/png');
+      const imageBlob = await canvasToBlob();
+      const estimatedHtmlBytes = 32 + Math.ceil(imageBlob.size * 4 / 3);
+      if (estimatedHtmlBytes > ScionosCaptureUtils.MAX_HTML_EXPORT_BYTES) {
+        throw new Error('The HTML export exceeds the supported size limit.');
+      }
+      const dataUrl = await ScionosCaptureUtils.blobToDataUrl(imageBlob);
       const htmlContent = ScionosCaptureUtils.buildHtmlReport({
         title: captureRecord && captureRecord.title ? captureRecord.title : getI18nText('captureTitle'),
         url: captureRecord && captureRecord.url ? captureRecord.url : '',
@@ -694,6 +704,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           btnPrint: getI18nText('btnPrint')
         }
       });
+      if (htmlContent.length > ScionosCaptureUtils.MAX_HTML_EXPORT_BYTES) {
+        throw new Error('The HTML export exceeds the supported size limit.');
+      }
 
       const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
       const link = document.createElement('a');
@@ -709,9 +722,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       showToast(getI18nText('exportError') + error.message, true);
     }
   });
-  printButton.addEventListener('click', () => {
-    cancelDraft();
-    if (!committedSurface) return;
+  printButton.addEventListener('click', async () => {
+    try {
+      cancelDraft();
+      if (!committedSurface) return;
     const printArea = document.getElementById('print-area');
     if (printArea) {
       const title = captureRecord && captureRecord.title ? captureRecord.title : getI18nText('captureTitle');
@@ -720,7 +734,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const dateFormatted = captureRecord && captureRecord.timestamp
         ? new Date(captureRecord.timestamp).toLocaleString(ScionosI18n.language)
         : new Date().toLocaleString(ScionosI18n.language);
-      const dataUrl = committedSurface.toDataURL('image/png');
+      const dataUrl = URL.createObjectURL(await canvasToBlob());
 
       printArea.innerHTML = `
         <div class="print-header">
@@ -735,9 +749,18 @@ document.addEventListener('DOMContentLoaded', async () => {
           <img src="${dataUrl}" alt="${ScionosCaptureUtils.escapeHtml(title)}">
         </div>
       `;
+      const revokePrintUrl = () => {
+        URL.revokeObjectURL(dataUrl);
+        window.removeEventListener('afterprint', revokePrintUrl);
+      };
+      window.addEventListener('afterprint', revokePrintUrl, { once: true });
+      setTimeout(revokePrintUrl, 60_000);
     }
-    showToast(getI18nText('printOpened'));
-    window.print();
+      showToast(getI18nText('printOpened'));
+      window.print();
+    } catch (error) {
+      showToast(getI18nText('exportError') + error.message, true);
+    }
   });
   copyButton.addEventListener('click', async () => {
     try {

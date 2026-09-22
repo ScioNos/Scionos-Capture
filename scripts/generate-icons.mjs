@@ -71,17 +71,21 @@ const svgTemplate = (size) => {
 
 async function generate() {
   const browser = await chromium.launch();
-  const page = await browser.newPage();
-
-  for (const size of [16, 48, 128]) {
-    await page.setViewportSize({ width: size, height: size });
-    await page.setContent(svgTemplate(size));
-    const outputPath = path.join(root, 'images', `icon${size}.png`);
-    await page.screenshot({ path: outputPath, omitBackground: true });
-    console.log(`Generated ${outputPath} (${size}x${size})`);
+  try {
+    const page = await browser.newPage();
+    for (const size of [16, 48, 128]) {
+      await page.setViewportSize({ width: size, height: size });
+      await page.setContent(svgTemplate(size));
+      const outputPath = path.join(root, 'images', `icon${size}.png`);
+      await page.screenshot({ path: outputPath, omitBackground: true });
+      console.log(`Generated ${outputPath} (${size}x${size})`);
+    }
+  } finally {
+    await browser.close();
   }
-
-  await browser.close();
 }
 
-generate().catch(console.error);
+generate().catch(error => {
+  console.error('Icon generation failed:', error);
+  process.exitCode = 1;
+});

@@ -379,9 +379,6 @@
           }
         }
       },
-      remember() {
-        // Maintenu pour compatibilité
-      },
       restore() {
         hidden.forEach(({ element, value, priority }) => {
           if (!element.isConnected) return;
@@ -412,14 +409,14 @@
 
   async function executeFullPageCapture() {
     const root = document.documentElement;
-    const originalScrollBehavior = root.style.scrollBehavior;
+    const originalScrollBehavior = ScionosContentUtils.snapshotInlineStyle(root, 'scroll-behavior');
     let progress;
     let restoreMotion = () => {};
     let surface;
     let originalPosition = { x: 0, y: 0 };
 
     try {
-      root.style.scrollBehavior = 'auto';
+      root.style.setProperty('scroll-behavior', 'auto');
       restoreMotion = suspendPageMotion();
       progress = createProgressIndicator();
       surface = findScrollSurface();
@@ -441,9 +438,9 @@
       console.error('Full-page capture failed:', error);
       alert(text('fullError') + error.message);
     } finally {
-      restoreMotion();
-      root.style.scrollBehavior = originalScrollBehavior;
       if (surface) surface.scrollTo(originalPosition.x, originalPosition.y);
+      restoreMotion();
+      ScionosContentUtils.restoreInlineStyle(originalScrollBehavior);
       removeProgressIndicator(progress);
     }
   }
@@ -478,8 +475,6 @@
         progress.style.visibility = 'visible';
         anchored.restore();
       }
-      anchored.remember();
-
       if (bitmapSize && (bitmapSize.width !== image.width || bitmapSize.height !== image.height)) throw layoutChangedError();
       bitmapSize = { width: image.width, height: image.height };
       const capture = getSurfaceCaptureCrop(surface, image);
@@ -618,10 +613,14 @@
           await Utils.waitForPaint();
           const response = await captureVisibleTab();
           const image = await loadImage(response.dataUrl);
-          const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
-          const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
-          const scaleX = image.width / Math.max(1, viewportWidth);
-          const scaleY = image.height / Math.max(1, viewportHeight);
+          const metrics = Utils.computeCaptureViewportMetrics({
+            bitmapWidth: image.width,
+            bitmapHeight: image.height,
+            innerWidth: window.innerWidth,
+            innerHeight: window.innerHeight
+          });
+          const scaleX = metrics.scaleX;
+          const scaleY = metrics.scaleY;
           const canvas = document.createElement('canvas');
           canvas.width = Math.round(cropWidth * scaleX);
           canvas.height = Math.round(cropHeight * scaleY);
@@ -647,17 +646,21 @@
   async function executeScrollingZoneCapture() {
     const root = document.documentElement;
     const previousFocus = document.activeElement;
-    const originalDocument = { x: window.scrollX, y: window.scrollY, scrollBehavior: root.style.scrollBehavior };
+    const originalDocument = {
+      x: window.scrollX,
+      y: window.scrollY,
+      scrollBehavior: ScionosContentUtils.snapshotInlineStyle(root, 'scroll-behavior')
+    };
     let progress;
     let restoreMotion = () => {};
     let selected;
 
     try {
-      root.style.scrollBehavior = 'auto';
+      root.style.setProperty('scroll-behavior', 'auto');
       selected = await selectScrollingRegion(originalDocument.x);
       if (!selected) return;
       if (selected.surface && !selected.surface.isDocument && selected.surface.element) {
-        selected.surface.element.style.scrollBehavior = 'auto';
+        selected.surface.element.style.setProperty('scroll-behavior', 'auto');
       }
       restoreMotion = suspendPageMotion();
       progress = createProgressIndicator();
@@ -676,13 +679,10 @@
       console.error('Scrolling-area capture failed:', error);
       alert(text('scrollingError') + error.message);
     } finally {
-      restoreMotion();
-      root.style.scrollBehavior = originalDocument.scrollBehavior;
+      if (selected && selected.scrollState) selected.scrollState.restore();
       window.scrollTo(originalDocument.x, originalDocument.y);
-      if (selected && selected.surface && !selected.surface.isDocument && selected.surface.element) {
-        selected.surface.element.style.scrollBehavior = '';
-        selected.surface.scrollTo(selected.originalPosition.x, selected.originalPosition.y);
-      }
+      restoreMotion();
+      ScionosContentUtils.restoreInlineStyle(originalDocument.scrollBehavior);
       removeProgressIndicator(progress);
       if (previousFocus && typeof previousFocus.focus === 'function' && previousFocus.isConnected) previousFocus.focus();
     }
@@ -718,7 +718,6 @@
         progress.style.visibility = 'visible';
         anchored.restore();
       }
-      anchored.remember();
       if (bitmapSize && (bitmapSize.width !== image.width || bitmapSize.height !== image.height)) throw layoutChangedError();
       bitmapSize = { width: image.width, height: image.height };
       const capture = getSurfaceCaptureCrop(surface, image);
@@ -821,7 +820,8 @@
 
       let firstPoint = null;
       let selectedSurface = getDocumentScrollSurface();
-      let originalPosition = selectedSurface.getPosition();
+      const scrollState = ScionosContentUtils.createScrollSurfaceStateTracker();
+      scrollState.remember(selectedSurface);
       let lastPointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
       let settled = false;
 
@@ -847,13 +847,21 @@
         window.removeEventListener('keydown', onKeyDown, true);
         window.removeEventListener('scroll', updatePreview, true);
       };
-      const settle = value => { if (!settled) { settled = true; cleanup(); resolve(value); } };
+      const settle = value => {
+        if (settled) return;
+        settled = true;
+        if (!value) scrollState.restore();
+        cleanup();
+        resolve(value);
+      };
       const finish = region => {
         if (!region || region.width < 5 || region.height < 5) { status.textContent = text('scrollingInvalidRegion'); status.setAttribute('role', 'alert'); return; }
-        settle({ region, surface: selectedSurface, originalPosition });
+        settle({ region, surface: selectedSurface, scrollState });
       };
       const reset = () => {
-        firstPoint = null; selectedSurface = getDocumentScrollSurface(); originalPosition = selectedSurface.getPosition();
+        firstPoint = null;
+        selectedSurface = getDocumentScrollSurface();
+        scrollState.reset(selectedSurface);
         selectionBox.style.display = 'none'; instructions.textContent = text('scrollingInstructionStart');
         status.textContent = ''; restartButton.disabled = true; overlay.focus();
       };
@@ -901,7 +909,11 @@
         if (event.target.closest('input, button')) return;
         const amounts = { ArrowDown: 48, ArrowUp: -48, PageDown: Math.round(window.innerHeight * 0.8), PageUp: -Math.round(window.innerHeight * 0.8) };
         if (event.key in amounts) {
-          event.preventDefault(); const position = selectedSurface.getPosition(); selectedSurface.scrollTo(position.x, position.y + amounts[event.key]); updatePreview();
+          event.preventDefault();
+          scrollState.remember(selectedSurface);
+          const position = selectedSurface.getPosition();
+          selectedSurface.scrollTo(position.x, position.y + amounts[event.key]);
+          updatePreview();
         }
       }
       let pointerDownPos = null;
@@ -922,7 +934,7 @@
             if (distance > 6) {
               isDragging = true;
               selectedSurface = findScrollSurfaceAtPoint(pointerDownPos.x, pointerDownPos.y);
-              originalPosition = selectedSurface.getPosition();
+              scrollState.remember(selectedSurface);
               firstPoint = surfacePoint(selectedSurface, pointerDownPos.x, pointerDownPos.y);
               instructions.textContent = text('scrollingInstructionEnd');
               status.textContent = text('scrollingPointSet');
@@ -953,7 +965,7 @@
         lastPointer = { x: event.clientX, y: event.clientY };
         if (!firstPoint) {
           selectedSurface = findScrollSurfaceAtPoint(event.clientX, event.clientY);
-          originalPosition = selectedSurface.getPosition();
+          scrollState.remember(selectedSurface);
           firstPoint = surfacePoint(selectedSurface, event.clientX, event.clientY);
           instructions.textContent = text('scrollingInstructionEnd'); status.textContent = text('scrollingPointSet'); restartButton.disabled = false; updatePreview(); return;
         }
@@ -964,12 +976,14 @@
           const hoverSurface = findScrollSurfaceAtPoint(event.clientX, event.clientY);
           if (hoverSurface && !hoverSurface.isDocument) {
             event.preventDefault();
+            scrollState.remember(hoverSurface);
             const position = hoverSurface.getPosition();
             hoverSurface.scrollTo(position.x + event.deltaX, position.y + event.deltaY);
           }
           return;
         }
         event.preventDefault();
+        scrollState.remember(selectedSurface);
         const position = selectedSurface.getPosition();
         selectedSurface.scrollTo(position.x + event.deltaX, position.y + event.deltaY);
         updatePreview();

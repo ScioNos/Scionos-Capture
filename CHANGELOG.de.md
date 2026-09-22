@@ -19,6 +19,11 @@
 
 - Dynamisches Ausblenden stationärer Eingabeleisten (z. B. ChatGPT, Claude, Notion, Messenger) mit `position: absolute` außerhalb des Scrollcontainers, nur noch auf der letzten Kachel sichtbar.
 - Bereichsstabilisierung auf den Scrollbereich (`range`) begrenzt, um Verschiebungen im Gesamtseitenlayout zu vermeiden.
+- Auswahlzuschnitt mit klassischen Scrollleisten und gebrochener Anzeigeskalierung korrigiert.
+- Scrollpositionen und `scroll-behavior`-Stile werden nach Abbruch, Neustart oder Fehler einer Aufnahme zuverlässig wiederhergestellt.
+- IndexedDB-Fragmente und Transfermetadaten werden atomar gespeichert, um teilweise persistierte Zustände zu vermeiden.
+- Inkrementelle Editor-Rasterisierung sowie asynchrone HTML-/Druckexporte mit Größenbegrenzung hinzugefügt.
+- Strikte Chrome-Versionsprüfung, synchronisierte Sicherheitsrichtlinien und explizite Fehler der Asset-Generatoren hinzugefügt.
 
 ## [1.1.1] - 2026-09-15
 

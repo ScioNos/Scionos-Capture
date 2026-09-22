@@ -21,6 +21,11 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 
 - Masquage dynamique des barres de saisie stationnaires (ex. ChatGPT, Claude, Notion, Messenger) en `position: absolute` hors du conteneur défilant, n’apparaissant plus qu’une seule fois sur la dernière tuile.
 - Stabilisation des dimensions de la page circonscrite à la zone défilante (`range`) évitant les sauts de mise en page.
+- Correction du recadrage des sélections avec barres de défilement classiques et mise à l’échelle fractionnaire.
+- Restauration fiable des positions de défilement et des styles `scroll-behavior` après annulation, redémarrage ou échec d’une capture.
+- Écriture atomique des fragments IndexedDB et des métadonnées de transfert pour éviter les états partiellement persistés.
+- Rasterisation incrémentale de l’éditeur et exports HTML/impression asynchrones avec garde-fou de taille.
+- Validation stricte des versions Chrome, synchronisation des politiques de sécurité et échec explicite des générateurs d’assets.
 
 ## [1.1.1] - 2026-09-15
 
