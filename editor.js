@@ -224,288 +224,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     zoomResetButton.disabled = !ready;
   }
 
-  function createSurface(width, height) {
-    const surface = document.createElement('canvas');
-    surface.width = Math.max(1, Math.round(width));
-    surface.height = Math.max(1, Math.round(height));
-    return surface;
-  }
-
-  function normalizeBounds(start, end) {
-    return {
-      x: Math.min(start.x, end.x),
-      y: Math.min(start.y, end.y),
-      width: Math.abs(end.x - start.x),
-      height: Math.abs(end.y - start.y)
-    };
-  }
-
-  function normalizeCrop(operation, sourceWidth, sourceHeight) {
-    const bounds = normalizeBounds(operation.start, operation.end);
-    const x = Math.max(0, Math.min(sourceWidth - 1, Math.floor(bounds.x)));
-    const y = Math.max(0, Math.min(sourceHeight - 1, Math.floor(bounds.y)));
-    const width = Math.max(1, Math.min(sourceWidth - x, Math.floor(bounds.width)));
-    const height = Math.max(1, Math.min(sourceHeight - y, Math.floor(bounds.height)));
-    return { x, y, width, height };
-  }
-
-  function operationBounds(operation, sourceWidth, sourceHeight) {
-    let bounds;
-    if (operation.shape === 'free') {
-      const xs = operation.points.map(point => point.x);
-      const ys = operation.points.map(point => point.y);
-      bounds = {
-        x: Math.min(...xs) - operation.radius,
-        y: Math.min(...ys) - operation.radius,
-        width: Math.max(...xs) - Math.min(...xs) + operation.radius * 2,
-        height: Math.max(...ys) - Math.min(...ys) + operation.radius * 2
-      };
-    } else {
-      bounds = normalizeBounds(operation.start, operation.end);
-    }
-    const padding = operation.type === 'blur' ? operation.blur * 2 : 0;
-    const x = Math.max(0, Math.floor(bounds.x - padding));
-    const y = Math.max(0, Math.floor(bounds.y - padding));
-    return {
-      x,
-      y,
-      width: Math.max(1, Math.min(sourceWidth - x, Math.ceil(bounds.width + padding * 2))),
-      height: Math.max(1, Math.min(sourceHeight - y, Math.ceil(bounds.height + padding * 2)))
-    };
-  }
-
-  function drawPath(targetContext, operation) {
-    if (!operation.points.length) return;
-    targetContext.save();
-    targetContext.strokeStyle = operation.color;
-    targetContext.fillStyle = operation.color;
-    targetContext.lineWidth = operation.width;
-    targetContext.lineCap = 'round';
-    targetContext.lineJoin = 'round';
-    if (operation.points.length === 1) {
-      targetContext.beginPath();
-      targetContext.arc(operation.points[0].x, operation.points[0].y, operation.width / 2, 0, Math.PI * 2);
-      targetContext.fill();
-    } else {
-      targetContext.beginPath();
-      targetContext.moveTo(operation.points[0].x, operation.points[0].y);
-      operation.points.slice(1).forEach(point => targetContext.lineTo(point.x, point.y));
-      targetContext.stroke();
-    }
-    targetContext.restore();
-  }
-
-  function createCensorPath(targetContext, operation) {
-    if (operation.shape === 'free') {
-      operation.points.forEach(point => {
-        targetContext.moveTo(point.x + operation.radius, point.y);
-        targetContext.arc(point.x, point.y, operation.radius, 0, Math.PI * 2);
-      });
-      return;
-    }
-    const bounds = normalizeBounds(operation.start, operation.end);
-    if (operation.shape === 'circle') {
-      targetContext.ellipse(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2, bounds.width / 2, bounds.height / 2, 0, 0, Math.PI * 2);
-    } else {
-      targetContext.rect(bounds.x, bounds.y, bounds.width, bounds.height);
-    }
-  }
-
-  function drawCensorShape(targetContext, operation) {
-    targetContext.beginPath();
-    createCensorPath(targetContext, operation);
-    targetContext.fill();
-  }
-
-  function applyCensor(surface, operation) {
-    const targetContext = surface.getContext('2d');
-    if (operation.type === 'color') {
-      targetContext.save();
-      targetContext.fillStyle = operation.color;
-      drawCensorShape(targetContext, operation);
-      targetContext.restore();
-      return;
-    }
-
-    const bounds = operationBounds(operation, surface.width, surface.height);
-    const source = createSurface(bounds.width, bounds.height);
-    source.getContext('2d').drawImage(
-      surface, bounds.x, bounds.y, bounds.width, bounds.height,
-      0, 0, bounds.width, bounds.height
-    );
-    targetContext.save();
-    targetContext.beginPath();
-    createCensorPath(targetContext, operation);
-    targetContext.clip();
-    targetContext.filter = `blur(${operation.blur}px)`;
-    targetContext.drawImage(source, bounds.x, bounds.y);
-    targetContext.restore();
-  }
-
-  function drawArrow(targetContext, operation) {
-    const { start, end, color, width } = operation;
-    const headLength = Math.max(14, width * 3.5);
-    const arrow = ScionosCaptureUtils.computeArrowPoints(start, end, headLength, Math.PI / 6);
-    targetContext.save();
-    targetContext.strokeStyle = color;
-    targetContext.fillStyle = color;
-    targetContext.lineWidth = width;
-    targetContext.lineCap = 'round';
-    targetContext.lineJoin = 'round';
-
-    targetContext.beginPath();
-    targetContext.moveTo(start.x, start.y);
-    targetContext.lineTo(end.x, end.y);
-    targetContext.stroke();
-
-    targetContext.beginPath();
-    targetContext.moveTo(end.x, end.y);
-    targetContext.lineTo(arrow.left.x, arrow.left.y);
-    targetContext.lineTo(arrow.right.x, arrow.right.y);
-    targetContext.closePath();
-    targetContext.fill();
-    targetContext.restore();
-  }
-
-  function drawShape(targetContext, operation) {
-    const { shape, mode, color, width, start, end } = operation;
-    const bounds = normalizeBounds(start, end);
-    targetContext.save();
-    if (mode === 'stroke') {
-      targetContext.strokeStyle = color;
-      targetContext.lineWidth = width || 4;
-      targetContext.lineCap = 'round';
-      targetContext.lineJoin = 'round';
-      if (shape === 'circle') {
-        targetContext.beginPath();
-        targetContext.ellipse(
-          bounds.x + bounds.width / 2, bounds.y + bounds.height / 2,
-          Math.max(1, bounds.width / 2), Math.max(1, bounds.height / 2), 0, 0, Math.PI * 2
-        );
-        targetContext.stroke();
-      } else {
-        targetContext.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
-      }
-    } else {
-      targetContext.fillStyle = color;
-      if (shape === 'circle') {
-        targetContext.beginPath();
-        targetContext.ellipse(
-          bounds.x + bounds.width / 2, bounds.y + bounds.height / 2,
-          Math.max(1, bounds.width / 2), Math.max(1, bounds.height / 2), 0, 0, Math.PI * 2
-        );
-        targetContext.fill();
-      } else {
-        targetContext.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
-      }
-    }
-    targetContext.restore();
-  }
-
-  function drawStepBadge(targetContext, operation) {
-    const { x, y, number, color, radius } = operation;
-    const r = Math.max(12, radius || 18);
-    targetContext.save();
-    targetContext.shadowColor = 'rgba(0, 0, 0, 0.4)';
-    targetContext.shadowBlur = 4;
-    targetContext.shadowOffsetX = 1;
-    targetContext.shadowOffsetY = 1;
-
-    targetContext.beginPath();
-    targetContext.arc(x, y, r, 0, Math.PI * 2);
-    targetContext.fillStyle = color;
-    targetContext.fill();
-
-    targetContext.shadowColor = 'transparent';
-    targetContext.strokeStyle = '#ffffff';
-    targetContext.lineWidth = Math.max(2, Math.round(r * 0.12));
-    targetContext.stroke();
-
-    targetContext.fillStyle = '#ffffff';
-    targetContext.font = `bold ${Math.round(r * 1.1)}px system-ui, -apple-system, sans-serif`;
-    targetContext.textAlign = 'center';
-    targetContext.textBaseline = 'middle';
-    targetContext.fillText(String(number), x, y + 1);
-    targetContext.restore();
-  }
-
-  function drawText(targetContext, operation) {
-    const { x, y, text, fontSize, color, bgColor } = operation;
-    if (!text) return;
-    const size = Math.max(12, fontSize || 20);
-    targetContext.save();
-    targetContext.font = `bold ${size}px "Segoe UI", system-ui, sans-serif`;
-
-    const lines = text.split('\n');
-    const lineHeight = size * 1.35;
-    let maxWidth = 0;
-    lines.forEach(line => {
-      const w = targetContext.measureText(line).width;
-      if (w > maxWidth) maxWidth = w;
-    });
-
-    const paddingX = Math.round(size * 0.4);
-    const paddingY = Math.round(size * 0.3);
-    const totalHeight = lines.length * lineHeight;
-
-    if (bgColor && bgColor !== 'transparent') {
-      targetContext.fillStyle = bgColor;
-      const rx = x - paddingX;
-      const ry = y - paddingY;
-      const rw = maxWidth + paddingX * 2;
-      const rh = totalHeight + paddingY * 2;
-      if (typeof targetContext.roundRect === 'function') {
-        targetContext.beginPath();
-        targetContext.roundRect(rx, ry, rw, rh, 6);
-        targetContext.fill();
-      } else {
-        targetContext.fillRect(rx, ry, rw, rh);
-      }
-    }
-
-    targetContext.fillStyle = color || '#ffffff';
-    targetContext.textBaseline = 'top';
-    targetContext.textAlign = 'left';
-    lines.forEach((line, index) => {
-      targetContext.fillText(line, x, y + index * lineHeight);
-    });
-    targetContext.restore();
-  }
-
-  function applyOperation(surface, operation) {
-    if (operation.kind === 'crop') {
-      const crop = normalizeCrop(operation, surface.width, surface.height);
-      const cropped = createSurface(crop.width, crop.height);
-      cropped.getContext('2d').drawImage(
-        surface, crop.x, crop.y, crop.width, crop.height,
-        0, 0, crop.width, crop.height
-      );
-      return cropped;
-    }
-    const ctx = surface.getContext('2d');
-    if (operation.kind === 'draw') drawPath(ctx, operation);
-    if (operation.kind === 'censor') applyCensor(surface, operation);
-    if (operation.kind === 'arrow') drawArrow(ctx, operation);
-    if (operation.kind === 'shape') drawShape(ctx, operation);
-    if (operation.kind === 'step') drawStepBadge(ctx, operation);
-    if (operation.kind === 'text') drawText(ctx, operation);
-    return surface;
-  }
-
-  function drawCropPreview(targetContext, operation, width, height) {
-    const crop = normalizeCrop(operation, width, height);
-    targetContext.save();
-    targetContext.fillStyle = 'rgba(3, 10, 20, .48)';
-    targetContext.beginPath();
-    targetContext.rect(0, 0, width, height);
-    targetContext.rect(crop.x, crop.y, crop.width, crop.height);
-    targetContext.fill('evenodd');
-    targetContext.strokeStyle = '#38bdf8';
-    targetContext.lineWidth = 2;
-    targetContext.setLineDash([7, 5]);
-    targetContext.strokeRect(crop.x, crop.y, crop.width, crop.height);
-    targetContext.restore();
-  }
+  const { createSurface, normalizeBounds, normalizeCrop, operationBounds, applyOperation, drawCropPreview } =
+    globalThis.ScionosEditorOperations.create({ captureUtils: ScionosCaptureUtils });
 
   function rebuildCommittedSurface() {
     if (!baseImage) return;
@@ -542,8 +262,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function renderCanvas() {
     if (!committedSurface) return;
-    canvas.width = committedSurface.width;
-    canvas.height = committedSurface.height;
+    if (canvas.width !== committedSurface.width) canvas.width = committedSurface.width;
+    if (canvas.height !== committedSurface.height) canvas.height = committedSurface.height;
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.drawImage(committedSurface, 0, 0);
     if (draftOperation) {
@@ -679,7 +399,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function cancelDraft() {
     draftOperation = null;
+    const pointerId = activePointerId;
     activePointerId = null;
+    if (pointerId !== null && canvas.hasPointerCapture(pointerId)) canvas.releasePointerCapture(pointerId);
     geometryPanel.hidden = true;
     renderCanvas();
   }
@@ -862,12 +584,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const point = getCanvasCoords(event);
     if (operation.kind !== 'draw' && operation.shape !== 'free') operation.end = point;
     else if (operation.points && operation.points.length === 1) operation.points.push(point);
-    if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
     activePointerId = null;
+    if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
     if (operation.kind === 'crop' || (operation.kind === 'censor' && operation.shape !== 'free')) showGeometry(operation);
     else await commitOperation(operation);
   });
-  canvas.addEventListener('pointercancel', cancelDraft);
+  canvas.addEventListener('pointercancel', event => {
+    if (event.pointerId === activePointerId) cancelDraft();
+  });
+  canvas.addEventListener('lostpointercapture', event => {
+    if (event.pointerId === activePointerId) cancelDraft();
+  });
 
   canvas.addEventListener('keydown', event => {
     if (!['crop', 'censor'].includes(currentTool) || censorShape.value === 'free') return;
@@ -1042,140 +769,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   zoomOutButton.addEventListener('click', () => applyZoom(currentZoom - 0.15));
   zoomResetButton.addEventListener('click', fitToScreen);
 
-  function canvasToBlob() {
-    return new Promise((resolve, reject) => {
-      committedSurface.toBlob(blob => blob ? resolve(blob) : reject(new Error('Image preparation failed.')), 'image/png');
-    });
-  }
-
-  downloadButton.addEventListener('click', async () => {
-    try {
-      const blob = await canvasToBlob();
-      const link = document.createElement('a');
-      const title = captureRecord && captureRecord.title ? captureRecord.title : '';
-      const baseName = ScionosCaptureUtils.sanitizeFilename(title, 'Scionos_Capture');
-      const dateStr = new Date().toISOString().slice(0, 10);
-      link.download = `${baseName}_${dateStr}.png`;
-      link.href = URL.createObjectURL(blob);
-      link.click();
-      setTimeout(() => URL.revokeObjectURL(link.href), 5000);
-      showToast(getI18nText('savedPng'));
-    } catch (error) {
-      showToast(getI18nText('exportError') + error.message, true);
-    }
+  globalThis.ScionosEditorExport.bind({
+    buttons: { downloadButton, htmlButton, printButton, copyButton },
+    getCommittedSurface: () => committedSurface,
+    getCaptureRecord: () => captureRecord,
+    getTextBlocks: () => activeTextBlocks,
+    getI18nText,
+    getLanguage: () => ScionosI18n.language,
+    showToast,
+    cancelDraft
   });
-  htmlButton.addEventListener('click', async () => {
-    try {
-      if (!committedSurface) return;
-      const imageBlob = await canvasToBlob();
-      const estimatedHtmlBytes = 32 + Math.ceil(imageBlob.size * 4 / 3);
-      if (estimatedHtmlBytes > ScionosCaptureUtils.MAX_HTML_EXPORT_BYTES) {
-        throw new Error('The HTML export exceeds the supported size limit.');
-      }
-      const dataUrl = await ScionosCaptureUtils.blobToDataUrl(imageBlob);
-      const htmlContent = ScionosCaptureUtils.buildHtmlReport({
-        title: captureRecord && captureRecord.title ? captureRecord.title : getI18nText('captureTitle'),
-        url: captureRecord && captureRecord.url ? captureRecord.url : '',
-        timestamp: captureRecord && captureRecord.timestamp ? captureRecord.timestamp : Date.now(),
-        width: committedSurface.width,
-        height: committedSurface.height,
-        dataUrl,
-        lang: ScionosI18n.language,
-        texts: {
-          appName: getI18nText('appName'),
-          reportSource: getI18nText('reportSource'),
-          reportDate: getI18nText('reportDate'),
-          reportDimensions: getI18nText('reportDimensions'),
-          reportZoomFit: getI18nText('reportZoomFit'),
-          reportZoomReset: getI18nText('reportZoomReset'),
-          reportCopied: getI18nText('reportCopied'),
-          btnPng: getI18nText('btnPng'),
-          btnCopy: getI18nText('btnCopy'),
-          btnPrint: getI18nText('btnPrint')
-        }
-      });
-      if (htmlContent.length > ScionosCaptureUtils.MAX_HTML_EXPORT_BYTES) {
-        throw new Error('The HTML export exceeds the supported size limit.');
-      }
-
-      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-      const link = document.createElement('a');
-      const title = captureRecord && captureRecord.title ? captureRecord.title : '';
-      const baseName = ScionosCaptureUtils.sanitizeFilename(title, 'Scionos_Capture');
-      const dateStr = new Date().toISOString().slice(0, 10);
-      link.download = `${baseName}_${dateStr}.html`;
-      link.href = URL.createObjectURL(blob);
-      link.click();
-      setTimeout(() => URL.revokeObjectURL(link.href), 5000);
-      showToast(getI18nText('savedHtml'));
-    } catch (error) {
-      showToast(getI18nText('exportError') + error.message, true);
-    }
-  });
-  printButton.addEventListener('click', async () => {
-    try {
-      cancelDraft();
-      if (!committedSurface) return;
-      const printArea = document.getElementById('print-area');
-      if (printArea) {
-        const title = captureRecord && captureRecord.title ? captureRecord.title : getI18nText('captureTitle');
-        const safeUrl = ScionosCaptureUtils.sanitizeUrl(captureRecord && captureRecord.url ? captureRecord.url : '');
-        const rawUrl = captureRecord && captureRecord.url ? captureRecord.url : '';
-        const dateFormatted = captureRecord && captureRecord.timestamp
-          ? new Date(captureRecord.timestamp).toLocaleString(ScionosI18n.language)
-          : new Date().toLocaleString(ScionosI18n.language);
-        const dataUrl = URL.createObjectURL(await canvasToBlob());
-
-        const textSpans = (activeTextBlocks || []).map(block => {
-          const left = (block.x / committedSurface.width * 100).toFixed(3);
-          const top = (block.y / committedSurface.height * 100).toFixed(3);
-          const width = (block.width / committedSurface.width * 100).toFixed(3);
-          const height = (block.height / committedSurface.height * 100).toFixed(3);
-          const fontSize = Math.max(8, Math.round(block.fontSize || 12));
-          if (block.href) {
-            const safeHref = ScionosCaptureUtils.sanitizeUrl(block.href);
-            return `<a href="${ScionosCaptureUtils.escapeHtml(safeHref)}" target="_blank" rel="noopener noreferrer" style="left:${left}%; top:${top}%; width:${width}%; height:${height}%; font-size:${fontSize}px;">${ScionosCaptureUtils.escapeHtml(block.text)}</a>`;
-          }
-          return `<span style="left:${left}%; top:${top}%; width:${width}%; height:${height}%; font-size:${fontSize}px;">${ScionosCaptureUtils.escapeHtml(block.text)}</span>`;
-        }).join('');
-
-        printArea.innerHTML = `
-          <div class="print-header">
-            <h1>${ScionosCaptureUtils.escapeHtml(title)}</h1>
-            <div class="print-meta">
-              ${rawUrl ? `<span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportSource'))} :</strong> <a href="${ScionosCaptureUtils.escapeHtml(safeUrl)}">${ScionosCaptureUtils.escapeHtml(rawUrl)}</a></span>` : ''}
-              <span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportDate'))} :</strong> ${ScionosCaptureUtils.escapeHtml(dateFormatted)}</span>
-              <span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportDimensions'))} :</strong> ${committedSurface.width} × ${committedSurface.height} px</span>
-            </div>
-          </div>
-          <div class="print-image-wrap">
-            <img src="${dataUrl}" alt="${ScionosCaptureUtils.escapeHtml(title)}">
-            <div class="searchable-text-layer" aria-hidden="true">${textSpans}</div>
-          </div>
-        `;
-        const revokePrintUrl = () => {
-          URL.revokeObjectURL(dataUrl);
-          window.removeEventListener('afterprint', revokePrintUrl);
-        };
-        window.addEventListener('afterprint', revokePrintUrl, { once: true });
-        setTimeout(revokePrintUrl, 60_000);
-      }
-      showToast(getI18nText('printOpened'));
-      window.print();
-    } catch (error) {
-      showToast(getI18nText('exportError') + error.message, true);
-    }
-  });
-  copyButton.addEventListener('click', async () => {
-    try {
-      const blob = await canvasToBlob();
-      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-      showToast(getI18nText('copySuccess'));
-    } catch (error) {
-      showToast(getI18nText('copyError') + error.message, true);
-    }
-  });
-
   document.addEventListener('keydown', event => {
     const typing = /^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName);
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {

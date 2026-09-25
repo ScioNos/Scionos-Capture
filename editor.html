@@ -254,7 +254,7 @@
     </div>
   </header>
 
-  <div class="toolbar" id="editor-toolbar" role="toolbar">
+  <div class="toolbar" id="editor-toolbar" role="toolbar" tabindex="0">
     <div id="primary-tool-group" class="tool-group">
       <button id="tool-select" class="tool-button" type="button" aria-pressed="true" data-tool="select"><svg class="icon" viewBox="0 0 24 24"><path d="m5 3 14 9-6 2-3 6z"/></svg><span id="txt-tool-select"></span></button>
       <button id="tool-draw" class="tool-button" type="button" aria-pressed="false" data-tool="draw"><svg class="icon" viewBox="0 0 24 24"><path d="m4 20 4-1 11-11-3-3L5 16zM14 7l3 3"/></svg><span id="txt-tool-draw"></span></button>
@@ -342,6 +342,8 @@
   <script src="capture-utils.js"></script>
   <script src="capture-store.js"></script>
   <script src="i18n.js"></script>
+  <script src="editor-operations.js"></script>
+  <script src="editor-export.js"></script>
   <script src="editor.js"></script>
 </body>
 </html>

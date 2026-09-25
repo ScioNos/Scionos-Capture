@@ -14,11 +14,22 @@
 - Vektor-Anmerkungspalette : Richtungspfeile (`tool-arrow`), Rechteck- und Kreisformen (`tool-shape`), Textanmerkungen (`tool-text`) und nummerierte Schrittmarken (`tool-step`) 1, 2, 3... mit Zurücksetzen-Taste.
 - Integriertes Offline-Benutzerhandbuch und Hilfeseite (`help.html`), erreichbar über die `?`-Schaltfläche in Popup und Editor.
 - Zusätzliche Tastaturkürzel im Editor: `A` (Pfeil), `S` (Form), `T` (Text), `P` (Schritt).
+- Erweiterte Testabdeckung: 36 Unit-Tests und 14 End-to-End-Tests (Playwright E2E).
 
 ### Behoben
 
 - Zuverlässige Erkennung des Tastaturkürzels im Popup: Hybride Unterstützung von Promise und Callback für `chrome.commands.getAll`, wodurch der fehlerhafte Status „Nicht konfiguriert“ bei aktivem `Alt+Shift+C` behoben wird.
 - Manifest V3-Konformität: Ungültiger Schlüssel `description` unter `_execute_action` in `manifest.json` entfernt.
+- Vollständiges Veröffentlichungsarchiv: Garantierte Aufnahme von `help.html` und `help.js` im ZIP-Archiv mit verstärkter Validierungsprüfung.
+- Editor-Leistung: Beseitigung unnötiger Canvas-Größenänderungen bei jedem Rendern zur Vermeidung von Kontext-Resets bei großen Aufnahmen.
+- Atomare Versionssynchronisierung: Strikte Vorab-Prüfung von `package-lock.json` vor dem Schreiben von Dateien auf die Festplatte.
+- Strengere PNG-Validierung: Vollständige 8-Byte-Signatur und `IHDR`-Header-Prüfung vor dem Auslesen der Bildabmessungen.
+- Editor-Barrierefreiheit: Tastatur-Fokussierbarkeit für die scrollbare Werkzeugleiste hinzugefügt (`tabindex="0"`).
+- Zuverlässigkeit beim Zeichnen: Garantiertes Bereinigen des Zeigerzustands bei `lostpointercapture` und `pointercancel`.
+
+### Geändert
+
+- Modulare interne Umstrukturierung der Aufnahme- (`content-dom.js`, `content-transfer.js`, `content-capture.js`) und Editor-Skripte (`editor-operations.js`, `editor-export.js`) zur besseren Wartbarkeit ohne funktionale Änderungen.
 
 ## [1.2.0] - 2026-09-22
 

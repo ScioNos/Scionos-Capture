@@ -58,6 +58,9 @@ async function prepareFullPageHarness(page, html) {
   });
   await page.addScriptTag({ path: path.resolve(__dirname, '../../capture-utils.js') });
   await page.addScriptTag({ path: path.resolve(__dirname, '../../capture-content-utils.js') });
+  await page.addScriptTag({ path: path.resolve(__dirname, '../../content-dom.js') });
+  await page.addScriptTag({ path: path.resolve(__dirname, '../../content-transfer.js') });
+  await page.addScriptTag({ path: path.resolve(__dirname, '../../content-capture.js') });
   await page.addScriptTag({ path: path.resolve(__dirname, '../../content.js') });
 }
 
@@ -440,6 +443,9 @@ test('scrolling-area overlay supports pointer, keyboard and exact multi-screen c
   });
   await page.addScriptTag({ path: path.resolve(__dirname, '../../capture-utils.js') });
   await page.addScriptTag({ path: path.resolve(__dirname, '../../capture-content-utils.js') });
+  await page.addScriptTag({ path: path.resolve(__dirname, '../../content-dom.js') });
+  await page.addScriptTag({ path: path.resolve(__dirname, '../../content-transfer.js') });
+  await page.addScriptTag({ path: path.resolve(__dirname, '../../content-capture.js') });
   await page.addScriptTag({ path: path.resolve(__dirname, '../../content.js') });
   const messages = Object.fromEntries(Object.entries(require('../../_locales/fr/messages.json'))
     .map(([key, value]) => [key, value.message]));

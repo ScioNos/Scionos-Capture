@@ -16,11 +16,22 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 - Outils d'annotation vectorielle : flèche directionnelle avec tête proportionnelle (`tool-arrow`), formes rectangle et ellipse en contour ou remplissage (`tool-shape`), texte annoté sur canevas avec fond contrasté (`tool-text`), et pastilles d'étapes numérotées auto-incrémentées 1, 2, 3... avec bouton de réinitialisation (`tool-step`).
 - Page et guide d'aide hors-ligne complet (`help.html`) accessible via le bouton `?` depuis la popup et l'éditeur.
 - Raccourcis clavier d'éditeur additionnels : `A` (flèche), `S` (forme), `T` (texte), `P` (pastille).
+- Couverture de test étendue à 36 tests unitaires et 14 tests de bout en bout (Playwright E2E).
 
 ### Corrigé
 
 - Résolution fiable du raccourci clavier dans la popup : prise en charge hybride (Promise et callback) pour `chrome.commands.getAll`, éliminant le faux affichage « Non configuré » lorsque `Alt+Shift+C` est actif.
 - Conformité Manifest V3 : suppression du champ invalide `description` sous `_execute_action` dans `manifest.json`.
+- Archive de distribution complète : inclusion garantie de `help.html` et `help.js` dans le ZIP de distribution avec validation de présence renforcée.
+- Performances de l'éditeur : suppression du redimensionnement systématique du canvas à chaque rendu pour éviter la réinitialisation inutile du contexte graphique sur les grandes captures.
+- Synchronisation de version atomique : échec explicite en amont si `package-lock.json` est absent ou invalide, et préparation en mémoire avant écriture disque.
+- Validation stricte des images PNG : vérification de la signature complète à 8 octets et de l'en-tête `IHDR` avant lecture des dimensions.
+- Accessibilité de l'éditeur : ajout de la navigabilité clavier sur la barre d'outils défilable (`tabindex="0"`).
+- Robustesse des gestes de dessin : nettoyage systématique de l'état du geste sur `lostpointercapture` et `pointercancel`.
+
+### Modifié
+
+- Refactorisation modulaire interne des scripts de capture (`content-dom.js`, `content-transfer.js`, `content-capture.js`) et de l’éditeur (`editor-operations.js`, `editor-export.js`) pour simplifier la maintenance, sans altération des fonctionnalités.
 
 ## [1.2.0] - 2026-09-22
 

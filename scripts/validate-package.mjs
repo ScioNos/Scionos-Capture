@@ -15,8 +15,10 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-function pngDimensions(buffer) {
-  assert(buffer.subarray(1, 4).toString('ascii') === 'PNG', 'Invalid PNG signature');
+export function pngDimensions(buffer) {
+  assert(buffer.length >= 24, 'PNG header is truncated');
+  assert(buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])), 'Invalid PNG signature');
+  assert(buffer.readUInt32BE(8) === 13 && buffer.subarray(12, 16).toString('ascii') === 'IHDR', 'Invalid PNG IHDR');
   return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
 }
 
@@ -27,7 +29,9 @@ export async function validatePackage() {
   assert(manifest.manifest_version === 3, 'manifest_version must be 3');
   assertChromeVersion(manifest.version);
   assert(packageJson.version === manifest.version, 'manifest and package versions must match');
+  assert(packageLock && typeof packageLock === 'object', 'package-lock.json must contain an object');
   assert(packageLock.version === manifest.version, 'manifest and package-lock versions must match');
+  assert(packageLock.packages && packageLock.packages[''], 'package-lock root entry is missing');
   assert(packageLock.packages[''].version === manifest.version, 'package-lock root version must match');
   assert(manifest.default_locale === 'fr', 'default locale must be fr');
   manifest.permissions.forEach(permission => assert(allowedPermissions.has(permission), `Unexpected permission: ${permission}`));
@@ -48,7 +52,7 @@ export async function validatePackage() {
     manifest.action.default_popup,
     ...Object.values(manifest.icons),
     manifest.action.default_icon,
-    'editor.html', 'help.html', 'capture-utils.js', 'capture-content-utils.js', 'capture-store.js', 'content.js', 'editor.js', 'help.js', 'i18n.js', 'popup.js'
+    'editor.html', 'help.html', 'capture-utils.js', 'capture-content-utils.js', 'capture-store.js', 'content-dom.js', 'content-transfer.js', 'content-capture.js', 'content.js', 'editor-operations.js', 'editor-export.js', 'editor.js', 'help.js', 'i18n.js', 'popup.js'
   ];
   await Promise.all(referencedFiles.map(async relativePath => {
     const stat = await fs.stat(path.join(root, relativePath));

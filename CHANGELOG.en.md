@@ -16,11 +16,22 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Vector annotation palette: directional arrows (`tool-arrow`), rectangle/ellipse shapes (`tool-shape`), canvas text annotations (`tool-text`), and numbered step badges (`tool-step`) with 1, 2, 3... auto-increment and quick reset.
 - Offline user guide and help page (`help.html`) accessible via `?` button from popup and editor.
 - Additional editor shortcuts: `A` (arrow), `S` (shape), `T` (text), `P` (step).
+- Expanded test suite: 36 unit tests and 14 end-to-end (Playwright E2E) tests.
 
 ### Fixed
 
 - Reliable keyboard shortcut resolution in the popup: hybrid Promise and callback handling for `chrome.commands.getAll`, resolving the false "Not configured" state when `Alt+Shift+C` is active.
 - Manifest V3 compliance: removed invalid `description` key under `_execute_action` in `manifest.json`.
+- Complete distribution archive: guaranteed inclusion of `help.html` and `help.js` in the distribution ZIP with strict validation checks.
+- Editor performance: removed unnecessary canvas dimension resets on every render pass, preserving drawing contexts during active edits on large captures.
+- Atomic version synchronization: fail-fast verification of `package-lock.json` integrity prior to writing any files to disk.
+- Stricter PNG validation: enforce full 8-byte PNG signature and `IHDR` chunk verification before reading dimensions.
+- Editor accessibility: keyboard focusability added to the scrollable toolbar (`tabindex="0"`).
+- Drawing gesture resilience: guaranteed pointer capture state cleanup upon `lostpointercapture` and `pointercancel`.
+
+### Changed
+
+- Internally refactored capture scripts (`content-dom.js`, `content-transfer.js`, `content-capture.js`) and editor scripts (`editor-operations.js`, `editor-export.js`) into focused files without changing capture flows or transfer formats.
 
 ## [1.2.0] - 2026-09-22
 

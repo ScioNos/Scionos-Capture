@@ -7,7 +7,7 @@
   "scripts": {
     "clean": "node scripts/clean.mjs",
     "version:sync": "node scripts/update-readme-version.mjs",
-    "check": "node --check background.js && node --check capture-utils.js && node --check capture-content-utils.js && node --check capture-store.js && node --check content.js && node --check editor.js && node --check help.js && node --check i18n.js && node --check popup.js",
+    "check": "node --check background.js && node --check capture-utils.js && node --check capture-content-utils.js && node --check capture-store.js && node --check content-dom.js && node --check content-transfer.js && node --check content-capture.js && node --check content.js && node --check editor-operations.js && node --check editor-export.js && node --check editor.js && node --check help.js && node --check i18n.js && node --check popup.js",
     "lint": "eslint . && html-validate popup.html editor.html help.html",
     "validate": "node scripts/validate-package.mjs",
     "test": "node --test tests/*.test.js",

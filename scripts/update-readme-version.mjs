@@ -10,55 +10,48 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * ainsi que dans tous les fichiers README et RELEASE_NOTES.
  *
  * @param {string} [targetVersion] - Nouvelle version cible (optionnelle, défaut: version dans package.json).
+ * @param {string} [projectRoot] - Root directory to synchronize; defaults to the repository root.
  * @returns {Promise<{ version: string, updatedFiles: string[] }>}
  */
-export async function updateReadmeVersion(targetVersion) {
-  const packagePath = path.join(root, 'package.json');
+export async function updateReadmeVersion(targetVersion, projectRoot = root) {
+  const packagePath = path.join(projectRoot, 'package.json');
   const packageJson = JSON.parse(await fs.readFile(packagePath, 'utf8'));
 
   const version = targetVersion || packageJson.version;
   assertChromeVersion(version);
 
-  const updatedFiles = [];
-
-  // 1. Mettre à jour package.json si une nouvelle version a été spécifiée
-  if (targetVersion && packageJson.version !== targetVersion) {
-    packageJson.version = targetVersion;
-    await fs.writeFile(packagePath, JSON.stringify(packageJson, null, 2) + '\n', 'utf8');
-    updatedFiles.push('package.json');
+  // Validate and stage all source data before writing any project files.
+  const packageLockPath = path.join(projectRoot, 'package-lock.json');
+  const packageLock = JSON.parse(await fs.readFile(packageLockPath, 'utf8'));
+  if (!packageLock || typeof packageLock !== 'object' || !packageLock.packages || !packageLock.packages['']) {
+    throw new Error('package-lock.json is invalid or missing its root package entry.');
   }
 
-  // 1b. Mettre à jour package-lock.json si présent
-  const packageLockPath = path.join(root, 'package-lock.json');
-  try {
-    const packageLock = JSON.parse(await fs.readFile(packageLockPath, 'utf8'));
-    let lockChanged = false;
-    if (packageLock.version !== version) {
-      packageLock.version = version;
-      lockChanged = true;
-    }
-    if (packageLock.packages?.[''] && packageLock.packages[''].version !== version) {
-      packageLock.packages[''].version = version;
-      lockChanged = true;
-    }
-    if (lockChanged) {
-      await fs.writeFile(packageLockPath, JSON.stringify(packageLock, null, 2) + '\n', 'utf8');
-      updatedFiles.push('package-lock.json');
-    }
-  } catch {
-    // Fichier package-lock.json absent ou ignoré
-  }
-
-  // 2. Mettre à jour manifest.json si nécessaire
-  const manifestPath = path.join(root, 'manifest.json');
+  const manifestPath = path.join(projectRoot, 'manifest.json');
   const manifest = JSON.parse(await fs.readFile(manifestPath, 'utf8'));
+  const updates = new Map();
+
+  if (packageJson.version !== version) {
+    packageJson.version = version;
+    updates.set('package.json', JSON.stringify(packageJson, null, 2) + '\n');
+  }
+
+  let lockChanged = false;
+  if (packageLock.version !== version) {
+    packageLock.version = version;
+    lockChanged = true;
+  }
+  if (packageLock.packages[''].version !== version) {
+    packageLock.packages[''].version = version;
+    lockChanged = true;
+  }
+  if (lockChanged) updates.set('package-lock.json', JSON.stringify(packageLock, null, 2) + '\n');
+
   if (manifest.version !== version) {
     manifest.version = version;
-    await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2) + '\n', 'utf8');
-    updatedFiles.push('manifest.json');
+    updates.set('manifest.json', JSON.stringify(manifest, null, 2) + '\n');
   }
 
-  // 3. Fichiers de documentation ciblés
   const docFiles = [
     'README.md',
     'README.en.md',
@@ -73,31 +66,24 @@ export async function updateReadmeVersion(targetVersion) {
   const supportedLine = chromeSupportedLine(version);
 
   for (const relPath of docFiles) {
-    const fullPath = path.join(root, relPath);
+    const fullPath = path.join(projectRoot, relPath);
     let content = await fs.readFile(fullPath, 'utf8');
     const originalContent = content;
 
-    // Badges shields.io
     content = content.replace(
       /https:\/\/img\.shields\.io\/badge\/version-[\d.]+(-[\w.]+)?-blue/g,
       `https://img.shields.io/badge/version-${version}-blue`
     );
-
-    // Liens vers les tags GitHub Release
     content = content.replace(
       /https:\/\/github\.com\/ScioNos\/Scionos-Capture\/releases\/tag\/v[\d.]+(-[\w.]+)?/g,
       `https://github.com/ScioNos/Scionos-Capture/releases/tag/v${version}`
     );
-
-    // Mentions et archives zip
     content = content.replace(
       /scionos-capture-v[\d.]+(-[\w.]+)?\.zip/g,
       `scionos-capture-v${version}.zip`
     );
-
-    // Textes de liens Markdown vers la release
     content = content.replace(
-      /\[([Rr]elease|versión)\s+v[\d.]+(-[\w.]+)?\]/g,
+      /\[([Rr]elease|versi(?:o|\u00f3)n)\s+v[\d.]+(-[\w.]+)?\]/g,
       `[$1 v${version}]`
     );
     content = content.replace(
@@ -113,7 +99,6 @@ export async function updateReadmeVersion(targetVersion) {
       );
     }
 
-    // Titre principal dans RELEASE_NOTES.md
     if (relPath === 'RELEASE_NOTES.md') {
       content = content.replace(
         /^#\s+Scionos\s+Capture\s+[\d.]+(-[\w.]+)?/m,
@@ -121,13 +106,14 @@ export async function updateReadmeVersion(targetVersion) {
       );
     }
 
-    if (content !== originalContent) {
-      await fs.writeFile(fullPath, content, 'utf8');
-      updatedFiles.push(relPath);
-    }
+    if (content !== originalContent) updates.set(relPath, content);
   }
 
-  return { version, updatedFiles };
+  for (const [relPath, content] of updates) {
+    await fs.writeFile(path.join(projectRoot, relPath), content, 'utf8');
+  }
+
+  return { version, updatedFiles: [...updates.keys()] };
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

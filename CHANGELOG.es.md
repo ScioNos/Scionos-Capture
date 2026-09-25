@@ -14,11 +14,22 @@
 - Paleta de anotación vectorial enriquecida : flechas (`tool-arrow`), formas geométricas (`tool-shape`), texto (`tool-text`) y distintivos numéricos de paso (`tool-step`) 1, 2, 3... con botón de reinicio.
 - Guía de usuario y ayuda integrada fuera de línea (`help.html`) accesible desde el botón `?` en popup y editor.
 - Atajos de teclado adicionales en el editor: `A` (flecha), `S` (forma), `T` (texto), `P` (paso).
+- Cobertura de pruebas ampliada: 36 pruebas unitarias y 14 pruebas de extremo a extremo (Playwright E2E).
 
 ### Corregido
 
 - Resolución fiable del atajo de teclado en la ventana emergente: soporte híbrido (Promise y callback) para `chrome.commands.getAll`, evitando el falso estado «No configurado» cuando `Alt+Shift+C` está activo.
 - Conformidad con Manifest V3: eliminación de la clave `description` no válida en `_execute_action` dentro de `manifest.json`.
+- Archivo de distribución completo: inclusión garantizada de `help.html` y `help.js` en el ZIP de distribución con validación estricta.
+- Rendimiento del editor: eliminación del redimensionamiento innecesario del lienzo en cada renderizado, conservando los contextos de dibujo.
+- Sincronización atómica de versiones: comprobación estricta de la integridad de `package-lock.json` antes de escribir en disco.
+- Validación PNG más estricta: comprobación de la firma completa de 8 bytes y de la cabecera `IHDR` antes de leer las dimensiones.
+- Accesibilidad del editor: navegación por teclado añadida a la barra de herramientas desplazable (`tabindex="0"`).
+- Resiliencia en el dibujo: limpieza garantizada del estado del puntero ante `lostpointercapture` y `pointercancel`.
+
+### Cambiado
+
+- Refactorización modular interna de los scripts de captura (`content-dom.js`, `content-transfer.js`, `content-capture.js`) y del editor (`editor-operations.js`, `editor-export.js`) para facilitar el mantenimiento sin cambios funcionales.
 
 ## [1.2.0] - 2026-09-22
 

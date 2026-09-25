@@ -12,8 +12,8 @@ const manifest = JSON.parse(await fsp.readFile(path.join(root, 'manifest.json'),
 const zipName = `scionos-capture-v${manifest.version}.zip`;
 const zipPath = path.join(dist, zipName);
 const files = [
-  'manifest.json', 'background.js', 'capture-store.js', 'capture-utils.js', 'capture-content-utils.js', 'content.js',
-  'editor.html', 'editor.js', 'i18n.js', 'popup.html', 'popup.js',
+  'manifest.json', 'background.js', 'capture-store.js', 'capture-utils.js', 'capture-content-utils.js', 'content-dom.js', 'content-transfer.js', 'content-capture.js', 'content.js',
+  'editor.html', 'editor-operations.js', 'editor-export.js', 'editor.js', 'help.html', 'help.js', 'i18n.js', 'popup.html', 'popup.js',
   'images/icon16.png', 'images/icon48.png', 'images/icon128.png',
   ...['fr', 'en', 'es', 'de'].map(locale => `_locales/${locale}/messages.json`),
   ...['fr', 'en', 'es', 'de'].map(locale => `images/flags/${locale}.svg`)
