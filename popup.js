@@ -26,6 +26,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     Object.entries(mappings).forEach(([id, key]) => {
       document.getElementById(id).textContent = getI18nText(key);
     });
+    const helpBtn = document.getElementById('btn-help');
+    if (helpBtn) {
+      helpBtn.title = getI18nText('btnHelp');
+      helpBtn.setAttribute('aria-label', getI18nText('btnHelp'));
+    }
     document.querySelector('[data-i18n="languageAuto"]').textContent = getI18nText('languageAuto');
   }
 
@@ -165,6 +170,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateShortcut();
     languageMenu.update();
   });
+
+  const helpButton = document.getElementById('btn-help');
+  if (helpButton) {
+    helpButton.addEventListener('click', () => {
+      chrome.tabs.create({ url: chrome.runtime.getURL('help.html') });
+    });
+  }
 
   shortcutButton.addEventListener('click', () => {
     const isEdge = navigator.userAgent.includes('Edg/');

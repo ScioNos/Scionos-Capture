@@ -157,6 +157,25 @@
     .toast.visible { opacity: 1; transform: translate(-50%, 0); }
     .toast.error { border-color: #9f1239; color: #fecdd3; }
 
+    .text-input-overlay {
+      position: absolute;
+      z-index: 20;
+      display: block;
+      min-width: 140px;
+      min-height: 44px;
+      box-sizing: border-box;
+      padding: 6px 10px;
+      border: 2px dashed var(--cyan);
+      border-radius: 6px;
+      background: rgba(12, 24, 40, 0.92);
+      color: #fff;
+      font-family: inherit;
+      font-size: 18px;
+      line-height: 1.3;
+      outline: none;
+      resize: both;
+    }
+
     @media (max-width: 1000px) {
       header { align-items: flex-start; flex-wrap: wrap; }
       .brand { flex-basis: calc(100% - 72px); }
@@ -177,8 +196,31 @@
       #print-area h1 { font-size: 18pt; margin: 0 0 6px 0; color: #075985; }
       #print-area .print-meta { font-size: 9pt; color: #475569; display: flex; flex-wrap: wrap; gap: 16px; }
       #print-area .print-meta a { color: #0284c7; text-decoration: none; word-break: break-all; }
-      #print-area .print-image-wrap { text-align: center; margin-top: 12px; }
+      #print-area .print-image-wrap { position: relative; text-align: center; margin-top: 12px; display: inline-block; width: 100%; }
       #print-area img { max-width: 100%; height: auto; display: block; margin: 0 auto; page-break-inside: avoid; break-inside: avoid; }
+      #print-area .searchable-text-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        pointer-events: auto;
+        user-select: text;
+      }
+      #print-area .searchable-text-layer span,
+      #print-area .searchable-text-layer a {
+        position: absolute;
+        color: transparent !important;
+        background: transparent !important;
+        line-height: 1;
+        white-space: nowrap;
+        user-select: text;
+      }
+      #print-area .searchable-text-layer a {
+        text-decoration: none;
+        cursor: pointer;
+      }
       @page { margin: 1.2cm; size: auto; }
     }
   </style>
@@ -204,6 +246,7 @@
           <button class="language-option" type="button" role="menuitemradio" data-language-mode="de"><img src="images/flags/de.svg" alt=""><span class="language-label">Deutsch</span><span class="language-check"></span></button>
         </div>
       </div>
+      <button id="btn-help" class="action-button" type="button"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span id="txt-help" class="action-label"></span></button>
       <button id="btn-copy" class="action-button" type="button" disabled><svg class="icon" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg><span id="txt-copy" class="action-label"></span></button>
       <button id="btn-pdf" class="action-button" type="button" disabled><svg class="icon" viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg><span id="txt-pdf" class="action-label"></span></button>
       <button id="btn-html" class="action-button" type="button" disabled><svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="m10 13-2 2 2 2m4-4 2 2-2 2"/></svg><span id="txt-html" class="action-label"></span></button>
@@ -215,6 +258,10 @@
     <div id="primary-tool-group" class="tool-group">
       <button id="tool-select" class="tool-button" type="button" aria-pressed="true" data-tool="select"><svg class="icon" viewBox="0 0 24 24"><path d="m5 3 14 9-6 2-3 6z"/></svg><span id="txt-tool-select"></span></button>
       <button id="tool-draw" class="tool-button" type="button" aria-pressed="false" data-tool="draw"><svg class="icon" viewBox="0 0 24 24"><path d="m4 20 4-1 11-11-3-3L5 16zM14 7l3 3"/></svg><span id="txt-tool-draw"></span></button>
+      <button id="tool-arrow" class="tool-button" type="button" aria-pressed="false" data-tool="arrow"><svg class="icon" viewBox="0 0 24 24"><line x1="5" y1="19" x2="19" y2="5"/><polyline points="9 5 19 5 19 15"/></svg><span id="txt-tool-arrow"></span></button>
+      <button id="tool-shape" class="tool-button" type="button" aria-pressed="false" data-tool="shape"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg><span id="txt-tool-shape"></span></button>
+      <button id="tool-text" class="tool-button" type="button" aria-pressed="false" data-tool="text"><svg class="icon" viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"/><line x1="12" y1="4" x2="12" y2="20"/></svg><span id="txt-tool-text"></span></button>
+      <button id="tool-step" class="tool-button" type="button" aria-pressed="false" data-tool="step"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M10 10l2-2"/></svg><span id="txt-tool-step"></span></button>
       <button id="tool-censor" class="tool-button" type="button" aria-pressed="false" data-tool="censor"><svg class="icon" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="m7 9 2-2m-2 6 6-6m-6 10L17 7m-6 10 6-6m-2 6 2-2"/></svg><span id="txt-tool-censor"></span></button>
       <button id="tool-crop" class="tool-button" type="button" aria-pressed="false" data-tool="crop"><svg class="icon" viewBox="0 0 24 24"><path d="M6 2v16a2 2 0 0 0 2 2h14M2 6h16a2 2 0 0 1 2 2v14"/></svg><span id="txt-tool-crop"></span></button>
     </div>
@@ -222,6 +269,31 @@
     <div id="draw-controls" class="tool-group" hidden>
       <label class="field" for="draw-size"><span id="label-draw-size"></span><select id="draw-size"><option value="4"></option><option value="8" selected></option><option value="16"></option><option value="32"></option></select></label>
       <label class="field" for="draw-color"><span id="label-draw-color"></span><input type="color" id="draw-color" value="#ef4444"></label>
+    </div>
+
+    <div id="arrow-controls" class="tool-group" hidden>
+      <label class="field" for="arrow-size"><span id="label-arrow-size"></span><select id="arrow-size"><option value="3"></option><option value="6" selected></option><option value="10"></option><option value="16"></option></select></label>
+      <label class="field" for="arrow-color"><span id="label-arrow-color"></span><input type="color" id="arrow-color" value="#ef4444"></label>
+    </div>
+
+    <div id="shape-controls" class="tool-group" hidden>
+      <label class="field" for="shape-type"><span id="label-shape-type"></span><select id="shape-type"><option value="rect" selected></option><option value="circle"></option></select></label>
+      <label class="field" for="shape-fill-mode"><span id="label-shape-mode"></span><select id="shape-fill-mode"><option value="stroke" selected></option><option value="fill"></option></select></label>
+      <label id="shape-size-field" class="field" for="shape-size"><span id="label-shape-size"></span><select id="shape-size"><option value="2"></option><option value="4" selected></option><option value="8"></option><option value="12"></option></select></label>
+      <label class="field" for="shape-color"><span id="label-shape-color"></span><input type="color" id="shape-color" value="#ef4444"></label>
+    </div>
+
+    <div id="text-controls" class="tool-group" hidden>
+      <label class="field" for="text-size"><span id="label-text-size"></span><select id="text-size"><option value="16"></option><option value="22" selected></option><option value="32"></option><option value="48"></option></select></label>
+      <label class="field" for="text-color"><span id="label-text-color"></span><input type="color" id="text-color" value="#ffffff"></label>
+      <label class="field" for="text-bg-color"><span id="label-text-bg-color"></span><select id="text-bg-color"><option value="rgba(0,0,0,0.75)" selected>Noir</option><option value="rgba(239,68,68,0.85)">Rouge</option><option value="rgba(14,165,233,0.85)">Bleu</option><option value="transparent">Transparent</option></select></label>
+    </div>
+
+    <div id="step-controls" class="tool-group" hidden>
+      <span id="step-counter-badge" class="field" style="font-weight:700; color:var(--cyan);"></span>
+      <label class="field" for="step-color"><span id="label-step-color"></span><input type="color" id="step-color" value="#ef4444"></label>
+      <label class="field" for="step-size"><span id="label-step-size"></span><select id="step-size"><option value="14"></option><option value="18" selected></option><option value="24"></option><option value="32"></option></select></label>
+      <button id="btn-step-reset" class="compact-button" type="button"><span id="txt-step-reset"></span></button>
     </div>
 
     <div id="censor-controls" class="tool-group" hidden>
@@ -241,7 +313,10 @@
 
   <main class="workspace" id="workspace">
     <div id="empty-state" class="empty-state"></div>
-    <div class="canvas-container" id="canvas-container" hidden><canvas id="main-canvas" tabindex="0"></canvas></div>
+    <div class="canvas-container" id="canvas-container" hidden>
+      <canvas id="main-canvas" tabindex="0"></canvas>
+      <textarea id="text-input-overlay" class="text-input-overlay" hidden></textarea>
+    </div>
   </main>
 
   <section id="geometry-panel" class="geometry-panel" aria-labelledby="geometry-title" hidden>

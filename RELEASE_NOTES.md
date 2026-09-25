@@ -1,33 +1,57 @@
-# Scionos Capture 1.2.0
+# Scionos Capture 1.3.0
 
 ## Français
 
-La version 1.2.0 résout définitivement la répétition de la barre de saisie (composer ChatGPT, Claude, Messenger, Notion) lors des captures de zone défilante grâce à une détection intelligente des éléments flottants et une stabilisation ciblée. Elle introduit le raccourci unifié `Alt+Shift+C` (avec bouton d’accès direct aux raccourcis dans la popup), la sélection intuitive par glisser-déposer avec option « Jusqu’en bas », le nommage automatique des fichiers avec le titre de la page, l’impression paginée multi-pages A4/PDF, ainsi qu’un cache mémoire IndexedDB et une sonde ping d’injection pour des performances optimales.
+La version 1.3.0 apporte des avancées majeures inspirées des meilleurs outils du web (FireShot, PrintFriendly, SingleFile) :
 
-Cette version corrige également le recadrage avec barres de défilement classiques, restaure les scrolls et styles CSS après interruption, sécurise la persistance atomique des transferts volumineux et améliore les performances de l’éditeur et des exports HTML/impression. La validation du package, des versions Chrome, des politiques de sécurité et des générateurs d’assets est désormais renforcée.
+- **Sélection avec défilement automatique (*Drag-to-scroll*)** : lorsque vous étirez votre zone de capture vers les bordures de l’écran, la page défile automatiquement et de manière fluide. La capture bascule en assemblage multi-tuiles haute résolution si la sélection dépasse l'écran visible.
+- **PDF avec texte indexable et hyperliens cliquables** : l'export PDF intègre une couche de texte vectoriel transparent superposée au pixel près. Le document obtenu est entièrement indexable dans vos lecteurs PDF, permet la recherche textuelle (`Ctrl+F`), la copie du texte et la navigation via les hyperliens `<a>` originaux.
+- **Protection de la vie privée lors de la censure** : tout bloc de texte situé sous une zone censurée (masquage opaque ou flou) est automatiquement purgé de la couche indexable du PDF afin qu'aucun secret ne puisse être recherché ni copié.
+- **Palette d’annotation enrichie** : nouveaux outils professionnels dans l'éditeur :
+  - **Flèches vectorielles** (`A`) avec pointe proportionnelle orientée.
+  - **Formes géométriques** (`S`) : rectangles et ellipses en mode contour ou remplissage.
+  - **Texte annoté** (`T`) : saisie directe sur le canevas avec fond contrasté personnalisable.
+  - **Pastilles d’étape numérotées** (`P`) : badges 1, 2, 3... auto-incrémentés avec bouton de réinitialisation pour documenter des tutoriels et procédures pas à pas.
+- **Page d'aide et guide d'utilisation hors-ligne** (`help.html`) : accessible instantanément via le bouton `?` dans la popup et l'éditeur, détaillant les modes de capture, les formats d'export, les raccourcis clavier et l'engagement 100 % local sans télémétrie.
 
-Téléchargez `scionos-capture-v1.2.0.zip`, vérifiez le fichier SHA-256, extrayez-le puis chargez le dossier dans Chrome ou Edge.
+Téléchargez `scionos-capture-v1.3.0.zip`, vérifiez le fichier SHA-256, extrayez-le puis chargez le dossier dans Chrome ou Edge.
 
 ## English
 
-Release 1.2.0 permanently resolves repeated composer/input bars on ChatGPT, Claude, Messenger, and Notion during scrolling-zone captures through intelligent floating-element detection and scoped stabilization. It introduces the unified `Alt+Shift+C` shortcut (with direct shortcut settings button in the popup), drag-to-select with a "To bottom" quick action, automatic page title inclusion in exported filenames, paged multi-page A4/PDF printing, as well as an IndexedDB memory cache and injection ping probe for peak performance.
+Version 1.3.0 brings major enhancements inspired by the web's best capture tools (FireShot, PrintFriendly, SingleFile):
 
-This version also fixes selection cropping with classic scrollbars, restores scroll positions and CSS styles after interruption, makes large-transfer persistence atomic, and improves editor and HTML/print export performance. Package, Chrome-version, security-policy, and asset-generator validation is now stricter.
+- **Selection with Continuous Auto-Scroll (*Drag-to-scroll*)**: When dragging selection borders toward the screen edges, the page scrolls automatically and smoothly, capturing multi-tile high-resolution stitched regions beyond the visible viewport.
+- **Searchable PDF with Text and Clickable Links**: Native PDF printing now overlays a transparent vector text layer precisely mapped to captured DOM text and `<a>` links. Exported PDFs support full-text search (`Ctrl+F`), text selection/copying, and clickable web links.
+- **Privacy Guarantee on Censor**: Any text underlying solid censor blocks or blur regions is automatically pruned from the PDF text layer to guarantee sensitive information cannot be searched or copied.
+- **Enriched Annotation Palette**:
+  - **Vector Arrows** (`A`) with directional arrowheads.
+  - **Geometric Shapes** (`S`): Rectangles and ellipses with stroke or solid fill styles.
+  - **Text Annotations** (`T`): Inline text placement with customizable background contrast.
+  - **Numbered Step Badges** (`P`): Auto-incrementing 1, 2, 3... step badges with quick reset for bug reports and guides.
+- **Built-in Offline Help & User Guide** (`help.html`): Accessible directly via the `?` button in both the popup and editor, outlining capture workflows, shortcuts, and 100% local privacy architecture.
 
-Download `scionos-capture-v1.2.0.zip`, verify the SHA-256 file, extract it, and load the folder in Chrome or Edge.
+Download `scionos-capture-v1.3.0.zip`, verify the SHA-256 file, extract it, and load the folder in Chrome or Edge.
 
 ## Español
 
-La versión 1.2.0 soluciona de forma definitiva la repetición de la barra de entrada de texto (ChatGPT, Claude, Messenger, Notion) en capturas de zona desplazable mediante detección inteligente de elementos flotantes y estabilización acotada. Introduce el atajo unificado `Alt+Shift+C` (con botón de acceso a la configuración de atajos en la ventana emergente), selección por arrastrar con acción rápida «Hasta abajo», nombres de archivo automáticos con el título de la página, impresión paginada multipágina A4/PDF, además de caché en memoria IndexedDB y sonda ping de inyección para un rendimiento óptimo.
+La versión 1.3.0 incorpora mejoras esenciales inspiradas en las mejores herramientas web (FireShot, PrintFriendly, SingleFile):
 
-También corrige el recorte con barras clásicas, restaura las posiciones de desplazamiento y los estilos CSS tras una interrupción, hace atómica la persistencia de transferencias grandes y mejora el rendimiento del editor y de las exportaciones HTML/impresión. La validación del paquete, de las versiones Chrome, de las políticas de seguridad y de los generadores de recursos es ahora más estricta.
+- **Selección con desplazamiento automático continuo**: al arrastrar el área de captura hacia los bordes de la pantalla, la página se desplaza suavemente de forma continua para capturar áreas más allá del área visible mediante ensamblado de múltiples teselas.
+- **PDF con texto indexable e hipervínculos**: la exportación a PDF incluye una capa de texto transparente superpuesta con precisión que permite búsqueda con `Ctrl+F`, selección/copia de texto y navegación con enlaces web activos.
+- **Privacidad estricta al censurar**: el texto cubierto por censura sólida o desenfoque se elimina automáticamente de la capa del PDF para proteger secretos y contraseñas.
+- **Paleta de anotación enriquecida**: flechas vectoriales (`A`), formas geométricas (`S`), texto anotado (`T`) y distintivos de paso numerados (`P`) 1, 2, 3... auto-incrementales.
+- **Página de ayuda integrada y sin conexión** (`help.html`): accesible desde el botón `?` en el popup y el editor con guía de uso completa y lista de atajos.
 
-Descarga `scionos-capture-v1.2.0.zip`, comprueba el archivo SHA-256 y cárgalo en Chrome o Edge.
+Descarga `scionos-capture-v1.3.0.zip`, comprueba el archivo SHA-256 y cárgalo en Chrome o Edge.
 
 ## Deutsch
 
-Version 1.2.0 behebt die wiederholte Eingabeleiste (ChatGPT, Claude, Messenger, Notion) bei Scrollbereich-Aufnahmen durch intelligente Erkennung schwebender Elemente und gezielte Bereichsstabilisierung. Sie führt das einheitliche Tastaturkürzel `Alt+Shift+C` ein (mit Direkttaste zur Tastaturkürzel-Verwaltung im Popup), Auswahl per Ziehen mit Schnellaktion „Bis ganz nach unten“, automatische Dateinamen mit dem Seitentitel, mehrseitigen A4/PDF-Druck sowie IndexedDB-Speichercaching und Ping-Injektionssonde für maximale Leistung.
+Version 1.3.0 bringt wichtige Neuerungen, inspiriert von den besten Web-Werkzeugen (FireShot, PrintFriendly, SingleFile):
 
-Zusätzlich korrigiert diese Version den Zuschnitt mit klassischen Scrollleisten, stellt Scrollpositionen und CSS-Stile nach Unterbrechungen wieder her, speichert große Übertragungen atomar und verbessert die Leistung des Editors sowie der HTML-/Druckexporte. Die Validierung von Paket, Chrome-Versionen, Sicherheitsrichtlinien und Asset-Generatoren ist jetzt strenger.
+- **Auswahl mit kontinuierlichem automatischem Scrollen**: Beim Ziehen der Bereichskanten an die Bildschirmränder scrollt die Seite gleichmäßig weiter und erfasst auch über den Bildschirm hinausgehende Bereiche per hochauflösendem Kachel-Stitching.
+- **Durchsuchbares PDF mit Text und anklickbaren Hyperlinks**: Beim PDF-Druck wird eine transparente Vektor-Textebene pixelgenau über das Bild gelegt. PDFs unterstützen `Strg+F`-Volltextsuche, Textkopieren und anklickbare Web-Links.
+- **Datenschutz bei Zensur**: Text unter soliden Zensurbalken oder Unschärfebereichen wird automatisch aus der PDF-Textebene entfernt, damit vertrauliche Informationen nicht auffindbar sind.
+- **Erweiterte Anmerkungspalette**: Vektorpfeile (`A`), geometrische Formen (`S`), Textnotizen (`T`) und automatisch hochzählende nummerierte Schrittmarken (`P`) 1, 2, 3... mit Schnell-Zurücksetzung.
+- **Integrierte Offline-Hilfeseite** (`help.html`): Direkt über die `?`-Schaltfläche in Popup und Editor erreichbar mit vollständigem Benutzerhandbuch und Tastaturkürzeln.
 
-Laden Sie `scionos-capture-v1.2.0.zip` herunter, prüfen Sie die SHA-256-Datei und laden Sie den Ordner in Chrome oder Edge.
+Laden Sie `scionos-capture-v1.3.0.zip` herunter, prüfen Sie die SHA-256-Datei und laden Sie den Ordner in Chrome oder Edge.

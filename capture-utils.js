@@ -639,6 +639,75 @@
     });
   }
 
+  function computeArrowPoints(start, end, headLength = 16, headAngle = Math.PI / 6) {
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const length = Math.hypot(dx, dy);
+    if (length === 0) {
+      return { start, end, left: end, right: end };
+    }
+    const angle = Math.atan2(dy, dx);
+    const actualHeadLength = Math.min(headLength, length * 0.45);
+    const left = {
+      x: end.x - actualHeadLength * Math.cos(angle - headAngle),
+      y: end.y - actualHeadLength * Math.sin(angle - headAngle)
+    };
+    const right = {
+      x: end.x - actualHeadLength * Math.cos(angle + headAngle),
+      y: end.y - actualHeadLength * Math.sin(angle + headAngle)
+    };
+    return { start, end, left, right };
+  }
+
+  function filterTextBlocksOnCensor(textBlocks, censorBounds) {
+    if (!Array.isArray(textBlocks) || !censorBounds) return textBlocks || [];
+    const cb = {
+      left: censorBounds.x,
+      top: censorBounds.y,
+      right: censorBounds.x + censorBounds.width,
+      bottom: censorBounds.y + censorBounds.height
+    };
+    return textBlocks.filter(block => {
+      const blockRight = block.x + block.width;
+      const blockBottom = block.y + block.height;
+      const intersects = !(
+        blockRight <= cb.left ||
+        block.x >= cb.right ||
+        blockBottom <= cb.top ||
+        block.y >= cb.bottom
+      );
+      return !intersects;
+    });
+  }
+
+  function shiftAndCropTextBlocks(textBlocks, cropRect) {
+    if (!Array.isArray(textBlocks) || !cropRect) return [];
+    const cr = {
+      left: cropRect.x,
+      top: cropRect.y,
+      right: cropRect.x + cropRect.width,
+      bottom: cropRect.y + cropRect.height
+    };
+    const result = [];
+    textBlocks.forEach(block => {
+      const blockRight = block.x + block.width;
+      const blockBottom = block.y + block.height;
+      const intersects = !(
+        blockRight <= cr.left ||
+        block.x >= cr.right ||
+        blockBottom <= cr.top ||
+        block.y >= cr.bottom
+      );
+      if (intersects) {
+        result.push(Object.assign({}, block, {
+          x: Math.max(0, block.x - cr.left),
+          y: Math.max(0, block.y - cr.top)
+        }));
+      }
+    });
+    return result;
+  }
+
   return {
     MAX_OUTPUT_PIXELS,
     MAX_CANVAS_DIMENSION,
@@ -661,6 +730,9 @@
     buildHtmlReport,
     blobToDataUrl,
     delay,
-    waitForPaint
+    waitForPaint,
+    computeArrowPoints,
+    filterTextBlocksOnCensor,
+    shiftAndCropTextBlocks
   };
 });

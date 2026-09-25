@@ -4,7 +4,7 @@
 
 ## Supported versions
 
-The latest release receives security updates. The actively supported line is `1.2.x` (the `1.2.0` release is being prepared).
+The latest release receives security updates. The actively supported line is `1.3.x` (the `1.2.0` release is being prepared).
 
 ## Reporting a vulnerability
 

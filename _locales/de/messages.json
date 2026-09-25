@@ -1,107 +1,434 @@
 {
-  "appName": { "message": "Scionos Capture" },
-  "appDesc": { "message": "Seiten sowie sichtbare, ausgewählte oder scrollbare Bereiche lokal aufnehmen und als PNG oder PDF exportieren." },
-  "languagePicker": { "message": "Sprache wählen" },
-  "languageCurrent": { "message": "Sprache: {language}" },
-  "languageAuto": { "message": "Automatisch — Browsersprache" },
-  "languageFR": { "message": "Français" },
-  "languageEN": { "message": "English" },
-  "languageES": { "message": "Español" },
-  "languageDE": { "message": "Deutsch" },
-  "brandTagline": { "message": "Das Wesentliche im Rahmen" },
-  "toolsToolbar": { "message": "Bearbeitungswerkzeuge" },
-  "btnFullPageTitle": { "message": "Ganze Seite" },
-  "btnFullPageDesc": { "message": "Die gesamte Seite zusammensetzen" },
-  "btnVisibleTitle": { "message": "Sichtbarer Bereich" },
-  "btnVisibleDesc": { "message": "Den angezeigten Inhalt aufnehmen" },
-  "btnZoneTitle": { "message": "Ausgewählter Bereich" },
-  "btnZoneDesc": { "message": "Den gewünschten Bereich aufziehen" },
-  "btnScrollingTitle": { "message": "Scrollbereich" },
-  "btnScrollingDesc": { "message": "Bereich über mehrere Ansichten wählen" },
-  "shortcutText": { "message": "Tastenkürzel" },
-  "shortcutUnavailable": { "message": "Nicht konfiguriert" },
-  "shortcutConfigure": { "message": "Tastenkürzel im Browser konfigurieren" },
-  "statusFull": { "message": "Ganze Seite wird vorbereitet…" },
-  "statusVisible": { "message": "Sichtbarer Bereich wird aufgenommen…" },
-  "statusZone": { "message": "Ziehen Sie den Aufnahmebereich auf." },
-  "statusScrolling": { "message": "Wählen Sie den Anfang des Scrollbereichs." },
-  "captureStartError": { "message": "Die Aufnahme wurde nicht gestartet: " },
-  "captureAlreadyRunning": { "message": "Auf dieser Seite läuft bereits eine Aufnahme." },
-  "unsupportedPage": { "message": "Diese Browserseite kann nicht aufgenommen werden." },
-  "progress": { "message": "Aufnahme läuft… {percent}%" },
-  "reduced": { "message": "Bild wurde für mehr Stabilität verkleinert" },
-  "visibleError": { "message": "Der sichtbare Bereich konnte nicht aufgenommen werden: " },
-  "fullError": { "message": "Die ganze Seite konnte nicht aufgenommen werden: " },
-  "fullScrollError": { "message": "Die scrollbare Fläche konnte nicht vollständig durchlaufen werden." },
-  "zoneError": { "message": "Die Auswahl konnte nicht aufgenommen werden: " },
-  "scrollingError": { "message": "Der Scrollbereich konnte nicht aufgenommen werden: " },
-  "scrollingDialogLabel": { "message": "Auswahl eines Scrollbereichs" },
-  "scrollingGeometry": { "message": "Koordinaten des Scrollbereichs" },
-  "scrollingInstructionStart": { "message": "Klicken Sie auf die erste Ecke oder geben Sie die Koordinaten ein." },
-  "scrollingInstructionEnd": { "message": "Scrollen Sie vertikal und klicken Sie auf die gegenüberliegende Ecke." },
-  "scrollingPointSet": { "message": "Erster Punkt gesetzt. Scrollen Sie durch die Seite." },
-  "scrollingInvalidRegion": { "message": "Der Bereich muss mindestens 5 × 5 px groß sein und in der sichtbaren Breite liegen." },
-  "scrollingCapture": { "message": "Erfassen" },
-  "scrollingToBottom": { "message": "Bis nach unten" },
-  "scrollingRestart": { "message": "Neu beginnen" },
-  "scrollingCancel": { "message": "Abbrechen" },
-  "tabChangedError": { "message": "Die Aufnahme wurde beendet, weil der aktive Tab gewechselt hat." },
-  "editorTitle": { "message": "Editor — Scionos Capture" },
-  "captureTitle": { "message": "Bildschirmaufnahme" },
-  "loadingCapture": { "message": "Aufnahme wird geladen…" },
-  "captureLoadError": { "message": "Keine Aufnahme verfügbar. Starten Sie eine neue Aufnahme über die Erweiterung." },
-  "captureReducedNotice": { "message": "Aufnahme wurde für mehr Stabilität auf {percent}% verkleinert." },
-  "historyFlattened": { "message": "Älterer Verlauf wurde nach 100 Änderungen zusammengeführt." },
-  "toolCursor": { "message": "Zeiger" },
-  "toolDraw": { "message": "Zeichnen" },
-  "toolCensor": { "message": "Verdecken" },
-  "toolCrop": { "message": "Zuschneiden" },
-  "toolUndo": { "message": "Rückgängig" },
-  "toolRedo": { "message": "Wiederholen" },
-  "btnCopy": { "message": "Kopieren" },
-  "btnPrint": { "message": "Drucken / PDF" },
-  "btnPng": { "message": "PNG herunterladen" },
-  "copySuccess": { "message": "Aufnahme in die Zwischenablage kopiert." },
-  "copyError": { "message": "Kopieren fehlgeschlagen: " },
-  "exportError": { "message": "Export fehlgeschlagen: " },
-  "modeBlur": { "message": "Visuelle Unschärfe" },
-  "modeColor": { "message": "Vollflächige Abdeckung" },
-  "shapeRect": { "message": "Rechteck" },
-  "shapeCircle": { "message": "Ellipse" },
-  "shapeFree": { "message": "Freihandpinsel" },
-  "labelMode": { "message": "Modus" },
-  "labelShape": { "message": "Form" },
-  "labelColor": { "message": "Farbe" },
-  "labelBlurIntensity": { "message": "Unschärfestärke" },
-  "labelDrawSize": { "message": "Strichstärke" },
-  "labelDrawColor": { "message": "Zeichenfarbe" },
-  "sizeFine": { "message": "Fein" },
-  "sizeMedium": { "message": "Mittel" },
-  "sizeThick": { "message": "Stark" },
-  "sizeVeryThick": { "message": "Sehr stark" },
-  "blurWarning": { "message": "Unschärfe ist nur visuell. Verwenden Sie für Geheimnisse eine volle Abdeckung." },
-  "geometryTitle": { "message": "Bereichsabmessungen" },
-  "coordinateX": { "message": "X" },
-  "coordinateY": { "message": "Y" },
-  "coordinateWidth": { "message": "Breite" },
-  "coordinateHeight": { "message": "Höhe" },
-  "applyCrop": { "message": "Anwenden" },
-  "cancelCrop": { "message": "Abbrechen" },
-  "zoomOut": { "message": "Verkleinern" },
-  "zoomIn": { "message": "Vergrößern" },
-  "zoomFit": { "message": "An Bildschirm anpassen" },
-  "canvasLabel": { "message": "Bearbeitungsbereich der Aufnahme" },
-  "captureReady": { "message": "Aufnahme kann bearbeitet werden." },
-  "savedPng": { "message": "PNG-Bild heruntergeladen." },
-  "savedHtml": { "message": "HTML-Bericht heruntergeladen." },
-  "btnHtml": { "message": "HTML exportieren" },
-  "reportSource": { "message": "Quelle" },
-  "reportDate": { "message": "Datum" },
-  "reportDimensions": { "message": "Abmessungen" },
-  "reportZoomFit": { "message": "Anpassen" },
-  "reportZoomReset": { "message": "100 %" },
-  "reportCopied": { "message": "Bild in die Zwischenablage kopiert." },
-  "printOpened": { "message": "Druckdialog geöffnet." },
-  "layoutChangedError": { "message": "Das Seitenlayout hat sich während der Aufnahme geändert. Warten Sie, bis die Seite geladen ist, und versuchen Sie es erneut." },
-  "captureTooLargeError": { "message": "Die Aufnahme ist weiterhin zu groß, um sicher verarbeitet zu werden." }
+  "appName": {
+    "message": "Scionos Capture"
+  },
+  "appDesc": {
+    "message": "Seiten sowie sichtbare, ausgewählte oder scrollbare Bereiche lokal aufnehmen und als PNG oder PDF exportieren."
+  },
+  "languagePicker": {
+    "message": "Sprache wählen"
+  },
+  "languageCurrent": {
+    "message": "Sprache: {language}"
+  },
+  "languageAuto": {
+    "message": "Automatisch — Browsersprache"
+  },
+  "languageFR": {
+    "message": "Français"
+  },
+  "languageEN": {
+    "message": "English"
+  },
+  "languageES": {
+    "message": "Español"
+  },
+  "languageDE": {
+    "message": "Deutsch"
+  },
+  "brandTagline": {
+    "message": "Das Wesentliche im Rahmen"
+  },
+  "toolsToolbar": {
+    "message": "Bearbeitungswerkzeuge"
+  },
+  "btnFullPageTitle": {
+    "message": "Ganze Seite"
+  },
+  "btnFullPageDesc": {
+    "message": "Die gesamte Seite zusammensetzen"
+  },
+  "btnVisibleTitle": {
+    "message": "Sichtbarer Bereich"
+  },
+  "btnVisibleDesc": {
+    "message": "Den angezeigten Inhalt aufnehmen"
+  },
+  "btnZoneTitle": {
+    "message": "Ausgewählter Bereich"
+  },
+  "btnZoneDesc": {
+    "message": "Den gewünschten Bereich aufziehen"
+  },
+  "btnScrollingTitle": {
+    "message": "Scrollbereich"
+  },
+  "btnScrollingDesc": {
+    "message": "Bereich über mehrere Ansichten wählen"
+  },
+  "shortcutText": {
+    "message": "Tastenkürzel"
+  },
+  "shortcutUnavailable": {
+    "message": "Nicht konfiguriert"
+  },
+  "shortcutConfigure": {
+    "message": "Tastenkürzel im Browser konfigurieren"
+  },
+  "statusFull": {
+    "message": "Ganze Seite wird vorbereitet…"
+  },
+  "statusVisible": {
+    "message": "Sichtbarer Bereich wird aufgenommen…"
+  },
+  "statusZone": {
+    "message": "Ziehen Sie den Aufnahmebereich auf."
+  },
+  "statusScrolling": {
+    "message": "Wählen Sie den Anfang des Scrollbereichs."
+  },
+  "captureStartError": {
+    "message": "Die Aufnahme wurde nicht gestartet: "
+  },
+  "captureAlreadyRunning": {
+    "message": "Auf dieser Seite läuft bereits eine Aufnahme."
+  },
+  "unsupportedPage": {
+    "message": "Diese Browserseite kann nicht aufgenommen werden."
+  },
+  "progress": {
+    "message": "Aufnahme läuft… {percent}%"
+  },
+  "reduced": {
+    "message": "Bild wurde für mehr Stabilität verkleinert"
+  },
+  "visibleError": {
+    "message": "Der sichtbare Bereich konnte nicht aufgenommen werden: "
+  },
+  "fullError": {
+    "message": "Die ganze Seite konnte nicht aufgenommen werden: "
+  },
+  "fullScrollError": {
+    "message": "Die scrollbare Fläche konnte nicht vollständig durchlaufen werden."
+  },
+  "zoneError": {
+    "message": "Die Auswahl konnte nicht aufgenommen werden: "
+  },
+  "scrollingError": {
+    "message": "Der Scrollbereich konnte nicht aufgenommen werden: "
+  },
+  "scrollingDialogLabel": {
+    "message": "Auswahl eines Scrollbereichs"
+  },
+  "scrollingGeometry": {
+    "message": "Koordinaten des Scrollbereichs"
+  },
+  "scrollingInstructionStart": {
+    "message": "Klicken Sie auf die erste Ecke oder geben Sie die Koordinaten ein."
+  },
+  "scrollingInstructionEnd": {
+    "message": "Scrollen Sie vertikal und klicken Sie auf die gegenüberliegende Ecke."
+  },
+  "scrollingPointSet": {
+    "message": "Erster Punkt gesetzt. Scrollen Sie durch die Seite."
+  },
+  "scrollingInvalidRegion": {
+    "message": "Der Bereich muss mindestens 5 × 5 px groß sein und in der sichtbaren Breite liegen."
+  },
+  "scrollingCapture": {
+    "message": "Erfassen"
+  },
+  "scrollingToBottom": {
+    "message": "Bis nach unten"
+  },
+  "scrollingRestart": {
+    "message": "Neu beginnen"
+  },
+  "scrollingCancel": {
+    "message": "Abbrechen"
+  },
+  "tabChangedError": {
+    "message": "Die Aufnahme wurde beendet, weil der aktive Tab gewechselt hat."
+  },
+  "editorTitle": {
+    "message": "Editor — Scionos Capture"
+  },
+  "captureTitle": {
+    "message": "Bildschirmaufnahme"
+  },
+  "loadingCapture": {
+    "message": "Aufnahme wird geladen…"
+  },
+  "captureLoadError": {
+    "message": "Keine Aufnahme verfügbar. Starten Sie eine neue Aufnahme über die Erweiterung."
+  },
+  "captureReducedNotice": {
+    "message": "Aufnahme wurde für mehr Stabilität auf {percent}% verkleinert."
+  },
+  "historyFlattened": {
+    "message": "Älterer Verlauf wurde nach 100 Änderungen zusammengeführt."
+  },
+  "toolCursor": {
+    "message": "Zeiger"
+  },
+  "toolDraw": {
+    "message": "Zeichnen"
+  },
+  "toolCensor": {
+    "message": "Verdecken"
+  },
+  "toolCrop": {
+    "message": "Zuschneiden"
+  },
+  "toolUndo": {
+    "message": "Rückgängig"
+  },
+  "toolRedo": {
+    "message": "Wiederholen"
+  },
+  "btnCopy": {
+    "message": "Kopieren"
+  },
+  "btnPrint": {
+    "message": "Drucken / PDF"
+  },
+  "btnPng": {
+    "message": "PNG herunterladen"
+  },
+  "copySuccess": {
+    "message": "Aufnahme in die Zwischenablage kopiert."
+  },
+  "copyError": {
+    "message": "Kopieren fehlgeschlagen: "
+  },
+  "exportError": {
+    "message": "Export fehlgeschlagen: "
+  },
+  "modeBlur": {
+    "message": "Visuelle Unschärfe"
+  },
+  "modeColor": {
+    "message": "Vollflächige Abdeckung"
+  },
+  "shapeRect": {
+    "message": "Rechteck"
+  },
+  "shapeCircle": {
+    "message": "Ellipse"
+  },
+  "shapeFree": {
+    "message": "Freihandpinsel"
+  },
+  "labelMode": {
+    "message": "Modus"
+  },
+  "labelShape": {
+    "message": "Form"
+  },
+  "labelColor": {
+    "message": "Farbe"
+  },
+  "labelBlurIntensity": {
+    "message": "Unschärfestärke"
+  },
+  "labelDrawSize": {
+    "message": "Strichstärke"
+  },
+  "labelDrawColor": {
+    "message": "Zeichenfarbe"
+  },
+  "sizeFine": {
+    "message": "Fein"
+  },
+  "sizeMedium": {
+    "message": "Mittel"
+  },
+  "sizeThick": {
+    "message": "Stark"
+  },
+  "sizeVeryThick": {
+    "message": "Sehr stark"
+  },
+  "blurWarning": {
+    "message": "Unschärfe ist nur visuell. Verwenden Sie für Geheimnisse eine volle Abdeckung."
+  },
+  "geometryTitle": {
+    "message": "Bereichsabmessungen"
+  },
+  "coordinateX": {
+    "message": "X"
+  },
+  "coordinateY": {
+    "message": "Y"
+  },
+  "coordinateWidth": {
+    "message": "Breite"
+  },
+  "coordinateHeight": {
+    "message": "Höhe"
+  },
+  "applyCrop": {
+    "message": "Anwenden"
+  },
+  "cancelCrop": {
+    "message": "Abbrechen"
+  },
+  "zoomOut": {
+    "message": "Verkleinern"
+  },
+  "zoomIn": {
+    "message": "Vergrößern"
+  },
+  "zoomFit": {
+    "message": "An Bildschirm anpassen"
+  },
+  "canvasLabel": {
+    "message": "Bearbeitungsbereich der Aufnahme"
+  },
+  "captureReady": {
+    "message": "Aufnahme kann bearbeitet werden."
+  },
+  "savedPng": {
+    "message": "PNG-Bild heruntergeladen."
+  },
+  "savedHtml": {
+    "message": "HTML-Bericht heruntergeladen."
+  },
+  "btnHtml": {
+    "message": "HTML exportieren"
+  },
+  "reportSource": {
+    "message": "Quelle"
+  },
+  "reportDate": {
+    "message": "Datum"
+  },
+  "reportDimensions": {
+    "message": "Abmessungen"
+  },
+  "reportZoomFit": {
+    "message": "Anpassen"
+  },
+  "reportZoomReset": {
+    "message": "100 %"
+  },
+  "reportCopied": {
+    "message": "Bild in die Zwischenablage kopiert."
+  },
+  "printOpened": {
+    "message": "Druckdialog geöffnet."
+  },
+  "layoutChangedError": {
+    "message": "Das Seitenlayout hat sich während der Aufnahme geändert. Warten Sie, bis die Seite geladen ist, und versuchen Sie es erneut."
+  },
+  "captureTooLargeError": {
+    "message": "Die Aufnahme ist weiterhin zu groß, um sicher verarbeitet zu werden."
+  },
+  "toolArrow": {
+    "message": "Pfeil"
+  },
+  "toolShape": {
+    "message": "Form"
+  },
+  "toolText": {
+    "message": "Text"
+  },
+  "toolStep": {
+    "message": "Schritt"
+  },
+  "stepReset": {
+    "message": "Auf 1 zurücksetzen"
+  },
+  "stepCounter": {
+    "message": "Schritt {number}"
+  },
+  "shapeStroke": {
+    "message": "Umriss"
+  },
+  "shapeFill": {
+    "message": "Gefüllt"
+  },
+  "labelShapeMode": {
+    "message": "Formstil"
+  },
+  "textPlaceholder": {
+    "message": "Text eingeben…"
+  },
+  "fontSize": {
+    "message": "Schriftgröße"
+  },
+  "labelTextColor": {
+    "message": "Textfarbe"
+  },
+  "labelBgColor": {
+    "message": "Hintergrund"
+  },
+  "btnHelp": {
+    "message": "Hilfe & Über"
+  },
+  "helpTitle": {
+    "message": "Hilfe — Scionos Capture"
+  },
+  "helpTagline": {
+    "message": "Benutzerhandbuch & Datenschutz"
+  },
+  "helpPrivacyHeader": {
+    "message": "100 % lokale Privatsphäre"
+  },
+  "helpPrivacyText": {
+    "message": "Scionos Capture läuft vollständig in Ihrem Browser. Es werden keine Screenshots, Metadaten oder Texte an externe Server übertragen. Keine Konten, kein Tracking, keine Netzwerkabhängigkeiten."
+  },
+  "helpModesHeader": {
+    "message": "Aufnahmemodi"
+  },
+  "helpModeFull": {
+    "message": "Ganze Seite: scrollt und fügt das gesamte Dokument automatisch zusammen, auch bei sehr langen Seiten."
+  },
+  "helpModeVisible": {
+    "message": "Sichtbarer Bereich: erfasst sofort das, was aktuell auf dem Bildschirm zu sehen ist."
+  },
+  "helpModeZone": {
+    "message": "Ausgewählter Bereich: Ziehen Sie ein Rechteck mit der Maus. Erreichen Sie die Bildschirmränder für automatisches Scrollen."
+  },
+  "helpModeScrolling": {
+    "message": "Scrollender Bereich: Definieren Sie zwei Ecken durch manuelles Scrollen, um einen internen Container zu erfassen."
+  },
+  "helpEditorHeader": {
+    "message": "Bearbeitung & Exportformate"
+  },
+  "helpEditorText": {
+    "message": "Versehen Sie Ihre Aufnahmen mit Pfeilen, Text, Schrittmarken oder Formen. Zensieren Sie vertrauliche Daten mit solider Maskierung (Weichzeichner ist rein visuell). Exportieren Sie als PNG, durchsuchbares PDF mit Links oder interaktiven HTML-Bericht."
+  },
+  "helpShortcutsHeader": {
+    "message": "Tastenkombinationen"
+  },
+  "helpShortcutActivation": {
+    "message": "Erweiterung aktivieren / Popup öffnen"
+  },
+  "helpShortcutSelect": {
+    "message": "Zeiger / Bewegen"
+  },
+  "helpShortcutDraw": {
+    "message": "Freihandpinsel"
+  },
+  "helpShortcutCensor": {
+    "message": "Zensieren / Weichzeichnen"
+  },
+  "helpShortcutCrop": {
+    "message": "Zuschneiden"
+  },
+  "helpShortcutArrow": {
+    "message": "Vektorpfeil"
+  },
+  "helpShortcutText": {
+    "message": "Textanmerkung"
+  },
+  "helpShortcutStep": {
+    "message": "Nummerierte Schrittmarke"
+  },
+  "helpShortcutShape": {
+    "message": "Geometrische Form"
+  },
+  "helpShortcutUndoRedo": {
+    "message": "Rückgängig / Wiederholen"
+  },
+  "helpShortcutZoom": {
+    "message": "Vergrößern / Verkleinern / Anpassen"
+  },
+  "helpVersionLabel": {
+    "message": "Installierte Version: {version}"
+  },
+  "helpClose": {
+    "message": "Hilfe schließen"
+  }
 }

@@ -16,7 +16,10 @@ const {
   escapeHtml,
   sanitizeUrl,
   sanitizeFilename,
-  buildHtmlReport
+  buildHtmlReport,
+  computeArrowPoints,
+  filterTextBlocksOnCensor,
+  shiftAndCropTextBlocks
 } = require('../capture-utils.js');
 
 test('includes the exact final scroll position without skipping the bottom of a page', () => {
@@ -180,4 +183,43 @@ test('sanitizes titles into safe and valid filenames', () => {
   assert.equal(sanitizeFilename('Capture'), 'Scionos_Capture');
   assert.equal(sanitizeFilename('A'.repeat(100)).length <= 45, true);
   assert.equal(sanitizeFilename('   __Titre  avec   espaces__   '), 'Titre_avec_espaces');
+});
+
+test('computes arrow points accurately for vector arrows', () => {
+  const arrow = computeArrowPoints({ x: 0, y: 0 }, { x: 100, y: 0 }, 20, Math.PI / 6);
+  assert.equal(arrow.start.x, 0);
+  assert.equal(arrow.end.x, 100);
+  assert.ok(arrow.left.x < 100 && arrow.left.x > 80);
+  assert.ok(arrow.right.x < 100 && arrow.right.x > 80);
+  assert.ok(arrow.left.y > 0);
+  assert.ok(arrow.right.y < 0);
+
+  // zero length edge case
+  const zeroArrow = computeArrowPoints({ x: 50, y: 50 }, { x: 50, y: 50 }, 20);
+  assert.deepEqual(zeroArrow.start, { x: 50, y: 50 });
+  assert.deepEqual(zeroArrow.end, { x: 50, y: 50 });
+});
+
+test('filters text blocks intersecting censored bounds to preserve privacy', () => {
+  const blocks = [
+    { x: 10, y: 10, width: 40, height: 15, text: 'Secret' },
+    { x: 200, y: 200, width: 60, height: 20, text: 'Public' }
+  ];
+  const censored = { x: 0, y: 0, width: 100, height: 50 };
+  const filtered = filterTextBlocksOnCensor(blocks, censored);
+  assert.equal(filtered.length, 1);
+  assert.equal(filtered[0].text, 'Public');
+});
+
+test('shifts and crops text blocks during image cropping', () => {
+  const blocks = [
+    { x: 50, y: 50, width: 40, height: 20, text: 'Inside' },
+    { x: 500, y: 500, width: 40, height: 20, text: 'Outside' }
+  ];
+  const cropRect = { x: 40, y: 40, width: 100, height: 100 };
+  const cropped = shiftAndCropTextBlocks(blocks, cropRect);
+  assert.equal(cropped.length, 1);
+  assert.equal(cropped[0].text, 'Inside');
+  assert.equal(cropped[0].x, 10);
+  assert.equal(cropped[0].y, 10);
 });

@@ -48,7 +48,7 @@ export async function validatePackage() {
     manifest.action.default_popup,
     ...Object.values(manifest.icons),
     manifest.action.default_icon,
-    'editor.html', 'capture-utils.js', 'capture-content-utils.js', 'capture-store.js', 'content.js', 'editor.js', 'i18n.js', 'popup.js'
+    'editor.html', 'help.html', 'capture-utils.js', 'capture-content-utils.js', 'capture-store.js', 'content.js', 'editor.js', 'help.js', 'i18n.js', 'popup.js'
   ];
   await Promise.all(referencedFiles.map(async relativePath => {
     const stat = await fs.stat(path.join(root, relativePath));

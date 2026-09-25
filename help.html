@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aide — Scionos Capture</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #07111f;
+      --panel: #101d2f;
+      --panel-hover: #172942;
+      --line: #31435b;
+      --text: #f8fafc;
+      --muted: #a9bad0;
+      --cyan: #38bdf8;
+      --cyan-deep: #075985;
+      --amber: #fbbf24;
+      --green: #10b981;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 105% -5%, rgba(56, 189, 248, 0.15), transparent 45%),
+        radial-gradient(circle at -5% 105%, rgba(16, 185, 129, 0.08), transparent 40%),
+        var(--ink);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    button { font: inherit; }
+
+    button:focus-visible, a:focus-visible {
+      outline: 3px solid var(--amber);
+      outline-offset: 2px;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .brand-mark img { width: 44px; height: 44px; }
+
+    .brand-copy { min-width: 0; }
+    .brand-copy h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
+    .brand-copy p { margin: 4px 0 0; color: var(--muted); font: 600 12px/1.2 ui-monospace, monospace; letter-spacing: 0.08em; text-transform: uppercase; }
+
+    .header-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .language-switcher { position: relative; }
+    .language-button {
+      min-width: 58px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 9px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--text);
+      cursor: pointer;
+    }
+    .language-button:hover { border-color: var(--cyan); background: var(--panel-hover); }
+    .language-button img, .language-option img { width: 24px; height: 16px; border-radius: 2px; }
+    .language-code { font: 700 11px/1 ui-monospace, monospace; }
+    .chevron { color: var(--muted); font-size: 10px; }
+
+    .language-menu {
+      position: absolute;
+      z-index: 20;
+      top: calc(100% + 7px);
+      right: 0;
+      width: 226px;
+      padding: 6px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #0c1828;
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.48);
+    }
+    .language-menu[hidden] { display: none; }
+    .language-option {
+      width: 100%;
+      min-height: 40px;
+      display: grid;
+      grid-template-columns: 26px 1fr 18px;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 9px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+    }
+    .language-option:hover, .language-option:focus-visible { background: var(--panel-hover); }
+    .language-option .auto-icon { color: var(--cyan); text-align: center; font-size: 18px; }
+    .language-label { font-size: 12px; }
+    .language-check { color: var(--cyan); font-weight: 800; }
+
+    .section {
+      margin-top: 36px;
+    }
+
+    .section h2 {
+      margin: 0 0 14px 0;
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--cyan);
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--panel), #0a1422);
+      padding: 20px 24px;
+      margin-bottom: 16px;
+    }
+
+    .card.highlight {
+      border-color: rgba(16, 185, 129, 0.4);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(7, 17, 31, 0.95));
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+      color: #fff;
+    }
+
+    .card-text {
+      margin: 0;
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 16px;
+    }
+
+    .shortcut-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
+    .shortcut-table th, .shortcut-table td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid rgba(49, 67, 91, 0.6);
+    }
+
+    .shortcut-table th {
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+    }
+
+    .shortcut-table tr:last-child td { border-bottom: none; }
+
+    kbd {
+      display: inline-block;
+      padding: 2px 7px;
+      border: 1px solid var(--line);
+      border-bottom-width: 2px;
+      border-radius: 5px;
+      background: #09121d;
+      color: #fff;
+      font: 700 11px/1.3 ui-monospace, monospace;
+    }
+
+    .footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .footer a {
+      color: var(--cyan);
+      text-decoration: none;
+    }
+    .footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="brand-mark"><img src="images/icon48.png" alt="Scionos Capture"></div>
+      <div class="brand-copy">
+        <h1>Scionos Capture</h1>
+        <p id="help-tagline"></p>
+      </div>
+      <div class="header-actions">
+        <div class="language-switcher">
+          <button id="language-button" class="language-button" type="button" aria-haspopup="menu" aria-expanded="false">
+            <img id="language-flag" src="images/flags/fr.svg" alt="">
+            <span id="language-code" class="language-code">FR</span><span class="chevron" aria-hidden="true">▼</span>
+          </button>
+          <div id="language-menu" class="language-menu" role="menu" hidden>
+            <button class="language-option" type="button" role="menuitemradio" data-language-mode="auto"><span class="auto-icon" aria-hidden="true">◎</span><span class="language-label" data-i18n="languageAuto"></span><span class="language-check"></span></button>
+            <button class="language-option" type="button" role="menuitemradio" data-language-mode="fr"><img src="images/flags/fr.svg" alt=""><span class="language-label">Français</span><span class="language-check"></span></button>
+            <button class="language-option" type="button" role="menuitemradio" data-language-mode="en"><img src="images/flags/en.svg" alt=""><span class="language-label">English</span><span class="language-check"></span></button>
+            <button class="language-option" type="button" role="menuitemradio" data-language-mode="es"><img src="images/flags/es.svg" alt=""><span class="language-label">Español</span><span class="language-check"></span></button>
+            <button class="language-option" type="button" role="menuitemradio" data-language-mode="de"><img src="images/flags/de.svg" alt=""><span class="language-label">Deutsch</span><span class="language-check"></span></button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="section">
+        <div class="card highlight">
+          <h2 id="sec-privacy-title" style="color: var(--green); margin-top: 0;"></h2>
+          <p id="sec-privacy-text" class="card-text"></p>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 id="sec-modes-title"></h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3 class="card-title" id="mode-full-title"></h3>
+            <p id="mode-full-desc" class="card-text"></p>
+          </div>
+          <div class="card">
+            <h3 class="card-title" id="mode-visible-title"></h3>
+            <p id="mode-visible-desc" class="card-text"></p>
+          </div>
+          <div class="card">
+            <h3 class="card-title" id="mode-zone-title"></h3>
+            <p id="mode-zone-desc" class="card-text"></p>
+          </div>
+          <div class="card">
+            <h3 class="card-title" id="mode-scrolling-title"></h3>
+            <p id="mode-scrolling-desc" class="card-text"></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 id="sec-editor-title"></h2>
+        <div class="card">
+          <p id="sec-editor-text" class="card-text"></p>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 id="sec-shortcuts-title"></h2>
+        <div class="card">
+          <table class="shortcut-table">
+            <thead>
+              <tr>
+                <th id="th-action">Action</th>
+                <th id="th-shortcut">Raccourci</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="sc-activation"></td>
+                <td><kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd></td>
+              </tr>
+              <tr>
+                <td id="sc-select"></td>
+                <td><kbd>V</kbd></td>
+              </tr>
+              <tr>
+                <td id="sc-draw"></td>
+                <td><kbd>D</kbd></td>
+              </tr>
+              <tr>
+                <td id="sc-arrow"></td>
+                <td><kbd>A</kbd></td>
+              </tr>
+              <tr>
+                <td id="sc-text"></td>
+                <td><kbd>T</kbd></td>
+              </tr>
+              <tr>
+                <td id="sc-step"></td>
+                <td><kbd>P</kbd></td>
+              </tr>
+              <tr>
+                <td id="sc-shape"></td>
+                <td><kbd>R</kbd></td>
+              </tr>
+              <tr>
+                <td id="sc-censor"></td>
+                <td><kbd>M</kbd></td>
+              </tr>
+              <tr>
+                <td id="sc-crop"></td>
+                <td><kbd>C</kbd></td>
+              </tr>
+              <tr>
+                <td id="sc-undoredo"></td>
+                <td><kbd>Ctrl</kbd> + <kbd>Z</kbd> / <kbd>Ctrl</kbd> + <kbd>Y</kbd></td>
+              </tr>
+              <tr>
+                <td id="sc-zoom"></td>
+                <td><kbd>+</kbd> / <kbd>−</kbd> / <kbd>0</kbd></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span id="help-version"></span>
+      <a href="https://github.com/ScioNos/Scionos-Capture" target="_blank" rel="noopener noreferrer">GitHub — ScioNos</a>
+    </footer>
+  </div>
+
+  <script src="i18n.js"></script>
+  <script src="help.js"></script>
+</body>
+</html>

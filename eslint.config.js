@@ -4,7 +4,7 @@ const browserGlobals = Object.fromEntries([
   'Blob', 'ClipboardItem', 'CustomEvent', 'FileReader', 'IDBKeyRange', 'Image', 'URL', 'URLSearchParams',
   'cancelAnimationFrame', 'chrome', 'confirm', 'console', 'crypto', 'document', 'fetch', 'indexedDB',
   'navigator', 'requestAnimationFrame', 'setTimeout', 'clearTimeout', 'window', 'alert', 'location',
-  'createImageBitmap', 'getComputedStyle', 'importScripts', 'module',
+  'createImageBitmap', 'getComputedStyle', 'importScripts', 'module', 'NodeFilter',
   'ScionosCaptureUtils', 'ScionosContentUtils', 'CaptureStore', 'ScionosI18n', 'getI18nText', 'initI18n'
 ].map(name => [name, 'readonly']));
 

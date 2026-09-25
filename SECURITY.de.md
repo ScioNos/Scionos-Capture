@@ -2,7 +2,7 @@
 
 [Français](SECURITY.md) · [English](SECURITY.en.md) · [Español](SECURITY.es.md) · [Deutsch](SECURITY.de.md)
 
-Das neueste Release erhält Sicherheitskorrekturen; die aktuell unterstützte Linie ist `1.2.x` (das Release `1.2.0` wird vorbereitet).
+Das neueste Release erhält Sicherheitskorrekturen; die aktuell unterstützte Linie ist `1.3.x` (das Release `1.2.0` wird vorbereitet).
 
 Für ausnutzbare Schwachstellen kein öffentliches Issue öffnen. Nutzen Sie die [private GitHub-Meldung](https://github.com/ScioNos/Scionos-Capture/security/advisories/new) oder kontaktieren Sie `info@eyelo.ch` und nennen Sie Version, Auswirkung, Schritte und möglichst einen nicht destruktiven Nachweis.
 

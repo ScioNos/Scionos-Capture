@@ -74,7 +74,22 @@
     .brand-copy h1 { margin: 0; font-size: 16px; line-height: 1.1; letter-spacing: -0.02em; }
     .brand-copy p { margin: 3px 0 0; color: var(--muted); font: 600 10px/1.2 ui-monospace, monospace; letter-spacing: 0.08em; text-transform: uppercase; }
 
-    .language-switcher { position: relative; margin-left: auto; }
+    .header-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+    .help-button {
+      width: 34px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--muted);
+      cursor: pointer;
+      font: 700 13px ui-monospace, monospace;
+      transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+    }
+    .help-button:hover { border-color: var(--cyan); color: var(--cyan); background: var(--panel-hover); }
+    .language-switcher { position: relative; }
     .language-button {
       min-width: 58px;
       height: 38px;
@@ -235,17 +250,20 @@
   <header class="header">
     <div class="brand-mark"><img src="images/icon48.png" alt=""></div>
     <div class="brand-copy"><h1>Scionos Capture</h1><p id="brand-tagline"></p></div>
-    <div class="language-switcher">
-      <button id="language-button" class="language-button" type="button" aria-haspopup="menu" aria-expanded="false">
-        <img id="language-flag" src="images/flags/fr.svg" alt="">
-        <span id="language-code" class="language-code">FR</span><span class="chevron" aria-hidden="true">▼</span>
-      </button>
-      <div id="language-menu" class="language-menu" role="menu" hidden>
-        <button class="language-option" type="button" role="menuitemradio" data-language-mode="auto"><span class="auto-icon" aria-hidden="true">◎</span><span class="language-label" data-i18n="languageAuto">Automatique — langue du navigateur</span><span class="language-check"></span></button>
-        <button class="language-option" type="button" role="menuitemradio" data-language-mode="fr"><img src="images/flags/fr.svg" alt=""><span class="language-label">Français</span><span class="language-check"></span></button>
-        <button class="language-option" type="button" role="menuitemradio" data-language-mode="en"><img src="images/flags/en.svg" alt=""><span class="language-label">English</span><span class="language-check"></span></button>
-        <button class="language-option" type="button" role="menuitemradio" data-language-mode="es"><img src="images/flags/es.svg" alt=""><span class="language-label">Español</span><span class="language-check"></span></button>
-        <button class="language-option" type="button" role="menuitemradio" data-language-mode="de"><img src="images/flags/de.svg" alt=""><span class="language-label">Deutsch</span><span class="language-check"></span></button>
+    <div class="header-actions">
+      <button id="btn-help" class="help-button" type="button" aria-label="Aide &amp; À propos"><span aria-hidden="true">?</span></button>
+      <div class="language-switcher">
+        <button id="language-button" class="language-button" type="button" aria-haspopup="menu" aria-expanded="false">
+          <img id="language-flag" src="images/flags/fr.svg" alt="">
+          <span id="language-code" class="language-code">FR</span><span class="chevron" aria-hidden="true">▼</span>
+        </button>
+        <div id="language-menu" class="language-menu" role="menu" hidden>
+          <button class="language-option" type="button" role="menuitemradio" data-language-mode="auto"><span class="auto-icon" aria-hidden="true">◎</span><span class="language-label" data-i18n="languageAuto">Automatique — langue du navigateur</span><span class="language-check"></span></button>
+          <button class="language-option" type="button" role="menuitemradio" data-language-mode="fr"><img src="images/flags/fr.svg" alt=""><span class="language-label">Français</span><span class="language-check"></span></button>
+          <button class="language-option" type="button" role="menuitemradio" data-language-mode="en"><img src="images/flags/en.svg" alt=""><span class="language-label">English</span><span class="language-check"></span></button>
+          <button class="language-option" type="button" role="menuitemradio" data-language-mode="es"><img src="images/flags/es.svg" alt=""><span class="language-label">Español</span><span class="language-check"></span></button>
+          <button class="language-option" type="button" role="menuitemradio" data-language-mode="de"><img src="images/flags/de.svg" alt=""><span class="language-label">Deutsch</span><span class="language-check"></span></button>
+        </div>
       </div>
     </div>
   </header>

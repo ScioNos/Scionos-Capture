@@ -4,6 +4,17 @@
 
 ## [Sin publicar]
 
+## [1.3.0] - 2026-09-25
+
+### Añadido
+
+- Desplazamiento automático continuo (*drag-to-scroll*) durante la selección por ratón, permitiendo capturar más allá del área visible mediante ensamblado de múltiples teselas.
+- Exportación a PDF con texto vectorial indexable (`Ctrl+F`), seleccionable e hipervínculos `<a>` activos superpuestos a la captura.
+- Eliminación automática del texto bajo áreas censuradas (color sólido o desenfoque) para garantizar la privacidad en el PDF.
+- Paleta de anotación vectorial enriquecida : flechas (`tool-arrow`), formas geométricas (`tool-shape`), texto (`tool-text`) y distintivos numéricos de paso (`tool-step`) 1, 2, 3... con botón de reinicio.
+- Guía de usuario y ayuda integrada fuera de línea (`help.html`) accesible desde el botón `?` en popup y editor.
+- Atajos de teclado adicionales en el editor: `A` (flecha), `S` (forma), `T` (texto), `P` (paso).
+
 ## [1.2.0] - 2026-09-22
 
 ### Añadido

@@ -47,11 +47,91 @@
     );
   }
 
+  function extractDomTextBlocks(region) {
+    const blocks = [];
+    if (!region || region.width <= 0 || region.height <= 0) return blocks;
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+
+    const targetLeft = Number.isFinite(region.left) ? region.left : (Number.isFinite(region.x) ? region.x : 0);
+    const targetTop = Number.isFinite(region.top) ? region.top : (Number.isFinite(region.y) ? region.y : 0);
+    const targetRight = targetLeft + region.width;
+    const targetBottom = targetTop + region.height;
+
+    try {
+      const walker = document.createTreeWalker(
+        document.body || document.documentElement,
+        NodeFilter.SHOW_TEXT,
+        {
+          acceptNode(node) {
+            if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+            const parent = node.parentElement;
+            if (!parent) return NodeFilter.FILTER_REJECT;
+            const tag = parent.tagName;
+            if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT' || tag === 'TEMPLATE') {
+              return NodeFilter.FILTER_REJECT;
+            }
+            if (parent.closest('[data-scionos-capture]')) return NodeFilter.FILTER_REJECT;
+            return NodeFilter.FILTER_ACCEPT;
+          }
+        }
+      );
+
+      let currentNode = walker.nextNode();
+      let count = 0;
+      const MAX_BLOCKS = 1500;
+      while (currentNode && count < MAX_BLOCKS) {
+        const parent = currentNode.parentElement;
+        const range = document.createRange();
+        range.selectNodeContents(currentNode);
+        const rect = range.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+          const docLeft = rect.left + scrollX;
+          const docTop = rect.top + scrollY;
+          const docRight = docLeft + rect.width;
+          const docBottom = docTop + rect.height;
+
+          if (
+            docRight > targetLeft &&
+            docLeft < targetRight &&
+            docBottom > targetTop &&
+            docTop < targetBottom
+          ) {
+            const computed = window.getComputedStyle(parent);
+            if (computed.visibility !== 'hidden' && computed.display !== 'none' && parseFloat(computed.opacity || '1') > 0.05) {
+              const link = parent.closest('a');
+              blocks.push({
+                text: currentNode.nodeValue.trim(),
+                x: Math.round(docLeft - targetLeft),
+                y: Math.round(docTop - targetTop),
+                width: Math.round(rect.width),
+                height: Math.round(rect.height),
+                fontSize: Math.round(parseFloat(computed.fontSize) || 14),
+                fontFamily: computed.fontFamily || 'sans-serif',
+                isLink: Boolean(link && link.href),
+                url: link && link.href ? link.href : null
+              });
+              count += 1;
+            }
+          }
+        }
+        currentNode = walker.nextNode();
+      }
+    } catch (_error) {
+      console.warn('DOM text extraction failed:', _error);
+    }
+    return blocks;
+  }
+
   async function executeVisibleCapture() {
     try {
       const response = await captureVisibleTab();
       const prepared = await prepareDataUrlForEditor(response.dataUrl);
-      await openEditor(prepared.blob, prepared.scale);
+      const textBlocks = extractDomTextBlocks({
+        left: window.scrollX, top: window.scrollY,
+        width: window.innerWidth, height: window.innerHeight
+      });
+      await openEditor(prepared.blob, prepared.scale, textBlocks);
     } catch (error) {
       console.error('Visible capture failed:', error);
       alert(text('visibleError') + error.message);
@@ -428,7 +508,11 @@
         await Utils.waitForPaint();
         try {
           const prepared = await captureFullPageAttempt(surface, baseline, progress);
-          await openEditor(prepared.blob, prepared.scale);
+          const metrics = surface.getMetrics();
+          const textBlocks = extractDomTextBlocks({
+            left: 0, top: 0, width: metrics.fullWidth, height: metrics.fullHeight
+          });
+          await openEditor(prepared.blob, prepared.scale, textBlocks);
           return;
         } catch (error) {
           if (error.code !== 'LAYOUT_CHANGED' || attempt > 0) throw error;
@@ -556,18 +640,31 @@
       (document.fullscreenElement || document.documentElement).appendChild(overlay);
       overlay.focus();
 
-      let startX = 0;
-      let startY = 0;
+      let docStartX = 0;
+      let docStartY = 0;
+      let currentClientX = 0;
+      let currentClientY = 0;
       let isDragging = false;
       let disposed = false;
+      let autoScrollRaf = null;
+      let hasScrolled = false;
+
+      const stopAutoScroll = () => {
+        if (autoScrollRaf) {
+          cancelAnimationFrame(autoScrollRaf);
+          autoScrollRaf = null;
+        }
+      };
 
       const dispose = () => {
         if (disposed) return;
         disposed = true;
+        stopAutoScroll();
         overlay.remove();
         window.removeEventListener('keydown', onKeyDown, true);
         resolve();
       };
+
       const onKeyDown = event => {
         if (event.key === 'Escape') {
           event.preventDefault();
@@ -575,34 +672,98 @@
         }
       };
 
+      const updateSelectionGeometry = () => {
+        const docCurrentX = currentClientX + window.scrollX;
+        const docCurrentY = currentClientY + window.scrollY;
+        const docLeft = Math.min(docStartX, docCurrentX);
+        const docTop = Math.min(docStartY, docCurrentY);
+        const width = Math.abs(docCurrentX - docStartX);
+        const height = Math.abs(docCurrentY - docStartY);
+
+        const viewLeft = docLeft - window.scrollX;
+        const viewTop = docTop - window.scrollY;
+
+        Object.assign(selectionBox.style, {
+          left: `${viewLeft}px`,
+          top: `${viewTop}px`,
+          width: `${width}px`,
+          height: `${height}px`,
+          display: 'block'
+        });
+        label.textContent = `${Math.round(width)} × ${Math.round(height)} px`;
+      };
+
+      const checkAutoScroll = () => {
+        if (!isDragging || disposed) return;
+        const SCROLL_MARGIN = 48;
+        const MAX_SPEED = 24;
+        let deltaY = 0;
+        let deltaX = 0;
+
+        if (currentClientY > window.innerHeight - SCROLL_MARGIN) {
+          const ratio = (currentClientY - (window.innerHeight - SCROLL_MARGIN)) / SCROLL_MARGIN;
+          deltaY = Math.min(MAX_SPEED, Math.max(2, Math.round(ratio * MAX_SPEED)));
+        } else if (currentClientY < SCROLL_MARGIN && window.scrollY > 0) {
+          const ratio = (SCROLL_MARGIN - currentClientY) / SCROLL_MARGIN;
+          deltaY = -Math.min(MAX_SPEED, Math.max(2, Math.round(ratio * MAX_SPEED)));
+        }
+
+        if (currentClientX > window.innerWidth - SCROLL_MARGIN) {
+          const ratio = (currentClientX - (window.innerWidth - SCROLL_MARGIN)) / SCROLL_MARGIN;
+          deltaX = Math.min(MAX_SPEED, Math.max(2, Math.round(ratio * MAX_SPEED)));
+        } else if (currentClientX < SCROLL_MARGIN && window.scrollX > 0) {
+          const ratio = (SCROLL_MARGIN - currentClientX) / SCROLL_MARGIN;
+          deltaX = -Math.min(MAX_SPEED, Math.max(2, Math.round(ratio * MAX_SPEED)));
+        }
+
+        if (deltaY !== 0 || deltaX !== 0) {
+          const prevX = window.scrollX;
+          const prevY = window.scrollY;
+          window.scrollBy(deltaX, deltaY);
+          if (window.scrollX !== prevX || window.scrollY !== prevY) {
+            hasScrolled = true;
+          }
+          updateSelectionGeometry();
+        }
+
+        autoScrollRaf = requestAnimationFrame(checkAutoScroll);
+      };
+
       overlay.addEventListener('pointerdown', event => {
         if (event.button !== 0) return;
         isDragging = true;
-        startX = event.clientX;
-        startY = event.clientY;
+        hasScrolled = false;
+        currentClientX = event.clientX;
+        currentClientY = event.clientY;
+        docStartX = event.clientX + window.scrollX;
+        docStartY = event.clientY + window.scrollY;
         overlay.setPointerCapture(event.pointerId);
-        Object.assign(selectionBox.style, {
-          left: `${startX}px`, top: `${startY}px`, width: '0px', height: '0px', display: 'block'
-        });
+        updateSelectionGeometry();
+        stopAutoScroll();
+        autoScrollRaf = requestAnimationFrame(checkAutoScroll);
       });
+
       overlay.addEventListener('pointermove', event => {
         if (!isDragging) return;
-        const left = Math.min(startX, event.clientX);
-        const top = Math.min(startY, event.clientY);
-        const width = Math.abs(event.clientX - startX);
-        const height = Math.abs(event.clientY - startY);
-        Object.assign(selectionBox.style, {
-          left: `${left}px`, top: `${top}px`, width: `${width}px`, height: `${height}px`
-        });
-        label.textContent = `${Math.round(width)} × ${Math.round(height)} px`;
+        currentClientX = event.clientX;
+        currentClientY = event.clientY;
+        updateSelectionGeometry();
       });
+
       overlay.addEventListener('pointerup', async event => {
         if (!isDragging) return;
         isDragging = false;
-        const cropX = Math.min(startX, event.clientX);
-        const cropY = Math.min(startY, event.clientY);
-        const cropWidth = Math.abs(event.clientX - startX);
-        const cropHeight = Math.abs(event.clientY - startY);
+        stopAutoScroll();
+        currentClientX = event.clientX;
+        currentClientY = event.clientY;
+
+        const docEndX = currentClientX + window.scrollX;
+        const docEndY = currentClientY + window.scrollY;
+        const finalDocX = Math.min(docStartX, docEndX);
+        const finalDocY = Math.min(docStartY, docEndY);
+        const cropWidth = Math.abs(docEndX - docStartX);
+        const cropHeight = Math.abs(docEndY - docStartY);
+
         overlay.style.visibility = 'hidden';
         if (cropWidth < 5 || cropHeight < 5) {
           dispose();
@@ -610,27 +771,53 @@
         }
 
         try {
-          await Utils.waitForPaint();
-          const response = await captureVisibleTab();
-          const image = await loadImage(response.dataUrl);
-          const metrics = Utils.computeCaptureViewportMetrics({
-            bitmapWidth: image.width,
-            bitmapHeight: image.height,
-            innerWidth: window.innerWidth,
-            innerHeight: window.innerHeight
-          });
-          const scaleX = metrics.scaleX;
-          const scaleY = metrics.scaleY;
-          const canvas = document.createElement('canvas');
-          canvas.width = Math.round(cropWidth * scaleX);
-          canvas.height = Math.round(cropHeight * scaleY);
-          canvas.getContext('2d').drawImage(
-            image,
-            Math.round(cropX * scaleX), Math.round(cropY * scaleY), canvas.width, canvas.height,
-            0, 0, canvas.width, canvas.height
-          );
-          const prepared = await prepareCanvasForEditor(canvas);
-          await openEditor(prepared.blob, prepared.scale);
+          const region = {
+            left: Math.round(finalDocX),
+            top: Math.round(finalDocY),
+            width: Math.round(cropWidth),
+            height: Math.round(cropHeight),
+            fullWidth: Math.round(cropWidth),
+            fullHeight: Math.round(cropHeight)
+          };
+          const textBlocks = extractDomTextBlocks(region);
+
+          if (hasScrolled || cropHeight > window.innerHeight) {
+            const surface = getDocumentScrollSurface();
+            const restoreMotion = suspendPageMotion();
+            const progress = createProgressIndicator();
+            try {
+              const baseline = await stabilizePageDimensions(surface, region);
+              const prepared = await captureScrollingRegionAttempt(surface, region, baseline, progress);
+              await openEditor(prepared.blob, prepared.scale, textBlocks);
+            } finally {
+              restoreMotion();
+              if (progress) progress.remove();
+            }
+          } else {
+            await Utils.waitForPaint();
+            const response = await captureVisibleTab();
+            const image = await loadImage(response.dataUrl);
+            const metrics = Utils.computeCaptureViewportMetrics({
+              bitmapWidth: image.width,
+              bitmapHeight: image.height,
+              innerWidth: window.innerWidth,
+              innerHeight: window.innerHeight
+            });
+            const scaleX = metrics.scaleX;
+            const scaleY = metrics.scaleY;
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.round(cropWidth * scaleX);
+            canvas.height = Math.round(cropHeight * scaleY);
+            const viewX = finalDocX - window.scrollX;
+            const viewY = finalDocY - window.scrollY;
+            canvas.getContext('2d').drawImage(
+              image,
+              Math.round(viewX * scaleX), Math.round(viewY * scaleY), canvas.width, canvas.height,
+              0, 0, canvas.width, canvas.height
+            );
+            const prepared = await prepareCanvasForEditor(canvas);
+            await openEditor(prepared.blob, prepared.scale, textBlocks);
+          }
         } catch (error) {
           console.error('Selection capture failed:', error);
           alert(text('zoneError') + error.message);
@@ -669,7 +856,8 @@
         const baseline = await stabilizePageDimensions(selected.surface, selected.region);
         try {
           const prepared = await captureScrollingRegionAttempt(selected.surface, selected.region, baseline, progress);
-          await openEditor(prepared.blob, prepared.scale);
+          const textBlocks = extractDomTextBlocks(selected.region);
+          await openEditor(prepared.blob, prepared.scale, textBlocks);
           return;
         } catch (error) {
           if (error.code !== 'LAYOUT_CHANGED' || attempt > 0) throw error;
@@ -1012,12 +1200,13 @@
     return response;
   }
 
-  async function openEditor(blob, scale) {
+  async function openEditor(blob, scale, textBlocks = []) {
     if (!(blob instanceof Blob) || blob.size < 1) throw new Error('Invalid capture image.');
     const expectedChunks = Math.ceil(blob.size / Utils.TRANSFER_CHUNK_BYTES);
     const begin = await sendMessage({
       action: 'BEGIN_CAPTURE_TRANSFER', expectedBytes: blob.size, expectedChunks,
-      title: document.title, url: location.href, scale
+      title: document.title, url: location.href, scale,
+      textBlocks: Array.isArray(textBlocks) ? textBlocks : []
     });
     if (!begin || !begin.success || !begin.transferId) {
       throw new Error(begin && begin.error ? begin.error : 'Editor unavailable.');

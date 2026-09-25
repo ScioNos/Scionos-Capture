@@ -1,107 +1,434 @@
 {
-  "appName": { "message": "Scionos Capture" },
-  "appDesc": { "message": "Capture a page, visible area, selection, or scrolling area, then annotate and export locally as PNG or PDF." },
-  "languagePicker": { "message": "Choose language" },
-  "languageCurrent": { "message": "Language: {language}" },
-  "languageAuto": { "message": "Automatic — browser language" },
-  "languageFR": { "message": "Français" },
-  "languageEN": { "message": "English" },
-  "languageES": { "message": "Español" },
-  "languageDE": { "message": "Deutsch" },
-  "brandTagline": { "message": "Frame what matters" },
-  "toolsToolbar": { "message": "Editing tools" },
-  "btnFullPageTitle": { "message": "Full page" },
-  "btnFullPageDesc": { "message": "Assemble the entire page" },
-  "btnVisibleTitle": { "message": "Visible area" },
-  "btnVisibleDesc": { "message": "Capture what is displayed" },
-  "btnZoneTitle": { "message": "Selected area" },
-  "btnZoneDesc": { "message": "Draw the area to keep" },
-  "btnScrollingTitle": { "message": "Scrolling area" },
-  "btnScrollingDesc": { "message": "Choose an area across several screens" },
-  "shortcutText": { "message": "Shortcut" },
-  "shortcutUnavailable": { "message": "Not configured" },
-  "shortcutConfigure": { "message": "Configure shortcut in browser" },
-  "statusFull": { "message": "Preparing the full page…" },
-  "statusVisible": { "message": "Capturing the visible area…" },
-  "statusZone": { "message": "Draw the area to capture." },
-  "statusScrolling": { "message": "Choose the start of the scrolling area." },
-  "captureStartError": { "message": "The capture did not start: " },
-  "captureAlreadyRunning": { "message": "A capture is already running on this page." },
-  "unsupportedPage": { "message": "This browser page cannot be captured." },
-  "progress": { "message": "Capture in progress… {percent}%" },
-  "reduced": { "message": "image reduced to preserve stability" },
-  "visibleError": { "message": "The visible area could not be captured: " },
-  "fullError": { "message": "The full page could not be captured: " },
-  "fullScrollError": { "message": "The scrollable surface could not be scrolled completely." },
-  "zoneError": { "message": "The selection could not be captured: " },
-  "scrollingError": { "message": "The scrolling area could not be captured: " },
-  "scrollingDialogLabel": { "message": "Scrolling area selection" },
-  "scrollingGeometry": { "message": "Scrolling area coordinates" },
-  "scrollingInstructionStart": { "message": "Click the first corner or enter the coordinates." },
-  "scrollingInstructionEnd": { "message": "Scroll vertically, then click the opposite corner." },
-  "scrollingPointSet": { "message": "First point set. Scroll through the page." },
-  "scrollingInvalidRegion": { "message": "The area must be at least 5 × 5 px and remain within the visible width." },
-  "scrollingCapture": { "message": "Capture" },
-  "scrollingToBottom": { "message": "To bottom" },
-  "scrollingRestart": { "message": "Start over" },
-  "scrollingCancel": { "message": "Cancel" },
-  "tabChangedError": { "message": "Capture stopped because the active tab changed." },
-  "editorTitle": { "message": "Editor — Scionos Capture" },
-  "captureTitle": { "message": "Screenshot" },
-  "loadingCapture": { "message": "Loading capture…" },
-  "captureLoadError": { "message": "No capture is available. Start a new capture from the extension." },
-  "captureReducedNotice": { "message": "Capture reduced to {percent}% to preserve stability." },
-  "historyFlattened": { "message": "Older history was flattened after 100 changes." },
-  "toolCursor": { "message": "Cursor" },
-  "toolDraw": { "message": "Draw" },
-  "toolCensor": { "message": "Mask" },
-  "toolCrop": { "message": "Crop" },
-  "toolUndo": { "message": "Undo" },
-  "toolRedo": { "message": "Redo" },
-  "btnCopy": { "message": "Copy" },
-  "btnPrint": { "message": "Print / PDF" },
-  "btnPng": { "message": "Download PNG" },
-  "copySuccess": { "message": "Capture copied to the clipboard." },
-  "copyError": { "message": "Copy failed: " },
-  "exportError": { "message": "Export failed: " },
-  "modeBlur": { "message": "Visual blur" },
-  "modeColor": { "message": "Solid mask" },
-  "shapeRect": { "message": "Rectangle" },
-  "shapeCircle": { "message": "Ellipse" },
-  "shapeFree": { "message": "Freehand brush" },
-  "labelMode": { "message": "Mode" },
-  "labelShape": { "message": "Shape" },
-  "labelColor": { "message": "Color" },
-  "labelBlurIntensity": { "message": "Blur intensity" },
-  "labelDrawSize": { "message": "Thickness" },
-  "labelDrawColor": { "message": "Drawing color" },
-  "sizeFine": { "message": "Fine" },
-  "sizeMedium": { "message": "Medium" },
-  "sizeThick": { "message": "Thick" },
-  "sizeVeryThick": { "message": "Very thick" },
-  "blurWarning": { "message": "Blur is only visual. Use a solid mask for secrets." },
-  "geometryTitle": { "message": "Area dimensions" },
-  "coordinateX": { "message": "X" },
-  "coordinateY": { "message": "Y" },
-  "coordinateWidth": { "message": "Width" },
-  "coordinateHeight": { "message": "Height" },
-  "applyCrop": { "message": "Apply" },
-  "cancelCrop": { "message": "Cancel" },
-  "zoomOut": { "message": "Zoom out" },
-  "zoomIn": { "message": "Zoom in" },
-  "zoomFit": { "message": "Fit to screen" },
-  "canvasLabel": { "message": "Screenshot editing area" },
-  "captureReady": { "message": "Capture ready to edit." },
-  "savedPng": { "message": "PNG image downloaded." },
-  "savedHtml": { "message": "HTML report downloaded." },
-  "btnHtml": { "message": "Export HTML" },
-  "reportSource": { "message": "Source" },
-  "reportDate": { "message": "Date" },
-  "reportDimensions": { "message": "Dimensions" },
-  "reportZoomFit": { "message": "Fit" },
-  "reportZoomReset": { "message": "100%" },
-  "reportCopied": { "message": "Image copied to the clipboard." },
-  "printOpened": { "message": "Print dialog opened." },
-  "layoutChangedError": { "message": "The page layout changed during capture. Wait for the page to finish loading and try again." },
-  "captureTooLargeError": { "message": "The capture is still too large to process safely." }
+  "appName": {
+    "message": "Scionos Capture"
+  },
+  "appDesc": {
+    "message": "Capture a page, visible area, selection, or scrolling area, then annotate and export locally as PNG or PDF."
+  },
+  "languagePicker": {
+    "message": "Choose language"
+  },
+  "languageCurrent": {
+    "message": "Language: {language}"
+  },
+  "languageAuto": {
+    "message": "Automatic — browser language"
+  },
+  "languageFR": {
+    "message": "Français"
+  },
+  "languageEN": {
+    "message": "English"
+  },
+  "languageES": {
+    "message": "Español"
+  },
+  "languageDE": {
+    "message": "Deutsch"
+  },
+  "brandTagline": {
+    "message": "Frame what matters"
+  },
+  "toolsToolbar": {
+    "message": "Editing tools"
+  },
+  "btnFullPageTitle": {
+    "message": "Full page"
+  },
+  "btnFullPageDesc": {
+    "message": "Assemble the entire page"
+  },
+  "btnVisibleTitle": {
+    "message": "Visible area"
+  },
+  "btnVisibleDesc": {
+    "message": "Capture what is displayed"
+  },
+  "btnZoneTitle": {
+    "message": "Selected area"
+  },
+  "btnZoneDesc": {
+    "message": "Draw the area to keep"
+  },
+  "btnScrollingTitle": {
+    "message": "Scrolling area"
+  },
+  "btnScrollingDesc": {
+    "message": "Choose an area across several screens"
+  },
+  "shortcutText": {
+    "message": "Shortcut"
+  },
+  "shortcutUnavailable": {
+    "message": "Not configured"
+  },
+  "shortcutConfigure": {
+    "message": "Configure shortcut in browser"
+  },
+  "statusFull": {
+    "message": "Preparing the full page…"
+  },
+  "statusVisible": {
+    "message": "Capturing the visible area…"
+  },
+  "statusZone": {
+    "message": "Draw the area to capture."
+  },
+  "statusScrolling": {
+    "message": "Choose the start of the scrolling area."
+  },
+  "captureStartError": {
+    "message": "The capture did not start: "
+  },
+  "captureAlreadyRunning": {
+    "message": "A capture is already running on this page."
+  },
+  "unsupportedPage": {
+    "message": "This browser page cannot be captured."
+  },
+  "progress": {
+    "message": "Capture in progress… {percent}%"
+  },
+  "reduced": {
+    "message": "image reduced to preserve stability"
+  },
+  "visibleError": {
+    "message": "The visible area could not be captured: "
+  },
+  "fullError": {
+    "message": "The full page could not be captured: "
+  },
+  "fullScrollError": {
+    "message": "The scrollable surface could not be scrolled completely."
+  },
+  "zoneError": {
+    "message": "The selection could not be captured: "
+  },
+  "scrollingError": {
+    "message": "The scrolling area could not be captured: "
+  },
+  "scrollingDialogLabel": {
+    "message": "Scrolling area selection"
+  },
+  "scrollingGeometry": {
+    "message": "Scrolling area coordinates"
+  },
+  "scrollingInstructionStart": {
+    "message": "Click the first corner or enter the coordinates."
+  },
+  "scrollingInstructionEnd": {
+    "message": "Scroll vertically, then click the opposite corner."
+  },
+  "scrollingPointSet": {
+    "message": "First point set. Scroll through the page."
+  },
+  "scrollingInvalidRegion": {
+    "message": "The area must be at least 5 × 5 px and remain within the visible width."
+  },
+  "scrollingCapture": {
+    "message": "Capture"
+  },
+  "scrollingToBottom": {
+    "message": "To bottom"
+  },
+  "scrollingRestart": {
+    "message": "Start over"
+  },
+  "scrollingCancel": {
+    "message": "Cancel"
+  },
+  "tabChangedError": {
+    "message": "Capture stopped because the active tab changed."
+  },
+  "editorTitle": {
+    "message": "Editor — Scionos Capture"
+  },
+  "captureTitle": {
+    "message": "Screenshot"
+  },
+  "loadingCapture": {
+    "message": "Loading capture…"
+  },
+  "captureLoadError": {
+    "message": "No capture is available. Start a new capture from the extension."
+  },
+  "captureReducedNotice": {
+    "message": "Capture reduced to {percent}% to preserve stability."
+  },
+  "historyFlattened": {
+    "message": "Older history was flattened after 100 changes."
+  },
+  "toolCursor": {
+    "message": "Cursor"
+  },
+  "toolDraw": {
+    "message": "Draw"
+  },
+  "toolCensor": {
+    "message": "Mask"
+  },
+  "toolCrop": {
+    "message": "Crop"
+  },
+  "toolUndo": {
+    "message": "Undo"
+  },
+  "toolRedo": {
+    "message": "Redo"
+  },
+  "btnCopy": {
+    "message": "Copy"
+  },
+  "btnPrint": {
+    "message": "Print / PDF"
+  },
+  "btnPng": {
+    "message": "Download PNG"
+  },
+  "copySuccess": {
+    "message": "Capture copied to the clipboard."
+  },
+  "copyError": {
+    "message": "Copy failed: "
+  },
+  "exportError": {
+    "message": "Export failed: "
+  },
+  "modeBlur": {
+    "message": "Visual blur"
+  },
+  "modeColor": {
+    "message": "Solid mask"
+  },
+  "shapeRect": {
+    "message": "Rectangle"
+  },
+  "shapeCircle": {
+    "message": "Ellipse"
+  },
+  "shapeFree": {
+    "message": "Freehand brush"
+  },
+  "labelMode": {
+    "message": "Mode"
+  },
+  "labelShape": {
+    "message": "Shape"
+  },
+  "labelColor": {
+    "message": "Color"
+  },
+  "labelBlurIntensity": {
+    "message": "Blur intensity"
+  },
+  "labelDrawSize": {
+    "message": "Thickness"
+  },
+  "labelDrawColor": {
+    "message": "Drawing color"
+  },
+  "sizeFine": {
+    "message": "Fine"
+  },
+  "sizeMedium": {
+    "message": "Medium"
+  },
+  "sizeThick": {
+    "message": "Thick"
+  },
+  "sizeVeryThick": {
+    "message": "Very thick"
+  },
+  "blurWarning": {
+    "message": "Blur is only visual. Use a solid mask for secrets."
+  },
+  "geometryTitle": {
+    "message": "Area dimensions"
+  },
+  "coordinateX": {
+    "message": "X"
+  },
+  "coordinateY": {
+    "message": "Y"
+  },
+  "coordinateWidth": {
+    "message": "Width"
+  },
+  "coordinateHeight": {
+    "message": "Height"
+  },
+  "applyCrop": {
+    "message": "Apply"
+  },
+  "cancelCrop": {
+    "message": "Cancel"
+  },
+  "zoomOut": {
+    "message": "Zoom out"
+  },
+  "zoomIn": {
+    "message": "Zoom in"
+  },
+  "zoomFit": {
+    "message": "Fit to screen"
+  },
+  "canvasLabel": {
+    "message": "Screenshot editing area"
+  },
+  "captureReady": {
+    "message": "Capture ready to edit."
+  },
+  "savedPng": {
+    "message": "PNG image downloaded."
+  },
+  "savedHtml": {
+    "message": "HTML report downloaded."
+  },
+  "btnHtml": {
+    "message": "Export HTML"
+  },
+  "reportSource": {
+    "message": "Source"
+  },
+  "reportDate": {
+    "message": "Date"
+  },
+  "reportDimensions": {
+    "message": "Dimensions"
+  },
+  "reportZoomFit": {
+    "message": "Fit"
+  },
+  "reportZoomReset": {
+    "message": "100%"
+  },
+  "reportCopied": {
+    "message": "Image copied to the clipboard."
+  },
+  "printOpened": {
+    "message": "Print dialog opened."
+  },
+  "layoutChangedError": {
+    "message": "The page layout changed during capture. Wait for the page to finish loading and try again."
+  },
+  "captureTooLargeError": {
+    "message": "The capture is still too large to process safely."
+  },
+  "toolArrow": {
+    "message": "Arrow"
+  },
+  "toolShape": {
+    "message": "Shape"
+  },
+  "toolText": {
+    "message": "Text"
+  },
+  "toolStep": {
+    "message": "Step badge"
+  },
+  "stepReset": {
+    "message": "Reset to 1"
+  },
+  "stepCounter": {
+    "message": "Step {number}"
+  },
+  "shapeStroke": {
+    "message": "Outline"
+  },
+  "shapeFill": {
+    "message": "Filled"
+  },
+  "labelShapeMode": {
+    "message": "Shape style"
+  },
+  "textPlaceholder": {
+    "message": "Type text…"
+  },
+  "fontSize": {
+    "message": "Font size"
+  },
+  "labelTextColor": {
+    "message": "Text color"
+  },
+  "labelBgColor": {
+    "message": "Background"
+  },
+  "btnHelp": {
+    "message": "Help & About"
+  },
+  "helpTitle": {
+    "message": "Help — Scionos Capture"
+  },
+  "helpTagline": {
+    "message": "User guide & Privacy"
+  },
+  "helpPrivacyHeader": {
+    "message": "100% Local Privacy"
+  },
+  "helpPrivacyText": {
+    "message": "Scionos Capture runs entirely in your browser. No screenshot, metadata, or text is transmitted to an external server. Zero accounts, zero tracking, zero network dependencies."
+  },
+  "helpModesHeader": {
+    "message": "Capture Modes"
+  },
+  "helpModeFull": {
+    "message": "Full page: automatically scrolls and stitches the entire document, even on very tall pages."
+  },
+  "helpModeVisible": {
+    "message": "Visible area: instantly captures what is currently on screen without scrolling."
+  },
+  "helpModeZone": {
+    "message": "Selected zone: drag a rectangle with the mouse. Reach screen edges to trigger continuous auto-scroll."
+  },
+  "helpModeScrolling": {
+    "message": "Scrolling zone: click two opposite corners while scrolling to target a precise internal container."
+  },
+  "helpEditorHeader": {
+    "message": "Editing & Export Formats"
+  },
+  "helpEditorText": {
+    "message": "Annotate with arrows, text, step badges, or shapes. Conceal sensitive data using solid masking (blur is strictly visual). Export as high-fidelity PNG, searchable PDF with clickable links, or standalone interactive HTML."
+  },
+  "helpShortcutsHeader": {
+    "message": "Keyboard Shortcuts"
+  },
+  "helpShortcutActivation": {
+    "message": "Activate extension / Open popup"
+  },
+  "helpShortcutSelect": {
+    "message": "Cursor / Move"
+  },
+  "helpShortcutDraw": {
+    "message": "Freehand brush"
+  },
+  "helpShortcutCensor": {
+    "message": "Mask / Blur"
+  },
+  "helpShortcutCrop": {
+    "message": "Crop tool"
+  },
+  "helpShortcutArrow": {
+    "message": "Vector arrow"
+  },
+  "helpShortcutText": {
+    "message": "Annotated text"
+  },
+  "helpShortcutStep": {
+    "message": "Numbered step badge"
+  },
+  "helpShortcutShape": {
+    "message": "Geometric shape"
+  },
+  "helpShortcutUndoRedo": {
+    "message": "Undo / Redo"
+  },
+  "helpShortcutZoom": {
+    "message": "Zoom in / Zoom out / Fit"
+  },
+  "helpVersionLabel": {
+    "message": "Installed version: {version}"
+  },
+  "helpClose": {
+    "message": "Close help"
+  }
 }

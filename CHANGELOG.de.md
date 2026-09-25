@@ -4,6 +4,17 @@
 
 ## [Unveröffentlicht]
 
+## [1.3.0] - 2026-09-25
+
+### Hinzugefügt
+
+- Kontinuierliches automatisches Scrollen (*drag-to-scroll*) bei Bereichsauswahl mit der Maus zur unterbrechungsfreien Aufnahme über den sichtbaren Bereich hinaus per Kachelzusammensetzung.
+- Durchsuchbarer PDF-Export mit transparenter Vektor-Textebene (`Strg+F`), auswählbarem Text und anklickbaren `<a>`-Links.
+- Automatisches Entfernen von Textblöcken unter zensierten Bereichen (Vollton oder Weichzeichner) zur Wahrung der Privatsphäre im exportierten PDF.
+- Vektor-Anmerkungspalette : Richtungspfeile (`tool-arrow`), Rechteck- und Kreisformen (`tool-shape`), Textanmerkungen (`tool-text`) und nummerierte Schrittmarken (`tool-step`) 1, 2, 3... mit Zurücksetzen-Taste.
+- Integriertes Offline-Benutzerhandbuch und Hilfeseite (`help.html`), erreichbar über die `?`-Schaltfläche in Popup und Editor.
+- Zusätzliche Tastaturkürzel im Editor: `A` (Pfeil), `S` (Form), `T` (Text), `P` (Schritt).
+
 ## [1.2.0] - 2026-09-22
 
 ### Hinzugefügt

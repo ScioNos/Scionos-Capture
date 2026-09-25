@@ -118,6 +118,7 @@ async function openEditorFromBlob(blob, metadata = {}) {
     url: safeMetadata(metadata.url),
     timestamp: new Date(createdAt).toISOString(),
     scale: Number.isFinite(numericScale) ? Math.max(0.01, Math.min(1, numericScale)) : 1,
+    textBlocks: Array.isArray(metadata.textBlocks) ? metadata.textBlocks : [],
     createdAt,
     expiresAt: createdAt + CAPTURE_TTL_MS
   };
@@ -148,6 +149,7 @@ async function beginTransfer(message, senderTab) {
     expectedBytes, expectedChunks, receivedBytes: 0, nextIndex: 0,
     title: safeMetadata(message.title, 'Screenshot'), url: safeMetadata(message.url),
     scale: Number.isFinite(Number(message.scale)) ? Math.max(0.01, Math.min(1, Number(message.scale))) : 1,
+    textBlocks: Array.isArray(message.textBlocks) ? message.textBlocks : [],
     createdAt, expiresAt: createdAt + TRANSFER_TTL_MS
   };
   await CaptureStore.putTransfer(record);

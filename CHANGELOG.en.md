@@ -6,6 +6,17 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-09-25
+
+### Added
+
+- Continuous auto-scroll (*drag-to-scroll*) for selection captures, expanding capture beyond visible viewport with seamless multi-tile stitching.
+- Searchable PDF export with transparent vector text layer (`Ctrl+F`), selectable text, and clickable `<a>` links.
+- Automatic text pruning under censored areas (solid color or blur) to guarantee privacy in exported PDFs.
+- Vector annotation palette: directional arrows (`tool-arrow`), rectangle/ellipse shapes (`tool-shape`), canvas text annotations (`tool-text`), and numbered step badges (`tool-step`) with 1, 2, 3... auto-increment and quick reset.
+- Offline user guide and help page (`help.html`) accessible via `?` button from popup and editor.
+- Additional editor shortcuts: `A` (arrow), `S` (shape), `T` (text), `P` (step).
+
 ## [1.2.0] - 2026-09-22
 
 ### Added

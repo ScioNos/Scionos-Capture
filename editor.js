@@ -11,6 +11,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   const toast = document.getElementById('toast');
   const toolButtons = Array.from(document.querySelectorAll('[data-tool]'));
   const drawControls = document.getElementById('draw-controls');
+  const arrowControls = document.getElementById('arrow-controls');
+  const arrowSize = document.getElementById('arrow-size');
+  const arrowColor = document.getElementById('arrow-color');
+  const shapeControls = document.getElementById('shape-controls');
+  const shapeType = document.getElementById('shape-type');
+  const shapeFillMode = document.getElementById('shape-fill-mode');
+  const shapeSize = document.getElementById('shape-size');
+  const shapeSizeField = document.getElementById('shape-size-field');
+  const shapeColor = document.getElementById('shape-color');
+  const textControls = document.getElementById('text-controls');
+  const textSize = document.getElementById('text-size');
+  const textColor = document.getElementById('text-color');
+  const textBgColor = document.getElementById('text-bg-color');
+  const textInputOverlay = document.getElementById('text-input-overlay');
+  const stepControls = document.getElementById('step-controls');
+  const stepCounterBadge = document.getElementById('step-counter-badge');
+  const stepColor = document.getElementById('step-color');
+  const stepSize = document.getElementById('step-size');
+  const btnStepReset = document.getElementById('btn-step-reset');
   const censorControls = document.getElementById('censor-controls');
   const censorType = document.getElementById('censor-type');
   const censorShape = document.getElementById('censor-shape');
@@ -24,6 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const blurWarning = document.getElementById('blur-warning');
   const drawColor = document.getElementById('draw-color');
   const drawSize = document.getElementById('draw-size');
+  const btnHelp = document.getElementById('btn-help');
   const undoButton = document.getElementById('btn-undo');
   const redoButton = document.getElementById('btn-redo');
   const downloadButton = document.getElementById('btn-download');
@@ -49,6 +69,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const MAX_ZOOM = 3;
   let currentTool = 'select';
   let currentZoom = 1;
+  let currentStepNumber = 1;
+  let pendingTextPoint = null;
+  let activeTextBlocks = [];
   let baseImage = null;
   let committedSurface = null;
   let operations = [];
@@ -59,14 +82,30 @@ document.addEventListener('DOMContentLoaded', async () => {
   let captureRecord = null;
   let toastTimer = null;
 
+  function updateStepBadge() {
+    if (stepCounterBadge) {
+      stepCounterBadge.textContent = getI18nText('stepCounter', { number: currentStepNumber });
+    }
+  }
+
   function updateTexts() {
     document.title = getI18nText('editorTitle');
     const textMap = {
       'txt-tool-select': 'toolCursor', 'txt-tool-draw': 'toolDraw',
+      'txt-tool-arrow': 'toolArrow', 'txt-tool-shape': 'toolShape',
+      'txt-tool-text': 'toolText', 'txt-tool-step': 'toolStep',
       'txt-tool-censor': 'toolCensor', 'txt-tool-crop': 'toolCrop',
       'txt-undo': 'toolUndo', 'txt-redo': 'toolRedo',
+      'txt-help': 'btnHelp',
       'txt-copy': 'btnCopy', 'txt-pdf': 'btnPrint', 'txt-html': 'btnHtml', 'txt-png': 'btnPng',
       'label-draw-size': 'labelDrawSize', 'label-draw-color': 'labelDrawColor',
+      'label-arrow-size': 'labelDrawSize', 'label-arrow-color': 'labelDrawColor',
+      'label-shape-type': 'labelShape', 'label-shape-mode': 'labelShapeMode',
+      'label-shape-size': 'labelDrawSize', 'label-shape-color': 'labelDrawColor',
+      'label-text-size': 'fontSize', 'label-text-color': 'labelTextColor',
+      'label-text-bg-color': 'labelBgColor',
+      'label-step-color': 'labelColor', 'label-step-size': 'labelDrawSize',
+      'txt-step-reset': 'stepReset',
       'label-mode': 'labelMode', 'label-shape': 'labelShape',
       'label-censor-size': 'labelDrawSize',
       'label-censor-color': 'labelColor', 'label-blur': 'labelBlurIntensity',
@@ -76,24 +115,50 @@ document.addEventListener('DOMContentLoaded', async () => {
       'geometry-apply': 'applyCrop', 'geometry-cancel': 'cancelCrop'
     };
     Object.entries(textMap).forEach(([id, key]) => {
-      document.getElementById(id).textContent = getI18nText(key);
+      const el = document.getElementById(id);
+      if (el) el.textContent = getI18nText(key);
     });
-    document.querySelector('[data-i18n="languageAuto"]').textContent = getI18nText('languageAuto');
+    const autoEl = document.querySelector('[data-i18n="languageAuto"]');
+    if (autoEl) autoEl.textContent = getI18nText('languageAuto');
 
     const drawSizeKeys = ['sizeFine', 'sizeMedium', 'sizeThick', 'sizeVeryThick'];
-    Array.from(drawSize.options).forEach((option, index) => { option.textContent = getI18nText(drawSizeKeys[index]); });
-    Array.from(censorSize.options).forEach((option, index) => { option.textContent = getI18nText(drawSizeKeys[index]); });
-    censorType.options[0].textContent = getI18nText('modeColor');
-    censorType.options[1].textContent = getI18nText('modeBlur');
-    censorShape.options[0].textContent = getI18nText('shapeRect');
-    censorShape.options[1].textContent = getI18nText('shapeCircle');
-    censorShape.options[2].textContent = getI18nText('shapeFree');
+    if (drawSize) Array.from(drawSize.options).forEach((opt, idx) => { opt.textContent = getI18nText(drawSizeKeys[idx]); });
+    if (arrowSize) Array.from(arrowSize.options).forEach((opt, idx) => { opt.textContent = getI18nText(drawSizeKeys[idx]); });
+    if (shapeSize) Array.from(shapeSize.options).forEach((opt, idx) => { opt.textContent = getI18nText(drawSizeKeys[idx]); });
+    if (stepSize) Array.from(stepSize.options).forEach((opt, idx) => { opt.textContent = getI18nText(drawSizeKeys[idx]); });
+    if (censorSize) Array.from(censorSize.options).forEach((opt, idx) => { opt.textContent = getI18nText(drawSizeKeys[idx]); });
+
+    if (shapeType && shapeType.options.length >= 2) {
+      shapeType.options[0].textContent = getI18nText('shapeRect');
+      shapeType.options[1].textContent = getI18nText('shapeCircle');
+    }
+    if (shapeFillMode && shapeFillMode.options.length >= 2) {
+      shapeFillMode.options[0].textContent = getI18nText('shapeStroke');
+      shapeFillMode.options[1].textContent = getI18nText('shapeFill');
+    }
+
+    if (censorType && censorType.options.length >= 2) {
+      censorType.options[0].textContent = getI18nText('modeColor');
+      censorType.options[1].textContent = getI18nText('modeBlur');
+    }
+    if (censorShape && censorShape.options.length >= 3) {
+      censorShape.options[0].textContent = getI18nText('shapeRect');
+      censorShape.options[1].textContent = getI18nText('shapeCircle');
+      censorShape.options[2].textContent = getI18nText('shapeFree');
+    }
+
+    if (textInputOverlay) textInputOverlay.placeholder = getI18nText('textPlaceholder');
+    updateStepBadge();
 
     canvas.setAttribute('aria-label', getI18nText('canvasLabel'));
     copyButton.setAttribute('aria-label', getI18nText('btnCopy'));
     printButton.setAttribute('aria-label', getI18nText('btnPrint'));
     htmlButton.setAttribute('aria-label', getI18nText('btnHtml'));
     downloadButton.setAttribute('aria-label', getI18nText('btnPng'));
+    if (btnHelp) {
+      btnHelp.setAttribute('aria-label', getI18nText('btnHelp'));
+      btnHelp.title = getI18nText('btnHelp');
+    }
     document.getElementById('primary-tool-group').setAttribute('aria-label', getI18nText('toolsToolbar'));
     zoomOutButton.setAttribute('aria-label', getI18nText('zoomOut'));
     zoomInButton.setAttribute('aria-label', getI18nText('zoomIn'));
@@ -103,11 +168,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ctrlKey = isMac ? '⌘' : 'Ctrl';
     const toolSelect = document.getElementById('tool-select');
     const toolDraw = document.getElementById('tool-draw');
+    const toolArrow = document.getElementById('tool-arrow');
+    const toolShape = document.getElementById('tool-shape');
+    const toolText = document.getElementById('tool-text');
+    const toolStep = document.getElementById('tool-step');
     const toolCensor = document.getElementById('tool-censor');
     const toolCrop = document.getElementById('tool-crop');
 
     if (toolSelect) toolSelect.title = `${getI18nText('toolCursor')} (V)`;
     if (toolDraw) toolDraw.title = `${getI18nText('toolDraw')} (D)`;
+    if (toolArrow) toolArrow.title = `${getI18nText('toolArrow')} (A)`;
+    if (toolShape) toolShape.title = `${getI18nText('toolShape')} (S)`;
+    if (toolText) toolText.title = `${getI18nText('toolText')} (T)`;
+    if (toolStep) toolStep.title = `${getI18nText('toolStep')} (P)`;
     if (toolCensor) toolCensor.title = `${getI18nText('toolCensor')} (M)`;
     if (toolCrop) toolCrop.title = `${getI18nText('toolCrop')} (C)`;
     if (undoButton) undoButton.title = `${getI18nText('toolUndo')} (${ctrlKey}+Z)`;
@@ -269,6 +342,136 @@ document.addEventListener('DOMContentLoaded', async () => {
     targetContext.restore();
   }
 
+  function drawArrow(targetContext, operation) {
+    const { start, end, color, width } = operation;
+    const headLength = Math.max(14, width * 3.5);
+    const arrow = ScionosCaptureUtils.computeArrowPoints(start, end, headLength, Math.PI / 6);
+    targetContext.save();
+    targetContext.strokeStyle = color;
+    targetContext.fillStyle = color;
+    targetContext.lineWidth = width;
+    targetContext.lineCap = 'round';
+    targetContext.lineJoin = 'round';
+
+    targetContext.beginPath();
+    targetContext.moveTo(start.x, start.y);
+    targetContext.lineTo(end.x, end.y);
+    targetContext.stroke();
+
+    targetContext.beginPath();
+    targetContext.moveTo(end.x, end.y);
+    targetContext.lineTo(arrow.left.x, arrow.left.y);
+    targetContext.lineTo(arrow.right.x, arrow.right.y);
+    targetContext.closePath();
+    targetContext.fill();
+    targetContext.restore();
+  }
+
+  function drawShape(targetContext, operation) {
+    const { shape, mode, color, width, start, end } = operation;
+    const bounds = normalizeBounds(start, end);
+    targetContext.save();
+    if (mode === 'stroke') {
+      targetContext.strokeStyle = color;
+      targetContext.lineWidth = width || 4;
+      targetContext.lineCap = 'round';
+      targetContext.lineJoin = 'round';
+      if (shape === 'circle') {
+        targetContext.beginPath();
+        targetContext.ellipse(
+          bounds.x + bounds.width / 2, bounds.y + bounds.height / 2,
+          Math.max(1, bounds.width / 2), Math.max(1, bounds.height / 2), 0, 0, Math.PI * 2
+        );
+        targetContext.stroke();
+      } else {
+        targetContext.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
+      }
+    } else {
+      targetContext.fillStyle = color;
+      if (shape === 'circle') {
+        targetContext.beginPath();
+        targetContext.ellipse(
+          bounds.x + bounds.width / 2, bounds.y + bounds.height / 2,
+          Math.max(1, bounds.width / 2), Math.max(1, bounds.height / 2), 0, 0, Math.PI * 2
+        );
+        targetContext.fill();
+      } else {
+        targetContext.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+      }
+    }
+    targetContext.restore();
+  }
+
+  function drawStepBadge(targetContext, operation) {
+    const { x, y, number, color, radius } = operation;
+    const r = Math.max(12, radius || 18);
+    targetContext.save();
+    targetContext.shadowColor = 'rgba(0, 0, 0, 0.4)';
+    targetContext.shadowBlur = 4;
+    targetContext.shadowOffsetX = 1;
+    targetContext.shadowOffsetY = 1;
+
+    targetContext.beginPath();
+    targetContext.arc(x, y, r, 0, Math.PI * 2);
+    targetContext.fillStyle = color;
+    targetContext.fill();
+
+    targetContext.shadowColor = 'transparent';
+    targetContext.strokeStyle = '#ffffff';
+    targetContext.lineWidth = Math.max(2, Math.round(r * 0.12));
+    targetContext.stroke();
+
+    targetContext.fillStyle = '#ffffff';
+    targetContext.font = `bold ${Math.round(r * 1.1)}px system-ui, -apple-system, sans-serif`;
+    targetContext.textAlign = 'center';
+    targetContext.textBaseline = 'middle';
+    targetContext.fillText(String(number), x, y + 1);
+    targetContext.restore();
+  }
+
+  function drawText(targetContext, operation) {
+    const { x, y, text, fontSize, color, bgColor } = operation;
+    if (!text) return;
+    const size = Math.max(12, fontSize || 20);
+    targetContext.save();
+    targetContext.font = `bold ${size}px "Segoe UI", system-ui, sans-serif`;
+
+    const lines = text.split('\n');
+    const lineHeight = size * 1.35;
+    let maxWidth = 0;
+    lines.forEach(line => {
+      const w = targetContext.measureText(line).width;
+      if (w > maxWidth) maxWidth = w;
+    });
+
+    const paddingX = Math.round(size * 0.4);
+    const paddingY = Math.round(size * 0.3);
+    const totalHeight = lines.length * lineHeight;
+
+    if (bgColor && bgColor !== 'transparent') {
+      targetContext.fillStyle = bgColor;
+      const rx = x - paddingX;
+      const ry = y - paddingY;
+      const rw = maxWidth + paddingX * 2;
+      const rh = totalHeight + paddingY * 2;
+      if (typeof targetContext.roundRect === 'function') {
+        targetContext.beginPath();
+        targetContext.roundRect(rx, ry, rw, rh, 6);
+        targetContext.fill();
+      } else {
+        targetContext.fillRect(rx, ry, rw, rh);
+      }
+    }
+
+    targetContext.fillStyle = color || '#ffffff';
+    targetContext.textBaseline = 'top';
+    targetContext.textAlign = 'left';
+    lines.forEach((line, index) => {
+      targetContext.fillText(line, x, y + index * lineHeight);
+    });
+    targetContext.restore();
+  }
+
   function applyOperation(surface, operation) {
     if (operation.kind === 'crop') {
       const crop = normalizeCrop(operation, surface.width, surface.height);
@@ -279,8 +482,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       );
       return cropped;
     }
-    if (operation.kind === 'draw') drawPath(surface.getContext('2d'), operation);
+    const ctx = surface.getContext('2d');
+    if (operation.kind === 'draw') drawPath(ctx, operation);
     if (operation.kind === 'censor') applyCensor(surface, operation);
+    if (operation.kind === 'arrow') drawArrow(ctx, operation);
+    if (operation.kind === 'shape') drawShape(ctx, operation);
+    if (operation.kind === 'step') drawStepBadge(ctx, operation);
+    if (operation.kind === 'text') drawText(ctx, operation);
     return surface;
   }
 
@@ -303,14 +511,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!baseImage) return;
     let surface = createSurface(baseImage.width, baseImage.height);
     surface.getContext('2d').drawImage(baseImage, 0, 0);
-    operations.forEach(operation => { surface = applyOperation(surface, operation); });
+    let blocks = Array.isArray(captureRecord?.textBlocks) ? [...captureRecord.textBlocks] : [];
+    operations.forEach(operation => {
+      surface = applyOperation(surface, operation);
+      if (operation.kind === 'crop') {
+        const crop = normalizeCrop(operation, surface.width, surface.height);
+        blocks = ScionosCaptureUtils.shiftAndCropTextBlocks(blocks, crop);
+      } else if (operation.kind === 'censor') {
+        const bounds = operationBounds(operation, surface.width, surface.height);
+        blocks = ScionosCaptureUtils.filterTextBlocksOnCensor(blocks, bounds);
+      }
+    });
     committedSurface = surface;
+    activeTextBlocks = blocks;
     renderCanvas();
   }
 
   function applyCommittedOperation(operation) {
     if (!committedSurface) return;
     committedSurface = applyOperation(committedSurface, operation);
+    if (operation.kind === 'crop') {
+      const crop = normalizeCrop(operation, committedSurface.width, committedSurface.height);
+      activeTextBlocks = ScionosCaptureUtils.shiftAndCropTextBlocks(activeTextBlocks, crop);
+    } else if (operation.kind === 'censor') {
+      const bounds = operationBounds(operation, committedSurface.width, committedSurface.height);
+      activeTextBlocks = ScionosCaptureUtils.filterTextBlocksOnCensor(activeTextBlocks, bounds);
+    }
     renderCanvas();
   }
 
@@ -340,6 +566,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   function meaningful(operation) {
     if (!operation) return false;
     if (operation.kind === 'draw' || operation.shape === 'free') return operation.points.length > 1;
+    if (operation.kind === 'step') return true;
+    if (operation.kind === 'text') return Boolean(operation.text && operation.text.trim().length > 0);
+    if (operation.kind === 'arrow') {
+      return Math.hypot(operation.end.x - operation.start.x, operation.end.y - operation.start.y) >= 4;
+    }
     const bounds = normalizeBounds(operation.start, operation.end);
     return bounds.width >= 2 && bounds.height >= 2;
   }
@@ -453,22 +684,77 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderCanvas();
   }
 
+  function openTextInput(point) {
+    commitTextInput();
+    pendingTextPoint = point;
+    const rect = canvas.getBoundingClientRect();
+    const left = (point.x / canvas.width) * rect.width;
+    const top = (point.y / canvas.height) * rect.height;
+    textInputOverlay.style.left = `${Math.round(left)}px`;
+    textInputOverlay.style.top = `${Math.round(top)}px`;
+    textInputOverlay.style.fontSize = `${Math.max(14, Math.round(Number(textSize.value) * currentZoom))}px`;
+    textInputOverlay.style.color = textColor.value;
+    textInputOverlay.value = '';
+    textInputOverlay.hidden = false;
+    textInputOverlay.focus();
+  }
+
+  function commitTextInput() {
+    if (textInputOverlay.hidden || !pendingTextPoint) return;
+    const val = textInputOverlay.value.trim();
+    if (val) {
+      commitOperation({
+        kind: 'text',
+        x: Math.round(pendingTextPoint.x),
+        y: Math.round(pendingTextPoint.y),
+        text: val,
+        fontSize: Number(textSize.value),
+        color: textColor.value,
+        bgColor: textBgColor.value
+      });
+    }
+    textInputOverlay.hidden = true;
+    textInputOverlay.value = '';
+    pendingTextPoint = null;
+  }
+
+  function cancelTextInput() {
+    textInputOverlay.hidden = true;
+    textInputOverlay.value = '';
+    pendingTextPoint = null;
+  }
+
   function setActiveTool(tool) {
+    if (currentTool === 'text' && tool !== 'text') {
+      commitTextInput();
+    }
     currentTool = tool;
     toolButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.tool === tool)));
-    canvas.style.cursor = tool === 'select' ? 'default' : 'crosshair';
+    canvas.style.cursor = tool === 'select' ? 'default' : (tool === 'text' ? 'text' : 'crosshair');
     cancelDraft();
     updateControlVisibility();
   }
 
   function updateControlVisibility() {
     drawControls.hidden = currentTool !== 'draw';
+    arrowControls.hidden = currentTool !== 'arrow';
+    shapeControls.hidden = currentTool !== 'shape';
+    textControls.hidden = currentTool !== 'text';
+    stepControls.hidden = currentTool !== 'step';
     censorControls.hidden = currentTool !== 'censor';
+
+    if (currentTool === 'shape') {
+      shapeSizeField.hidden = shapeFillMode.value !== 'stroke';
+    }
     const isBlur = currentTool === 'censor' && censorType.value === 'blur';
     blurField.hidden = !isBlur;
     blurWarning.hidden = !isBlur;
     censorColorField.hidden = currentTool !== 'censor' || censorType.value !== 'color';
     censorSizeField.hidden = currentTool !== 'censor' || censorShape.value !== 'free';
+
+    if (currentTool !== 'text') {
+      commitTextInput();
+    }
   }
 
   async function loadCapture() {
@@ -488,6 +774,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const record = await CaptureStore.getCapture(captureId);
       if (!record || !record.blob) throw new Error(getI18nText('captureLoadError'));
       captureRecord = record;
+      activeTextBlocks = Array.isArray(record.textBlocks) ? [...record.textBlocks] : [];
       baseImage = await createImageBitmap(record.blob);
       chrome.runtime.sendMessage({ action: 'ACK_CAPTURE_LOADED', captureId }, () => {
         if (chrome.runtime.lastError) console.warn('Capture cleanup acknowledgement failed:', chrome.runtime.lastError.message);
@@ -521,11 +808,35 @@ document.addEventListener('DOMContentLoaded', async () => {
   canvas.addEventListener('pointerdown', event => {
     if (!baseImage || currentTool === 'select' || event.button !== 0) return;
     const point = getCanvasCoords(event);
+    if (currentTool === 'text') {
+      openTextInput(point);
+      return;
+    }
+    if (currentTool === 'step') {
+      commitOperation({
+        kind: 'step',
+        x: Math.round(point.x),
+        y: Math.round(point.y),
+        number: currentStepNumber,
+        color: stepColor.value,
+        radius: Number(stepSize.value)
+      });
+      currentStepNumber++;
+      updateStepBadge();
+      return;
+    }
     activePointerId = event.pointerId;
     canvas.setPointerCapture(activePointerId);
     geometryPanel.hidden = true;
     if (currentTool === 'draw') {
       draftOperation = { kind: 'draw', color: drawColor.value, width: Number(drawSize.value), points: [point] };
+    } else if (currentTool === 'arrow') {
+      draftOperation = { kind: 'arrow', start: point, end: point, color: arrowColor.value, width: Number(arrowSize.value) };
+    } else if (currentTool === 'shape') {
+      draftOperation = {
+        kind: 'shape', shape: shapeType.value, mode: shapeFillMode.value,
+        color: shapeColor.value, width: Number(shapeSize.value), start: point, end: point
+      };
     } else if (currentTool === 'censor') {
       draftOperation = createCensorOperation(point, point);
     } else {
@@ -550,7 +861,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const operation = draftOperation;
     const point = getCanvasCoords(event);
     if (operation.kind !== 'draw' && operation.shape !== 'free') operation.end = point;
-    else if (operation.points.length === 1) operation.points.push(point);
+    else if (operation.points && operation.points.length === 1) operation.points.push(point);
     if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
     activePointerId = null;
     if (operation.kind === 'crop' || (operation.kind === 'censor' && operation.shape !== 'free')) showGeometry(operation);
@@ -648,6 +959,85 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
+  if (arrowSize) {
+    arrowSize.addEventListener('change', () => {
+      if (draftOperation && draftOperation.kind === 'arrow') {
+        draftOperation.width = Number(arrowSize.value);
+        scheduleRender();
+      }
+    });
+  }
+  if (arrowColor) {
+    arrowColor.addEventListener('input', () => {
+      if (draftOperation && draftOperation.kind === 'arrow') {
+        draftOperation.color = arrowColor.value;
+        scheduleRender();
+      }
+    });
+  }
+
+  if (shapeType) {
+    shapeType.addEventListener('change', () => {
+      if (draftOperation && draftOperation.kind === 'shape') {
+        draftOperation.shape = shapeType.value;
+        scheduleRender();
+      }
+    });
+  }
+  if (shapeFillMode) {
+    shapeFillMode.addEventListener('change', () => {
+      updateControlVisibility();
+      if (draftOperation && draftOperation.kind === 'shape') {
+        draftOperation.mode = shapeFillMode.value;
+        scheduleRender();
+      }
+    });
+  }
+  if (shapeSize) {
+    shapeSize.addEventListener('change', () => {
+      if (draftOperation && draftOperation.kind === 'shape') {
+        draftOperation.width = Number(shapeSize.value);
+        scheduleRender();
+      }
+    });
+  }
+  if (shapeColor) {
+    shapeColor.addEventListener('input', () => {
+      if (draftOperation && draftOperation.kind === 'shape') {
+        draftOperation.color = shapeColor.value;
+        scheduleRender();
+      }
+    });
+  }
+
+  if (btnStepReset) {
+    btnStepReset.addEventListener('click', () => {
+      currentStepNumber = 1;
+      updateStepBadge();
+    });
+  }
+
+  if (btnHelp) {
+    btnHelp.addEventListener('click', () => {
+      window.open(chrome.runtime.getURL('help.html'), '_blank');
+    });
+  }
+
+  if (textInputOverlay) {
+    textInputOverlay.addEventListener('keydown', event => {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        commitTextInput();
+      } else if (event.key === 'Escape') {
+        event.preventDefault();
+        cancelTextInput();
+      }
+    });
+    textInputOverlay.addEventListener('blur', () => {
+      commitTextInput();
+    });
+  }
+
   zoomInButton.addEventListener('click', () => applyZoom(currentZoom + 0.15));
   zoomOutButton.addEventListener('click', () => applyZoom(currentZoom - 0.15));
   zoomResetButton.addEventListener('click', fitToScreen);
@@ -726,36 +1116,50 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       cancelDraft();
       if (!committedSurface) return;
-    const printArea = document.getElementById('print-area');
-    if (printArea) {
-      const title = captureRecord && captureRecord.title ? captureRecord.title : getI18nText('captureTitle');
-      const safeUrl = ScionosCaptureUtils.sanitizeUrl(captureRecord && captureRecord.url ? captureRecord.url : '');
-      const rawUrl = captureRecord && captureRecord.url ? captureRecord.url : '';
-      const dateFormatted = captureRecord && captureRecord.timestamp
-        ? new Date(captureRecord.timestamp).toLocaleString(ScionosI18n.language)
-        : new Date().toLocaleString(ScionosI18n.language);
-      const dataUrl = URL.createObjectURL(await canvasToBlob());
+      const printArea = document.getElementById('print-area');
+      if (printArea) {
+        const title = captureRecord && captureRecord.title ? captureRecord.title : getI18nText('captureTitle');
+        const safeUrl = ScionosCaptureUtils.sanitizeUrl(captureRecord && captureRecord.url ? captureRecord.url : '');
+        const rawUrl = captureRecord && captureRecord.url ? captureRecord.url : '';
+        const dateFormatted = captureRecord && captureRecord.timestamp
+          ? new Date(captureRecord.timestamp).toLocaleString(ScionosI18n.language)
+          : new Date().toLocaleString(ScionosI18n.language);
+        const dataUrl = URL.createObjectURL(await canvasToBlob());
 
-      printArea.innerHTML = `
-        <div class="print-header">
-          <h1>${ScionosCaptureUtils.escapeHtml(title)}</h1>
-          <div class="print-meta">
-            ${rawUrl ? `<span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportSource'))} :</strong> <a href="${ScionosCaptureUtils.escapeHtml(safeUrl)}">${ScionosCaptureUtils.escapeHtml(rawUrl)}</a></span>` : ''}
-            <span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportDate'))} :</strong> ${ScionosCaptureUtils.escapeHtml(dateFormatted)}</span>
-            <span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportDimensions'))} :</strong> ${committedSurface.width} × ${committedSurface.height} px</span>
+        const textSpans = (activeTextBlocks || []).map(block => {
+          const left = (block.x / committedSurface.width * 100).toFixed(3);
+          const top = (block.y / committedSurface.height * 100).toFixed(3);
+          const width = (block.width / committedSurface.width * 100).toFixed(3);
+          const height = (block.height / committedSurface.height * 100).toFixed(3);
+          const fontSize = Math.max(8, Math.round(block.fontSize || 12));
+          if (block.href) {
+            const safeHref = ScionosCaptureUtils.sanitizeUrl(block.href);
+            return `<a href="${ScionosCaptureUtils.escapeHtml(safeHref)}" target="_blank" rel="noopener noreferrer" style="left:${left}%; top:${top}%; width:${width}%; height:${height}%; font-size:${fontSize}px;">${ScionosCaptureUtils.escapeHtml(block.text)}</a>`;
+          }
+          return `<span style="left:${left}%; top:${top}%; width:${width}%; height:${height}%; font-size:${fontSize}px;">${ScionosCaptureUtils.escapeHtml(block.text)}</span>`;
+        }).join('');
+
+        printArea.innerHTML = `
+          <div class="print-header">
+            <h1>${ScionosCaptureUtils.escapeHtml(title)}</h1>
+            <div class="print-meta">
+              ${rawUrl ? `<span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportSource'))} :</strong> <a href="${ScionosCaptureUtils.escapeHtml(safeUrl)}">${ScionosCaptureUtils.escapeHtml(rawUrl)}</a></span>` : ''}
+              <span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportDate'))} :</strong> ${ScionosCaptureUtils.escapeHtml(dateFormatted)}</span>
+              <span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportDimensions'))} :</strong> ${committedSurface.width} × ${committedSurface.height} px</span>
+            </div>
           </div>
-        </div>
-        <div class="print-image-wrap">
-          <img src="${dataUrl}" alt="${ScionosCaptureUtils.escapeHtml(title)}">
-        </div>
-      `;
-      const revokePrintUrl = () => {
-        URL.revokeObjectURL(dataUrl);
-        window.removeEventListener('afterprint', revokePrintUrl);
-      };
-      window.addEventListener('afterprint', revokePrintUrl, { once: true });
-      setTimeout(revokePrintUrl, 60_000);
-    }
+          <div class="print-image-wrap">
+            <img src="${dataUrl}" alt="${ScionosCaptureUtils.escapeHtml(title)}">
+            <div class="searchable-text-layer" aria-hidden="true">${textSpans}</div>
+          </div>
+        `;
+        const revokePrintUrl = () => {
+          URL.revokeObjectURL(dataUrl);
+          window.removeEventListener('afterprint', revokePrintUrl);
+        };
+        window.addEventListener('afterprint', revokePrintUrl, { once: true });
+        setTimeout(revokePrintUrl, 60_000);
+      }
       showToast(getI18nText('printOpened'));
       window.print();
     } catch (error) {
@@ -785,7 +1189,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
     if (typing || event.ctrlKey || event.metaKey || event.altKey) return;
-    const shortcuts = { v: 'select', d: 'draw', m: 'censor', c: 'crop' };
+    const shortcuts = {
+      v: 'select',
+      d: 'draw',
+      a: 'arrow',
+      s: 'shape',
+      t: 'text',
+      p: 'step',
+      m: 'censor',
+      c: 'crop'
+    };
     if (shortcuts[event.key.toLowerCase()]) setActiveTool(shortcuts[event.key.toLowerCase()]);
     if (event.key === '+') applyZoom(currentZoom + 0.15);
     if (event.key === '-') applyZoom(currentZoom - 0.15);

@@ -6,6 +6,17 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-09-25
+
+### Ajouté
+
+- Défilement automatique continu (*drag-to-scroll*) lors de la sélection de zone à la souris, étendant la zone capturée au-delà de la hauteur visible avec assemblage multi-tuiles fluide.
+- Génération de PDF avec texte vectoriel indexable (`Ctrl+F`), texte sélectionnable et hyperliens `<a>` cliquables superposés à la capture.
+- Élimination automatique et sécurisée des blocs de texte sous les zones censurées (masquage solide ou flou) pour préserver la confidentialité dans le PDF exporté.
+- Outils d'annotation vectorielle : flèche directionnelle avec tête proportionnelle (`tool-arrow`), formes rectangle et ellipse en contour ou remplissage (`tool-shape`), texte annoté sur canevas avec fond contrasté (`tool-text`), et pastilles d'étapes numérotées auto-incrémentées 1, 2, 3... avec bouton de réinitialisation (`tool-step`).
+- Page et guide d'aide hors-ligne complet (`help.html`) accessible via le bouton `?` depuis la popup et l'éditeur.
+- Raccourcis clavier d'éditeur additionnels : `A` (flèche), `S` (forme), `T` (texte), `P` (pastille).
+
 ## [1.2.0] - 2026-09-22
 
 ### Ajouté

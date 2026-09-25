@@ -1,107 +1,434 @@
 {
-  "appName": { "message": "Scionos Capture" },
-  "appDesc": { "message": "Capturez une page, une zone visible, sélectionnée ou défilante, puis annotez et exportez localement en PNG ou PDF." },
-  "languagePicker": { "message": "Choisir la langue" },
-  "languageCurrent": { "message": "Langue : {language}" },
-  "languageAuto": { "message": "Automatique — langue du navigateur" },
-  "languageFR": { "message": "Français" },
-  "languageEN": { "message": "English" },
-  "languageES": { "message": "Español" },
-  "languageDE": { "message": "Deutsch" },
-  "brandTagline": { "message": "Cadrez l’essentiel" },
-  "toolsToolbar": { "message": "Outils d’édition" },
-  "btnFullPageTitle": { "message": "Page entière" },
-  "btnFullPageDesc": { "message": "Assembler toute la page" },
-  "btnVisibleTitle": { "message": "Zone visible" },
-  "btnVisibleDesc": { "message": "Capturer ce qui est affiché" },
-  "btnZoneTitle": { "message": "Zone sélectionnée" },
-  "btnZoneDesc": { "message": "Tracer la zone à conserver" },
-  "btnScrollingTitle": { "message": "Zone défilante" },
-  "btnScrollingDesc": { "message": "Choisir une zone sur plusieurs écrans" },
-  "shortcutText": { "message": "Raccourci" },
-  "shortcutUnavailable": { "message": "Non configuré" },
-  "shortcutConfigure": { "message": "Configurer le raccourci dans le navigateur" },
-  "statusFull": { "message": "Préparation de la page entière…" },
-  "statusVisible": { "message": "Capture de la zone visible…" },
-  "statusZone": { "message": "Tracez la zone à capturer." },
-  "statusScrolling": { "message": "Choisissez le début de la zone défilante." },
-  "captureStartError": { "message": "La capture n’a pas démarré : " },
-  "captureAlreadyRunning": { "message": "Une capture est déjà en cours sur cette page." },
-  "unsupportedPage": { "message": "Cette page du navigateur ne peut pas être capturée." },
-  "progress": { "message": "Capture en cours… {percent} %" },
-  "reduced": { "message": "image réduite pour préserver la stabilité" },
-  "visibleError": { "message": "La zone visible n’a pas pu être capturée : " },
-  "fullError": { "message": "La page entière n’a pas pu être capturée : " },
-  "fullScrollError": { "message": "Le conteneur défilant n’a pas pu être parcouru complètement." },
-  "zoneError": { "message": "La sélection n’a pas pu être capturée : " },
-  "scrollingError": { "message": "La zone défilante n’a pas pu être capturée : " },
-  "scrollingDialogLabel": { "message": "Sélection d’une zone défilante" },
-  "scrollingGeometry": { "message": "Coordonnées de la zone défilante" },
-  "scrollingInstructionStart": { "message": "Cliquez sur le premier coin ou saisissez les coordonnées." },
-  "scrollingInstructionEnd": { "message": "Faites défiler verticalement, puis cliquez sur le coin opposé." },
-  "scrollingPointSet": { "message": "Premier point défini. Faites défiler la page." },
-  "scrollingInvalidRegion": { "message": "La zone doit mesurer au moins 5 × 5 px et rester dans la largeur visible." },
-  "scrollingCapture": { "message": "Capturer" },
-  "scrollingToBottom": { "message": "Jusqu’en bas" },
-  "scrollingRestart": { "message": "Recommencer" },
-  "scrollingCancel": { "message": "Annuler" },
-  "tabChangedError": { "message": "La capture a été interrompue car l’onglet actif a changé." },
-  "editorTitle": { "message": "Éditeur — Scionos Capture" },
-  "captureTitle": { "message": "Capture d’écran" },
-  "loadingCapture": { "message": "Chargement de la capture…" },
-  "captureLoadError": { "message": "Aucune capture n’est disponible. Lancez une nouvelle capture depuis l’extension." },
-  "captureReducedNotice": { "message": "Capture réduite à {percent} % pour préserver la stabilité." },
-  "historyFlattened": { "message": "L’historique ancien a été aplati après 100 modifications." },
-  "toolCursor": { "message": "Curseur" },
-  "toolDraw": { "message": "Dessiner" },
-  "toolCensor": { "message": "Masquer" },
-  "toolCrop": { "message": "Rogner" },
-  "toolUndo": { "message": "Annuler" },
-  "toolRedo": { "message": "Refaire" },
-  "btnCopy": { "message": "Copier" },
-  "btnPrint": { "message": "Imprimer / PDF" },
-  "btnPng": { "message": "Télécharger PNG" },
-  "copySuccess": { "message": "Capture copiée dans le presse-papiers." },
-  "copyError": { "message": "La copie a échoué : " },
-  "exportError": { "message": "L’export a échoué : " },
-  "modeBlur": { "message": "Flou visuel" },
-  "modeColor": { "message": "Masquage solide" },
-  "shapeRect": { "message": "Rectangle" },
-  "shapeCircle": { "message": "Ellipse" },
-  "shapeFree": { "message": "Pinceau libre" },
-  "labelMode": { "message": "Mode" },
-  "labelShape": { "message": "Forme" },
-  "labelColor": { "message": "Couleur" },
-  "labelBlurIntensity": { "message": "Intensité du flou" },
-  "labelDrawSize": { "message": "Épaisseur" },
-  "labelDrawColor": { "message": "Couleur du dessin" },
-  "sizeFine": { "message": "Fine" },
-  "sizeMedium": { "message": "Moyenne" },
-  "sizeThick": { "message": "Épaisse" },
-  "sizeVeryThick": { "message": "Très épaisse" },
-  "blurWarning": { "message": "Le flou reste visuel. Utilisez un masquage solide pour les secrets." },
-  "geometryTitle": { "message": "Dimensions de la zone" },
-  "coordinateX": { "message": "X" },
-  "coordinateY": { "message": "Y" },
-  "coordinateWidth": { "message": "Largeur" },
-  "coordinateHeight": { "message": "Hauteur" },
-  "applyCrop": { "message": "Appliquer" },
-  "cancelCrop": { "message": "Annuler" },
-  "zoomOut": { "message": "Réduire le zoom" },
-  "zoomIn": { "message": "Agrandir le zoom" },
-  "zoomFit": { "message": "Adapter à l’écran" },
-  "canvasLabel": { "message": "Zone d’édition de la capture" },
-  "captureReady": { "message": "Capture prête à être modifiée." },
-  "savedPng": { "message": "Image PNG téléchargée." },
-  "savedHtml": { "message": "Rapport HTML téléchargé." },
-  "btnHtml": { "message": "Exporter HTML" },
-  "reportSource": { "message": "Source" },
-  "reportDate": { "message": "Date" },
-  "reportDimensions": { "message": "Dimensions" },
-  "reportZoomFit": { "message": "Adapter" },
-  "reportZoomReset": { "message": "100 %" },
-  "reportCopied": { "message": "Image copiée dans le presse-papiers." },
-  "printOpened": { "message": "Fenêtre d’impression ouverte." },
-  "layoutChangedError": { "message": "La mise en page a changé pendant la capture. Attendez la fin du chargement puis réessayez." },
-  "captureTooLargeError": { "message": "La capture reste trop volumineuse pour être traitée en toute sécurité." }
+  "appName": {
+    "message": "Scionos Capture"
+  },
+  "appDesc": {
+    "message": "Capturez une page, une zone visible, sélectionnée ou défilante, puis annotez et exportez localement en PNG ou PDF."
+  },
+  "languagePicker": {
+    "message": "Choisir la langue"
+  },
+  "languageCurrent": {
+    "message": "Langue : {language}"
+  },
+  "languageAuto": {
+    "message": "Automatique — langue du navigateur"
+  },
+  "languageFR": {
+    "message": "Français"
+  },
+  "languageEN": {
+    "message": "English"
+  },
+  "languageES": {
+    "message": "Español"
+  },
+  "languageDE": {
+    "message": "Deutsch"
+  },
+  "brandTagline": {
+    "message": "Cadrez l’essentiel"
+  },
+  "toolsToolbar": {
+    "message": "Outils d’édition"
+  },
+  "btnFullPageTitle": {
+    "message": "Page entière"
+  },
+  "btnFullPageDesc": {
+    "message": "Assembler toute la page"
+  },
+  "btnVisibleTitle": {
+    "message": "Zone visible"
+  },
+  "btnVisibleDesc": {
+    "message": "Capturer ce qui est affiché"
+  },
+  "btnZoneTitle": {
+    "message": "Zone sélectionnée"
+  },
+  "btnZoneDesc": {
+    "message": "Tracer la zone à conserver"
+  },
+  "btnScrollingTitle": {
+    "message": "Zone défilante"
+  },
+  "btnScrollingDesc": {
+    "message": "Choisir une zone sur plusieurs écrans"
+  },
+  "shortcutText": {
+    "message": "Raccourci"
+  },
+  "shortcutUnavailable": {
+    "message": "Non configuré"
+  },
+  "shortcutConfigure": {
+    "message": "Configurer le raccourci dans le navigateur"
+  },
+  "statusFull": {
+    "message": "Préparation de la page entière…"
+  },
+  "statusVisible": {
+    "message": "Capture de la zone visible…"
+  },
+  "statusZone": {
+    "message": "Tracez la zone à capturer."
+  },
+  "statusScrolling": {
+    "message": "Choisissez le début de la zone défilante."
+  },
+  "captureStartError": {
+    "message": "La capture n’a pas démarré : "
+  },
+  "captureAlreadyRunning": {
+    "message": "Une capture est déjà en cours sur cette page."
+  },
+  "unsupportedPage": {
+    "message": "Cette page du navigateur ne peut pas être capturée."
+  },
+  "progress": {
+    "message": "Capture en cours… {percent} %"
+  },
+  "reduced": {
+    "message": "image réduite pour préserver la stabilité"
+  },
+  "visibleError": {
+    "message": "La zone visible n’a pas pu être capturée : "
+  },
+  "fullError": {
+    "message": "La page entière n’a pas pu être capturée : "
+  },
+  "fullScrollError": {
+    "message": "Le conteneur défilant n’a pas pu être parcouru complètement."
+  },
+  "zoneError": {
+    "message": "La sélection n’a pas pu être capturée : "
+  },
+  "scrollingError": {
+    "message": "La zone défilante n’a pas pu être capturée : "
+  },
+  "scrollingDialogLabel": {
+    "message": "Sélection d’une zone défilante"
+  },
+  "scrollingGeometry": {
+    "message": "Coordonnées de la zone défilante"
+  },
+  "scrollingInstructionStart": {
+    "message": "Cliquez sur le premier coin ou saisissez les coordonnées."
+  },
+  "scrollingInstructionEnd": {
+    "message": "Faites défiler verticalement, puis cliquez sur le coin opposé."
+  },
+  "scrollingPointSet": {
+    "message": "Premier point défini. Faites défiler la page."
+  },
+  "scrollingInvalidRegion": {
+    "message": "La zone doit mesurer au moins 5 × 5 px et rester dans la largeur visible."
+  },
+  "scrollingCapture": {
+    "message": "Capturer"
+  },
+  "scrollingToBottom": {
+    "message": "Jusqu’en bas"
+  },
+  "scrollingRestart": {
+    "message": "Recommencer"
+  },
+  "scrollingCancel": {
+    "message": "Annuler"
+  },
+  "tabChangedError": {
+    "message": "La capture a été interrompue car l’onglet actif a changé."
+  },
+  "editorTitle": {
+    "message": "Éditeur — Scionos Capture"
+  },
+  "captureTitle": {
+    "message": "Capture d’écran"
+  },
+  "loadingCapture": {
+    "message": "Chargement de la capture…"
+  },
+  "captureLoadError": {
+    "message": "Aucune capture n’est disponible. Lancez une nouvelle capture depuis l’extension."
+  },
+  "captureReducedNotice": {
+    "message": "Capture réduite à {percent} % pour préserver la stabilité."
+  },
+  "historyFlattened": {
+    "message": "L’historique ancien a été aplati après 100 modifications."
+  },
+  "toolCursor": {
+    "message": "Curseur"
+  },
+  "toolDraw": {
+    "message": "Dessiner"
+  },
+  "toolCensor": {
+    "message": "Masquer"
+  },
+  "toolCrop": {
+    "message": "Rogner"
+  },
+  "toolUndo": {
+    "message": "Annuler"
+  },
+  "toolRedo": {
+    "message": "Refaire"
+  },
+  "btnCopy": {
+    "message": "Copier"
+  },
+  "btnPrint": {
+    "message": "Imprimer / PDF"
+  },
+  "btnPng": {
+    "message": "Télécharger PNG"
+  },
+  "copySuccess": {
+    "message": "Capture copiée dans le presse-papiers."
+  },
+  "copyError": {
+    "message": "La copie a échoué : "
+  },
+  "exportError": {
+    "message": "L’export a échoué : "
+  },
+  "modeBlur": {
+    "message": "Flou visuel"
+  },
+  "modeColor": {
+    "message": "Masquage solide"
+  },
+  "shapeRect": {
+    "message": "Rectangle"
+  },
+  "shapeCircle": {
+    "message": "Ellipse"
+  },
+  "shapeFree": {
+    "message": "Pinceau libre"
+  },
+  "labelMode": {
+    "message": "Mode"
+  },
+  "labelShape": {
+    "message": "Forme"
+  },
+  "labelColor": {
+    "message": "Couleur"
+  },
+  "labelBlurIntensity": {
+    "message": "Intensité du flou"
+  },
+  "labelDrawSize": {
+    "message": "Épaisseur"
+  },
+  "labelDrawColor": {
+    "message": "Couleur du dessin"
+  },
+  "sizeFine": {
+    "message": "Fine"
+  },
+  "sizeMedium": {
+    "message": "Moyenne"
+  },
+  "sizeThick": {
+    "message": "Épaisse"
+  },
+  "sizeVeryThick": {
+    "message": "Très épaisse"
+  },
+  "blurWarning": {
+    "message": "Le flou reste visuel. Utilisez un masquage solide pour les secrets."
+  },
+  "geometryTitle": {
+    "message": "Dimensions de la zone"
+  },
+  "coordinateX": {
+    "message": "X"
+  },
+  "coordinateY": {
+    "message": "Y"
+  },
+  "coordinateWidth": {
+    "message": "Largeur"
+  },
+  "coordinateHeight": {
+    "message": "Hauteur"
+  },
+  "applyCrop": {
+    "message": "Appliquer"
+  },
+  "cancelCrop": {
+    "message": "Annuler"
+  },
+  "zoomOut": {
+    "message": "Réduire le zoom"
+  },
+  "zoomIn": {
+    "message": "Agrandir le zoom"
+  },
+  "zoomFit": {
+    "message": "Adapter à l’écran"
+  },
+  "canvasLabel": {
+    "message": "Zone d’édition de la capture"
+  },
+  "captureReady": {
+    "message": "Capture prête à être modifiée."
+  },
+  "savedPng": {
+    "message": "Image PNG téléchargée."
+  },
+  "savedHtml": {
+    "message": "Rapport HTML téléchargé."
+  },
+  "btnHtml": {
+    "message": "Exporter HTML"
+  },
+  "reportSource": {
+    "message": "Source"
+  },
+  "reportDate": {
+    "message": "Date"
+  },
+  "reportDimensions": {
+    "message": "Dimensions"
+  },
+  "reportZoomFit": {
+    "message": "Adapter"
+  },
+  "reportZoomReset": {
+    "message": "100 %"
+  },
+  "reportCopied": {
+    "message": "Image copiée dans le presse-papiers."
+  },
+  "printOpened": {
+    "message": "Fenêtre d’impression ouverte."
+  },
+  "layoutChangedError": {
+    "message": "La mise en page a changé pendant la capture. Attendez la fin du chargement puis réessayez."
+  },
+  "captureTooLargeError": {
+    "message": "La capture reste trop volumineuse pour être traitée en toute sécurité."
+  },
+  "toolArrow": {
+    "message": "Flèche"
+  },
+  "toolShape": {
+    "message": "Forme"
+  },
+  "toolText": {
+    "message": "Texte"
+  },
+  "toolStep": {
+    "message": "Pastille"
+  },
+  "stepReset": {
+    "message": "Remettre à 1"
+  },
+  "stepCounter": {
+    "message": "Étape {number}"
+  },
+  "shapeStroke": {
+    "message": "Contour"
+  },
+  "shapeFill": {
+    "message": "Rempli"
+  },
+  "labelShapeMode": {
+    "message": "Style de forme"
+  },
+  "textPlaceholder": {
+    "message": "Saisir un texte…"
+  },
+  "fontSize": {
+    "message": "Taille de police"
+  },
+  "labelTextColor": {
+    "message": "Couleur du texte"
+  },
+  "labelBgColor": {
+    "message": "Fond"
+  },
+  "btnHelp": {
+    "message": "Aide & À propos"
+  },
+  "helpTitle": {
+    "message": "Aide — Scionos Capture"
+  },
+  "helpTagline": {
+    "message": "Guide d’utilisation & Confidentialité"
+  },
+  "helpPrivacyHeader": {
+    "message": "Confidentialité 100 % locale"
+  },
+  "helpPrivacyText": {
+    "message": "Scionos Capture s’exécute entièrement dans votre navigateur. Aucune capture, métadonnée ou texte n’est transmis à un serveur externe. Zéro compte, zéro pistage, zéro dépendance réseau."
+  },
+  "helpModesHeader": {
+    "message": "Modes de capture"
+  },
+  "helpModeFull": {
+    "message": "Page entière : défile et assemble automatiquement l’ensemble du document, même sur les pages très longues."
+  },
+  "helpModeVisible": {
+    "message": "Zone visible : capture instantanément ce qui est affiché à l’écran sans défilement."
+  },
+  "helpModeZone": {
+    "message": "Zone sélectionnée : tracez un rectangle à la souris. Approchez les bords de l’écran pour activer le défilement automatique continu."
+  },
+  "helpModeScrolling": {
+    "message": "Zone défilante : définissez deux coins en faisant défiler manuellement pour cibler un conteneur interne précis."
+  },
+  "helpEditorHeader": {
+    "message": "Édition & Formats d’export"
+  },
+  "helpEditorText": {
+    "message": "Annotez avec des flèches, textes, pastilles numérotées ou formes. Masquez les données sensibles avec le masquage solide (le flou reste purement visuel). Exportez en PNG haute fidélité, en PDF avec texte et hyperliens indexables, ou en rapport HTML interactif autonome."
+  },
+  "helpShortcutsHeader": {
+    "message": "Raccourcis clavier"
+  },
+  "helpShortcutActivation": {
+    "message": "Activer l’extension / Ouvrir la popup"
+  },
+  "helpShortcutSelect": {
+    "message": "Curseur / Déplacement"
+  },
+  "helpShortcutDraw": {
+    "message": "Pinceau de dessin libre"
+  },
+  "helpShortcutCensor": {
+    "message": "Masquage / Flou"
+  },
+  "helpShortcutCrop": {
+    "message": "Rognage géométrique"
+  },
+  "helpShortcutArrow": {
+    "message": "Flèche vectorielle"
+  },
+  "helpShortcutText": {
+    "message": "Texte annoté"
+  },
+  "helpShortcutStep": {
+    "message": "Pastille d’étape numérotée"
+  },
+  "helpShortcutShape": {
+    "message": "Forme géométrique"
+  },
+  "helpShortcutUndoRedo": {
+    "message": "Annuler / Refaire"
+  },
+  "helpShortcutZoom": {
+    "message": "Zoom avant / Zoom arrière / Adapter"
+  },
+  "helpVersionLabel": {
+    "message": "Version installée : {version}"
+  },
+  "helpClose": {
+    "message": "Fermer l’aide"
+  }
 }
