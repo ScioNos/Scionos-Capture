@@ -17,6 +17,11 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 - Page et guide d'aide hors-ligne complet (`help.html`) accessible via le bouton `?` depuis la popup et l'éditeur.
 - Raccourcis clavier d'éditeur additionnels : `A` (flèche), `S` (forme), `T` (texte), `P` (pastille).
 
+### Corrigé
+
+- Résolution fiable du raccourci clavier dans la popup : prise en charge hybride (Promise et callback) pour `chrome.commands.getAll`, éliminant le faux affichage « Non configuré » lorsque `Alt+Shift+C` est actif.
+- Conformité Manifest V3 : suppression du champ invalide `description` sous `_execute_action` dans `manifest.json`.
+
 ## [1.2.0] - 2026-09-22
 
 ### Ajouté

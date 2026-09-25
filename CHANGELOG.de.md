@@ -15,6 +15,11 @@
 - Integriertes Offline-Benutzerhandbuch und Hilfeseite (`help.html`), erreichbar über die `?`-Schaltfläche in Popup und Editor.
 - Zusätzliche Tastaturkürzel im Editor: `A` (Pfeil), `S` (Form), `T` (Text), `P` (Schritt).
 
+### Behoben
+
+- Zuverlässige Erkennung des Tastaturkürzels im Popup: Hybride Unterstützung von Promise und Callback für `chrome.commands.getAll`, wodurch der fehlerhafte Status „Nicht konfiguriert“ bei aktivem `Alt+Shift+C` behoben wird.
+- Manifest V3-Konformität: Ungültiger Schlüssel `description` unter `_execute_action` in `manifest.json` entfernt.
+
 ## [1.2.0] - 2026-09-22
 
 ### Hinzugefügt

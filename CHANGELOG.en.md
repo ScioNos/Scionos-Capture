@@ -17,6 +17,11 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Offline user guide and help page (`help.html`) accessible via `?` button from popup and editor.
 - Additional editor shortcuts: `A` (arrow), `S` (shape), `T` (text), `P` (step).
 
+### Fixed
+
+- Reliable keyboard shortcut resolution in the popup: hybrid Promise and callback handling for `chrome.commands.getAll`, resolving the false "Not configured" state when `Alt+Shift+C` is active.
+- Manifest V3 compliance: removed invalid `description` key under `_execute_action` in `manifest.json`.
+
 ## [1.2.0] - 2026-09-22
 
 ### Added
