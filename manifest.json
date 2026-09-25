@@ -30,8 +30,7 @@
       "suggested_key": {
         "default": "Alt+Shift+C",
         "mac": "MacCtrl+Command+C"
-      },
-      "description": "__MSG_appName__"
+      }
     }
   }
 }

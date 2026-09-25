@@ -35,8 +35,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       shortcutButton.classList.add('unconfigured');
       return;
     }
-    chrome.commands.getAll(commands => {
-      const command = (commands || []).find(item => item.name === '_execute_action');
+    const handleCommands = commands => {
+      const command = (commands || []).find(item =>
+        item.name === '_execute_action' || item.name === '_execute_browser_action'
+      );
       const isConfigured = Boolean(command && command.shortcut);
       shortcutValue.textContent = isConfigured
         ? command.shortcut.replaceAll('+', ' + ')
@@ -47,7 +49,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         'aria-label',
         `${getI18nText('shortcutText')} : ${shortcutValue.textContent}. ${getI18nText('shortcutConfigure')}`
       );
-    });
+    };
+
+    try {
+      const result = chrome.commands.getAll(handleCommands);
+      if (result && typeof result.then === 'function') {
+        result.then(handleCommands).catch(() => handleCommands([]));
+      }
+    } catch {
+      handleCommands([]);
+    }
   }
 
   function showStatus(message, isError = false) {
