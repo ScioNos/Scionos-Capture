@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertChromeVersion, chromeSupportedLine } from './version.mjs';
+import { RELEASE_ZIP_FILES } from './release-files.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const supportedLocales = ['fr', 'en', 'es', 'de'];
@@ -57,6 +58,10 @@ export async function validatePackage() {
   await Promise.all(referencedFiles.map(async relativePath => {
     const stat = await fs.stat(path.join(root, relativePath));
     assert(stat.isFile(), `Referenced file is missing: ${relativePath}`);
+  }));
+  await Promise.all(RELEASE_ZIP_FILES.map(async relativePath => {
+    const stat = await fs.stat(path.join(root, relativePath));
+    assert(stat.isFile(), `Release ZIP file is missing: ${relativePath}`);
   }));
 
   for (const size of [16, 48, 128]) {

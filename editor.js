@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.title = getI18nText('editorTitle');
     const textMap = {
       'txt-tool-select': 'toolCursor', 'txt-tool-draw': 'toolDraw',
+      'txt-tool-highlight': 'toolHighlight',
       'txt-tool-arrow': 'toolArrow', 'txt-tool-shape': 'toolShape',
       'txt-tool-text': 'toolText', 'txt-tool-step': 'toolStep',
       'txt-tool-censor': 'toolCensor', 'txt-tool-crop': 'toolCrop',
@@ -146,6 +147,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       censorShape.options[1].textContent = getI18nText('shapeCircle');
       censorShape.options[2].textContent = getI18nText('shapeFree');
     }
+    if (textBgColor && textBgColor.options.length >= 4) {
+      const bgKeys = ['textBgBlack', 'textBgRed', 'textBgBlue', 'textBgTransparent'];
+      Array.from(textBgColor.options).forEach((opt, idx) => {
+        if (bgKeys[idx]) opt.textContent = getI18nText(bgKeys[idx]);
+      });
+    }
 
     if (textInputOverlay) textInputOverlay.placeholder = getI18nText('textPlaceholder');
     updateStepBadge();
@@ -168,6 +175,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ctrlKey = isMac ? '⌘' : 'Ctrl';
     const toolSelect = document.getElementById('tool-select');
     const toolDraw = document.getElementById('tool-draw');
+    const toolHighlight = document.getElementById('tool-highlight');
     const toolArrow = document.getElementById('tool-arrow');
     const toolShape = document.getElementById('tool-shape');
     const toolText = document.getElementById('tool-text');
@@ -177,6 +185,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (toolSelect) toolSelect.title = `${getI18nText('toolCursor')} (V)`;
     if (toolDraw) toolDraw.title = `${getI18nText('toolDraw')} (D)`;
+    if (toolHighlight) toolHighlight.title = `${getI18nText('toolHighlight')} (H)`;
     if (toolArrow) toolArrow.title = `${getI18nText('toolArrow')} (A)`;
     if (toolShape) toolShape.title = `${getI18nText('toolShape')} (S)`;
     if (toolText) toolText.title = `${getI18nText('toolText')} (T)`;
@@ -285,7 +294,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function meaningful(operation) {
     if (!operation) return false;
-    if (operation.kind === 'draw' || operation.shape === 'free') return operation.points.length > 1;
+    if (operation.kind === 'draw' || operation.kind === 'highlight' || operation.shape === 'free') return operation.points.length > 1;
     if (operation.kind === 'step') return true;
     if (operation.kind === 'text') return Boolean(operation.text && operation.text.trim().length > 0);
     if (operation.kind === 'arrow') {
@@ -313,6 +322,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         baseImage = replacement;
         operations = [];
         redoOperations = [];
+        if (captureRecord) captureRecord.textBlocks = [...activeTextBlocks];
         showToast(getI18nText('historyFlattened'));
       } catch (error) {
         showToast(getI18nText('exportError') + error.message, true);
@@ -458,7 +468,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function updateControlVisibility() {
-    drawControls.hidden = currentTool !== 'draw';
+    drawControls.hidden = currentTool !== 'draw' && currentTool !== 'highlight';
     arrowControls.hidden = currentTool !== 'arrow';
     shapeControls.hidden = currentTool !== 'shape';
     textControls.hidden = currentTool !== 'text';
@@ -552,6 +562,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     geometryPanel.hidden = true;
     if (currentTool === 'draw') {
       draftOperation = { kind: 'draw', color: drawColor.value, width: Number(drawSize.value), points: [point] };
+    } else if (currentTool === 'highlight') {
+      draftOperation = { kind: 'highlight', color: drawColor.value, width: Math.max(12, Number(drawSize.value) * 2), points: [point] };
     } else if (currentTool === 'arrow') {
       draftOperation = { kind: 'arrow', start: point, end: point, color: arrowColor.value, width: Number(arrowSize.value) };
     } else if (currentTool === 'shape') {
@@ -569,7 +581,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   canvas.addEventListener('pointermove', event => {
     if (!draftOperation || event.pointerId !== activePointerId) return;
     const point = getCanvasCoords(event);
-    if (draftOperation.kind === 'draw' || draftOperation.shape === 'free') {
+    if (draftOperation.kind === 'draw' || draftOperation.kind === 'highlight' || draftOperation.shape === 'free') {
       const previous = draftOperation.points[draftOperation.points.length - 1];
       if (!previous || Math.hypot(point.x - previous.x, point.y - previous.y) >= 0.75) draftOperation.points.push(point);
     } else {
@@ -582,7 +594,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!draftOperation || event.pointerId !== activePointerId) return;
     const operation = draftOperation;
     const point = getCanvasCoords(event);
-    if (operation.kind !== 'draw' && operation.shape !== 'free') operation.end = point;
+    if (operation.kind !== 'draw' && operation.kind !== 'highlight' && operation.shape !== 'free') operation.end = point;
     else if (operation.points && operation.points.length === 1) operation.points.push(point);
     activePointerId = null;
     if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
@@ -646,6 +658,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const operation = operations.pop();
     if (!operation) return;
     redoOperations.push(operation);
+    if (operation.kind === 'step' && operation.number === currentStepNumber - 1) {
+      currentStepNumber = Math.max(1, operation.number);
+      updateStepBadge();
+    }
     cancelDraft();
     rebuildCommittedSurface();
   });
@@ -795,6 +811,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const shortcuts = {
       v: 'select',
       d: 'draw',
+      h: 'highlight',
       a: 'arrow',
       s: 'shape',
       t: 'text',

@@ -6,6 +6,35 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-09-28
+
+### Added
+
+- Semi-transparent Highlighter tool (`H`) in the editor with keyboard shortcut, built-in help, and translations.
+- Automatic slicing and pagination of tall captures for print/PDF with repeated headers and a searchable text layer per page.
+- Auto-scroll extended to internal scroll containers with multi-tile region stitching.
+- Local standardized `YYYY-MM-DD_HH-mm` export timestamps.
+
+### Fixed
+
+- Searchable PDF text layer: blocks taken from `<a>` links are exported as clickable hyperlinks again (the `url` field is now honored).
+- Scrolling selection: a thin drag (width or height > 10 px) now confirms the region on pointer release.
+- Internationalization: the `statusZone` key is included in the content-script message bundle (overlay label for screen readers).
+- Help: the Shape tool shortcut is fixed (`S` instead of `R`).
+- Editor: reloading the page keeps the capture (the acknowledgement no longer purges the blob; cleanup happens on tab close or expiry).
+- Print/PDF: non-HTTP(S) source URLs render as plain text instead of an empty link.
+- Popup: a failure to open the shortcuts page now surfaces the error instead of failing silently.
+- History: flattening after 100 operations preserves the text layer; undoing a step badge restores its counter.
+- Filenames: truncation on code-point boundaries (emojis preserved); text-background options and HTML report errors translated in all 4 languages.
+
+### Changed & Performance
+
+- Tile robustness: backoff retries on `captureVisibleTab` rate limiting (tab switches are not retried).
+- Performance: anchored-element classification cached per attempt, layout pre-filters before style recalc, deduplicated container scans.
+- Text extraction: real visibility check via `checkVisibility` (inherited opacity honored).
+- Storage: truly bounded LRU IndexedDB memory cache.
+- Maintenance: single shared release file list for packaging and validation; storage cache internals no longer exposed.
+
 ## [1.3.0] - 2026-09-25
 
 ### Added
@@ -97,7 +126,9 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Canvas-clipping zoom, non-responsive toolbar, incomplete translations, hard-coded shortcut, contrast, and accessible names.
 - Locale descriptions above 132 characters, editor reload data loss, and inaccurate retention wording.
 
-[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.0...v1.3.1
+[1.3.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0

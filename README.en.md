@@ -15,7 +15,7 @@ A fully local Chrome and Edge screenshot extension. Capture the viewport, a sele
 
 ## Installation
 
-Download `scionos-capture-v1.3.0.zip` from the [v1.3.0 release](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.3.0), optionally verify the `.sha256` file, and extract it. Open `chrome://extensions` or `edge://extensions`, enable **Developer mode**, choose **Load unpacked**, and select the extracted folder.
+Download `scionos-capture-v1.3.1.zip` from the [v1.3.1 release](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.3.1), optionally verify the `.sha256` file, and extract it. Open `chrome://extensions` or `edge://extensions`, enable **Developer mode**, choose **Load unpacked**, and select the extracted folder.
 
 To work from source, clone the repository, run `npm ci`, and load the project root as an unpacked extension.
 
@@ -29,7 +29,7 @@ In the editor, `V`, `D`, `M`, and `C` select tools; `Ctrl+Z`/`Ctrl+Y` undo and r
 
 `activeTab` and `scripting` capture only after an explicit action; `storage` keeps language and temporary editor mapping; `unlimitedStorage` prevents quota failures for large local images; `alarms` expires temporary captures.
 
-Transfer chunks remain only in local IndexedDB and are deleted after assembly or within fifteen minutes. The final capture is deleted as soon as the editor decodes it; a fifteen-minute expiry only protects against orphaned captures. See [PRIVACY.en.md](PRIVACY.en.md) and [SECURITY.en.md](SECURITY.en.md).
+Transfer chunks remain only in local IndexedDB and are deleted after assembly or within fifteen minutes. The final capture is retained until the editor tab is closed; a fifteen-minute expiry only protects against orphaned captures. See [PRIVACY.en.md](PRIVACY.en.md) and [SECURITY.en.md](SECURITY.en.md).
 
 ## Known limitations
 

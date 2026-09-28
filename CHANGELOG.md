@@ -6,6 +6,35 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-09-28
+
+### Ajouté
+
+- Outil Surligneur (`H`) semi-transparent dans l'éditeur avec raccourci, aide intégrée et traductions.
+- Découpage et pagination automatique des longues captures pour l'impression/PDF en tranches avec en-têtes répétés et calque de texte interrogeable par page.
+- Défilement automatique étendu aux conteneurs internes scrollables avec assemblage multi-tuiles de la région.
+- Horodatage des exports au format local standardisé `AAAA-MM-JJ_HH-mm`.
+
+### Corrigé
+
+- Couche de texte PDF : les blocs issus des liens `<a>` sont de nouveau exportés comme hyperliens cliquables (champ `url` pris en compte).
+- Sélection défilante : un glisser fin (largeur ou hauteur > 10 px) valide désormais la zone au relâcher du pointeur.
+- Internationalisation : la clé `statusZone` est incluse dans le bundle des scripts de contenu (libellé de l'overlay pour les lecteurs d'écran).
+- Aide : le raccourci de l'outil Forme est corrigé (`S` au lieu de `R`).
+- Éditeur : le rechargement de la page conserve la capture (l'accusé de réception ne purge plus le blob, nettoyage à la fermeture de l'onglet ou à l'expiration).
+- Impression/PDF : les URL sources non HTTP(S) affichent un texte simple au lieu d'un lien vide.
+- Popup : l'échec d'ouverture de la page des raccourcis affiche désormais l'erreur au lieu d'un rejet silencieux.
+- Historique : l'aplatissement après 100 opérations conserve le calque de texte ; l'annulation d'une pastille restaure son compteur.
+- Noms de fichiers : troncature sur frontières de points de code (émojis préservés) ; options de fond de texte et erreurs du rapport HTML traduites dans les 4 langues.
+
+### Modifié & Performances
+
+- Robustesse des tuiles : réessais avec backoff sur limitation de `captureVisibleTab` (changement d'onglet non re-tenté).
+- Performances : classification des éléments ancrés mise en cache par tentative, pré-filtres layout avant calculs de style, balayages de conteneurs dédupliqués.
+- Extraction de texte : vérification de la visibilité réelle via `checkVisibility` (opacité héritée prise en compte).
+- Persistance : cache mémoire IndexedDB réellement LRU et borné.
+- Maintenance : liste unique des fichiers du ZIP partagée entre packaging et validation ; cache interne du stockage non exposé.
+
 ## [1.3.0] - 2026-09-25
 
 ### Ajouté
@@ -102,7 +131,9 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 - Descriptions localisées dépassant la limite de 132 caractères.
 - Conservation temporaire plus longue que celle annoncée et perte au rechargement de l’éditeur.
 
-[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.0...v1.3.1
+[1.3.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0

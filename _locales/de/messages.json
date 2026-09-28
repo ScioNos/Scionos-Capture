@@ -164,6 +164,9 @@
   "toolDraw": {
     "message": "Zeichnen"
   },
+  "toolHighlight": {
+    "message": "Textmarker"
+  },
   "toolCensor": {
     "message": "Verdecken"
   },
@@ -305,6 +308,9 @@
   "reportCopied": {
     "message": "Bild in die Zwischenablage kopiert."
   },
+  "reportCopyError": {
+    "message": "Kopieren fehlgeschlagen: "
+  },
   "printOpened": {
     "message": "Druckdialog geöffnet."
   },
@@ -353,6 +359,18 @@
   "labelBgColor": {
     "message": "Hintergrund"
   },
+  "textBgBlack": {
+    "message": "Schwarz"
+  },
+  "textBgRed": {
+    "message": "Rot"
+  },
+  "textBgBlue": {
+    "message": "Blau"
+  },
+  "textBgTransparent": {
+    "message": "Transparent"
+  },
   "btnHelp": {
     "message": "Hilfe & Über"
   },
@@ -400,6 +418,9 @@
   },
   "helpShortcutDraw": {
     "message": "Freihandpinsel"
+  },
+  "helpShortcutHighlight": {
+    "message": "Textmarker"
   },
   "helpShortcutCensor": {
     "message": "Zensieren / Weichzeichnen"

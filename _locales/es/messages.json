@@ -164,6 +164,9 @@
   "toolDraw": {
     "message": "Dibujar"
   },
+  "toolHighlight": {
+    "message": "Resaltador"
+  },
   "toolCensor": {
     "message": "Ocultar"
   },
@@ -305,6 +308,9 @@
   "reportCopied": {
     "message": "Imagen copiada al portapapeles."
   },
+  "reportCopyError": {
+    "message": "Error al copiar: "
+  },
   "printOpened": {
     "message": "Se abrió el diálogo de impresión."
   },
@@ -353,6 +359,18 @@
   "labelBgColor": {
     "message": "Fondo"
   },
+  "textBgBlack": {
+    "message": "Negro"
+  },
+  "textBgRed": {
+    "message": "Rojo"
+  },
+  "textBgBlue": {
+    "message": "Azul"
+  },
+  "textBgTransparent": {
+    "message": "Transparente"
+  },
   "btnHelp": {
     "message": "Ayuda y Acerca de"
   },
@@ -400,6 +418,9 @@
   },
   "helpShortcutDraw": {
     "message": "Pincel libre"
+  },
+  "helpShortcutHighlight": {
+    "message": "Resaltador"
   },
   "helpShortcutCensor": {
     "message": "Máscara / Desenfoque"

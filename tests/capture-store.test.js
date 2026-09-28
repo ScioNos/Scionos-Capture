@@ -62,18 +62,30 @@ test('purges expired transfer metadata and chunks', async () => {
   assert.deepEqual(await CaptureStore.listTransferChunks(id), []);
 });
 
-test('caches capture records in memory and invalidates on deletion', async () => {
-  CaptureStore.clearCaptureCache();
+test('returns stored captures and drops them on deletion', async () => {
   const id = `cache-test-${Date.now()}`;
   const record = { id, title: 'Cache Test', createdAt: Date.now() };
   await CaptureStore.putCapture(record);
 
-  assert.equal(CaptureStore.captureCache.has(id), true);
   const cached = await CaptureStore.getCapture(id);
   assert.equal(cached.title, 'Cache Test');
 
   await CaptureStore.deleteCapture(id);
-  assert.equal(CaptureStore.captureCache.has(id), false);
+  assert.equal(await CaptureStore.getCapture(id), undefined);
+});
+
+test('keeps every capture readable when the memory cache overflows', async () => {
+  const ids = [];
+  for (let i = 0; i < 8; i += 1) {
+    const id = `lru-${Date.now()}-${i}`;
+    ids.push(id);
+    await CaptureStore.putCapture({ id, title: `Doc ${i}`, createdAt: Date.now() });
+  }
+  for (let i = 0; i < ids.length; i += 1) {
+    assert.equal((await CaptureStore.getCapture(ids[i])).title, `Doc ${i}`);
+  }
+  await Promise.all(ids.map(id => CaptureStore.deleteCapture(id)));
+  assert.equal(await CaptureStore.getCapture(ids[0]), undefined);
 });
 
 test('applies versioned migrations sequentially', () => {

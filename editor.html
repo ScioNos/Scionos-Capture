@@ -198,6 +198,11 @@
       #print-area .print-meta a { color: #0284c7; text-decoration: none; word-break: break-all; }
       #print-area .print-image-wrap { position: relative; text-align: center; margin-top: 12px; display: inline-block; width: 100%; }
       #print-area img { max-width: 100%; height: auto; display: block; margin: 0 auto; page-break-inside: avoid; break-inside: avoid; }
+      #print-area .print-page { page-break-after: always; break-after: page; }
+      #print-area .print-page:last-child { page-break-after: auto; break-after: auto; }
+      #print-area .print-header.print-continued h2 { font-size: 12pt; margin: 0 0 8px 0; color: #075985; }
+      #print-area .print-slice { position: relative; width: 100%; overflow: hidden; }
+      #print-area .print-slice img { width: 100%; max-width: none; margin: 0; }
       #print-area .searchable-text-layer {
         position: absolute;
         top: 0;
@@ -258,6 +263,7 @@
     <div id="primary-tool-group" class="tool-group">
       <button id="tool-select" class="tool-button" type="button" aria-pressed="true" data-tool="select"><svg class="icon" viewBox="0 0 24 24"><path d="m5 3 14 9-6 2-3 6z"/></svg><span id="txt-tool-select"></span></button>
       <button id="tool-draw" class="tool-button" type="button" aria-pressed="false" data-tool="draw"><svg class="icon" viewBox="0 0 24 24"><path d="m4 20 4-1 11-11-3-3L5 16zM14 7l3 3"/></svg><span id="txt-tool-draw"></span></button>
+      <button id="tool-highlight" class="tool-button" type="button" aria-pressed="false" data-tool="highlight"><svg class="icon" viewBox="0 0 24 24"><path d="M4 20l1.5-4.5L16 5l3 3L8.5 18.5z"/><path d="M13.5 7.5l3 3"/></svg><span id="txt-tool-highlight"></span></button>
       <button id="tool-arrow" class="tool-button" type="button" aria-pressed="false" data-tool="arrow"><svg class="icon" viewBox="0 0 24 24"><line x1="5" y1="19" x2="19" y2="5"/><polyline points="9 5 19 5 19 15"/></svg><span id="txt-tool-arrow"></span></button>
       <button id="tool-shape" class="tool-button" type="button" aria-pressed="false" data-tool="shape"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg><span id="txt-tool-shape"></span></button>
       <button id="tool-text" class="tool-button" type="button" aria-pressed="false" data-tool="text"><svg class="icon" viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"/><line x1="12" y1="4" x2="12" y2="20"/></svg><span id="txt-tool-text"></span></button>

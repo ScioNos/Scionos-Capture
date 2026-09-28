@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       'sc-activation': 'helpShortcutActivation',
       'sc-select': 'helpShortcutSelect',
       'sc-draw': 'helpShortcutDraw',
+      'sc-highlight': 'helpShortcutHighlight',
       'sc-arrow': 'helpShortcutArrow',
       'sc-text': 'helpShortcutText',
       'sc-step': 'helpShortcutStep',
@@ -38,7 +39,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const manifestVersion = (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getManifest)
       ? chrome.runtime.getManifest().version
-      : '1.3.0';
+      : '1.3.1';
     const versionElement = document.getElementById('help-version');
     if (versionElement) {
       versionElement.textContent = getI18nText('helpVersionLabel', { version: manifestVersion });

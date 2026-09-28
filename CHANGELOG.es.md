@@ -4,6 +4,35 @@
 
 ## [Sin publicar]
 
+## [1.3.1] - 2026-09-28
+
+### Añadido
+
+- Herramienta Resaltador (`H`) semitransparente en el editor con atajo, ayuda integrada y traducciones.
+- División y paginación automática de capturas largas para impresión/PDF en tranches con encabezados repetidos y capa de texto indexable por página.
+- Desplazamiento automático extendido a contenedores internos con ensamblado de la región por teselas.
+- Marcas de tiempo de exportación en formato local estandarizado `AAAA-MM-DD_HH-mm`.
+
+### Corregido
+
+- Capa de texto del PDF: los bloques de enlaces `<a>` vuelven a exportarse como hipervínculos activos (se respeta el campo `url`).
+- Selección con desplazamiento: un arrastre fino (ancho o alto > 10 px) ya confirma la zona al soltar el puntero.
+- Internacionalización: la clave `statusZone` se incluye en el paquete de mensajes (etiqueta para lectores de pantalla).
+- Ayuda: atajo de la herramienta Forma corregido (`S` en lugar de `R`).
+- Editor: recargar la página conserva la captura (la confirmación ya no elimina la imagen; limpieza al cerrar la pestaña o al caducar).
+- Impresión/PDF: las URL de origen no HTTP(S) se muestran como texto simple en lugar de un enlace vacío.
+- Popup: si falla la apertura de la página de atajos, ahora se muestra el error.
+- Historial: el aplanado tras 100 operaciones conserva la capa de texto; deshacer un distintivo restaura su contador.
+- Nombres de archivo: truncado por puntos de código (emojis preservados); opciones de fondo de texto y errores del informe HTML traducidos en los 4 idiomas.
+
+### Modificado y Rendimiento
+
+- Robustez de teselas: reintentos con backoff ante limitación de `captureVisibleTab` (sin reintentar cambios de pestaña).
+- Rendimiento: clasificación de elementos anclados en caché por intento, prefiltros de layout antes del cálculo de estilos, barridos deduplicados.
+- Extracción de texto: visibilidad real con `checkVisibility` (opacidad heredada respetada).
+- Almacenamiento: caché de memoria IndexedDB realmente LRU y limitada.
+- Mantenimiento: lista única de archivos compartida entre empaquetado y validación; caché interna del almacenamiento no expuesta.
+
 ## [1.3.0] - 2026-09-25
 
 ### Añadido
@@ -88,7 +117,9 @@
 - Soporte completo en 4 idiomas: francés, inglés, español y alemán.
 - Accesibilidad total (WCAG, alto contraste, navegación por teclado, lectores de pantalla).
 
-[Sin publicar]: https://github.com/ScioNos/Scionos-Capture/compare/v1.2.0...HEAD
+[Sin publicar]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.0...v1.3.1
+[1.3.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0

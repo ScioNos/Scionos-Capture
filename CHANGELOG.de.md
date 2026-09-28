@@ -4,6 +4,35 @@
 
 ## [Unveröffentlicht]
 
+## [1.3.1] - 2026-09-28
+
+### Hinzugefügt
+
+- Halbtransparentes Textmarker-Werkzeug (`H`) im Editor mit Tastenkürzel, integrierter Hilfe und Übersetzungen.
+- Automatische Aufteilung und Paginierung langer Aufnahmen für Druck/PDF mit wiederholten Kopfzeilen und durchsuchbarer Textebene je Seite.
+- Automatisches Scrollen auf interne Scrollcontainer erweitert mit Kachelzusammensetzung.
+- Lokale standardisierte `JJJJ-MM-TT_HH-mm`-Exportzeitstempel.
+
+### Behoben
+
+- Durchsuchbare PDF-Textebene: Blöcke aus `<a>`-Links werden wieder als anklickbare Hyperlinks exportiert (Feld `url` wird berücksichtigt).
+- Scrollende Auswahl: Eine schmale Auswahl (Breite oder Höhe > 10 px) wird nun beim Loslassen bestätigt.
+- Internationalisierung: Der Schlüssel `statusZone` ist im Nachrichtenpaket enthalten (Overlay-Beschriftung für Screenreader).
+- Hilfe: Tastenkürzel des Form-Werkzeugs korrigiert (`S` statt `R`).
+- Editor: Neuladen behält die Aufnahme (Bestätigung löscht das Bild nicht mehr; Bereinigung beim Schließen oder Ablauf).
+- Druck/PDF: Nicht-HTTP(S)-Quell-URLs erscheinen als einfacher Text statt leerem Link.
+- Popup: Fehler beim Öffnen der Tastenkürzel-Seite werden nun angezeigt.
+- Verlauf: Glättung nach 100 Vorgängen erhält die Textebene; Rückgängigmachen einer Marke stellt den Zähler wieder her.
+- Dateinamen: Kürzung an Codepoint-Grenzen (Emojis erhalten); Texthintergrund-Optionen und HTML-Berichtsfehler in allen 4 Sprachen übersetzt.
+
+### Geändert & Leistung
+
+- Kachel-Robustheit: Wiederholungen mit Backoff bei `captureVisibleTab`-Limitierung (Tabwechsel werden nicht wiederholt).
+- Leistung: Anker-Klassifizierung pro Versuch zwischengespeichert, Layout-Vorfilter vor Stilberechnung, deduplizierte Container-Scans.
+- Textextraktion: echte Sichtbarkeit per `checkVisibility` (vererbte Opazität beachtet).
+- Speicherung: tatsächlich begrenzter LRU-IndexedDB-Cache.
+- Wartung: Einzige gemeinsame Dateiliste für Paketierung und Validierung; Speicher-Cache nicht mehr öffentlich.
+
 ## [1.3.0] - 2026-09-25
 
 ### Hinzugefügt
@@ -88,7 +117,9 @@
 - Vollständige 4-Sprachen-Unterstützung: Französisch, Englisch, Spanisch und Deutsch.
 - Volle Barrierefreiheit (WCAG, hohe Kontraste, Tastaturnavigation, Screenreader).
 
-[Unveröffentlicht]: https://github.com/ScioNos/Scionos-Capture/compare/v1.2.0...HEAD
+[Unveröffentlicht]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.0...v1.3.1
+[1.3.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0

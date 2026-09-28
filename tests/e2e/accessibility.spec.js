@@ -400,6 +400,39 @@ test('zone capture uses viewport pixels when classic scrollbars reduce the conte
   await page.close();
 });
 
+test('zone capture auto-scrolls an internal container and stitches the region', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, `<!doctype html><html lang="fr"><style>
+    html, body { margin: 0; height: 600px; overflow: hidden; }
+    [data-scroll-surface] { position: absolute; left: 40px; top: 60px; width: 300px; height: 480px; overflow: auto; border: 4px solid #111827; }
+    .content { width: 300px; height: 1500px; background: linear-gradient(#fff, #60a5fa); }
+  </style><div data-scroll-surface><div class="content">Internal timeline</div></div></html>`);
+  const zoneResponse = await page.evaluate(localizedMessages => new Promise(resolve => {
+    globalThis.__captureListener({ action: 'START_ZONE_CAPTURE', language: 'fr', messages: localizedMessages }, {}, resolve);
+  }), frenchMessages);
+  expect(zoneResponse).toEqual({ status: 'started' });
+
+  const overlay = page.locator('[data-scionos-capture="selection"]');
+  await expect(overlay).toBeVisible();
+
+  // Diagonal drag ending near the viewport bottom edge: the inner container
+  // (not the page) must auto-scroll while the selection grows.
+  await page.mouse.move(120, 150);
+  await page.mouse.down();
+  await page.mouse.move(280, 590, { steps: 20 });
+  await expect.poll(() => page.locator('[data-scroll-surface]').evaluate(element => element.scrollTop), { timeout: 15000 }).toBeGreaterThan(300);
+  await page.mouse.up();
+
+  const scrolledResult = await readOpenedCapture(page);
+  expect(scrolledResult.width).toBe(160);
+  expect(scrolledResult.height).toBeGreaterThan(400);
+  expect(scrolledResult.positions.length).toBeGreaterThan(1);
+  expect(scrolledResult.positions.every(position => position.windowY === 0)).toBe(true);
+  const surfaceMoves = scrolledResult.positions.map(position => position.surfaceY);
+  expect([...surfaceMoves].sort((first, second) => first - second)).toEqual(surfaceMoves);
+  await page.close();
+});
+
 test('scrolling-area overlay supports pointer, keyboard and exact multi-screen capture', async () => {
   const page = await context.newPage();
   await page.setViewportSize({ width: 800, height: 600 });
@@ -588,4 +621,37 @@ test('editor zoom, crop, undo and redo keep the complete canvas reachable', asyn
   await expect(page.locator('#main-canvas')).toHaveAttribute('width', '640');
   await page.locator('#btn-redo').click();
   await expect(page.locator('#main-canvas')).toHaveAttribute('width', '320');
+});
+
+test('editor highlighter draws a translucent stroke with undo support', async () => {
+  const page = await context.newPage();
+  await page.goto(`chrome-extension://${extensionId}/editor.html`);
+  await page.evaluate(async () => {
+    const source = document.createElement('canvas');
+    source.width = 640;
+    source.height = 480;
+    const sourceContext = source.getContext('2d');
+    sourceContext.fillStyle = '#ffffff';
+    sourceContext.fillRect(0, 0, 640, 480);
+    const blob = await new Promise(resolve => source.toBlob(resolve, 'image/png'));
+    await CaptureStore.putCapture({
+      id: 'e2e-highlight', blob, title: 'E2E', url: 'https://example.com',
+      timestamp: new Date().toISOString(), scale: 1, createdAt: Date.now()
+    });
+  });
+  await page.goto(`chrome-extension://${extensionId}/editor.html?capture=e2e-highlight`);
+  await expect(page.locator('#main-canvas')).toHaveAttribute('width', '640');
+  await expect(page.locator('#tool-highlight')).toBeVisible();
+  await expect(page.locator('#txt-tool-highlight')).not.toBeEmpty();
+  await page.locator('#tool-highlight').click();
+  await expect(page.locator('#btn-undo')).toBeDisabled();
+  const box = await page.locator('#main-canvas').boundingBox();
+  await page.mouse.move(box.x + 100, box.y + 100);
+  await page.mouse.down();
+  await page.mouse.move(box.x + 300, box.y + 150, { steps: 10 });
+  await page.mouse.up();
+  await expect(page.locator('#btn-undo')).toBeEnabled();
+  await page.locator('#btn-undo').click();
+  await expect(page.locator('#btn-undo')).toBeDisabled();
+  await page.close();
 });

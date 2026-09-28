@@ -130,6 +130,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const messageKeys = [
         'progress', 'reduced', 'visibleError', 'fullError', 'fullScrollError', 'zoneError',
+        'statusZone',
         'scrollingError', 'scrollingDialogLabel', 'scrollingGeometry',
         'scrollingInstructionStart', 'scrollingInstructionEnd', 'scrollingPointSet',
         'scrollingInvalidRegion', 'scrollingCapture', 'scrollingToBottom', 'scrollingRestart', 'scrollingCancel',
@@ -178,10 +179,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  shortcutButton.addEventListener('click', () => {
+  shortcutButton.addEventListener('click', async () => {
     const isEdge = navigator.userAgent.includes('Edg/');
     const shortcutsUrl = isEdge ? 'edge://extensions/shortcuts' : 'chrome://extensions/shortcuts';
-    chrome.tabs.create({ url: shortcutsUrl });
+    try {
+      const created = chrome.tabs.create({ url: shortcutsUrl });
+      if (created && typeof created.catch === 'function') {
+        await created.catch(error => {
+          throw error instanceof Error ? error : new Error(String(error));
+        });
+      }
+    } catch (error) {
+      console.error('Shortcut page open failed:', error);
+      showStatus(error && error.message ? error.message : String(error), true);
+    }
   });
 
   captureButtons[0].addEventListener('click', () => startCapture('START_FULL_PAGE_CAPTURE', 'statusFull'));

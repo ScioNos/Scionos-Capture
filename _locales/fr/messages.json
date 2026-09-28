@@ -164,6 +164,9 @@
   "toolDraw": {
     "message": "Dessiner"
   },
+  "toolHighlight": {
+    "message": "Surligneur"
+  },
   "toolCensor": {
     "message": "Masquer"
   },
@@ -305,6 +308,9 @@
   "reportCopied": {
     "message": "Image copiée dans le presse-papiers."
   },
+  "reportCopyError": {
+    "message": "La copie a échoué : "
+  },
   "printOpened": {
     "message": "Fenêtre d’impression ouverte."
   },
@@ -353,6 +359,18 @@
   "labelBgColor": {
     "message": "Fond"
   },
+  "textBgBlack": {
+    "message": "Noir"
+  },
+  "textBgRed": {
+    "message": "Rouge"
+  },
+  "textBgBlue": {
+    "message": "Bleu"
+  },
+  "textBgTransparent": {
+    "message": "Transparent"
+  },
   "btnHelp": {
     "message": "Aide & À propos"
   },
@@ -400,6 +418,9 @@
   },
   "helpShortcutDraw": {
     "message": "Pinceau de dessin libre"
+  },
+  "helpShortcutHighlight": {
+    "message": "Surligneur"
   },
   "helpShortcutCensor": {
     "message": "Masquage / Flou"

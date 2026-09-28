@@ -5,19 +5,14 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import archiver from 'archiver';
 import { validatePackage } from './validate-package.mjs';
+import { RELEASE_ZIP_FILES } from './release-files.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dist = path.join(root, 'dist');
 const manifest = JSON.parse(await fsp.readFile(path.join(root, 'manifest.json'), 'utf8'));
 const zipName = `scionos-capture-v${manifest.version}.zip`;
 const zipPath = path.join(dist, zipName);
-const files = [
-  'manifest.json', 'background.js', 'capture-store.js', 'capture-utils.js', 'capture-content-utils.js', 'content-dom.js', 'content-transfer.js', 'content-capture.js', 'content.js',
-  'editor.html', 'editor-operations.js', 'editor-export.js', 'editor.js', 'help.html', 'help.js', 'i18n.js', 'popup.html', 'popup.js',
-  'images/icon16.png', 'images/icon48.png', 'images/icon128.png',
-  ...['fr', 'en', 'es', 'de'].map(locale => `_locales/${locale}/messages.json`),
-  ...['fr', 'en', 'es', 'de'].map(locale => `images/flags/${locale}.svg`)
-];
+const files = RELEASE_ZIP_FILES;
 
 await validatePackage();
 await fsp.mkdir(dist, { recursive: true });

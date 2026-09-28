@@ -78,7 +78,15 @@ function enqueueVisibleCapture(senderTab) {
     if (remainingDelay > 0) await ScionosCaptureUtils.delay(remainingDelay);
     await assertOriginalTabActive(senderTab);
     lastCaptureStartedAt = Date.now();
-    return chrome.tabs.captureVisibleTab(senderTab.windowId, { format: 'png' });
+    return chrome.tabs.captureVisibleTab(senderTab.windowId, { format: 'png' }).catch(error => {
+      const message = error && error.message ? error.message : '';
+      if (/rate|limit|quota|timed out|timeout|busy/i.test(message)) {
+        const tagged = new Error(message || 'Tab capture is rate limited, retrying.');
+        tagged.code = 'RATE_LIMITED';
+        throw tagged;
+      }
+      throw error;
+    });
   });
   captureQueue = task.catch(() => undefined);
   return task;
@@ -234,9 +242,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     .then(transfer => cleanupTransfer(transfer.id)).then(() => ({ success: true }));
   else if (message.action === 'ACK_CAPTURE_LOADED' && isEditorSender(sender)) {
     operation = chrome.storage.session.get(mappingKey(sender.tab.id)).then(async stored => {
-      const captureId = stored[mappingKey(sender.tab.id)];
+      const key = mappingKey(sender.tab.id);
+      const captureId = stored[key];
       if (!captureId || captureId !== message.captureId) throw new Error('Invalid editor capture acknowledgement.');
-      await cleanupCapture(captureId);
+      await chrome.storage.session.remove(key);
       return { success: true };
     });
   } else return;

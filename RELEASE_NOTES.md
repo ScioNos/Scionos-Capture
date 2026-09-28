@@ -1,6 +1,8 @@
-# Scionos Capture 1.3.0
+# Scionos Capture 1.3.1
 
 ## Français
+
+Correctifs 1.3.1 : hyperliens `<a>` de nouveau cliquables dans le PDF, validation des sélections fines, rechargement de l'éditeur sans perte, traductions complétées (fond de texte, rapport HTML, `statusZone`), raccourci Forme (`S`) corrigé dans l'aide, et robustesse (raccourcis, historique, noms de fichiers). S'y ajoutent : cache LRU borné, horodatage précis et nouvel outil Surligneur (`H`).
 
 La version 1.3.0 apporte des avancées majeures inspirées des meilleurs outils du web (FireShot, PrintFriendly, SingleFile) :
 
@@ -15,9 +17,11 @@ La version 1.3.0 apporte des avancées majeures inspirées des meilleurs outils 
 - **Page d'aide et guide d'utilisation hors-ligne** (`help.html`) : accessible instantanément via le bouton `?` dans la popup et l'éditeur, détaillant les modes de capture, les formats d'export, les raccourcis clavier et l'engagement 100 % local sans télémétrie.
 - **Résolution du raccourci clavier & conformité Manifest V3** : prise en charge hybride (Promise et callback) pour l'API `chrome.commands.getAll` éliminant le faux affichage « Non configuré » dans la popup, et alignement strict de `_execute_action` sur la spécification MV3.
 
-Téléchargez `scionos-capture-v1.3.0.zip`, vérifiez le fichier SHA-256, extrayez-le puis chargez le dossier dans Chrome ou Edge.
+Téléchargez `scionos-capture-v1.3.1.zip`, vérifiez le fichier SHA-256, extrayez-le puis chargez le dossier dans Chrome ou Edge.
 
 ## English
+
+Patch 1.3.1: `<a>` hyperlinks clickable again in PDFs, thin selections confirmed on release, editor reload without data loss, completed translations (text background, HTML report, `statusZone`), Shape shortcut (`S`) fixed in help, plus robustness fixes (shortcuts page, history, filenames). Also: bounded LRU cache, precise timestamps and a new Highlighter tool (`H`).
 
 Version 1.3.0 brings major enhancements inspired by the web's best capture tools (FireShot, PrintFriendly, SingleFile):
 
@@ -32,9 +36,11 @@ Version 1.3.0 brings major enhancements inspired by the web's best capture tools
 - **Built-in Offline Help & User Guide** (`help.html`): Accessible directly via the `?` button in both the popup and editor, outlining capture workflows, shortcuts, and 100% local privacy architecture.
 - **Keyboard Shortcut Resolution & Manifest V3 Compliance**: Hybrid Promise and callback handling for `chrome.commands.getAll` resolving the false "Not configured" state in the popup, and strict alignment of `_execute_action` with the MV3 specification.
 
-Download `scionos-capture-v1.3.0.zip`, verify the SHA-256 file, extract it, and load the folder in Chrome or Edge.
+Download `scionos-capture-v1.3.1.zip`, verify the SHA-256 file, extract it, and load the folder in Chrome or Edge.
 
 ## Español
+
+Parche 1.3.1: hipervínculos `<a>` activos de nuevo en el PDF, selecciones finas confirmadas al soltar, recarga del editor sin pérdida, traducciones completadas (fondo de texto, informe HTML, `statusZone`), atajo de Forma (`S`) corregido en la ayuda y mejoras de robustez. Además: caché LRU limitada, marcas de tiempo precisas y nueva herramienta Resaltador (`H`).
 
 La versión 1.3.0 incorpora mejoras esenciales inspiradas en las mejores herramientas web (FireShot, PrintFriendly, SingleFile):
 
@@ -45,9 +51,11 @@ La versión 1.3.0 incorpora mejoras esenciales inspiradas en las mejores herrami
 - **Página de ayuda integrada y sin conexión** (`help.html`): accesible desde el botón `?` en el popup y el editor con guía de uso completa y lista de atajos.
 - **Resolución del atajo de teclado y conformidad con Manifest V3**: soporte híbrido (Promise y callback) para `chrome.commands.getAll` que soluciona el falso estado «No configurado» en el popup, y alineación estricta de `_execute_action` con la especificación MV3.
 
-Descarga `scionos-capture-v1.3.0.zip`, comprueba el archivo SHA-256 y cárgalo en Chrome o Edge.
+Descarga `scionos-capture-v1.3.1.zip`, comprueba el archivo SHA-256 y cárgalo en Chrome o Edge.
 
 ## Deutsch
+
+Patch 1.3.1: `<a>`-Hyperlinks wieder anklickbar im PDF, schmale Auswahl wird beim Loslassen bestätigt, Neuladen ohne Verlust, vervollständigte Übersetzungen (Texthintergrund, HTML-Bericht, `statusZone`), Form-Kürzel (`S`) in der Hilfe korrigiert sowie Robustheit. Dazu: begrenzter LRU-Cache, präzise Zeitstempel und neues Textmarker-Werkzeug (`H`).
 
 Version 1.3.0 bringt wichtige Neuerungen, inspiriert von den besten Web-Werkzeugen (FireShot, PrintFriendly, SingleFile):
 
@@ -58,4 +66,4 @@ Version 1.3.0 bringt wichtige Neuerungen, inspiriert von den besten Web-Werkzeug
 - **Integrierte Offline-Hilfeseite** (`help.html`): Direkt über die `?`-Schaltfläche in Popup und Editor erreichbar mit vollständigem Benutzerhandbuch und Tastaturkürzeln.
 - **Tastaturkürzel-Erkennung & Manifest V3-Konformität**: Hybride Promise- und Callback-Verarbeitung für `chrome.commands.getAll` zur Behebung der falschen Anzeige „Nicht konfiguriert“ im Popup sowie strikte Anpassung von `_execute_action` an die MV3-Spezifikation.
 
-Laden Sie `scionos-capture-v1.3.0.zip` herunter, prüfen Sie die SHA-256-Datei und laden Sie den Ordner in Chrome oder Edge.
+Laden Sie `scionos-capture-v1.3.1.zip` herunter, prüfen Sie die SHA-256-Datei und laden Sie den Ordner in Chrome oder Edge.

@@ -74,6 +74,29 @@
       targetContext.restore();
     }
 
+    function drawHighlight(targetContext, operation) {
+      if (!operation.points.length) return;
+      targetContext.save();
+      targetContext.globalCompositeOperation = 'multiply';
+      targetContext.globalAlpha = 0.45;
+      targetContext.strokeStyle = operation.color;
+      targetContext.fillStyle = operation.color;
+      targetContext.lineWidth = Math.max(8, operation.width || 16);
+      targetContext.lineCap = 'round';
+      targetContext.lineJoin = 'round';
+      if (operation.points.length === 1) {
+        targetContext.beginPath();
+        targetContext.arc(operation.points[0].x, operation.points[0].y, targetContext.lineWidth / 2, 0, Math.PI * 2);
+        targetContext.fill();
+      } else {
+        targetContext.beginPath();
+        targetContext.moveTo(operation.points[0].x, operation.points[0].y);
+        operation.points.slice(1).forEach(point => targetContext.lineTo(point.x, point.y));
+        targetContext.stroke();
+      }
+      targetContext.restore();
+    }
+
     function createCensorPath(targetContext, operation) {
       if (operation.shape === 'free') {
         operation.points.forEach(point => {
@@ -263,6 +286,7 @@
       }
       const ctx = surface.getContext('2d');
       if (operation.kind === 'draw') drawPath(ctx, operation);
+      if (operation.kind === 'highlight') drawHighlight(ctx, operation);
       if (operation.kind === 'censor') applyCensor(surface, operation);
       if (operation.kind === 'arrow') drawArrow(ctx, operation);
       if (operation.kind === 'shape') drawShape(ctx, operation);

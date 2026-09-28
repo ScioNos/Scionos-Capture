@@ -16,10 +16,13 @@ const {
   escapeHtml,
   sanitizeUrl,
   sanitizeFilename,
+  buildLocalTimestamp,
   buildHtmlReport,
   computeArrowPoints,
   filterTextBlocksOnCensor,
-  shiftAndCropTextBlocks
+  shiftAndCropTextBlocks,
+  buildTextLayerSpans,
+  buildPrintSlicePlan
 } = require('../capture-utils.js');
 
 test('includes the exact final scroll position without skipping the bottom of a page', () => {
@@ -222,4 +225,62 @@ test('shifts and crops text blocks during image cropping', () => {
   assert.equal(cropped[0].text, 'Inside');
   assert.equal(cropped[0].x, 10);
   assert.equal(cropped[0].y, 10);
+});
+
+test('renders linked text blocks as anchors in the searchable layer', () => {
+  const spans = buildTextLayerSpans([
+    { x: 10, y: 20, width: 100, height: 15, text: 'Link', fontSize: 14, url: 'https://example.com/page' },
+    { x: 10, y: 40, width: 80, height: 15, text: 'Plain', fontSize: 14, url: null }
+  ], 200, 100);
+  assert.ok(spans.includes('<a href="https://example.com/page"'));
+  assert.ok(spans.includes('<span'));
+  assert.ok(!spans.includes('<a href="">'));
+});
+
+test('escapes text and drops unsafe protocols in the searchable layer', () => {
+  const spans = buildTextLayerSpans([
+    { x: 0, y: 0, width: 50, height: 10, text: '<img src=x onerror=alert(1)>', fontSize: 12, url: 'javascript:alert(1)' }
+  ], 200, 100);
+  assert.ok(!spans.includes('<img'));
+  assert.ok(spans.includes('&lt;img'));
+  assert.ok(!spans.includes('javascript:'));
+});
+
+test('returns an empty layer without dimensions or blocks', () => {
+  assert.equal(buildTextLayerSpans([], 200, 100), '');
+  assert.equal(buildTextLayerSpans(null, 200, 100), '');
+  assert.equal(buildTextLayerSpans([{ x: 0, y: 0, width: 1, height: 1, text: 'x' }], 0, 100), '');
+});
+
+test('builds a filesystem-safe local timestamp with minute precision', () => {
+  const stamp = buildLocalTimestamp(new Date(2026, 8, 27, 14, 5, 9));
+  assert.equal(stamp, '2026-09-27_14-05');
+  assert.ok(!/[<>:"/\\|?*]/.test(stamp));
+  assert.ok(stamp.length <= 45);
+});
+
+test('truncates filenames on code-point boundaries without lone surrogates', () => {
+  const name = sanitizeFilename('A'.repeat(44) + '😀 test');
+  assert.ok(!/[\uD800-\uDBFF](?![\uDC00-\uDFFF])/.test(name));
+  assert.ok(!/(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/.test(name));
+  assert.ok([...name].length <= 45);
+});
+
+test('keeps short captures on a single print page', () => {
+  assert.deepEqual(buildPrintSlicePlan(800, 600), [{ top: 0, height: 600, single: true }]);
+});
+
+test('slices tall captures into contiguous portrait pages', () => {
+  const slices = buildPrintSlicePlan(800, 3000);
+  assert.ok(slices.length > 1);
+  assert.ok(slices.every(slice => slice.single === false));
+  assert.equal(slices[0].top, 0);
+  assert.equal(slices[slices.length - 1].top + slices[slices.length - 1].height, 3000);
+  slices.forEach((slice, index) => {
+    if (index > 0) assert.equal(slice.top, slices[index - 1].top + slices[index - 1].height);
+  });
+});
+
+test('falls back to a single print page beyond the page cap', () => {
+  assert.deepEqual(buildPrintSlicePlan(800, 100000), [{ top: 0, height: 100000, single: true }]);
 });

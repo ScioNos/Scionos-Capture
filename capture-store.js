@@ -76,21 +76,31 @@
   }
 
   const captureCache = new Map();
+  const CAPTURE_CACHE_LIMIT = 5;
 
-  function clearCaptureCache() {
-    captureCache.clear();
+  function cacheCapture(record) {
+    if (!record || !record.id) return;
+    captureCache.delete(record.id);
+    captureCache.set(record.id, record);
+    while (captureCache.size > CAPTURE_CACHE_LIMIT) {
+      captureCache.delete(captureCache.keys().next().value);
+    }
   }
 
   const putCapture = async record => {
     const result = await runRequest(CAPTURE_STORE, 'readwrite', store => store.put(record));
-    if (record && record.id) captureCache.set(record.id, record);
+    cacheCapture(record);
     return result;
   };
 
   const getCapture = async id => {
-    if (captureCache.has(id)) return captureCache.get(id);
+    if (captureCache.has(id)) {
+      const cached = captureCache.get(id);
+      cacheCapture(cached);
+      return cached;
+    }
     const record = await runRequest(CAPTURE_STORE, 'readonly', store => store.get(id));
-    if (record) captureCache.set(id, record);
+    if (record) cacheCapture(record);
     return record;
   };
 
@@ -215,6 +225,6 @@
     putCapture, getCapture, listCaptures, deleteCapture, purgeExpiredCaptures,
     putTransfer, getTransfer, listTransfers, putTransferChunk, getTransferChunk, appendTransferChunk,
     listTransferChunks, deleteTransfer, purgeExpiredTransfers, listTransfersByOwner,
-    applyMigrations, MIGRATIONS, clearCaptureCache, captureCache
+    applyMigrations, MIGRATIONS
   };
 });

@@ -173,6 +173,18 @@
         let disposed = false;
         let autoScrollRaf = null;
         let hasScrolled = false;
+        let dragSurface = null;
+        let dragStartSurfacePt = null;
+        let surfaceDeltaX = 0;
+        let surfaceDeltaY = 0;
+        let surfaceScrolled = false;
+
+        const toSurfacePoint = (surface, clientX, clientY) => {
+          const position = surface.getPosition();
+          if (surface.isDocument) return { x: position.x + clientX, y: position.y + clientY };
+          const rect = surface.getCaptureRect();
+          return { x: position.x + clientX - rect.left, y: position.y + clientY - rect.top };
+        };
 
         const stopAutoScroll = () => {
           if (autoScrollRaf) {
@@ -198,8 +210,8 @@
         };
 
         const updateSelectionGeometry = () => {
-          const docCurrentX = currentClientX + window.scrollX;
-          const docCurrentY = currentClientY + window.scrollY;
+          const docCurrentX = currentClientX + window.scrollX + surfaceDeltaX;
+          const docCurrentY = currentClientY + window.scrollY + surfaceDeltaY;
           const docLeft = Math.min(docStartX, docCurrentX);
           const docTop = Math.min(docStartY, docCurrentY);
           const width = Math.abs(docCurrentX - docStartX);
@@ -242,11 +254,28 @@
           }
 
           if (deltaY !== 0 || deltaX !== 0) {
-            const prevX = window.scrollX;
-            const prevY = window.scrollY;
-            window.scrollBy(deltaX, deltaY);
-            if (window.scrollX !== prevX || window.scrollY !== prevY) {
-              hasScrolled = true;
+            let moved = false;
+            if (dragSurface && !dragSurface.isDocument) {
+              const before = dragSurface.getPosition();
+              dragSurface.scrollTo(before.x + deltaX, before.y + deltaY);
+              const after = dragSurface.getPosition();
+              const stepX = after.x - before.x;
+              const stepY = after.y - before.y;
+              if (stepX !== 0 || stepY !== 0) {
+                surfaceDeltaX += stepX;
+                surfaceDeltaY += stepY;
+                moved = true;
+                hasScrolled = true;
+                surfaceScrolled = true;
+              }
+            }
+            if (!moved) {
+              const prevX = window.scrollX;
+              const prevY = window.scrollY;
+              window.scrollBy(deltaX, deltaY);
+              if (window.scrollX !== prevX || window.scrollY !== prevY) {
+                hasScrolled = true;
+              }
             }
             updateSelectionGeometry();
           }
@@ -258,10 +287,15 @@
           if (event.button !== 0) return;
           isDragging = true;
           hasScrolled = false;
+          surfaceScrolled = false;
+          surfaceDeltaX = 0;
+          surfaceDeltaY = 0;
           currentClientX = event.clientX;
           currentClientY = event.clientY;
           docStartX = event.clientX + window.scrollX;
           docStartY = event.clientY + window.scrollY;
+          dragSurface = findScrollSurfaceAtPoint(event.clientX, event.clientY);
+          dragStartSurfacePt = toSurfacePoint(dragSurface, event.clientX, event.clientY);
           overlay.setPointerCapture(event.pointerId);
           updateSelectionGeometry();
           stopAutoScroll();
@@ -282,8 +316,8 @@
           currentClientX = event.clientX;
           currentClientY = event.clientY;
 
-          const docEndX = currentClientX + window.scrollX;
-          const docEndY = currentClientY + window.scrollY;
+          const docEndX = currentClientX + window.scrollX + surfaceDeltaX;
+          const docEndY = currentClientY + window.scrollY + surfaceDeltaY;
           const finalDocX = Math.min(docStartX, docEndX);
           const finalDocY = Math.min(docStartY, docEndY);
           const cropWidth = Math.abs(docEndX - docStartX);
@@ -306,7 +340,30 @@
             };
             const textBlocks = extractDomTextBlocks(region);
 
-            if (hasScrolled || cropHeight > window.innerHeight) {
+            if (surfaceScrolled && dragSurface && !dragSurface.isDocument && dragStartSurfacePt) {
+              const metrics = dragSurface.getMetrics();
+              const dragEndSurfacePt = toSurfacePoint(dragSurface, currentClientX, currentClientY);
+              const surfRegion = {
+                x: Math.max(0, Math.min(dragStartSurfacePt.x, dragEndSurfacePt.x)),
+                y: Math.max(0, Math.min(dragStartSurfacePt.y, dragEndSurfacePt.y)),
+                width: Math.abs(dragEndSurfacePt.x - dragStartSurfacePt.x),
+                height: Math.abs(dragEndSurfacePt.y - dragStartSurfacePt.y)
+              };
+              surfRegion.x = Math.min(surfRegion.x, metrics.fullWidth - 1);
+              surfRegion.y = Math.min(surfRegion.y, metrics.fullHeight - 1);
+              surfRegion.width = Math.max(5, Math.min(metrics.fullWidth - surfRegion.x, Math.round(surfRegion.width)));
+              surfRegion.height = Math.max(5, Math.min(metrics.fullHeight - surfRegion.y, Math.round(surfRegion.height)));
+              const restoreMotion = suspendPageMotion();
+              const progress = createProgressIndicator();
+              try {
+                const baseline = await stabilizePageDimensions(dragSurface, surfRegion);
+                const prepared = await captureScrollingRegionAttempt(dragSurface, surfRegion, baseline, progress);
+                await openEditor(prepared.blob, prepared.scale, textBlocks);
+              } finally {
+                restoreMotion();
+                if (progress) progress.remove();
+              }
+            } else if (hasScrolled || cropHeight > window.innerHeight) {
               const surface = getDocumentScrollSurface();
               const restoreMotion = suspendPageMotion();
               const progress = createProgressIndicator();
@@ -662,7 +719,7 @@
           if (isDragging && firstPoint && pointerDownPos) {
             const deltaX = Math.abs(event.clientX - pointerDownPos.x);
             const deltaY = Math.abs(event.clientY - pointerDownPos.y);
-            if (deltaX > 10 && deltaY > 10) {
+            if (deltaX > 10 || deltaY > 10) {
               dragSettled = true;
               finish(normalize(firstPoint, surfacePoint(selectedSurface, event.clientX, event.clientY)));
               pointerDownPos = null;

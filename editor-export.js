@@ -20,7 +20,7 @@
         const link = document.createElement('a');
         const title = current.captureRecord && current.captureRecord.title ? current.captureRecord.title : '';
         const baseName = ScionosCaptureUtils.sanitizeFilename(title, 'Scionos_Capture');
-        const dateStr = new Date().toISOString().slice(0, 10);
+        const dateStr = ScionosCaptureUtils.buildLocalTimestamp();
         link.download = `${baseName}_${dateStr}.png`;
         link.href = URL.createObjectURL(blob);
         link.click();
@@ -55,6 +55,7 @@
             reportZoomFit: getI18nText('reportZoomFit'),
             reportZoomReset: getI18nText('reportZoomReset'),
             reportCopied: getI18nText('reportCopied'),
+            reportCopyError: getI18nText('reportCopyError'),
             btnPng: getI18nText('btnPng'),
             btnCopy: getI18nText('btnCopy'),
             btnPrint: getI18nText('btnPrint')
@@ -68,7 +69,7 @@
         const link = document.createElement('a');
         const title = current.captureRecord && current.captureRecord.title ? current.captureRecord.title : '';
         const baseName = ScionosCaptureUtils.sanitizeFilename(title, 'Scionos_Capture');
-        const dateStr = new Date().toISOString().slice(0, 10);
+        const dateStr = ScionosCaptureUtils.buildLocalTimestamp();
         link.download = `${baseName}_${dateStr}.html`;
         link.href = URL.createObjectURL(blob);
         link.click();
@@ -91,34 +92,57 @@
             ? new Date(current.captureRecord.timestamp).toLocaleString(getLanguage())
             : new Date().toLocaleString(getLanguage());
           const dataUrl = URL.createObjectURL(await canvasToBlob());
+          const imageWidth = current.committedSurface.width;
+          const imageHeight = current.committedSurface.height;
+          const escapedTitle = ScionosCaptureUtils.escapeHtml(title);
 
-          const textSpans = (current.activeTextBlocks || []).map(block => {
-            const left = (block.x / current.committedSurface.width * 100).toFixed(3);
-            const top = (block.y / current.committedSurface.height * 100).toFixed(3);
-            const width = (block.width / current.committedSurface.width * 100).toFixed(3);
-            const height = (block.height / current.committedSurface.height * 100).toFixed(3);
-            const fontSize = Math.max(8, Math.round(block.fontSize || 12));
-            if (block.href) {
-              const safeHref = ScionosCaptureUtils.sanitizeUrl(block.href);
-              return `<a href="${ScionosCaptureUtils.escapeHtml(safeHref)}" target="_blank" rel="noopener noreferrer" style="left:${left}%; top:${top}%; width:${width}%; height:${height}%; font-size:${fontSize}px;">${ScionosCaptureUtils.escapeHtml(block.text)}</a>`;
-            }
-            return `<span style="left:${left}%; top:${top}%; width:${width}%; height:${height}%; font-size:${fontSize}px;">${ScionosCaptureUtils.escapeHtml(block.text)}</span>`;
-          }).join('');
-
-          printArea.innerHTML = `
+          const headerHtml = `
             <div class="print-header">
-              <h1>${ScionosCaptureUtils.escapeHtml(title)}</h1>
+              <h1>${escapedTitle}</h1>
               <div class="print-meta">
-                ${rawUrl ? `<span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportSource'))} :</strong> <a href="${ScionosCaptureUtils.escapeHtml(safeUrl)}">${ScionosCaptureUtils.escapeHtml(rawUrl)}</a></span>` : ''}
+                ${rawUrl ? (safeUrl ? `<span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportSource'))} :</strong> <a href="${ScionosCaptureUtils.escapeHtml(safeUrl)}">${ScionosCaptureUtils.escapeHtml(rawUrl)}</a></span>` : `<span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportSource'))} :</strong> <span>${ScionosCaptureUtils.escapeHtml(rawUrl)}</span></span>`) : ''}
                 <span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportDate'))} :</strong> ${ScionosCaptureUtils.escapeHtml(dateFormatted)}</span>
-                <span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportDimensions'))} :</strong> ${current.committedSurface.width} × ${current.committedSurface.height} px</span>
+                <span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportDimensions'))} :</strong> ${imageWidth} × ${imageHeight} px</span>
               </div>
-            </div>
-            <div class="print-image-wrap">
-              <img src="${dataUrl}" alt="${ScionosCaptureUtils.escapeHtml(title)}">
-              <div class="searchable-text-layer" aria-hidden="true">${textSpans}</div>
-            </div>
-          `;
+            </div>`;
+
+          // Paginate tall captures into portrait page slices so no page
+          // overflows: each slice keeps its own searchable text layer.
+          const slices = ScionosCaptureUtils.buildPrintSlicePlan(imageWidth, imageHeight);
+          let pagesHtml = '';
+          if (slices.length === 1 && slices[0].single) {
+            const textSpans = ScionosCaptureUtils.buildTextLayerSpans(
+              current.activeTextBlocks, imageWidth, imageHeight
+            );
+            pagesHtml = `<div class="print-page">${headerHtml}
+              <div class="print-image-wrap">
+                <img src="${dataUrl}" alt="${escapedTitle}">
+                <div class="searchable-text-layer" aria-hidden="true">${textSpans}</div>
+              </div>
+            </div>`;
+          } else {
+            for (const slice of slices) {
+              const sliceTop = slice.top;
+              const sliceH = slice.height;
+              const shifted = ScionosCaptureUtils.shiftAndCropTextBlocks(
+                current.activeTextBlocks || [],
+                { x: 0, y: sliceTop, width: imageWidth, height: sliceH }
+              );
+              const textSpans = ScionosCaptureUtils.buildTextLayerSpans(shifted, imageWidth, sliceH);
+              const offsetPercent = (sliceTop / imageHeight * 100).toFixed(3);
+              const pageHeader = sliceTop === 0
+                ? headerHtml
+                : `<div class="print-header print-continued"><h2>${escapedTitle}</h2></div>`;
+              pagesHtml += `<div class="print-page">${pageHeader}
+                <div class="print-slice" style="aspect-ratio: ${imageWidth} / ${sliceH};">
+                  <img src="${dataUrl}" alt="${escapedTitle}" style="transform: translateY(-${offsetPercent}%);">
+                  <div class="searchable-text-layer" aria-hidden="true">${textSpans}</div>
+                </div>
+              </div>`;
+            }
+          }
+
+          printArea.innerHTML = pagesHtml;
           const revokePrintUrl = () => {
             URL.revokeObjectURL(dataUrl);
             window.removeEventListener('afterprint', revokePrintUrl);

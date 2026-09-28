@@ -3,12 +3,26 @@
   function createContentTransfer({ Utils, text }) {
 
     async function captureVisibleTab() {
-      const response = await sendMessage({ action: 'CAPTURE_VISIBLE_TAB' });
-      if (!response || !response.success) {
+      const retryDelays = [0, 400, 900];
+      let lastError;
+      for (let attempt = 0; attempt < retryDelays.length; attempt += 1) {
+        if (retryDelays[attempt]) await Utils.delay(retryDelays[attempt]);
+        let response;
+        try {
+          response = await sendMessage({ action: 'CAPTURE_VISIBLE_TAB' });
+        } catch (error) {
+          lastError = error;
+          continue;
+        }
+        if (response && response.success) return response;
         if (response && response.errorCode === 'TAB_CHANGED') throw new Error(text('tabChangedError'));
+        if (response && response.errorCode === 'RATE_LIMITED') {
+          lastError = new Error(response.error || 'Capture failed.');
+          continue;
+        }
         throw new Error(response && response.error ? response.error : 'Capture failed.');
       }
-      return response;
+      throw lastError || new Error('Capture failed.');
     }
 
     async function openEditor(blob, scale, textBlocks = []) {

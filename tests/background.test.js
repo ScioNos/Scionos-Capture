@@ -101,8 +101,9 @@ test('service worker persists a chunked PNG, opens the editor, and deletes it af
     action: 'ACK_CAPTURE_LOADED', captureId: complete.captureId
   }, { id: 'test-extension', tab: { id: editorTabId, windowId: 3 }, url: 'chrome-extension://test-extension/editor.html?capture=' + complete.captureId });
   assert.equal(acknowledgement.success, true);
-  assert.equal(await CaptureStore.getCapture(complete.captureId), undefined);
+  assert.equal((await CaptureStore.getCapture(complete.captureId)).title, 'Test');
   assert.equal(harness.sessionValues[mapping[0]], undefined);
+  await CaptureStore.deleteCapture(complete.captureId);
 });
 
 test('service worker rejects out-of-order chunks', async () => {

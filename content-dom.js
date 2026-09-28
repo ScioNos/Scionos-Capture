@@ -53,8 +53,8 @@
               docBottom > targetTop &&
               docTop < targetBottom
             ) {
-              const computed = window.getComputedStyle(parent);
-              if (computed.visibility !== 'hidden' && computed.display !== 'none' && parseFloat(computed.opacity || '1') > 0.05) {
+              if (isRenderedVisible(parent)) {
+                const computed = window.getComputedStyle(parent);
                 const link = parent.closest('a');
                 blocks.push({
                   text: currentNode.nodeValue.trim(),
@@ -77,6 +77,20 @@
         console.warn('DOM text extraction failed:', _error);
       }
       return blocks;
+    }
+
+    function isRenderedVisible(element) {
+      try {
+        if (element && typeof element.checkVisibility === 'function') {
+          return element.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true });
+        }
+      } catch {
+        // Fall through to the computed-style check below.
+      }
+      const computed = window.getComputedStyle(element);
+      return computed.visibility !== 'hidden'
+        && computed.display !== 'none'
+        && parseFloat(computed.opacity || '1') > 0.05;
     }
 
     function getDocumentScrollSurface() {
@@ -152,25 +166,27 @@
 
     function isVisibleScrollCandidate(element) {
       if (!element || element === document.documentElement || element.closest('[data-scionos-capture]')) return false;
+      if (element.scrollWidth <= element.clientWidth + 2 && element.scrollHeight <= element.clientHeight + 2) return false;
+      const rect = element.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0
+        || rect.left < -8 || rect.top < -8
+        || rect.right > window.innerWidth + 8 || rect.bottom > window.innerHeight + 8) return false;
       const styles = getComputedStyle(element);
       const canScrollX = element.scrollWidth > element.clientWidth + 2
         && SCROLLABLE_OVERFLOW_VALUES.has(styles.overflowX);
       const canScrollY = element.scrollHeight > element.clientHeight + 2
         && SCROLLABLE_OVERFLOW_VALUES.has(styles.overflowY);
-      if (!canScrollX && !canScrollY) return false;
-
-      const rect = element.getBoundingClientRect();
-      return rect.width > 0
-        && rect.height > 0
-        && rect.left >= -8
-        && rect.top >= -8
-        && rect.right <= window.innerWidth + 8
-        && rect.bottom <= window.innerHeight + 8;
+      return canScrollX || canScrollY;
     }
 
     function isScrollableElement(element) {
       if (!element || element === document.documentElement || element === document.body) return false;
       if (element.closest && element.closest('[data-scionos-capture]')) return false;
+      if (element.scrollWidth <= element.clientWidth + 2 && element.scrollHeight <= element.clientHeight + 2) return false;
+      const rect = element.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0
+        || rect.bottom <= 0 || rect.top >= window.innerHeight
+        || rect.right <= 0 || rect.left >= window.innerWidth) return false;
       const styles = getComputedStyle(element);
       if (styles.display === 'none' || styles.visibility === 'hidden') return false;
       const canScrollX = element.scrollWidth > element.clientWidth + 2
@@ -179,13 +195,7 @@
         && SCROLLABLE_OVERFLOW_VALUES.has(styles.overflowY);
       if (!canScrollX && !canScrollY) return false;
 
-      const rect = element.getBoundingClientRect();
-      return rect.width > 0
-        && rect.height > 0
-        && rect.bottom > 0
-        && rect.top < window.innerHeight
-        && rect.right > 0
-        && rect.left < window.innerWidth;
+      return true;
     }
 
     function findScrollSurface() {
@@ -218,9 +228,15 @@
 
       // Strategy 2: If clicked on a header, border or non-scrollable wrapper (e.g. Messenger chat header/dock),
       // inspect enclosing container cards/dialogs under the point for scrollable descendants
+      const scannedContainers = new Set();
       for (const element of elements) {
         let container = element;
         while (container && container !== document.body && container !== document.documentElement) {
+          if (scannedContainers.has(container)) {
+            container = container.parentElement;
+            continue;
+          }
+          scannedContainers.add(container);
           const scrollableChildren = Array.from(container.querySelectorAll('*')).filter(isScrollableElement);
           if (scrollableChildren.length > 0) {
             scrollableChildren.sort((first, second) => {
@@ -333,6 +349,7 @@
 
     function createAnchoredElementManager(surface, captureBounds) {
       let hidden = [];
+      let scanned = null;
       const bounds = captureBounds || (surface.isDocument
         ? { left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight }
         : surface.getCaptureRect());
@@ -381,9 +398,15 @@
       return {
         prepare(tileIndex = 0, totalTiles = 1) {
           hidden = [];
-          for (const element of document.querySelectorAll('body *')) {
-            const anchorType = classifyElement(element);
-            if (!anchorType) continue;
+          if (!scanned) {
+            scanned = [];
+            for (const element of document.querySelectorAll('body *')) {
+              const anchorType = classifyElement(element);
+              if (anchorType) scanned.push({ element, anchorType });
+            }
+          }
+          for (const { element, anchorType } of scanned) {
+            if (!element.isConnected) continue;
 
             const shouldHide = (anchorType === 'top' && tileIndex > 0)
               || (anchorType === 'bottom' && tileIndex < totalTiles - 1 && totalTiles > 1);

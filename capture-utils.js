@@ -205,7 +205,43 @@
       .replace(/_+/g, '_')
       .replace(/^_+|_+$/g, '');
     if (!clean || clean.toLowerCase() === 'screenshot' || clean.toLowerCase() === 'capture') return fallback;
-    return clean.slice(0, maxLength).replace(/_+$/, '') || fallback;
+    return [...clean].slice(0, maxLength).join('').replace(/_+$/, '') || fallback;
+  }
+
+  function buildTextLayerSpans(textBlocks, imageWidth, imageHeight) {
+    if (!Array.isArray(textBlocks) || !Number(imageWidth) || !Number(imageHeight)) return '';
+    return textBlocks.map(block => {
+      const left = (block.x / imageWidth * 100).toFixed(3);
+      const top = (block.y / imageHeight * 100).toFixed(3);
+      const width = (block.width / imageWidth * 100).toFixed(3);
+      const height = (block.height / imageHeight * 100).toFixed(3);
+      const fontSize = Math.max(8, Math.round(block.fontSize || 12));
+      if (block.url) {
+        const safeHref = sanitizeUrl(block.url);
+        return `<a href="${escapeHtml(safeHref)}" target="_blank" rel="noopener noreferrer" style="left:${left}%; top:${top}%; width:${width}%; height:${height}%; font-size:${fontSize}px;">${escapeHtml(block.text)}</a>`;
+      }
+      return `<span style="left:${left}%; top:${top}%; width:${width}%; height:${height}%; font-size:${fontSize}px;">${escapeHtml(block.text)}</span>`;
+    }).join('');
+  }
+
+  function buildPrintSlicePlan(imageWidth, imageHeight, ratio = 1.3, maxPages = 30) {
+    const width = Math.max(1, Math.floor(Number(imageWidth) || 0));
+    const height = Math.max(1, Math.floor(Number(imageHeight) || 0));
+    const sliceHeight = Math.max(1, Math.round(width * Math.max(0.5, Number(ratio) || 1.3)));
+    const count = Math.ceil(height / sliceHeight);
+    if (count <= 1 || count > Math.max(1, Math.floor(Number(maxPages) || 30))) {
+      return [{ top: 0, height, single: true }];
+    }
+    const slices = [];
+    for (let top = 0; top < height; top += sliceHeight) {
+      slices.push({ top, height: Math.min(sliceHeight, height - top), single: false });
+    }
+    return slices;
+  }
+
+  function buildLocalTimestamp(date = new Date()) {
+    const pad = value => String(value).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}_${pad(date.getHours())}-${pad(date.getMinutes())}`;
   }
 
   function buildHtmlReport(options = {}) {
@@ -228,6 +264,7 @@
     const txtCopy = texts.btnCopy || 'Copier';
     const txtPrint = texts.btnPrint || 'Imprimer';
     const txtCopied = texts.reportCopied || 'Image copiée dans le presse-papiers.';
+    const txtCopyError = texts.reportCopyError || 'Copy failed: ';
     const txtAppName = texts.appName || 'Scionos Capture';
 
     const escapedTitle = escapeHtml(title);
@@ -591,7 +628,7 @@
           await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
           showToast(${JSON.stringify(txtCopied)});
         } catch (err) {
-          showToast('Erreur: ' + err.message);
+          showToast(${JSON.stringify(txtCopyError)} + err.message);
         }
       });
 
@@ -727,6 +764,9 @@
     escapeHtml,
     sanitizeUrl,
     sanitizeFilename,
+    buildLocalTimestamp,
+    buildTextLayerSpans,
+    buildPrintSlicePlan,
     buildHtmlReport,
     blobToDataUrl,
     delay,

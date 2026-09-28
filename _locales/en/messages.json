@@ -164,6 +164,9 @@
   "toolDraw": {
     "message": "Draw"
   },
+  "toolHighlight": {
+    "message": "Highlighter"
+  },
   "toolCensor": {
     "message": "Mask"
   },
@@ -305,6 +308,9 @@
   "reportCopied": {
     "message": "Image copied to the clipboard."
   },
+  "reportCopyError": {
+    "message": "Copy failed: "
+  },
   "printOpened": {
     "message": "Print dialog opened."
   },
@@ -353,6 +359,18 @@
   "labelBgColor": {
     "message": "Background"
   },
+  "textBgBlack": {
+    "message": "Black"
+  },
+  "textBgRed": {
+    "message": "Red"
+  },
+  "textBgBlue": {
+    "message": "Blue"
+  },
+  "textBgTransparent": {
+    "message": "Transparent"
+  },
   "btnHelp": {
     "message": "Help & About"
   },
@@ -400,6 +418,9 @@
   },
   "helpShortcutDraw": {
     "message": "Freehand brush"
+  },
+  "helpShortcutHighlight": {
+    "message": "Highlighter"
   },
   "helpShortcutCensor": {
     "message": "Mask / Blur"
