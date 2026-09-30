@@ -11,6 +11,7 @@ const MAX_METADATA_LENGTH = 4096;
 
 let captureQueue = Promise.resolve();
 let lastCaptureStartedAt = 0;
+let storageInitialization = Promise.resolve();
 
 const alarmName = captureId => CAPTURE_ALARM_PREFIX + captureId;
 const transferAlarmName = transferId => TRANSFER_ALARM_PREFIX + transferId;
@@ -43,7 +44,53 @@ async function cleanupTransfer(transferId, { clearAlarm = true } = {}) {
   if (clearAlarm) await chrome.alarms.clear(transferAlarmName(transferId));
 }
 
-async function initializeStorage() {
+function editorCaptureId(tab) {
+  try {
+    const url = new URL(tab.pendingUrl || tab.url);
+    const editor = new URL(chrome.runtime.getURL('editor.html'));
+    return url.protocol === editor.protocol && url.host === editor.host && url.pathname === editor.pathname
+      ? url.searchParams.get('capture') : null;
+  } catch { return null; }
+}
+
+async function getExtensionTabContexts() {
+  if (typeof chrome.runtime.getContexts !== 'function') return null;
+  try {
+    return await chrome.runtime.getContexts({ contextTypes: ['TAB'] });
+  } catch (error) {
+    console.warn('Extension tab context lookup failed:', error);
+    return null;
+  }
+}
+
+async function getOpenCaptureIds(excludedTabId = null) {
+  const contexts = await getExtensionTabContexts();
+  if (contexts) {
+    return new Set(contexts
+      .filter(context => context.tabId !== excludedTabId)
+      .map(context => editorCaptureId({ url: context.documentUrl }))
+      .filter(Boolean));
+  }
+
+  const [tabs, stored] = await Promise.all([chrome.tabs.query({}), chrome.storage.session.get(null)]);
+  const activeTabIds = new Set(tabs.filter(tab => tab.id !== excludedTabId).map(tab => tab.id));
+  const captureIds = new Set(tabs
+    .filter(tab => tab.id !== excludedTabId)
+    .map(editorCaptureId)
+    .filter(Boolean));
+  Object.entries(stored).forEach(([key, captureId]) => {
+    const tabId = Number(key.slice(TAB_MAPPING_PREFIX.length));
+    if (key.startsWith(TAB_MAPPING_PREFIX) && activeTabIds.has(tabId)) captureIds.add(captureId);
+  });
+  return captureIds;
+}
+
+function initializeStorage() {
+  storageInitialization = storageInitialization.then(reconcileStorage);
+  return storageInitialization;
+}
+
+async function reconcileStorage() {
   try {
     await chrome.storage.local.setAccessLevel({ accessLevel: 'TRUSTED_CONTEXTS' });
     await chrome.storage.session.setAccessLevel({ accessLevel: 'TRUSTED_CONTEXTS' });
@@ -52,10 +99,43 @@ async function initializeStorage() {
   }
   try {
     await chrome.storage.local.remove('captureData');
-    await CaptureStore.purgeExpiredCaptures(CAPTURE_TTL_MS);
     await CaptureStore.purgeExpiredTransfers();
-    const [captures, transfers] = await Promise.all([CaptureStore.listCaptures(), CaptureStore.listTransfers()]);
-    await Promise.all([...captures.map(scheduleExpiry), ...transfers.map(scheduleTransferExpiry)]);
+    const [captures, transfers, tabs, stored, contexts] = await Promise.all([
+      CaptureStore.listCaptures(), CaptureStore.listTransfers(), chrome.tabs.query({}),
+      chrome.storage.session.get(null), getExtensionTabContexts()
+    ]);
+    const existingIds = new Set(captures.map(record => record.id));
+    const mappings = {};
+    if (contexts) {
+      for (const context of contexts) {
+        const id = editorCaptureId({ url: context.documentUrl });
+        if (Number.isInteger(context.tabId) && context.tabId >= 0 && id && existingIds.has(id)) {
+          mappings[mappingKey(context.tabId)] = id;
+        }
+      }
+    } else {
+      for (const tab of tabs) {
+        const id = editorCaptureId(tab);
+        if (id && existingIds.has(id)) mappings[mappingKey(tab.id)] = id;
+      }
+      const tabsById = new Map(tabs.map(tab => [tab.id, tab]));
+      for (const [key, id] of Object.entries(stored)) {
+        if (!key.startsWith(TAB_MAPPING_PREFIX) || !existingIds.has(id) || mappings[key]) continue;
+        const tabId = Number(key.slice(TAB_MAPPING_PREFIX.length));
+        const tab = tabsById.get(tabId);
+        if (tab && typeof tab.url !== 'string' && typeof tab.pendingUrl !== 'string') mappings[key] = id;
+      }
+    }
+    const staleKeys = Object.keys(stored).filter(key => key.startsWith(TAB_MAPPING_PREFIX) && stored[key] !== mappings[key]);
+    if (staleKeys.length) await chrome.storage.session.remove(staleKeys);
+    if (Object.keys(mappings).length) await chrome.storage.session.set(mappings);
+    const activeIds = new Set(Object.values(mappings));
+    for (const record of captures) {
+      if (activeIds.has(record.id)) await chrome.alarms.clear(alarmName(record.id));
+      else if ((Number(record.expiresAt) || record.createdAt + CAPTURE_TTL_MS) <= Date.now()) await cleanupCapture(record.id);
+      else await scheduleExpiry(record);
+    }
+    await Promise.all(transfers.map(scheduleTransferExpiry));
   } catch (error) {
     console.warn('Temporary capture initialization failed:', error);
   }
@@ -127,6 +207,8 @@ async function openEditorFromBlob(blob, metadata = {}) {
     timestamp: new Date(createdAt).toISOString(),
     scale: Number.isFinite(numericScale) ? Math.max(0.01, Math.min(1, numericScale)) : 1,
     textBlocks: Array.isArray(metadata.textBlocks) ? metadata.textBlocks : [],
+    textCoordinateSpace: metadata.textCoordinateSpace === 'bitmap' ? 'bitmap' : null,
+    textLayerLimited: Boolean(metadata.textLayerLimited),
     createdAt,
     expiresAt: createdAt + CAPTURE_TTL_MS
   };
@@ -158,6 +240,8 @@ async function beginTransfer(message, senderTab) {
     title: safeMetadata(message.title, 'Screenshot'), url: safeMetadata(message.url),
     scale: Number.isFinite(Number(message.scale)) ? Math.max(0.01, Math.min(1, Number(message.scale))) : 1,
     textBlocks: Array.isArray(message.textBlocks) ? message.textBlocks : [],
+    textCoordinateSpace: message.textCoordinateSpace === 'bitmap' ? 'bitmap' : null,
+    textLayerLimited: Boolean(message.textLayerLimited),
     createdAt, expiresAt: createdAt + TRANSFER_TTL_MS
   };
   await CaptureStore.putTransfer(record);
@@ -227,53 +311,86 @@ function isEditorSender(sender) {
   try {
     const url = new URL(sender.url);
     const editorUrl = new URL(chrome.runtime.getURL('editor.html'));
-    return url.origin === editorUrl.origin && url.pathname === editorUrl.pathname;
+    return url.protocol === editorUrl.protocol && url.host === editorUrl.host && url.pathname === editorUrl.pathname;
   } catch { return false; }
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (!message || typeof message.action !== 'string' || !isTrustedTabSender(sender)) return;
-  let operation;
-  if (message.action === 'CAPTURE_VISIBLE_TAB') operation = enqueueVisibleCapture(sender.tab).then(dataUrl => ({ success: true, dataUrl }));
-  else if (message.action === 'BEGIN_CAPTURE_TRANSFER') operation = beginTransfer(message, sender.tab);
-  else if (message.action === 'APPEND_CAPTURE_CHUNK') operation = appendTransferChunk(message, sender.tab);
-  else if (message.action === 'COMPLETE_CAPTURE_TRANSFER') operation = completeTransfer(message, sender.tab);
-  else if (message.action === 'ABORT_CAPTURE_TRANSFER') operation = getOwnedTransfer(message.transferId, sender.tab)
-    .then(transfer => cleanupTransfer(transfer.id)).then(() => ({ success: true }));
-  else if (message.action === 'ACK_CAPTURE_LOADED' && isEditorSender(sender)) {
-    operation = chrome.storage.session.get(mappingKey(sender.tab.id)).then(async stored => {
-      const key = mappingKey(sender.tab.id);
-      const captureId = stored[key];
-      if (!captureId || captureId !== message.captureId) throw new Error('Invalid editor capture acknowledgement.');
-      await chrome.storage.session.remove(key);
-      return { success: true };
-    });
-  } else return;
-  Promise.resolve(operation).then(sendResponse).catch(error => {
+  if (!['CAPTURE_VISIBLE_TAB', 'BEGIN_CAPTURE_TRANSFER', 'APPEND_CAPTURE_CHUNK',
+    'COMPLETE_CAPTURE_TRANSFER', 'ABORT_CAPTURE_TRANSFER', 'ACK_CAPTURE_LOADED'].includes(message.action)) return;
+  storageInitialization.then(() => {
+    let operation;
+    if (message.action === 'CAPTURE_VISIBLE_TAB') operation = enqueueVisibleCapture(sender.tab).then(dataUrl => ({ success: true, dataUrl }));
+    else if (message.action === 'BEGIN_CAPTURE_TRANSFER') operation = beginTransfer(message, sender.tab);
+    else if (message.action === 'APPEND_CAPTURE_CHUNK') operation = appendTransferChunk(message, sender.tab);
+    else if (message.action === 'COMPLETE_CAPTURE_TRANSFER') operation = completeTransfer(message, sender.tab);
+    else if (message.action === 'ABORT_CAPTURE_TRANSFER') operation = getOwnedTransfer(message.transferId, sender.tab)
+      .then(transfer => cleanupTransfer(transfer.id)).then(() => ({ success: true }));
+    else if (message.action === 'ACK_CAPTURE_LOADED' && isEditorSender(sender)) {
+      operation = chrome.storage.session.get(mappingKey(sender.tab.id)).then(async stored => {
+        const key = mappingKey(sender.tab.id);
+        const captureId = stored[key];
+        if (!captureId || captureId !== message.captureId) throw new Error('Invalid editor capture acknowledgement.');
+        await chrome.alarms.clear(alarmName(captureId));
+        return { success: true };
+      });
+    } else return;
+    return operation;
+  }).then(sendResponse).catch(error => {
     console.error(message.action + ' failed:', error);
     sendResponse({ success: false, error: error.message || 'Capture operation failed.', errorCode: error.code || '' });
   });
   return true;
 });
 
-chrome.alarms.onAlarm.addListener(alarm => {
-  if (alarm.name.startsWith(CAPTURE_ALARM_PREFIX)) {
-    cleanupCapture(alarm.name.slice(CAPTURE_ALARM_PREFIX.length), { clearAlarm: false }).catch(error => console.warn('Capture expiry failed:', error));
-  } else if (alarm.name.startsWith(TRANSFER_ALARM_PREFIX)) {
-    cleanupTransfer(alarm.name.slice(TRANSFER_ALARM_PREFIX.length), { clearAlarm: false }).catch(error => console.warn('Transfer expiry failed:', error));
-  }
+chrome.alarms.onAlarm.addListener(async alarm => {
+  await storageInitialization;
+  try {
+    if (alarm.name.startsWith(CAPTURE_ALARM_PREFIX)) {
+      const id = alarm.name.slice(CAPTURE_ALARM_PREFIX.length);
+      const openCaptureIds = await getOpenCaptureIds();
+      if (openCaptureIds.has(id)) {
+        await chrome.alarms.clear(alarm.name);
+      } else {
+        const record = await CaptureStore.getCapture(id);
+        if (record && (Number(record.expiresAt) || record.createdAt + CAPTURE_TTL_MS) > Date.now()) await scheduleExpiry(record);
+        else await cleanupCapture(id, { clearAlarm: false });
+      }
+    } else if (alarm.name.startsWith(TRANSFER_ALARM_PREFIX)) {
+      const id = alarm.name.slice(TRANSFER_ALARM_PREFIX.length);
+      const transfer = await CaptureStore.getTransfer(id);
+      if (transfer && transfer.expiresAt > Date.now()) await scheduleTransferExpiry(transfer);
+      else await cleanupTransfer(id, { clearAlarm: false });
+    }
+  } catch (error) { console.warn('Temporary capture expiry failed:', error); }
 });
 
 chrome.tabs.onRemoved.addListener(async tabId => {
   try {
+    await storageInitialization;
     const key = mappingKey(tabId);
     const stored = await chrome.storage.session.get(key);
-    if (stored[key]) await cleanupCapture(stored[key]);
+    if (stored[key]) {
+      const openCaptureIds = await getOpenCaptureIds(tabId);
+      if (!openCaptureIds.has(stored[key])) await cleanupCapture(stored[key]);
+      else await chrome.storage.session.remove(key);
+    }
     const transfers = await CaptureStore.listTransfersByOwner(tabId);
     await Promise.all(transfers.map(transfer => cleanupTransfer(transfer.id)));
   } catch (error) {
     console.warn('Capture cleanup failed:', error);
   }
+});
+
+// Navigation away from an editor makes its capture orphaned, even if the tab stays open.
+chrome.tabs.onUpdated.addListener(async (tabId, change) => {
+  if (!change.url) return;
+  const key = mappingKey(tabId);
+  const stored = await chrome.storage.session.get(key);
+  const captureId = editorCaptureId({ url: change.url });
+  if (stored[key] && stored[key] !== captureId) await chrome.storage.session.remove(key);
+  if (stored[key] || captureId) await initializeStorage();
 });
 
 initializeStorage();

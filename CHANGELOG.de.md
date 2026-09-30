@@ -4,6 +4,20 @@
 
 ## [Unveröffentlicht]
 
+## [1.3.2] - 2026-09-30
+
+### Behoben
+
+- CSS-, Container- und Bildkoordinaten vereinheitlicht; Auswahl mit automatischem Seitenscrollen korrigiert; Textmetadaten an DPR und Bildverkleinerungen angepasst.
+- Bereits erfasste Bereiche werden nicht mehr überschrieben; feste und haftende Elemente werden pro Kachel neu bewertet, einschließlich Positionsänderungen und zunächst unsichtbarer Elemente.
+- PDF: Text pro Kachel erfasst; verdeckte, unsichtbare und teilweise abgeschnittene Wörter ausgelassen; Zuschnitt und Maskierung an Bildpixeln ausgerichtet; ältere Ebenen mit ungeprüften Koordinaten ausgelassen.
+- Editor: lange URLs begrenzt, Anpassung an verfügbare Breite, Texteingabefokus und natives Rückgängigmachen erhalten, Schrittzähler nach Wiederherstellung und asynchrone Verlaufskonsolidierung korrigiert.
+- Aufnahmen bleiben bei geöffnetem Editor erhalten und werden beim Schließen gelöscht; verwaiste Aufnahmen und abgebrochene Übertragungen laufen ab; Zuordnungen werden beim Aufwachen wiederhergestellt.
+
+### Wartung und Validierung
+
+- Zeitbudgets für Stabilisierung und Texterfassung begrenzt; transitive Abhängigkeiten aktualisiert; Tests mit echten Pixeln, vier Skalierungen und Textextraktion aus erzeugten PDFs ergänzt.
+
 ## [1.3.1] - 2026-09-28
 
 ### Hinzugefügt
@@ -117,7 +131,8 @@
 - Vollständige 4-Sprachen-Unterstützung: Französisch, Englisch, Spanisch und Deutsch.
 - Volle Barrierefreiheit (WCAG, hohe Kontraste, Tastaturnavigation, Screenreader).
 
-[Unveröffentlicht]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.1...HEAD
+[Unveröffentlicht]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.2...HEAD
+[1.3.2]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.1...v1.2.0

@@ -25,12 +25,12 @@
     async function executeVisibleCapture() {
       try {
         const response = await captureVisibleTab();
-        const prepared = await prepareDataUrlForEditor(response.dataUrl);
         const textBlocks = extractDomTextBlocks({
-          left: window.scrollX, top: window.scrollY,
+          x: window.scrollX, y: window.scrollY,
           width: window.innerWidth, height: window.innerHeight
         });
-        await openEditor(prepared.blob, prepared.scale, textBlocks);
+        const prepared = await prepareDataUrlForEditor(response.dataUrl, textBlocks);
+        await openPreparedCapture(prepared);
       } catch (error) {
         console.error('Visible capture failed:', error);
         alert(text('visibleError') + error.message);
@@ -58,11 +58,7 @@
           await Utils.waitForPaint();
           try {
             const prepared = await captureFullPageAttempt(surface, baseline, progress);
-            const metrics = surface.getMetrics();
-            const textBlocks = extractDomTextBlocks({
-              left: 0, top: 0, width: metrics.fullWidth, height: metrics.fullHeight
-            });
-            await openEditor(prepared.blob, prepared.scale, textBlocks);
+            await openPreparedCapture(prepared);
             return;
           } catch (error) {
             if (error.code !== 'LAYOUT_CHANGED' || attempt > 0) throw error;
@@ -79,6 +75,24 @@
       }
     }
 
+    async function openPreparedCapture(prepared) {
+      await openEditor(prepared.blob, prepared.scale, prepared.textBlocks, prepared.textLayerLimited);
+    }
+
+    function collectTileText(blocks, surface, region, written) {
+      const tileBlocks = extractDomTextBlocks(written, surface);
+      blocks.limited = blocks.limited || tileBlocks.limited;
+      // Only disjoint written strips contribute text, including the final overlapping tile.
+      for (const block of tileBlocks) {
+        const adjusted = { ...block, x: block.x + written.x - region.x, y: block.y + written.y - region.y };
+        const key = [adjusted.text, adjusted.x.toFixed(2), adjusted.y.toFixed(2)].join(':');
+        if (blocks.keys.has(key)) continue;
+        if (blocks.items.length >= 1500) { blocks.limited = true; break; }
+        blocks.keys.add(key);
+        blocks.items.push(adjusted);
+      }
+    }
+
     async function captureFullPageAttempt(surface, baseline, progress) {
       const { fullWidth, fullHeight, viewportWidth, viewportHeight } = baseline;
       const grid = Utils.buildCaptureGrid(fullWidth, fullHeight, viewportWidth, viewportHeight);
@@ -87,6 +101,9 @@
       let context;
       let outputScale = 1;
       let bitmapSize;
+      const blocks = { items: [], keys: new Set(), limited: false };
+      const xPositions = Utils.buildScrollPositions(fullWidth, viewportWidth);
+      const yPositions = Utils.buildScrollPositions(fullHeight, viewportHeight);
 
       for (let index = 0; index < grid.length; index += 1) {
         const target = grid[index];
@@ -98,13 +115,26 @@
         const percent = Math.round(((index + 1) / grid.length) * 100);
         updateProgress(progress, percent, outputScale < 0.9999);
 
-        anchored.prepare(index, grid.length);
+        const column = index % xPositions.length;
+        const row = Math.floor(index / xPositions.length);
+        const startX = column ? xPositions[column - 1] + viewportWidth : actual.x;
+        const startY = row ? yPositions[row - 1] + viewportHeight : actual.y;
+        const written = { x: startX, y: startY,
+          width: Math.min(fullWidth, actual.x + viewportWidth) - startX,
+          height: Math.min(fullHeight, actual.y + viewportHeight) - startY };
+        const origin = surface.isDocument ? { left: 0, top: 0 } : surface.getCaptureRect();
+        anchored.prepare(index, grid.length, {
+          left: origin.left + startX - actual.x, top: origin.top + startY - actual.y,
+          right: origin.left + startX + written.width - actual.x,
+          bottom: origin.top + startY + written.height - actual.y
+        });
         progress.style.visibility = 'hidden';
         let image;
         try {
           await Utils.waitForPaint();
           const response = await captureVisibleTab();
           image = await loadImage(response.dataUrl);
+          collectTileText(blocks, surface, { x: 0, y: 0 }, written);
         } finally {
           progress.style.visibility = 'visible';
           anchored.restore();
@@ -125,21 +155,29 @@
           updateProgress(progress, percent, dimensions.reduced);
         }
 
+        const sourceX = Math.round((written.x - actual.x) * capture.scaleX);
+        const sourceY = Math.round((written.y - actual.y) * capture.scaleY);
+        const sourceRight = Math.min(capture.crop.width, Math.round((written.x + written.width - actual.x) * capture.scaleX));
+        const sourceBottom = Math.min(capture.crop.height, Math.round((written.y + written.height - actual.y) * capture.scaleY));
         const destination = Utils.computeTileDestination(
-          actual.x, actual.y, capture.crop.width, capture.crop.height,
-          capture.scaleX, capture.scaleY, outputScale
+          written, fullWidth, fullHeight, canvas.width, canvas.height
         );
         context.drawImage(
-          image, capture.crop.x, capture.crop.y, capture.crop.width, capture.crop.height,
+          image, capture.crop.x + sourceX, capture.crop.y + sourceY, sourceRight - sourceX, sourceBottom - sourceY,
           destination.x, destination.y, destination.width, destination.height
         );
       }
 
-      return prepareCanvasForEditor(canvas, outputScale);
+      return prepareCanvasForEditor(canvas, outputScale,
+        Utils.scaleTextBlocks(blocks.items, canvas.width / fullWidth, canvas.height / fullHeight), blocks.limited);
     }
 
     function executeZoneCapture() {
       return new Promise(resolve => {
+        const originalDocumentPosition = { x: window.scrollX, y: window.scrollY };
+        const scrollState = ScionosContentUtils.createScrollSurfaceStateTracker();
+        scrollState.remember(getDocumentScrollSurface());
+        const previousFocus = document.activeElement;
         const overlay = document.createElement('div');
         overlay.dataset.scionosCapture = 'selection';
         Object.assign(overlay.style, {
@@ -198,6 +236,9 @@
           disposed = true;
           stopAutoScroll();
           overlay.remove();
+          scrollState.restore();
+          window.scrollTo(originalDocumentPosition.x, originalDocumentPosition.y);
+          if (previousFocus && previousFocus.isConnected) previousFocus.focus({ preventScroll: true });
           window.removeEventListener('keydown', onKeyDown, true);
           resolve();
         };
@@ -295,6 +336,7 @@
           docStartX = event.clientX + window.scrollX;
           docStartY = event.clientY + window.scrollY;
           dragSurface = findScrollSurfaceAtPoint(event.clientX, event.clientY);
+          scrollState.remember(dragSurface);
           dragStartSurfacePt = toSurfacePoint(dragSurface, event.clientX, event.clientY);
           overlay.setPointerCapture(event.pointerId);
           updateSelectionGeometry();
@@ -331,14 +373,14 @@
 
           try {
             const region = {
-              left: Math.round(finalDocX),
-              top: Math.round(finalDocY),
+              x: Math.round(finalDocX),
+              y: Math.round(finalDocY),
               width: Math.round(cropWidth),
               height: Math.round(cropHeight),
               fullWidth: Math.round(cropWidth),
               fullHeight: Math.round(cropHeight)
             };
-            const textBlocks = extractDomTextBlocks(region);
+
 
             if (surfaceScrolled && dragSurface && !dragSurface.isDocument && dragStartSurfacePt) {
               const metrics = dragSurface.getMetrics();
@@ -358,7 +400,7 @@
               try {
                 const baseline = await stabilizePageDimensions(dragSurface, surfRegion);
                 const prepared = await captureScrollingRegionAttempt(dragSurface, surfRegion, baseline, progress);
-                await openEditor(prepared.blob, prepared.scale, textBlocks);
+                await openPreparedCapture(prepared);
               } finally {
                 restoreMotion();
                 if (progress) progress.remove();
@@ -370,7 +412,7 @@
               try {
                 const baseline = await stabilizePageDimensions(surface, region);
                 const prepared = await captureScrollingRegionAttempt(surface, region, baseline, progress);
-                await openEditor(prepared.blob, prepared.scale, textBlocks);
+                await openPreparedCapture(prepared);
               } finally {
                 restoreMotion();
                 if (progress) progress.remove();
@@ -397,8 +439,11 @@
                 Math.round(viewX * scaleX), Math.round(viewY * scaleY), canvas.width, canvas.height,
                 0, 0, canvas.width, canvas.height
               );
-              const prepared = await prepareCanvasForEditor(canvas);
-              await openEditor(prepared.blob, prepared.scale, textBlocks);
+              const textBlocks = extractDomTextBlocks(region);
+              const prepared = await prepareCanvasForEditor(canvas, 1,
+                Utils.scaleTextBlocks(textBlocks, canvas.width / region.width, canvas.height / region.height),
+                Boolean(textBlocks.limited));
+              await openPreparedCapture(prepared);
             }
           } catch (error) {
             console.error('Selection capture failed:', error);
@@ -438,8 +483,7 @@
           const baseline = await stabilizePageDimensions(selected.surface, selected.region);
           try {
             const prepared = await captureScrollingRegionAttempt(selected.surface, selected.region, baseline, progress);
-            const textBlocks = extractDomTextBlocks(selected.region);
-            await openEditor(prepared.blob, prepared.scale, textBlocks);
+            await openPreparedCapture(prepared);
             return;
           } catch (error) {
             if (error.code !== 'LAYOUT_CHANGED' || attempt > 0) throw error;
@@ -466,6 +510,7 @@
       let context;
       let outputScale = 1;
       let bitmapSize;
+      const blocks = { items: [], keys: new Set(), limited: false };
 
       for (let index = 0; index < plan.length; index += 1) {
         const tile = plan[index];
@@ -477,13 +522,21 @@
         const percent = Math.round(((index + 1) / plan.length) * 100);
         updateProgress(progress, percent, outputScale < 0.9999);
 
-        anchored.prepare(index, plan.length);
+        const written = { x: region.x, y: region.y + tile.destinationTop,
+          width: region.width, height: tile.sourceHeight };
+        const origin = surface.isDocument ? { left: 0, top: 0 } : surface.getCaptureRect();
+        anchored.prepare(index, plan.length, {
+          left: origin.left + written.x - actual.x, top: origin.top + written.y - actual.y,
+          right: origin.left + written.x + written.width - actual.x,
+          bottom: origin.top + written.y + written.height - actual.y
+        });
         progress.style.visibility = 'hidden';
         let image;
         try {
           await Utils.waitForPaint();
           const response = await captureVisibleTab();
           image = await loadImage(response.dataUrl);
+          collectTileText(blocks, surface, region, written);
         } finally {
           progress.style.visibility = 'visible';
           anchored.restore();
@@ -511,15 +564,17 @@
         const sourceWidth = sourceRight - sourceLeft;
         const sourceHeight = sourceBottom - sourceTop;
         if (sourceLeft < capture.crop.x || sourceTop < capture.crop.y || sourceWidth < 1 || sourceHeight < 1) throw new Error(text('fullScrollError'));
-        const destinationTop = Math.round(tile.destinationTop * capture.scaleY * outputScale);
-        const destinationBottom = Math.round((tile.destinationTop + sourceHeight / capture.scaleY) * capture.scaleY * outputScale);
-        const destinationWidth = Math.round(sourceWidth * outputScale);
+        const destination = Utils.computeTileDestination(
+          { x: 0, y: tile.destinationTop, width: region.width, height: tile.sourceHeight },
+          region.width, region.height, canvas.width, canvas.height
+        );
         context.drawImage(
           image, sourceLeft, sourceTop, sourceWidth, sourceHeight,
-          0, destinationTop, destinationWidth, Math.max(1, destinationBottom - destinationTop)
+          destination.x, destination.y, destination.width, destination.height
         );
       }
-      return prepareCanvasForEditor(canvas, outputScale);
+      return prepareCanvasForEditor(canvas, outputScale,
+        Utils.scaleTextBlocks(blocks.items, canvas.width / region.width, canvas.height / region.height), blocks.limited);
     }
 
     function selectScrollingRegion(lockedScrollX) {

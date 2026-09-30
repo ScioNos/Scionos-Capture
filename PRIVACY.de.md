@@ -2,7 +2,7 @@
 
 [Français](PRIVACY.md) · [English](PRIVACY.en.md) · [Español](PRIVACY.es.md) · [Deutsch](PRIVACY.de.md)
 
-Letzte Aktualisierung: 23. August 2026.
+Letzte Aktualisierung: 30. September 2026.
 
 **Verantwortlicher Herausgeber:** eyelo SA (UID: CHE-108.174.302), Waadt (Vaud), Schweiz — Marke **ScioNos** ([scionos.ch](https://scionos.ch)) — Kontakt: info@eyelo.ch
 
@@ -12,6 +12,8 @@ Die Scrollbereich-Aufnahme verarbeitet mehrere sichtbare Teile derselben Seite u
 
 Keine Aufnahme, URL oder Browserdaten werden an eyelo SA, ScioNos oder Dritte gesendet. Es gibt kein Konto, keine Telemetrie, Werbung oder externe Bibliothek.
 
-Die Aufnahme und die für die Übertragung benötigten Fragmente werden vorübergehend in IndexedDB gespeichert. Fragmente werden nach dem Zusammensetzen oder spätestens nach fünfzehn Minuten gelöscht. Die endgültige Aufnahme bleibt bis zum Schließen des Editor-Tabs erhalten (Neuladen erhält sie); die fünfzehnminütige Frist dient nur als Sicherheitsnetz.
+Aufnahmen und Textmetadaten bleiben in lokalem IndexedDB. Fragmente werden nach dem Zusammensetzen oder nach fünfzehn Minuten Inaktivität gelöscht; ein angehaltener Browser kann die Bereinigung bis zum Aufwachen verzögern. Die endgültige Aufnahme bleibt erhalten, solange ein zugehöriger Editor-Tab geöffnet ist, auch nach Neuladen und über fünfzehn Minuten hinaus. Beim Schließen des letzten Editors wird sie gelöscht. Ohne Editor kann sie fünfzehn Minuten nach ihrer Erstellung bereinigt werden. Zuordnungen werden beim Aufwachen und Browserneustart mit offenen Tabs abgeglichen.
 
 Die Sprache liegt in `chrome.storage.local`, die temporäre Editor-Zuordnung in `chrome.storage.session`. Alle lokalen Daten können über die Erweiterungsverwaltung oder Deinstallation entfernt werden. Datenschutz-Kontakt: info@eyelo.ch. Für Schwachstellen siehe [SECURITY.de.md](SECURITY.de.md).
+
+Die durchsuchbare PDF-Ebene enthält nur vollständige Wörter mit überprüfbarer Sichtbarkeit. Unsichere Wörter werden aus dieser Ebene ausgelassen; das aufgenommene Bild bleibt erhalten. Ältere Ebenen mit ungeprüften Koordinaten werden ebenfalls ausgelassen. Vertrauliche Pixel müssen deckend maskiert werden; Unschärfe ist nur ein visueller Effekt.

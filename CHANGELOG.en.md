@@ -6,6 +6,20 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.3.2] - 2026-09-30
+
+### Fixed
+
+- Unified CSS, container and bitmap coordinates; restored document auto-scroll selection; scaled text metadata for DPR and image reductions.
+- Assembly no longer overwrites captured areas; fixed and sticky elements are reassessed on each tile, including position changes and initially offscreen elements.
+- PDF: collect text per tile; omit covered, invisible and partially cropped words; align cropping and censorship with bitmap pixels; omit legacy layers with unverified coordinates.
+- Editor: contain long URLs, fit the available width, preserve text-input focus and native input undo, advance step numbers after redo, and protect asynchronous history consolidation.
+- Keep captures while their editor remains open and delete them on closure; expire orphans and abandoned transfers; reconstruct associations when the worker wakes.
+
+### Maintenance and validation
+
+- Bound stabilization and text-collection budgets; patch transitive dependencies; add real-pixel tests, four scaling factors and extraction from generated PDFs.
+
 ## [1.3.1] - 2026-09-28
 
 ### Added
@@ -126,7 +140,8 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Canvas-clipping zoom, non-responsive toolbar, incomplete translations, hard-coded shortcut, contrast, and accessible names.
 - Locale descriptions above 132 characters, editor reload data loss, and inaccurate retention wording.
 
-[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.2...HEAD
+[1.3.2]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.1...v1.2.0

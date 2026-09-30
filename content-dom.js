@@ -3,79 +3,105 @@
   function createContentDom({ Utils, text }) {
     const SCROLLABLE_OVERFLOW_VALUES = new Set(['auto', 'overlay', 'scroll']);
 
-    function extractDomTextBlocks(region) {
+    // region is in surface CSS coordinates; returned rectangles are relative to it.
+    // Export only complete words whose painted visibility can be established.
+    function extractDomTextBlocks(region, surface = getDocumentScrollSurface()) {
       const blocks = [];
+      blocks.limited = false;
       if (!region || region.width <= 0 || region.height <= 0) return blocks;
-      const scrollX = window.scrollX;
-      const scrollY = window.scrollY;
-
-      const targetLeft = Number.isFinite(region.left) ? region.left : (Number.isFinite(region.x) ? region.x : 0);
-      const targetTop = Number.isFinite(region.top) ? region.top : (Number.isFinite(region.y) ? region.y : 0);
-      const targetRight = targetLeft + region.width;
-      const targetBottom = targetTop + region.height;
-
-      try {
-        const walker = document.createTreeWalker(
-          document.body || document.documentElement,
-          NodeFilter.SHOW_TEXT,
-          {
-            acceptNode(node) {
-              if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
-              const parent = node.parentElement;
-              if (!parent) return NodeFilter.FILTER_REJECT;
-              const tag = parent.tagName;
-              if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT' || tag === 'TEMPLATE') {
-                return NodeFilter.FILTER_REJECT;
-              }
-              if (parent.closest('[data-scionos-capture]')) return NodeFilter.FILTER_REJECT;
-              return NodeFilter.FILTER_ACCEPT;
-            }
-          }
-        );
-
-        let currentNode = walker.nextNode();
-        let count = 0;
-        const MAX_BLOCKS = 1500;
-        while (currentNode && count < MAX_BLOCKS) {
-          const parent = currentNode.parentElement;
-          const range = document.createRange();
-          range.selectNodeContents(currentNode);
-          const rect = range.getBoundingClientRect();
-          if (rect.width > 0 && rect.height > 0) {
-            const docLeft = rect.left + scrollX;
-            const docTop = rect.top + scrollY;
-            const docRight = docLeft + rect.width;
-            const docBottom = docTop + rect.height;
-
-            if (
-              docRight > targetLeft &&
-              docLeft < targetRight &&
-              docBottom > targetTop &&
-              docTop < targetBottom
-            ) {
-              if (isRenderedVisible(parent)) {
-                const computed = window.getComputedStyle(parent);
-                const link = parent.closest('a');
-                blocks.push({
-                  text: currentNode.nodeValue.trim(),
-                  x: Math.round(docLeft - targetLeft),
-                  y: Math.round(docTop - targetTop),
-                  width: Math.round(rect.width),
-                  height: Math.round(rect.height),
-                  fontSize: Math.round(parseFloat(computed.fontSize) || 14),
-                  fontFamily: computed.fontFamily || 'sans-serif',
-                  isLink: Boolean(link && link.href),
-                  url: link && link.href ? link.href : null
-                });
-                count += 1;
-              }
-            }
-          }
-          currentNode = walker.nextNode();
-        }
-      } catch (_error) {
-        console.warn('DOM text extraction failed:', _error);
+      const position = surface.getPosition();
+      const viewport = surface.isDocument
+        ? { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight }
+        : surface.getCaptureRect();
+      const originX = viewport.left - position.x;
+      const originY = viewport.top - position.y;
+      const clip = { left: originX + region.x, top: originY + region.y,
+        right: originX + region.x + region.width, bottom: originY + region.y + region.height };
+      const overlaps = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+      const deadline = Date.now() + 500;
+      const painted = [];
+      for (const element of document.querySelectorAll('body *')) {
+        if (Date.now() >= deadline) { blocks.limited = true; return blocks; }
+        if (element.closest('[data-scionos-capture]')) continue;
+        const rect = element.getBoundingClientRect();
+        if (overlaps(rect, clip) && isRenderedVisible(element)) painted.push({ element, rect });
       }
+      const ancestorReliability = new WeakMap();
+      const colorContext = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
+      colorContext.canvas.width = colorContext.canvas.height = 1;
+      const colors = new Map();
+      const opaqueColor = color => {
+        if (!colors.has(color)) {
+          colorContext.clearRect(0, 0, 1, 1);
+          colorContext.fillStyle = 'transparent';
+          colorContext.fillStyle = color;
+          colorContext.fillRect(0, 0, 1, 1);
+          colors.set(color, colorContext.getImageData(0, 0, 1, 1).data[3] === 255);
+        }
+        return colors.get(color);
+      };
+      const root = surface.isDocument ? (document.body || document.documentElement) : surface.element;
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      try {
+        textNodes: for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+          if (Date.now() >= deadline) { blocks.limited = true; break; }
+          const parent = node.parentElement;
+          if (!parent || !node.nodeValue.trim() || parent.closest('script, style, noscript, template, [data-scionos-capture]')) continue;
+          if (!isRenderedVisible(parent)) continue;
+          const computed = getComputedStyle(parent);
+          const link = parent.closest('a');
+          for (const match of node.nodeValue.matchAll(/\S+/gu)) {
+            if (Date.now() >= deadline || blocks.length >= 1500) { blocks.limited = true; break textNodes; }
+            const range = document.createRange();
+            range.setStart(node, match.index);
+            range.setEnd(node, match.index + match[0].length);
+            const rects = Array.from(range.getClientRects());
+            const rect = range.getBoundingClientRect();
+            if (!rect.width || !rect.height || !overlaps(rect, clip)) continue;
+            let reliable = opaqueColor(computed.color) && opaqueColor(computed.webkitTextFillColor || computed.color)
+              && computed.textTransform === 'none' && rects.length === 1 && rect.left >= clip.left && rect.right <= clip.right
+              && rect.top >= clip.top && rect.bottom <= clip.bottom
+              && rect.left >= viewport.left && rect.right <= Math.min(window.innerWidth, viewport.left + viewport.width)
+              && rect.top >= viewport.top && rect.bottom <= Math.min(window.innerHeight, viewport.top + viewport.height);
+            // Geometric overlaps are rejected even for pointer-events:none or a layer behind
+            // the text. This deliberately prefers an image-only word to a privacy leak.
+            if (reliable) reliable = !painted.some(item => item.element !== parent
+              && !item.element.contains(parent) && !parent.contains(item.element) && overlaps(item.rect, rect));
+            if (reliable) {
+              for (let ancestor = parent; ancestor && reliable; ancestor = ancestor.parentElement) {
+                if (!ancestorReliability.has(ancestor)) {
+                  const style = getComputedStyle(ancestor);
+                  let safe = parseFloat(style.opacity || '1') === 1 && style.filter === 'none'
+                    && style.clipPath === 'none' && style.clip === 'auto'
+                    && (!style.maskImage || style.maskImage === 'none')
+                    && (!style.webkitMaskImage || style.webkitMaskImage === 'none')
+                    && (!style.webkitTextSecurity || style.webkitTextSecurity === 'none');
+                  for (const pseudo of ['::before', '::after']) {
+                    const content = getComputedStyle(ancestor, pseudo).content;
+                    if (content && content !== 'none' && content !== 'normal') safe = false;
+                  }
+                  ancestorReliability.set(ancestor, safe);
+                }
+                reliable = ancestorReliability.get(ancestor);
+              }
+            }
+            if (reliable) {
+              // Hit testing also catches clipping by nested overflow containers.
+              for (const x of [rect.left + 0.5, (rect.left + rect.right) / 2, rect.right - 0.5]) {
+                for (const y of [rect.top + 0.5, (rect.top + rect.bottom) / 2, rect.bottom - 0.5]) {
+                  const hit = document.elementFromPoint(x, y);
+                  if (!hit || !(hit === parent || parent.contains(hit))) reliable = false;
+                }
+              }
+            }
+            if (!reliable || blocks.length >= 1500) { blocks.limited = true; continue; }
+            blocks.push({ text: match[0], x: rect.left - clip.left, y: rect.top - clip.top,
+              width: rect.width, height: rect.height, fontSize: parseFloat(computed.fontSize) || 14,
+              fontFamily: computed.fontFamily || 'sans-serif', isLink: Boolean(link && link.href),
+              url: link && link.href ? link.href : null });
+          }
+        }
+      } catch (error) { blocks.limited = true; console.warn('DOM text extraction failed:', error); }
       return blocks;
     }
 
@@ -302,11 +328,11 @@
     }
 
     async function stabilizePageDimensions(surface, range) {
+      const deadline = Date.now() + 5000;
       await settleVisibleResources();
-      const startedAt = Date.now();
       let previous = surface.getMetrics();
       let stablePasses = 0;
-      for (let pass = 0; pass < 4 && stablePasses < 2 && Date.now() - startedAt < 5000; pass += 1) {
+      for (let pass = 0; pass < 4 && stablePasses < 2 && Date.now() < deadline; pass += 1) {
         let positions = Utils.buildScrollPositions(previous.fullHeight, previous.viewportHeight);
         if (range) {
           const rangeTop = typeof range.top === 'number' ? range.top : (Number(range.y) || 0);
@@ -318,9 +344,12 @@
         }
         const originalX = surface.getPosition().x;
         for (const y of positions) {
+          if (Date.now() >= deadline) break;
           surface.scrollTo(originalX, y);
           await Utils.waitForPaint();
-          await Utils.delay(120);
+          if (Date.now() >= deadline) break;
+          await Utils.delay(Math.min(120, Math.max(0, deadline - Date.now())));
+          if (Date.now() >= deadline) break;
           assertSurfacePosition(surface, { x: originalX, y });
         }
         const next = surface.getMetrics();
@@ -347,86 +376,55 @@
       return () => style.remove();
     }
 
-    function createAnchoredElementManager(surface, captureBounds) {
+    function createAnchoredElementManager(surface) {
       let hidden = [];
-      let scanned = null;
-      const bounds = captureBounds || (surface.isDocument
-        ? { left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight }
-        : surface.getCaptureRect());
-
-      const classifyElement = element => {
-        if (!element.isConnected || element.closest('[data-scionos-capture]')) return null;
-        if (!surface.isDocument && (element === surface.element || element.contains(surface.element))) return null;
-
-        const styles = getComputedStyle(element);
-        const isFixedOrSticky = ['fixed', 'sticky'].includes(styles.position);
-        const isExternalAbsolute = !surface.isDocument
-          && styles.position === 'absolute'
-          && !surface.element.contains(element);
-
-        if (!isFixedOrSticky && !isExternalAbsolute) return null;
-
-        const rect = element.getBoundingClientRect();
-        if (rect.width < 1 || rect.height < 1 || rect.bottom <= 0 || rect.right <= 0) return null;
-
-        const overlapsHorizontally = rect.right > bounds.left && rect.left < bounds.right;
-        const overlapsVertically = rect.bottom > bounds.top && rect.top < bounds.bottom;
-        if (!overlapsHorizontally || !overlapsVertically) return null;
-
-        if (surface.isDocument && styles.position === 'fixed') {
-          const viewportCenter = window.innerHeight / 2;
-          const isBottom = rect.top > viewportCenter || (Number.parseFloat(styles.bottom) <= 10 && rect.bottom >= window.innerHeight - 15);
-          return isBottom ? 'bottom' : 'top';
-        }
-
-        const surfaceRect = surface.isDocument
-          ? { left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight }
-          : surface.getCaptureRect();
-
-        const top = Number.parseFloat(styles.top);
-        const bottom = Number.parseFloat(styles.bottom);
-        const isAnchoredTop = Number.isFinite(top) && Math.abs(rect.top - (surfaceRect.top + top)) <= 4;
-        const isAnchoredBottom = Number.isFinite(bottom) && Math.abs(rect.bottom - (surfaceRect.bottom - bottom)) <= 4;
-
-        if (isAnchoredTop) return 'top';
-        if (isAnchoredBottom) return 'bottom';
-
-        const midY = (bounds.top + bounds.bottom) / 2;
-        return rect.top >= midY ? 'bottom' : 'top';
-      };
-
+      const seen = new WeakMap();
       return {
-        prepare(tileIndex = 0, totalTiles = 1) {
+        prepare(tileIndex = 0, totalTiles = 1, writtenRect = null) {
           hidden = [];
-          if (!scanned) {
-            scanned = [];
-            for (const element of document.querySelectorAll('body *')) {
-              const anchorType = classifyElement(element);
-              if (anchorType) scanned.push({ element, anchorType });
-            }
-          }
-          for (const { element, anchorType } of scanned) {
-            if (!element.isConnected) continue;
-
-            const shouldHide = (anchorType === 'top' && tileIndex > 0)
-              || (anchorType === 'bottom' && tileIndex < totalTiles - 1 && totalTiles > 1);
-
+          const capture = surface.isDocument
+            ? { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight }
+            : surface.getCaptureRect();
+          const bounds = writtenRect || { left: capture.left, top: capture.top,
+            right: capture.left + capture.width, bottom: capture.top + capture.height };
+          const visible = [];
+          const position = surface.getPosition();
+          for (const element of document.querySelectorAll('body *')) {
+            if (!element.isConnected || element.closest('[data-scionos-capture]')
+                || (!surface.isDocument && (element === surface.element || element.contains(surface.element)))) continue;
+            const rect = element.getBoundingClientRect();
+            if (!rect.width || !rect.height || rect.right <= capture.left || rect.left >= capture.left + capture.width
+                || rect.bottom <= capture.top || rect.top >= capture.top + capture.height) continue;
+            const styles = getComputedStyle(element);
+            if (styles.visibility === 'hidden' || styles.display === 'none') continue;
+            const fixed = styles.position === 'fixed';
+            const sticky = styles.position === 'sticky';
+            const top = parseFloat(styles.top), bottom = parseFloat(styles.bottom);
+            const left = parseFloat(styles.left), right = parseFloat(styles.right);
+            const verticalPin = sticky && (Math.abs(rect.top - capture.top - top) <= 4
+              || Math.abs(rect.bottom - capture.top - capture.height + bottom) <= 4);
+            const horizontalPin = sticky && (Math.abs(rect.left - capture.left - left) <= 4
+              || Math.abs(rect.right - capture.left - capture.width + right) <= 4);
+            const external = !surface.isDocument && styles.position === 'absolute' && !surface.element.contains(element);
+            const bottomFixed = fixed && rect.top > capture.top + capture.height / 2;
+            const firstPosition = seen.get(element);
+            // A vertical sticky header still needs all columns of its first row.
+            // A horizontal sticky sidebar still needs all rows of its first column.
+            const repeated = firstPosition && (fixed || external
+              || (verticalPin && Math.abs(position.y - firstPosition.y) > 2)
+              || (horizontalPin && Math.abs(position.x - firstPosition.x) > 2));
+            const shouldHide = repeated || (bottomFixed && tileIndex < totalTiles - 1);
             if (shouldHide) {
-              hidden.push({
-                element,
-                value: element.style.getPropertyValue('visibility'),
-                priority: element.style.getPropertyPriority('visibility')
-              });
+              hidden.push(ScionosContentUtils.snapshotInlineStyle(element, 'visibility'));
               element.style.setProperty('visibility', 'hidden', 'important');
+            } else if (rect.right > bounds.left && rect.left < bounds.right && rect.bottom > bounds.top && rect.top < bounds.bottom) {
+              visible.push(element);
             }
           }
+          visible.forEach(element => { if (!seen.has(element)) seen.set(element, position); });
         },
         restore() {
-          hidden.forEach(({ element, value, priority }) => {
-            if (!element.isConnected) return;
-            if (value) element.style.setProperty('visibility', value, priority);
-            else element.style.removeProperty('visibility');
-          });
+          hidden.forEach(ScionosContentUtils.restoreInlineStyle);
           hidden = [];
         }
       };

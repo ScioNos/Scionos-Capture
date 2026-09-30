@@ -451,5 +451,8 @@
   },
   "helpClose": {
     "message": "Fermer l’aide"
+  },
+  "textLayerLimitedNotice": {
+    "message": "La couche recherchable du PDF est limitée aux textes dont la visibilité est vérifiable. Le rendu de l’image reste conservé."
   }
 }

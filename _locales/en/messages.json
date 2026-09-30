@@ -451,5 +451,8 @@
   },
   "helpClose": {
     "message": "Close help"
+  },
+  "textLayerLimitedNotice": {
+    "message": "The searchable PDF layer is limited to text whose visibility can be verified. The captured image is preserved."
   }
 }

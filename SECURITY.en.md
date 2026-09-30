@@ -4,7 +4,7 @@
 
 ## Supported versions
 
-The latest release receives security updates. The actively supported line is `1.3.x` (the `1.2.0` release is being prepared).
+The latest release receives security updates. The actively supported line is `1.3.x`.
 
 ## Reporting a vulnerability
 
@@ -13,3 +13,5 @@ Do not open a public issue for a security vulnerability. Use [private GitHub vul
 We aim to acknowledge reports within 3 business days and provide an initial assessment within 7 business days. Coordinated disclosure follows the availability of a fix.
 
 Captures, including scrolling-area tiles, remain in the local extension origin. No remote script runs and scrolling capture adds no permission. Orphaned captures expire after fifteen minutes and are purged on the next wake if the browser was suspended. Use a solid mask for secrets; blur is not cryptographic deletion.
+
+The searchable PDF layer retains only complete words whose visibility can be verified. Uncertain words are omitted from that layer while the captured image is preserved. Legacy layers with unverified coordinates are also omitted. Use solid censorship to protect confidential pixels; blur is only a visual effect.

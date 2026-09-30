@@ -5,9 +5,11 @@
 No adjuntes capturas con datos personales, credenciales o secretos.
 
 1. Crea una rama `fix/...`, `feat/...` o `docs/...`.
-2. Usa Node.js 20 o 24 y ejecuta `npm ci`.
+2. Usa Node.js 24 y ejecuta `npm ci`.
 3. Mantén cero dependencias de ejecución y justifica las de desarrollo.
 4. Ejecuta `npm run verify` antes de la pull request.
 5. Prueba manualmente Chrome y Edge.
 
 Comprueba los cuatro modos, incluidos los dos puntos, el desplazamiento, los fragmentos parciales y los campos geométricos del área desplazable. Cubre también páginas altas y anchas, DPR, cambio de pestaña, Deshacer/Rehacer, recorte, máscara, copia, PNG/PDF, zoom, teclado y cuatro idiomas. Añade cada nueva cadena a todos los `_locales/*/messages.json` y mantén los permisos mínimos, documentados y validados.
+
+Se recomienda Node.js 24 para la verificación completa, incluida la extracción PDF con PDF.js 6.3.289 (solo para pruebas). Las comprobaciones principales siguen siendo compatibles con Node.js 20.

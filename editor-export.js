@@ -8,9 +8,9 @@
       get activeTextBlocks() { return getTextBlocks(); }
     };
 
-    function canvasToBlob() {
+    function canvasToBlob(surface = current.committedSurface) {
       return new Promise((resolve, reject) => {
-        current.committedSurface.toBlob(blob => blob ? resolve(blob) : reject(new Error('Image preparation failed.')), 'image/png');
+        surface.toBlob(blob => blob ? resolve(blob) : reject(new Error('Image preparation failed.')), 'image/png');
       });
     }
 
@@ -91,9 +91,12 @@
           const dateFormatted = current.captureRecord && current.captureRecord.timestamp
             ? new Date(current.captureRecord.timestamp).toLocaleString(getLanguage())
             : new Date().toLocaleString(getLanguage());
-          const dataUrl = URL.createObjectURL(await canvasToBlob());
-          const imageWidth = current.committedSurface.width;
-          const imageHeight = current.committedSurface.height;
+          // Snapshot image geometry and metadata together before the asynchronous encoding.
+          const surface = current.committedSurface;
+          const imageWidth = surface.width;
+          const imageHeight = surface.height;
+          const textBlocks = [...(current.activeTextBlocks || [])];
+          const dataUrl = URL.createObjectURL(await canvasToBlob(surface));
           const escapedTitle = ScionosCaptureUtils.escapeHtml(title);
 
           const headerHtml = `
@@ -112,7 +115,7 @@
           let pagesHtml = '';
           if (slices.length === 1 && slices[0].single) {
             const textSpans = ScionosCaptureUtils.buildTextLayerSpans(
-              current.activeTextBlocks, imageWidth, imageHeight
+              textBlocks, imageWidth, imageHeight
             );
             pagesHtml = `<div class="print-page">${headerHtml}
               <div class="print-image-wrap">
@@ -125,7 +128,7 @@
               const sliceTop = slice.top;
               const sliceH = slice.height;
               const shifted = ScionosCaptureUtils.shiftAndCropTextBlocks(
-                current.activeTextBlocks || [],
+                textBlocks,
                 { x: 0, y: sliceTop, width: imageWidth, height: sliceH }
               );
               const textSpans = ScionosCaptureUtils.buildTextLayerSpans(shifted, imageWidth, sliceH);

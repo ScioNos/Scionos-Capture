@@ -15,7 +15,7 @@ Vollständig lokale Screenshot-Erweiterung für Chrome und Edge. Sichtbaren, aus
 
 ## Installation
 
-`scionos-capture-v1.3.1.zip` aus dem [Release v1.3.1](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.3.1) herunterladen, optional `.sha256` prüfen und entpacken. `chrome://extensions` oder `edge://extensions` öffnen, **Entwicklermodus** aktivieren, **Entpackte Erweiterung laden** wählen und den Ordner auswählen.
+`scionos-capture-v1.3.2.zip` aus dem [Release v1.3.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.3.2) herunterladen, optional `.sha256` prüfen und entpacken. `chrome://extensions` oder `edge://extensions` öffnen, **Entwicklermodus** aktivieren, **Entpackte Erweiterung laden** wählen und den Ordner auswählen.
 
 Aus dem Quellcode: Repository klonen, `npm ci` ausführen und die Projektwurzel als entpackte Erweiterung laden.
 
@@ -23,10 +23,16 @@ Aus dem Quellcode: Repository klonen, `npm ci` ausführen und die Projektwurzel 
 
 **Ganze Seite**, **Sichtbarer Bereich**, **Ausgewählter Bereich** oder **Scrollbereich** wählen. Beim Scrollbereich die erste Ecke anklicken, vertikal scrollen und die gegenüberliegende Ecke wählen. `Escape` bricht ab, **Neu beginnen** löscht den ersten Punkt; X/Y/Breite/Höhe ermöglichen die Tastaturbedienung. Vorgeschlagen ist `Alt+Shift+C`; das Popup zeigt die tatsächliche Belegung. Im Editor steuern `V`, `D`, `M`, `C`, `Strg+Z`, `Strg+Y`, `+`, `-` und `0` Werkzeuge, Verlauf und Zoom. Für Geheimnisse eine volle Abdeckung verwenden.
 
-`activeTab` und `scripting` reagieren nur auf eine ausdrückliche Aktion; `storage` speichert Sprache und temporäre Zuordnung; `unlimitedStorage` verhindert lokale Quotenfehler; `alarms` lässt Aufnahmen ablaufen. Übertragungsfragmente verbleiben nur im lokalen IndexedDB und werden nach dem Zusammensetzen oder innerhalb von fünfzehn Minuten gelöscht. Die endgültige Aufnahme bleibt bis zum Schließen des Editor-Tabs erhalten; die fünfzehnminütige Frist schützt nur verwaiste Aufnahmen. Siehe [PRIVACY.de.md](PRIVACY.de.md) und [SECURITY.de.md](SECURITY.de.md).
+`activeTab` und `scripting` reagieren nur auf eine ausdrückliche Aktion; `storage` speichert Sprache und temporäre Zuordnung; `unlimitedStorage` verhindert lokale Quotenfehler; `alarms` lässt Aufnahmen ablaufen. Übertragungsfragmente verbleiben nur im lokalen IndexedDB und werden nach dem Zusammensetzen oder nach fünfzehn Minuten Inaktivität gelöscht (beim Aufwachen, falls der Browser angehalten ist). Die endgültige Aufnahme bleibt erhalten, solange ein zugehöriger Editor geöffnet ist, auch nach Neuladen und über fünfzehn Minuten hinaus. Sie wird beim Schließen des letzten Editors gelöscht; ohne Editor kann sie fünfzehn Minuten nach ihrer Erstellung bereinigt werden. Siehe [PRIVACY.de.md](PRIVACY.de.md) und [SECURITY.de.md](SECURITY.de.md).
 
 ## Grenzen und Entwicklung
 
 Endlos scrollende Seiten besitzen kein bestimmbares Ende. Ein Scrollbereich bleibt auf die beim ersten Punkt sichtbare Breite begrenzt und wird nicht horizontal zusammengesetzt. Veränderliche oder `sticky` Inhalte können zwischen Kacheln abweichen. Interne Browserseiten und Extension-Stores sind nicht injizierbar. Bilder über 16 Millionen Pixel oder 16.384 px pro Seite werden verkleinert.
 
-Node.js 20 oder 24 verwenden, `npm ci` und `npm run verify` ausführen. Siehe [CONTRIBUTING.de.md](CONTRIBUTING.de.md), [CHANGELOG.de.md](CHANGELOG.de.md) und [MIT-Lizenz](LICENSE).
+Node.js 24 verwenden, `npm ci` und `npm run verify` ausführen. Siehe [CONTRIBUTING.de.md](CONTRIBUTING.de.md), [CHANGELOG.de.md](CHANGELOG.de.md) und [MIT-Lizenz](LICENSE).
+
+### PDF — 1.3.2
+
+Die durchsuchbare PDF-Ebene enthält nur vollständige Wörter mit überprüfbarer Sichtbarkeit. Unsichere Wörter werden aus dieser Ebene ausgelassen; das aufgenommene Bild bleibt erhalten. Ältere Ebenen mit ungeprüften Koordinaten werden ebenfalls ausgelassen. Vertrauliche Pixel müssen deckend maskiert werden; Unschärfe ist nur ein visueller Effekt.
+
+Node.js 24 wird für die vollständige Prüfung empfohlen, einschließlich PDF-Textextraktion mit PDF.js 6.3.289 (nur als Testabhängigkeit). Die Hauptprüfungen bleiben mit Node.js 20 kompatibel.

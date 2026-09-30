@@ -70,6 +70,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   let currentTool = 'select';
   let currentZoom = 1;
   let currentStepNumber = 1;
+  let historyRevision = 0;
+  let historyConsolidation = null;
   let pendingTextPoint = null;
   let activeTextBlocks = [];
   let baseImage = null;
@@ -204,6 +206,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!captureRecord) emptyState.textContent = getI18nText('loadingCapture');
     updateRecordMetadata();
+    updateCaptureNotice();
     updateControlVisibility();
   }
 
@@ -213,6 +216,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const formattedDate = new Date(captureRecord.timestamp).toLocaleString(ScionosI18n.language);
     pageMeta.textContent = `${captureRecord.url || ''} — ${formattedDate}`;
     pageMeta.title = captureRecord.url || '';
+  }
+
+  function updateCaptureNotice() {
+    const record = captureRecord;
+    if (!record) return;
+    notice.textContent = [
+      record.scale < 0.9999 ? getI18nText('captureReducedNotice', { percent: Math.round(record.scale * 100) }) : '',
+      record.textLayerLimited || (record.textBlocks?.length && record.textCoordinateSpace !== 'bitmap')
+        ? getI18nText('textLayerLimitedNotice') : ''
+    ].filter(Boolean).join(' ');
   }
 
   function showToast(message, isError = false) {
@@ -236,19 +249,27 @@ document.addEventListener('DOMContentLoaded', async () => {
   const { createSurface, normalizeBounds, normalizeCrop, operationBounds, applyOperation, drawCropPreview } =
     globalThis.ScionosEditorOperations.create({ captureUtils: ScionosCaptureUtils });
 
+  function filterTextBlocksForOperation(blocks, operation, surface) {
+    const concealsText = operation.kind === 'censor'
+      || (operation.kind === 'shape' && operation.mode !== 'stroke');
+    if (!concealsText) return blocks;
+    const bounds = operationBounds(operation, surface.width, surface.height);
+    return ScionosCaptureUtils.filterTextBlocksIntersectingBounds(blocks, bounds);
+  }
+
   function rebuildCommittedSurface() {
     if (!baseImage) return;
     let surface = createSurface(baseImage.width, baseImage.height);
     surface.getContext('2d').drawImage(baseImage, 0, 0);
-    let blocks = Array.isArray(captureRecord?.textBlocks) ? [...captureRecord.textBlocks] : [];
+    let blocks = captureRecord?.textCoordinateSpace === 'bitmap' && Array.isArray(captureRecord.textBlocks)
+      ? [...captureRecord.textBlocks] : [];
     operations.forEach(operation => {
+      const crop = operation.kind === 'crop' ? normalizeCrop(operation, surface.width, surface.height) : null;
       surface = applyOperation(surface, operation);
-      if (operation.kind === 'crop') {
-        const crop = normalizeCrop(operation, surface.width, surface.height);
+      if (crop) {
         blocks = ScionosCaptureUtils.shiftAndCropTextBlocks(blocks, crop);
-      } else if (operation.kind === 'censor') {
-        const bounds = operationBounds(operation, surface.width, surface.height);
-        blocks = ScionosCaptureUtils.filterTextBlocksOnCensor(blocks, bounds);
+      } else {
+        blocks = filterTextBlocksForOperation(blocks, operation, surface);
       }
     });
     committedSurface = surface;
@@ -258,13 +279,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function applyCommittedOperation(operation) {
     if (!committedSurface) return;
+    const crop = operation.kind === 'crop'
+      ? normalizeCrop(operation, committedSurface.width, committedSurface.height) : null;
     committedSurface = applyOperation(committedSurface, operation);
-    if (operation.kind === 'crop') {
-      const crop = normalizeCrop(operation, committedSurface.width, committedSurface.height);
+    if (crop) {
       activeTextBlocks = ScionosCaptureUtils.shiftAndCropTextBlocks(activeTextBlocks, crop);
-    } else if (operation.kind === 'censor') {
-      const bounds = operationBounds(operation, committedSurface.width, committedSurface.height);
-      activeTextBlocks = ScionosCaptureUtils.filterTextBlocksOnCensor(activeTextBlocks, bounds);
+    } else {
+      activeTextBlocks = filterTextBlocksForOperation(activeTextBlocks, operation, committedSurface);
     }
     renderCanvas();
   }
@@ -309,25 +330,40 @@ document.addEventListener('DOMContentLoaded', async () => {
       cancelDraft();
       return;
     }
+    historyRevision += 1;
     operations.push(operation);
     redoOperations = [];
     draftOperation = null;
     geometryPanel.hidden = true;
     applyCommittedOperation(operation);
 
-    if (operations.length >= MAX_OPERATIONS) {
+    await consolidateHistory();
+  }
+
+  function consolidateHistory() {
+    if (historyConsolidation) return historyConsolidation;
+    if (operations.length < MAX_OPERATIONS) return Promise.resolve();
+    historyConsolidation = (async () => {
       try {
-        const replacement = await createImageBitmap(committedSurface);
-        if (baseImage && typeof baseImage.close === 'function') baseImage.close();
-        baseImage = replacement;
-        operations = [];
-        redoOperations = [];
-        if (captureRecord) captureRecord.textBlocks = [...activeTextBlocks];
-        showToast(getI18nText('historyFlattened'));
+        while (operations.length >= MAX_OPERATIONS) {
+          const revision = historyRevision;
+          const blocks = [...activeTextBlocks];
+          const replacement = await createImageBitmap(committedSurface);
+          if (revision !== historyRevision) { replacement.close(); continue; }
+          if (baseImage && typeof baseImage.close === 'function') baseImage.close();
+          baseImage = replacement;
+          operations = [];
+          redoOperations = [];
+          historyRevision += 1;
+          if (captureRecord) captureRecord.textBlocks = blocks;
+          updateHistoryButtons();
+          showToast(getI18nText('historyFlattened'));
+        }
       } catch (error) {
         showToast(getI18nText('exportError') + error.message, true);
       }
-    }
+    })().finally(() => { historyConsolidation = null; });
+    return historyConsolidation;
   }
 
   function updateHistoryButtons() {
@@ -350,7 +386,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function fitToScreen() {
     if (!canvas.width) return;
-    const availableWidth = Math.max(100, workspace.clientWidth - 60);
+    const style = getComputedStyle(workspace);
+    const availableWidth = Math.max(1, workspace.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight));
     applyZoom(Math.min(1, availableWidth / canvas.width));
   }
 
@@ -517,9 +554,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateRecordMetadata();
       setEditorReady(true);
       fitToScreen();
-      notice.textContent = record.scale < 0.9999
-        ? getI18nText('captureReducedNotice', { percent: Math.round(record.scale * 100) })
-        : '';
+      updateCaptureNotice();
       showToast(getI18nText('captureReady'));
     } catch (error) {
       console.error('Capture loading failed:', error);
@@ -541,6 +576,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!baseImage || currentTool === 'select' || event.button !== 0) return;
     const point = getCanvasCoords(event);
     if (currentTool === 'text') {
+      event.preventDefault();
       openTextInput(point);
       return;
     }
@@ -657,6 +693,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   undoButton.addEventListener('click', () => {
     const operation = operations.pop();
     if (!operation) return;
+    historyRevision += 1;
     redoOperations.push(operation);
     if (operation.kind === 'step' && operation.number === currentStepNumber - 1) {
       currentStepNumber = Math.max(1, operation.number);
@@ -668,9 +705,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   redoButton.addEventListener('click', () => {
     const operation = redoOperations.pop();
     if (!operation) return;
+    historyRevision += 1;
     operations.push(operation);
+    if (operation.kind === 'step') {
+      currentStepNumber = Math.max(currentStepNumber, operation.number + 1);
+      updateStepBadge();
+    }
     cancelDraft();
     rebuildCommittedSurface();
+    consolidateHistory();
   });
 
   censorType.addEventListener('change', () => {
@@ -796,7 +839,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     cancelDraft
   });
   document.addEventListener('keydown', event => {
-    const typing = /^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName);
+    const active = document.activeElement;
+    const typing = active && (/^(INPUT|SELECT|TEXTAREA)$/.test(active.tagName) || active.isContentEditable);
+    if (typing) return;
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
       event.preventDefault();
       (event.shiftKey ? redoButton : undoButton).click();

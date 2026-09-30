@@ -24,6 +24,7 @@ const {
   buildTextLayerSpans,
   buildPrintSlicePlan
 } = require('../capture-utils.js');
+const { filterTextBlocksIntersectingBounds } = require('../capture-utils.js');
 
 test('includes the exact final scroll position without skipping the bottom of a page', () => {
   assert.deepEqual(buildScrollPositions(2500, 1000), [0, 1000, 1500]);
@@ -162,12 +163,36 @@ test('excludes classic Windows scrollbars while preserving fractional DPR scalin
   assert.deepEqual(metrics.crop, { x: 0, y: 0, width: 2379, height: 1479 });
 });
 
-test('rounds tile edges without accumulating fractional-DPR seams', () => {
-  const first = computeTileDestination(0, 0, 1001, 751, 1.25, 1.25, 0.8);
-  const second = computeTileDestination(800.8, 600.8, 1001, 751, 1.25, 1.25, 0.8);
-  assert.equal(first.width, 801);
-  assert.equal(second.x, first.width);
-  assert.equal(second.y, first.height);
+test('maps tile destinations from written CSS bounds and reaches the output edges at fractional DPR', () => {
+  for (const dpr of [1.25, 1.5]) {
+    const dimensions = computeOutputDimensions(1703, 1109, dpr, dpr);
+    const firstColumn = computeTileDestination(
+      { x: 0, y: 0, width: 800, height: 600 }, 1703, 1109, dimensions.width, dimensions.height
+    );
+    const secondColumn = computeTileDestination(
+      { x: 800, y: 0, width: 800, height: 600 }, 1703, 1109, dimensions.width, dimensions.height
+    );
+    const lastColumn = computeTileDestination(
+      { x: 1600, y: 0, width: 103, height: 600 }, 1703, 1109, dimensions.width, dimensions.height
+    );
+    const lastRow = computeTileDestination(
+      { x: 0, y: 600, width: 1703, height: 509 }, 1703, 1109, dimensions.width, dimensions.height
+    );
+
+    assert.equal(secondColumn.x, firstColumn.x + firstColumn.width);
+    assert.equal(lastColumn.x, secondColumn.x + secondColumn.width);
+    assert.equal(lastColumn.x + lastColumn.width, dimensions.width);
+    assert.equal(lastRow.y + lastRow.height, dimensions.height);
+  }
+});
+
+test('filters searchable blocks intersecting opaque annotation bounds', () => {
+  const blocks = [
+    { x: 60, y: 60, width: 240, height: 30, text: 'SECRET' },
+    { x: 60, y: 150, width: 240, height: 30, text: 'PUBLIC' }
+  ];
+  const filtered = filterTextBlocksIntersectingBounds(blocks, { x: 50, y: 50, width: 300, height: 80 });
+  assert.deepEqual(filtered.map(block => block.text), ['PUBLIC']);
 });
 
 test('computes a bounded adaptive reduction for oversized PNG payloads', () => {
@@ -283,4 +308,26 @@ test('slices tall captures into contiguous portrait pages', () => {
 
 test('falls back to a single print page beyond the page cap', () => {
   assert.deepEqual(buildPrintSlicePlan(800, 100000), [{ top: 0, height: 100000, single: true }]);
+});
+
+
+test('discards partially cropped words rather than retaining their hidden characters', () => {
+  const blocks = [
+    { text: 'SECRET_LEFT', x: 90, y: 10, width: 30, height: 10 },
+    { text: 'SECRET_RIGHT', x: 190, y: 10, width: 30, height: 10 },
+    { text: 'PUBLIC', x: 110, y: 10, width: 30, height: 10 }
+  ];
+  assert.deepEqual(shiftAndCropTextBlocks(blocks, { x: 100, y: 0, width: 100, height: 50 }).map(b => b.text), ['PUBLIC']);
+});
+
+test('keeps censor bounds and text aligned after DPR conversion and reduction', () => {
+  const { scaleTextBlocks } = require('../capture-utils.js');
+  const css = [{ text: 'SECRET', x: 100, y: 100, width: 100, height: 20, fontSize: 14 }];
+  for (const dpr of [1, 1.25, 1.5, 2]) {
+    for (const reduction of [1, 0.6]) {
+      const scale = dpr * reduction;
+      const blocks = scaleTextBlocks(css, scale);
+      assert.equal(filterTextBlocksOnCensor(blocks, { x: 100 * scale, y: 100 * scale, width: 100 * scale, height: 20 * scale }).length, 0);
+    }
+  }
 });

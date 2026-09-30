@@ -25,12 +25,12 @@
       throw lastError || new Error('Capture failed.');
     }
 
-    async function openEditor(blob, scale, textBlocks = []) {
+    async function openEditor(blob, scale, textBlocks = [], textLayerLimited = false) {
       if (!(blob instanceof Blob) || blob.size < 1) throw new Error('Invalid capture image.');
       const expectedChunks = Math.ceil(blob.size / Utils.TRANSFER_CHUNK_BYTES);
       const begin = await sendMessage({
         action: 'BEGIN_CAPTURE_TRANSFER', expectedBytes: blob.size, expectedChunks,
-        title: document.title, url: location.href, scale,
+        title: document.title, url: location.href, scale, textLayerLimited, textCoordinateSpace: 'bitmap',
         textBlocks: Array.isArray(textBlocks) ? textBlocks : []
       });
       if (!begin || !begin.success || !begin.transferId) {
@@ -70,17 +70,19 @@
       });
     }
 
-    async function prepareDataUrlForEditor(dataUrl) {
+    async function prepareDataUrlForEditor(dataUrl, textBlocks = []) {
       const image = await loadImage(dataUrl);
       const dimensions = Utils.computeOutputDimensions(image.width, image.height, 1, 1);
       const canvas = document.createElement('canvas');
       canvas.width = dimensions.width;
       canvas.height = dimensions.height;
       canvas.getContext('2d').drawImage(image, 0, 0, dimensions.width, dimensions.height);
-      return prepareCanvasForEditor(canvas, dimensions.scale);
+      return prepareCanvasForEditor(canvas, dimensions.scale,
+        Utils.scaleTextBlocks(textBlocks, canvas.width / window.innerWidth, canvas.height / window.innerHeight),
+        Boolean(textBlocks.limited));
     }
 
-    async function prepareCanvasForEditor(sourceCanvas, baseScale = 1) {
+    async function prepareCanvasForEditor(sourceCanvas, baseScale = 1, textBlocks = [], textLayerLimited = false) {
       const dimensions = Utils.computeOutputDimensions(sourceCanvas.width, sourceCanvas.height, 1, 1);
       let canvas = sourceCanvas;
       let scale = Math.max(0.01, Number(baseScale) || 1);
@@ -105,7 +107,8 @@
         blob = await canvasToBlob(canvas);
       }
       if (blob.size > Utils.MAX_TRANSFER_BYTES) throw new Error(text('captureTooLargeError'));
-      return { blob, scale };
+      return { blob, scale, textLayerLimited,
+        textBlocks: Utils.scaleTextBlocks(textBlocks, canvas.width / sourceCanvas.width, canvas.height / sourceCanvas.height) };
     }
 
     function canvasToBlob(canvas) {

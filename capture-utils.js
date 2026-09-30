@@ -132,18 +132,21 @@
     };
   }
 
-  function computeTileDestination(actualX, actualY, cropWidth, cropHeight, captureScaleX, captureScaleY, outputScale) {
-    const safeScaleX = Math.max(0.01, Number(captureScaleX) || 1);
-    const safeScaleY = Math.max(0.01, Number(captureScaleY) || safeScaleX);
-    const safeOutputScale = Math.max(0.01, Number(outputScale) || 1);
-    const x = Math.max(0, Number(actualX) || 0);
-    const y = Math.max(0, Number(actualY) || 0);
-    const cssWidth = Math.max(0, Number(cropWidth) || 0) / safeScaleX;
-    const cssHeight = Math.max(0, Number(cropHeight) || 0) / safeScaleY;
-    const left = Math.round(x * safeScaleX * safeOutputScale);
-    const top = Math.round(y * safeScaleY * safeOutputScale);
-    const right = Math.round((x + cssWidth) * safeScaleX * safeOutputScale);
-    const bottom = Math.round((y + cssHeight) * safeScaleY * safeOutputScale);
+  function computeTileDestination(rect, fullWidth, fullHeight, outputWidth, outputHeight) {
+    const safeFullWidth = Math.max(1, Number(fullWidth) || 1);
+    const safeFullHeight = Math.max(1, Number(fullHeight) || 1);
+    const safeOutputWidth = Math.max(1, Math.round(Number(outputWidth) || 1));
+    const safeOutputHeight = Math.max(1, Math.round(Number(outputHeight) || 1));
+    const x = Math.max(0, Math.min(safeFullWidth, Number(rect && rect.x) || 0));
+    const y = Math.max(0, Math.min(safeFullHeight, Number(rect && rect.y) || 0));
+    const width = Math.max(0, Math.min(safeFullWidth - x, Number(rect && rect.width) || 0));
+    const height = Math.max(0, Math.min(safeFullHeight - y, Number(rect && rect.height) || 0));
+    const rightCss = x + width;
+    const bottomCss = y + height;
+    const left = Math.round(x / safeFullWidth * safeOutputWidth);
+    const top = Math.round(y / safeFullHeight * safeOutputHeight);
+    const right = rightCss >= safeFullWidth ? safeOutputWidth : Math.round(rightCss / safeFullWidth * safeOutputWidth);
+    const bottom = bottomCss >= safeFullHeight ? safeOutputHeight : Math.round(bottomCss / safeFullHeight * safeOutputHeight);
     return { x: left, y: top, width: Math.max(1, right - left), height: Math.max(1, bottom - top) };
   }
 
@@ -696,13 +699,13 @@
     return { start, end, left, right };
   }
 
-  function filterTextBlocksOnCensor(textBlocks, censorBounds) {
-    if (!Array.isArray(textBlocks) || !censorBounds) return textBlocks || [];
+  function filterTextBlocksIntersectingBounds(textBlocks, bounds) {
+    if (!Array.isArray(textBlocks) || !bounds) return textBlocks || [];
     const cb = {
-      left: censorBounds.x,
-      top: censorBounds.y,
-      right: censorBounds.x + censorBounds.width,
-      bottom: censorBounds.y + censorBounds.height
+      left: bounds.x,
+      top: bounds.y,
+      right: bounds.x + bounds.width,
+      bottom: bounds.y + bounds.height
     };
     return textBlocks.filter(block => {
       const blockRight = block.x + block.width;
@@ -715,6 +718,20 @@
       );
       return !intersects;
     });
+  }
+
+  function filterTextBlocksOnCensor(textBlocks, censorBounds) {
+    return filterTextBlocksIntersectingBounds(textBlocks, censorBounds);
+  }
+
+  // Text rectangles use output bitmap pixels. Never retain a partially cropped block:
+  // its hidden characters would otherwise remain recoverable in the PDF.
+  function scaleTextBlocks(textBlocks, scaleX, scaleY = scaleX) {
+    return (textBlocks || []).map(block => ({ ...block,
+      x: block.x * scaleX, y: block.y * scaleY,
+      width: block.width * scaleX, height: block.height * scaleY,
+      fontSize: (block.fontSize || 12) * scaleY
+    }));
   }
 
   function shiftAndCropTextBlocks(textBlocks, cropRect) {
@@ -735,11 +752,9 @@
         blockBottom <= cr.top ||
         block.y >= cr.bottom
       );
-      if (intersects) {
-        result.push(Object.assign({}, block, {
-          x: Math.max(0, block.x - cr.left),
-          y: Math.max(0, block.y - cr.top)
-        }));
+      if (intersects && block.x >= cr.left && block.y >= cr.top
+          && blockRight <= cr.right && blockBottom <= cr.bottom) {
+        result.push({ ...block, x: block.x - cr.left, y: block.y - cr.top });
       }
     });
     return result;
@@ -773,6 +788,8 @@
     waitForPaint,
     computeArrowPoints,
     filterTextBlocksOnCensor,
-    shiftAndCropTextBlocks
+    filterTextBlocksIntersectingBounds,
+    shiftAndCropTextBlocks,
+    scaleTextBlocks
   };
 });

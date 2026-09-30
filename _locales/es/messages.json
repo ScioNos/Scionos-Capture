@@ -451,5 +451,8 @@
   },
   "helpClose": {
     "message": "Cerrar ayuda"
+  },
+  "textLayerLimitedNotice": {
+    "message": "La capa de búsqueda del PDF se limita al texto cuya visibilidad puede verificarse. Se conserva la imagen capturada."
   }
 }

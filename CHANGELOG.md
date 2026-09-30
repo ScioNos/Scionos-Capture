@@ -6,6 +6,20 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 
 ## [Unreleased]
 
+## [1.3.2] - 2026-09-30
+
+### Corrigé
+
+- Coordonnées CSS, conteneurs et pixels unifiées ; sélection avec défilement automatique de la page rétablie ; métadonnées textuelles ajustées au DPR et aux réductions.
+- Assemblage sans réécriture des portions déjà capturées ; éléments fixes et collants réévalués à chaque tuile, y compris après changement de position ou apparition hors écran.
+- PDF : texte collecté par tuile, exclusions des mots recouverts, invisibles ou partiellement rognés ; rognage et masquage alignés sur les pixels ; anciens calques aux coordonnées non vérifiables omis.
+- Éditeur : URL longue contenue, ajustement à la largeur disponible, champ Texte conservant le focus, annulation native des champs, compteur des pastilles après rétablissement et consolidation asynchrone de l’historique corrigés.
+- Captures conservées tant que leur éditeur est ouvert, supprimées à sa fermeture ; expiration des orphelins et transferts abandonnés ; associations reconstituées au réveil.
+
+### Maintenance et validation
+
+- Délais de stabilisation et de collecte textuelle bornés ; dépendances transitives corrigées ; tests sur pixels réels, quatre facteurs d’échelle et extraction effective de PDF.
+
 ## [1.3.1] - 2026-09-28
 
 ### Ajouté
@@ -131,7 +145,8 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 - Descriptions localisées dépassant la limite de 132 caractères.
 - Conservation temporaire plus longue que celle annoncée et perte au rechargement de l’éditeur.
 
-[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.2...HEAD
+[1.3.2]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.1...v1.2.0
