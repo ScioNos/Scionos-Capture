@@ -112,6 +112,15 @@ test('unreleased synchronization preserves published links and history and is id
     for (const file of ['package.json', 'package-lock.json', 'manifest.json', ...docs]) {
       await fs.copyFile(path.join(__dirname, '..', file), path.join(root, file));
     }
+    // Fix the published download fixture independently of the repository's current release.
+    const publishedReadme = [
+      '![Version](https://img.shields.io/badge/version-1.3.2-blue)',
+      '[Release v1.3.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.3.2)',
+      'Download: `scionos-capture-v1.3.2.zip`'
+    ].join('\n') + '\n';
+    for (const file of docs.filter(file => file.startsWith('README'))) {
+      await fs.writeFile(path.join(root, file), publishedReadme, 'utf8');
+    }
     const history = '# Historical audit 1.3.2\nPublished 2026-09-30\n';
     for (const file of ['CHANGELOG.md', 'AUDIT_1.3.2.md']) await fs.writeFile(path.join(root, file), history);
     await updateReadmeVersion('1.3.4', root, { unreleased: true });
