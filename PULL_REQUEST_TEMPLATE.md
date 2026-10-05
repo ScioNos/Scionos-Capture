@@ -7,6 +7,7 @@ Décrivez le problème résolu et la solution.
 ## Vérification
 
 - [ ] `npm run verify` réussit
+- [ ] Brouillons refusés à l’export et absence des secrets masqués dans les pixels et le texte PDF vérifiées
 - [ ] Extension testée dans Chrome et Edge
 - [ ] Clavier, responsive et langues concernés vérifiés
 - [ ] Zone défilante vérifiée si capture, scroll, DPR ou assemblage sont concernés

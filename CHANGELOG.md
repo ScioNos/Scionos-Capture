@@ -6,6 +6,16 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 
 ## [Unreleased]
 
+## [1.3.3] - 2026-10-05
+
+- Captures : assemblage rectangulaire commun, sélection horizontale sans étirement, coordonnées corrigées pour les conteneurs translatés ou mis à l’échelle ; transformations complexes refusées explicitement.
+- Sélection : défilement automatique aux bords du conteneur choisi, largeur et origine horizontale verrouillées dans le mode vertical, surcouches utilisables au-dessus des dialogues modaux.
+- Assemblage : pied de page fixe conservé intégralement lorsque la dernière tranche est plus courte ; restauration après annulation et réponses tardives ignorées.
+- Confidentialité : texte recouvert par un descendant exclu du PDF ; masque libre continu, y compris entre points éloignés et lors d’un simple clic.
+- Exports : validation ou annulation obligatoire des modifications en attente ; pixels et métadonnées issus de la même révision pour PNG, HTML, copie et PDF.
+- HTML : image incorporée une seule fois, contrôle de taille en octets, défilement des longues images et zoom 100 % corrigés ; extraction textuelle arrêtée au plafond de 1 500 blocs.
+- Maintenance : version 1.3.3 distincte des téléchargements publiés, synchronisation `--unreleased`, vérification des Markdown et régressions sur pixels réels, PDF et quatre DPR.
+
 ## [1.3.2] - 2026-09-30
 
 ### Corrigé
@@ -145,7 +155,8 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 - Descriptions localisées dépassant la limite de 132 caractères.
 - Conservation temporaire plus longue que celle annoncée et perte au rechargement de l’éditeur.
 
-[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.2...HEAD
+[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.3...HEAD
+[1.3.3]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.2.0...v1.3.0

@@ -5,6 +5,7 @@ Problem und Lösung beschreiben.
 ## Prüfung
 
 - [ ] `npm run verify` ist erfolgreich
+- [ ] Export ausstehender Änderungen blockiert und maskierte Geheimnisse aus Bild und PDF-Text entfernt
 - [ ] In Chrome und Edge getestet
 - [ ] Relevante Tastatur-, Responsive- und Sprachfälle geprüft
 - [ ] Scrollbereich geprüft, wenn Aufnahme, Scrollen, DPR oder Zusammensetzen betroffen sind

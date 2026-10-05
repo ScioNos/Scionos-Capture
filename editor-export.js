@@ -1,22 +1,32 @@
 // PNG, HTML, print and clipboard actions for the screenshot editor.
 (function registerEditorExport(globalScope) {
-  function bindEditorExport({ buttons, getCommittedSurface, getCaptureRecord, getTextBlocks, getI18nText, getLanguage, showToast, cancelDraft }) {
+  function bindEditorExport({ buttons, getCommittedSurface, getCaptureRecord, getTextBlocks, getI18nText, getLanguage, showToast, hasPendingDraft = () => false }) {
     const { downloadButton, htmlButton, printButton, copyButton } = buttons;
-    const current = {
-      get committedSurface() { return getCommittedSurface(); },
-      get captureRecord() { return getCaptureRecord(); },
-      get activeTextBlocks() { return getTextBlocks(); }
-    };
+    function snapshot() {
+      if (hasPendingDraft()) {
+        showToast(getI18nText('exportPendingDraft'), true);
+        return null;
+      }
+      const source = getCommittedSurface();
+      if (!source) return null;
+      const committedSurface = document.createElement('canvas');
+      committedSurface.width = source.width;
+      committedSurface.height = source.height;
+      committedSurface.getContext('2d').drawImage(source, 0, 0);
+      return { committedSurface, captureRecord: { ...getCaptureRecord() }, activeTextBlocks: [...(getTextBlocks() || [])] };
+    }
 
-    function canvasToBlob(surface = current.committedSurface) {
+    function canvasToBlob(surface) {
       return new Promise((resolve, reject) => {
         surface.toBlob(blob => blob ? resolve(blob) : reject(new Error('Image preparation failed.')), 'image/png');
       });
     }
 
     downloadButton.addEventListener('click', async () => {
+      const current = snapshot();
+      if (!current) return;
       try {
-        const blob = await canvasToBlob();
+        const blob = await canvasToBlob(current.committedSurface);
         const link = document.createElement('a');
         const title = current.captureRecord && current.captureRecord.title ? current.captureRecord.title : '';
         const baseName = ScionosCaptureUtils.sanitizeFilename(title, 'Scionos_Capture');
@@ -31,9 +41,11 @@
       }
     });
     htmlButton.addEventListener('click', async () => {
+      const current = snapshot();
+      if (!current) return;
       try {
         if (!current.committedSurface) return;
-        const imageBlob = await canvasToBlob();
+        const imageBlob = await canvasToBlob(current.committedSurface);
         const estimatedHtmlBytes = 32 + Math.ceil(imageBlob.size * 4 / 3);
         if (estimatedHtmlBytes > ScionosCaptureUtils.MAX_HTML_EXPORT_BYTES) {
           throw new Error('The HTML export exceeds the supported size limit.');
@@ -61,11 +73,11 @@
             btnPrint: getI18nText('btnPrint')
           }
         });
-        if (htmlContent.length > ScionosCaptureUtils.MAX_HTML_EXPORT_BYTES) {
+        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+        if (blob.size > ScionosCaptureUtils.MAX_HTML_EXPORT_BYTES) {
           throw new Error('The HTML export exceeds the supported size limit.');
         }
 
-        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
         const link = document.createElement('a');
         const title = current.captureRecord && current.captureRecord.title ? current.captureRecord.title : '';
         const baseName = ScionosCaptureUtils.sanitizeFilename(title, 'Scionos_Capture');
@@ -80,8 +92,9 @@
       }
     });
     printButton.addEventListener('click', async () => {
+      const current = snapshot();
+      if (!current) return;
       try {
-        cancelDraft();
         if (!current.committedSurface) return;
         const printArea = document.getElementById('print-area');
         if (printArea) {
@@ -160,8 +173,10 @@
       }
     });
     copyButton.addEventListener('click', async () => {
+      const current = snapshot();
+      if (!current) return;
       try {
-        const blob = await canvasToBlob();
+        const blob = await canvasToBlob(current.committedSurface);
         await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
         showToast(getI18nText('copySuccess'));
       } catch (error) {

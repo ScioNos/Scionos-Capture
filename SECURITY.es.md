@@ -11,3 +11,5 @@ El objetivo es responder en 3 días laborables y dar una evaluación inicial en 
 Las capturas, incluidos los mosaicos de un área desplazable, permanecen en el origen local. No se ejecutan scripts remotos y el nuevo modo no añade permisos. Las huérfanas caducan tras quince minutos. Usa máscara sólida para secretos; el desenfoque no es una eliminación criptográfica.
 
 La capa de búsqueda del PDF conserva solo palabras completas cuya visibilidad puede verificarse. Las palabras inciertas se omiten de esa capa y se conserva la imagen capturada. También se omiten las capas antiguas con coordenadas no verificadas. Usa censura sólida para proteger píxeles confidenciales; el desenfoque es solo visual.
+
+Aplica o cancela los cambios pendientes antes de exportar. El desenfoque es un efecto visual; usa una máscara sólida para secretos.

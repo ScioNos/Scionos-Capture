@@ -2,11 +2,13 @@
 (function registerContentTransfer(globalScope) {
   function createContentTransfer({ Utils, text }) {
 
-    async function captureVisibleTab() {
+    async function captureVisibleTab(checkpoint = () => {}) {
       const retryDelays = [0, 400, 900];
       let lastError;
       for (let attempt = 0; attempt < retryDelays.length; attempt += 1) {
+        checkpoint();
         if (retryDelays[attempt]) await Utils.delay(retryDelays[attempt]);
+        checkpoint();
         let response;
         try {
           response = await sendMessage({ action: 'CAPTURE_VISIBLE_TAB' });
@@ -14,6 +16,7 @@
           lastError = error;
           continue;
         }
+        checkpoint();
         if (response && response.success) return response;
         if (response && response.errorCode === 'TAB_CHANGED') throw new Error(text('tabChangedError'));
         if (response && response.errorCode === 'RATE_LIMITED') {
@@ -25,7 +28,8 @@
       throw lastError || new Error('Capture failed.');
     }
 
-    async function openEditor(blob, scale, textBlocks = [], textLayerLimited = false) {
+    async function openEditor(blob, scale, textBlocks = [], textLayerLimited = false, checkpoint = () => {}, commit = () => {}) {
+      checkpoint();
       if (!(blob instanceof Blob) || blob.size < 1) throw new Error('Invalid capture image.');
       const expectedChunks = Math.ceil(blob.size / Utils.TRANSFER_CHUNK_BYTES);
       const begin = await sendMessage({
@@ -38,21 +42,28 @@
       }
       const transferId = begin.transferId;
       try {
+        checkpoint();
         for (let index = 0; index < expectedChunks; index += 1) {
+          checkpoint();
           const chunk = blob.slice(index * Utils.TRANSFER_CHUNK_BYTES, (index + 1) * Utils.TRANSFER_CHUNK_BYTES);
           const data = await blobToBase64(chunk);
+          checkpoint();
           let response;
           let lastError;
           for (const retryDelay of [0, 250, 500]) {
             if (retryDelay) await Utils.delay(retryDelay);
+            checkpoint();
             try {
               response = await sendMessage({ action: 'APPEND_CAPTURE_CHUNK', transferId, index, data });
               if (response && response.success) break;
               lastError = new Error(response && response.error ? response.error : 'Capture chunk rejected.');
             } catch (error) { lastError = error; }
           }
+          checkpoint();
           if (!response || !response.success) throw lastError || new Error('Capture chunk failed.');
         }
+        checkpoint();
+        commit();
         const completed = await sendMessage({ action: 'COMPLETE_CAPTURE_TRANSFER', transferId });
         if (!completed || !completed.success) throw new Error(completed && completed.error ? completed.error : 'Editor unavailable.');
       } catch (error) {

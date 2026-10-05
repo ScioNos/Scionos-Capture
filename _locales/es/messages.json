@@ -454,5 +454,11 @@
   },
   "textLayerLimitedNotice": {
     "message": "La capa de búsqueda del PDF se limita al texto cuya visibilidad puede verificarse. Se conserva la imagen capturada."
+  },
+  "exportPendingDraft": {
+    "message": "Aplica o cancela la modificación pendiente antes de exportar."
+  },
+  "unsupportedTransformError": {
+    "message": "Esta superficie usa una rotación, inclinación o transformación no compatible. Captura una zona visible sin esta transformación."
   }
 }

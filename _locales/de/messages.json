@@ -454,5 +454,11 @@
   },
   "textLayerLimitedNotice": {
     "message": "Die durchsuchbare PDF-Ebene enthält nur Text mit überprüfbarer Sichtbarkeit. Das aufgenommene Bild bleibt erhalten."
+  },
+  "exportPendingDraft": {
+    "message": "Übernehmen oder verwerfen Sie die ausstehende Änderung vor dem Export."
+  },
+  "unsupportedTransformError": {
+    "message": "Dieser Bereich verwendet eine nicht unterstützte Drehung, Scherung oder Transformation. Erfassen Sie einen sichtbaren Bereich ohne diese Transformation."
   }
 }

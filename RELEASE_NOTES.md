@@ -1,47 +1,55 @@
-# Scionos Capture 1.3.2
+# Scionos Capture 1.3.3
+
+**Date de version : 5 octobre 2026 (2026-10-05).**
 
 ## Français
 
-- Coordonnées CSS, conteneurs et pixels unifiées ; sélection avec défilement automatique de la page rétablie ; métadonnées textuelles ajustées au DPR et aux réductions.
-- Assemblage sans réécriture des portions déjà capturées ; éléments fixes et collants réévalués à chaque tuile, y compris après changement de position ou apparition hors écran.
-- PDF : texte collecté par tuile, exclusions des mots recouverts, invisibles ou partiellement rognés ; rognage et masquage alignés sur les pixels ; anciens calques aux coordonnées non vérifiables omis.
-- Éditeur : URL longue contenue, ajustement à la largeur disponible, champ Texte conservant le focus, annulation native des champs, compteur des pastilles après rétablissement et consolidation asynchrone de l’historique corrigés.
-- Captures conservées tant que leur éditeur est ouvert, supprimées à sa fermeture ; expiration des orphelins et transferts abandonnés ; associations reconstituées au réveil.
-- Délais de stabilisation et de collecte textuelle bornés ; dépendances transitives corrigées ; tests sur pixels réels, quatre facteurs d’échelle et extraction effective de PDF.
+**1.3.3 — 2026-10-05**
 
-La couche recherchable du PDF conserve uniquement les mots complets dont la visibilité est vérifiable. Les mots incertains sont omis de cette couche ; l’image capturée est conservée. Les anciens calques aux coordonnées non vérifiables sont également omis. Le masquage solide reste nécessaire pour protéger les pixels confidentiels ; le flou est seulement visuel.
+- Captures : assemblage rectangulaire commun, sélection horizontale sans étirement, coordonnées corrigées pour les conteneurs translatés ou mis à l’échelle ; transformations complexes refusées explicitement.
+- Sélection : défilement automatique aux bords du conteneur choisi, largeur et origine horizontale verrouillées dans le mode vertical, surcouches utilisables au-dessus des dialogues modaux.
+- Assemblage : pied de page fixe conservé intégralement lorsque la dernière tranche est plus courte ; restauration après annulation et réponses tardives ignorées.
+- Confidentialité : texte recouvert par un descendant exclu du PDF ; masque libre continu, y compris entre points éloignés et lors d’un simple clic.
+- Exports : validation ou annulation obligatoire des modifications en attente ; pixels et métadonnées issus de la même révision pour PNG, HTML, copie et PDF.
+- HTML : image incorporée une seule fois, contrôle de taille en octets, défilement des longues images et zoom 100 % corrigés ; extraction textuelle arrêtée au plafond de 1 500 blocs.
+- Maintenance : version 1.3.3 distincte des téléchargements publiés, synchronisation `--unreleased`, vérification des Markdown et régressions sur pixels réels, PDF et quatre DPR.
 
 ## English
 
-- Unified CSS, container and bitmap coordinates; restored document auto-scroll selection; scaled text metadata for DPR and image reductions.
-- Assembly no longer overwrites captured areas; fixed and sticky elements are reassessed on each tile, including position changes and initially offscreen elements.
-- PDF: collect text per tile; omit covered, invisible and partially cropped words; align cropping and censorship with bitmap pixels; omit legacy layers with unverified coordinates.
-- Editor: contain long URLs, fit the available width, preserve text-input focus and native input undo, advance step numbers after redo, and protect asynchronous history consolidation.
-- Keep captures while their editor remains open and delete them on closure; expire orphans and abandoned transfers; reconstruct associations when the worker wakes.
-- Bound stabilization and text-collection budgets; patch transitive dependencies; add real-pixel tests, four scaling factors and extraction from generated PDFs.
+**1.3.3 — 2026-10-05**
 
-The searchable PDF layer retains only complete words whose visibility can be verified. Uncertain words are omitted from that layer while the captured image is preserved. Legacy layers with unverified coordinates are also omitted. Use solid censorship to protect confidential pixels; blur is only a visual effect.
+- Capture: shared rectangular stitching, horizontal selections without stretching, correct coordinates for translated or scaled containers; unsupported complex transforms fail explicitly.
+- Selection: auto-scroll at the selected container edges, locked horizontal origin and width in vertical mode, overlays usable above modal dialogs.
+- Stitching: retain the complete fixed footer when the final strip is shorter; restore state after cancellation and ignore late responses.
+- Privacy: omit text covered by descendants from searchable PDFs; continuous freehand masks across distant points and single clicks.
+- Exports: apply or cancel pending edits before exporting; PNG, HTML, clipboard and PDF use pixels and metadata from the same revision.
+- HTML: embed the image once, check the final byte size, fix long-image scrolling and 100% zoom; stop text extraction at 1,500 blocks.
+- Maintenance: separate version 1.3.3 from published downloads, add `--unreleased` synchronization, verify Markdown, and add real-pixel, PDF and four-DPR regressions.
 
 ## Español
 
-- Coordenadas CSS, del contenedor y de la imagen unificadas; selección con desplazamiento automático de la página corregida; metadatos de texto ajustados al DPR y a las reducciones.
-- El ensamblado ya no sobrescribe las partes capturadas; elementos fijos y adherentes reevaluados en cada tesela, incluidos cambios de posición y elementos inicialmente fuera de pantalla.
-- PDF: texto recopilado por tesela; palabras cubiertas, invisibles o parcialmente recortadas omitidas; recorte y censura alineados con los píxeles; capas antiguas con coordenadas no verificadas omitidas.
-- Editor: URL largas contenidas, ajuste al ancho disponible, foco de texto conservado, deshacer nativo en campos, numeración tras rehacer y consolidación asíncrona del historial corregidos.
-- Capturas conservadas mientras el editor permanece abierto y eliminadas al cerrarlo; caducidad de capturas huérfanas y transferencias abandonadas; asociaciones reconstruidas al despertar.
-- Tiempos de estabilización y recopilación de texto limitados; dependencias transitivas corregidas; pruebas con píxeles reales, cuatro escalas y extracción de PDF generados.
+**1.3.3 — 2026-10-05**
 
-La capa de búsqueda del PDF conserva solo palabras completas cuya visibilidad puede verificarse. Las palabras inciertas se omiten de esa capa y se conserva la imagen capturada. También se omiten las capas antiguas con coordenadas no verificadas. Usa censura sólida para proteger píxeles confidenciales; el desenfoque es solo visual.
+- Capturas: ensamblado rectangular común, selecciones horizontales sin estiramiento y coordenadas correctas en contenedores trasladados o escalados; rechazo explícito de transformaciones complejas no compatibles.
+- Selección: desplazamiento automático en los bordes del contenedor elegido, origen horizontal y ancho bloqueados en el modo vertical, selección sobre diálogos modales.
+- Ensamblado: pie fijo completo incluso si el último fragmento es más corto; restauración al cancelar y respuestas tardías ignoradas.
+- Privacidad: texto cubierto por descendientes omitido del PDF; máscaras libres continuas entre puntos distantes y con un solo clic.
+- Exportaciones: aplicar o cancelar cambios pendientes antes de exportar; PNG, HTML, portapapeles y PDF usan píxeles y metadatos de la misma revisión.
+- HTML: imagen integrada una sola vez, tamaño final verificado en bytes, desplazamiento de imágenes largas y zoom 100 % corregidos; extracción limitada a 1.500 bloques.
+- Mantenimiento: versión 1.3.3 separada de las descargas publicadas, sincronización `--unreleased`, revisión de Markdown y regresiones con píxeles reales, PDF y cuatro DPR.
 
 ## Deutsch
 
-- CSS-, Container- und Bildkoordinaten vereinheitlicht; Auswahl mit automatischem Seitenscrollen korrigiert; Textmetadaten an DPR und Bildverkleinerungen angepasst.
-- Bereits erfasste Bereiche werden nicht mehr überschrieben; feste und haftende Elemente werden pro Kachel neu bewertet, einschließlich Positionsänderungen und zunächst unsichtbarer Elemente.
-- PDF: Text pro Kachel erfasst; verdeckte, unsichtbare und teilweise abgeschnittene Wörter ausgelassen; Zuschnitt und Maskierung an Bildpixeln ausgerichtet; ältere Ebenen mit ungeprüften Koordinaten ausgelassen.
-- Editor: lange URLs begrenzt, Anpassung an verfügbare Breite, Texteingabefokus und natives Rückgängigmachen erhalten, Schrittzähler nach Wiederherstellung und asynchrone Verlaufskonsolidierung korrigiert.
-- Aufnahmen bleiben bei geöffnetem Editor erhalten und werden beim Schließen gelöscht; verwaiste Aufnahmen und abgebrochene Übertragungen laufen ab; Zuordnungen werden beim Aufwachen wiederhergestellt.
-- Zeitbudgets für Stabilisierung und Texterfassung begrenzt; transitive Abhängigkeiten aktualisiert; Tests mit echten Pixeln, vier Skalierungen und Textextraktion aus erzeugten PDFs ergänzt.
+**1.3.3 — 2026-10-05**
 
-Die durchsuchbare PDF-Ebene enthält nur vollständige Wörter mit überprüfbarer Sichtbarkeit. Unsichere Wörter werden aus dieser Ebene ausgelassen; das aufgenommene Bild bleibt erhalten. Ältere Ebenen mit ungeprüften Koordinaten werden ebenfalls ausgelassen. Vertrauliche Pixel müssen deckend maskiert werden; Unschärfe ist nur ein visueller Effekt.
+- Aufnahmen: gemeinsame rechteckige Kachelzusammensetzung, horizontale Auswahl ohne Streckung, korrekte Koordinaten für verschobene oder skalierte Container; explizite Ablehnung komplexer Transformationen.
+- Auswahl: automatisches Scrollen an den Rändern des gewählten Containers, feste horizontale Position und Breite im vertikalen Modus, Auswahl über modalen Dialogen.
+- Zusammensetzung: vollständige feste Fußzeile auch bei kürzerem letzten Abschnitt; Zustand nach Abbruch wiederhergestellt und verspätete Antworten ignoriert.
+- Datenschutz: durch Nachfahren verdeckten Text aus PDFs entfernen; durchgehende freie Maskierung zwischen entfernten Punkten und bei einzelnen Klicks.
+- Exporte: ausstehende Änderungen vor Export übernehmen oder verwerfen; PNG, HTML, Zwischenablage und PDF verwenden Bild und Metadaten derselben Revision.
+- HTML: Bild nur einmal einbetten, endgültige Byte-Größe prüfen, Scrollen langer Bilder und 100-%-Zoom korrigieren; Textextraktion bei 1.500 Blöcken beenden.
+- Wartung: Version 1.3.3 von veröffentlichten Downloads trennen, `--unreleased`-Synchronisierung, Markdown-Prüfung sowie Regressionen mit echten Pixeln, PDF und vier DPR.
 
-ZIP: `scionos-capture-v1.3.2.zip` · SHA-256: `scionos-capture-v1.3.2.zip.sha256`.
+Archive ZIP / ZIP archive : `scionos-capture-v1.3.3.zip` · SHA-256 : `scionos-capture-v1.3.3.zip.sha256`.
+
+Validation locale : `npm run verify` sous Node.js 24 — 59 tests unitaires et 68 tests E2E Chromium réussis. Archive de 29 fichiers et SHA-256 vérifié. La CI couvre également les contrôles principaux sous Node.js 20 et les régressions Windows.

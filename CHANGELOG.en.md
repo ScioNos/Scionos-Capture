@@ -6,6 +6,16 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.3.3] - 2026-10-05
+
+- Capture: shared rectangular stitching, horizontal selections without stretching, correct coordinates for translated or scaled containers; unsupported complex transforms fail explicitly.
+- Selection: auto-scroll at the selected container edges, locked horizontal origin and width in vertical mode, overlays usable above modal dialogs.
+- Stitching: retain the complete fixed footer when the final strip is shorter; restore state after cancellation and ignore late responses.
+- Privacy: omit text covered by descendants from searchable PDFs; continuous freehand masks across distant points and single clicks.
+- Exports: apply or cancel pending edits before exporting; PNG, HTML, clipboard and PDF use pixels and metadata from the same revision.
+- HTML: embed the image once, check the final byte size, fix long-image scrolling and 100% zoom; stop text extraction at 1,500 blocks.
+- Maintenance: separate version 1.3.3 from published downloads, add `--unreleased` synchronization, verify Markdown, and add real-pixel, PDF and four-DPR regressions.
+
 ## [1.3.2] - 2026-09-30
 
 ### Fixed
@@ -140,7 +150,8 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Canvas-clipping zoom, non-responsive toolbar, incomplete translations, hard-coded shortcut, contrast, and accessible names.
 - Locale descriptions above 132 characters, editor reload data loss, and inaccurate retention wording.
 
-[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.2...HEAD
+[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.3...HEAD
+[1.3.3]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.2.0...v1.3.0

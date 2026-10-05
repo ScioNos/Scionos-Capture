@@ -99,6 +99,19 @@
 
     function createCensorPath(targetContext, operation) {
       if (operation.shape === 'free') {
+        for (let index = 1; index < operation.points.length; index += 1) {
+          const start = operation.points[index - 1];
+          const end = operation.points[index];
+          const length = Math.hypot(end.x - start.x, end.y - start.y);
+          if (!length) continue;
+          const nx = -(end.y - start.y) * operation.radius / length;
+          const ny = (end.x - start.x) * operation.radius / length;
+          targetContext.moveTo(start.x - nx, start.y - ny);
+          targetContext.lineTo(end.x - nx, end.y - ny);
+          targetContext.lineTo(end.x + nx, end.y + ny);
+          targetContext.lineTo(start.x + nx, start.y + ny);
+          targetContext.closePath();
+        }
         operation.points.forEach(point => {
           targetContext.moveTo(point.x + operation.radius, point.y);
           targetContext.arc(point.x, point.y, operation.radius, 0, Math.PI * 2);

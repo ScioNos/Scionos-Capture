@@ -2,6 +2,8 @@
 
 [Français](README.md) · [English](README.en.md) · [Español](README.es.md) · [Deutsch](README.de.md)
 
+![Version](https://img.shields.io/badge/version-1.3.3-blue)
+
 Extensión totalmente local para capturas en Chrome y Edge. Captura el área visible, una selección, una área desplazable o una página completa; después dibuja, oculta, recorta y exporta como PNG, HTML interactivo o PDF.
 
 ## Funciones
@@ -15,7 +17,7 @@ Extensión totalmente local para capturas en Chrome y Edge. Captura el área vis
 
 ## Instalación
 
-Descarga `scionos-capture-v1.3.2.zip` de la [versión v1.3.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.3.2), verifica si quieres el archivo `.sha256` y extrae el ZIP. Abre `chrome://extensions` o `edge://extensions`, activa el **Modo de desarrollador**, elige **Cargar descomprimida** y selecciona la carpeta extraída.
+Descarga `scionos-capture-v1.3.3.zip` de la [versión v1.3.3](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.3.3), verifica si quieres el archivo `.sha256` y extrae el ZIP. Abre `chrome://extensions` o `edge://extensions`, activa el **Modo de desarrollador**, elige **Cargar descomprimida** y selecciona la carpeta extraída.
 
 Desde el código fuente: clona el repositorio, ejecuta `npm ci` y carga la raíz del proyecto como extensión descomprimida.
 
@@ -31,8 +33,18 @@ Las páginas infinitas permanentes no tienen un final determinable. El área des
 
 Usa Node.js 24, ejecuta `npm ci` y `npm run verify`. Consulta [CONTRIBUTING.es.md](CONTRIBUTING.es.md), [CHANGELOG.es.md](CHANGELOG.es.md) y la [licencia MIT](LICENSE).
 
-### PDF — 1.3.2
+### PDF
+
+Aplica o cancela los cambios pendientes antes de exportar. El desenfoque es un efecto visual; usa una máscara sólida para secretos.
+
+Se admiten contenedores trasladados y escalados. Las rotaciones, inclinaciones y perspectivas no compatibles producen un error explícito.
 
 La capa de búsqueda del PDF conserva solo palabras completas cuya visibilidad puede verificarse. Las palabras inciertas se omiten de esa capa y se conserva la imagen capturada. También se omiten las capas antiguas con coordenadas no verificadas. Usa censura sólida para proteger píxeles confidenciales; el desenfoque es solo visual.
 
 Se recomienda Node.js 24 para la verificación completa, incluida la extracción PDF con PDF.js 6.3.289 (solo para pruebas). Las comprobaciones principales siguen siendo compatibles con Node.js 20.
+
+Sincroniza una versión no publicada con `npm run version:sync -- 1.3.3 --unreleased`; en PowerShell usa `npm.cmd run version:sync -- 1.3.3 --unreleased`. Los enlaces de descarga publicados se conservan.
+
+<!-- local-package --> Archivo local : `scionos-capture-v1.3.3.zip` · SHA-256 : `scionos-capture-v1.3.3.zip.sha256`.
+
+`npm run test:native` verifica los cuatro modos en Chrome y Edge instalados, con capturas reales y perfiles temporales. La acción de la extensión concede `activeTab`; no se usan perfiles personales.

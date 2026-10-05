@@ -1,7 +1,7 @@
 const js = require('@eslint/js');
 
 const browserGlobals = Object.fromEntries([
-  'Blob', 'ClipboardItem', 'CustomEvent', 'FileReader', 'IDBKeyRange', 'Image', 'URL', 'URLSearchParams',
+  'Blob', 'ClipboardItem', 'CustomEvent', 'DOMMatrixReadOnly', 'FileReader', 'IDBKeyRange', 'Image', 'URL', 'URLSearchParams',
   'cancelAnimationFrame', 'chrome', 'confirm', 'console', 'crypto', 'document', 'fetch', 'indexedDB',
   'navigator', 'requestAnimationFrame', 'setTimeout', 'clearTimeout', 'window', 'alert', 'location',
   'createImageBitmap', 'getComputedStyle', 'importScripts', 'module', 'NodeFilter',

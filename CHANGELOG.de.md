@@ -4,6 +4,16 @@
 
 ## [Unveröffentlicht]
 
+## [1.3.3] - 2026-10-05
+
+- Aufnahmen: gemeinsame rechteckige Kachelzusammensetzung, horizontale Auswahl ohne Streckung, korrekte Koordinaten für verschobene oder skalierte Container; explizite Ablehnung komplexer Transformationen.
+- Auswahl: automatisches Scrollen an den Rändern des gewählten Containers, feste horizontale Position und Breite im vertikalen Modus, Auswahl über modalen Dialogen.
+- Zusammensetzung: vollständige feste Fußzeile auch bei kürzerem letzten Abschnitt; Zustand nach Abbruch wiederhergestellt und verspätete Antworten ignoriert.
+- Datenschutz: durch Nachfahren verdeckten Text aus PDFs entfernen; durchgehende freie Maskierung zwischen entfernten Punkten und bei einzelnen Klicks.
+- Exporte: ausstehende Änderungen vor Export übernehmen oder verwerfen; PNG, HTML, Zwischenablage und PDF verwenden Bild und Metadaten derselben Revision.
+- HTML: Bild nur einmal einbetten, endgültige Byte-Größe prüfen, Scrollen langer Bilder und 100-%-Zoom korrigieren; Textextraktion bei 1.500 Blöcken beenden.
+- Wartung: Version 1.3.3 von veröffentlichten Downloads trennen, `--unreleased`-Synchronisierung, Markdown-Prüfung sowie Regressionen mit echten Pixeln, PDF und vier DPR.
+
 ## [1.3.2] - 2026-09-30
 
 ### Behoben
@@ -131,7 +141,8 @@
 - Vollständige 4-Sprachen-Unterstützung: Französisch, Englisch, Spanisch und Deutsch.
 - Volle Barrierefreiheit (WCAG, hohe Kontraste, Tastaturnavigation, Screenreader).
 
-[Unveröffentlicht]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.2...HEAD
+[Unveröffentlicht]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.3...HEAD
+[1.3.3]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.2.0...v1.3.0

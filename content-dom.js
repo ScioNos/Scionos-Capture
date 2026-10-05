@@ -10,13 +10,12 @@
       blocks.limited = false;
       if (!region || region.width <= 0 || region.height <= 0) return blocks;
       const position = surface.getPosition();
-      const viewport = surface.isDocument
-        ? { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight }
-        : surface.getCaptureRect();
-      const originX = viewport.left - position.x;
-      const originY = viewport.top - position.y;
-      const clip = { left: originX + region.x, top: originY + region.y,
-        right: originX + region.x + region.width, bottom: originY + region.y + region.height };
+      const viewport = surface.getCaptureRect();
+      const scaleX = viewport.scaleX || 1, scaleY = viewport.scaleY || 1;
+      const originX = viewport.left - position.x * scaleX;
+      const originY = viewport.top - position.y * scaleY;
+      const clip = { left: originX + region.x * scaleX, top: originY + region.y * scaleY,
+        right: originX + (region.x + region.width) * scaleX, bottom: originY + (region.y + region.height) * scaleY };
       const overlaps = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
       const deadline = Date.now() + 500;
       const painted = [];
@@ -66,7 +65,7 @@
             // Geometric overlaps are rejected even for pointer-events:none or a layer behind
             // the text. This deliberately prefers an image-only word to a privacy leak.
             if (reliable) reliable = !painted.some(item => item.element !== parent
-              && !item.element.contains(parent) && !parent.contains(item.element) && overlaps(item.rect, rect));
+              && !item.element.contains(parent) && overlaps(item.rect, rect));
             if (reliable) {
               for (let ancestor = parent; ancestor && reliable; ancestor = ancestor.parentElement) {
                 if (!ancestorReliability.has(ancestor)) {
@@ -90,13 +89,13 @@
               for (const x of [rect.left + 0.5, (rect.left + rect.right) / 2, rect.right - 0.5]) {
                 for (const y of [rect.top + 0.5, (rect.top + rect.bottom) / 2, rect.bottom - 0.5]) {
                   const hit = document.elementFromPoint(x, y);
-                  if (!hit || !(hit === parent || parent.contains(hit))) reliable = false;
+                  if (hit !== parent) reliable = false;
                 }
               }
             }
             if (!reliable || blocks.length >= 1500) { blocks.limited = true; continue; }
-            blocks.push({ text: match[0], x: rect.left - clip.left, y: rect.top - clip.top,
-              width: rect.width, height: rect.height, fontSize: parseFloat(computed.fontSize) || 14,
+            blocks.push({ text: match[0], x: (rect.left - clip.left) / scaleX, y: (rect.top - clip.top) / scaleY,
+              width: rect.width / scaleX, height: rect.height / scaleY, fontSize: parseFloat(computed.fontSize) || 14,
               fontFamily: computed.fontFamily || 'sans-serif', isLink: Boolean(link && link.href),
               url: link && link.href ? link.href : null });
           }
@@ -144,7 +143,10 @@
           window.scrollTo(x, y);
         },
         getCaptureRect() {
-          return { left: 0, top: 0, width: element.clientWidth, height: element.clientHeight };
+          const gutterWidth = Math.max(0, window.innerWidth - element.clientWidth);
+          const rootLeft = document.documentElement.getBoundingClientRect().left + window.scrollX;
+          const left = rootLeft > 0 && rootLeft <= gutterWidth + 1 ? rootLeft : 0;
+          return { left, top: 0, width: element.clientWidth, height: element.clientHeight };
         }
       };
     }
@@ -174,12 +176,36 @@
           }
         },
         getCaptureRect() {
+          for (let ancestor = element; ancestor; ancestor = ancestor.parentElement) {
+            const style = getComputedStyle(ancestor);
+            const matrix = new DOMMatrixReadOnly(style.transform === 'none' ? undefined : style.transform);
+            const individualScale = (style.scale || 'none').split(/\s+/u);
+            if (!matrix.is2D || Math.abs(matrix.b) > 0.000001 || Math.abs(matrix.c) > 0.000001
+                || matrix.a <= 0 || matrix.d <= 0
+                || (style.rotate && style.rotate !== 'none' && parseFloat(style.rotate) !== 0)
+                || (style.perspective && style.perspective !== 'none')
+                || individualScale.some(value => value !== 'none' && !(Number(value) > 0))) {
+              throw new Error(text('unsupportedTransformError'));
+            }
+          }
           const rect = element.getBoundingClientRect();
+          const style = getComputedStyle(element);
+          const size = (dimension, sides) => {
+            let result = parseFloat(style[dimension]);
+            if (style.boxSizing !== 'border-box') {
+              for (const side of sides) result += (parseFloat(style['padding' + side]) || 0) + (parseFloat(style['border' + side + 'Width']) || 0);
+            }
+            return result || (dimension === 'width' ? element.offsetWidth : element.offsetHeight);
+          };
+          const scaleX = rect.width / size('width', ['Left', 'Right']);
+          const scaleY = rect.height / size('height', ['Top', 'Bottom']);
+          if (!(scaleX > 0 && scaleY > 0)) throw new Error(text('unsupportedTransformError'));
           return {
-            left: rect.left + element.clientLeft,
-            top: rect.top + element.clientTop,
-            width: element.clientWidth,
-            height: element.clientHeight
+            left: rect.left + element.clientLeft * scaleX,
+            top: rect.top + element.clientTop * scaleY,
+            width: element.clientWidth * scaleX,
+            height: element.clientHeight * scaleY,
+            scaleX, scaleY
           };
         }
       };
@@ -327,9 +353,10 @@
       ]);
     }
 
-    async function stabilizePageDimensions(surface, range) {
+    async function stabilizePageDimensions(surface, range, checkpoint = () => {}) {
       const deadline = Date.now() + 5000;
       await settleVisibleResources();
+      checkpoint();
       let previous = surface.getMetrics();
       let stablePasses = 0;
       for (let pass = 0; pass < 4 && stablePasses < 2 && Date.now() < deadline; pass += 1) {
@@ -344,11 +371,14 @@
         }
         const originalX = surface.getPosition().x;
         for (const y of positions) {
+          checkpoint();
           if (Date.now() >= deadline) break;
           surface.scrollTo(originalX, y);
           await Utils.waitForPaint();
+          checkpoint();
           if (Date.now() >= deadline) break;
           await Utils.delay(Math.min(120, Math.max(0, deadline - Date.now())));
+          checkpoint();
           if (Date.now() >= deadline) break;
           assertSurfacePosition(surface, { x: originalX, y });
         }
@@ -378,10 +408,12 @@
 
     function createAnchoredElementManager(surface) {
       let hidden = [];
+      let bottomPatches = [];
       const seen = new WeakMap();
       return {
-        prepare(tileIndex = 0, totalTiles = 1, writtenRect = null) {
+        prepare(tileIndex = 0, totalTiles = 1, writtenRect = null, isLastRow = tileIndex === totalTiles - 1) {
           hidden = [];
+          bottomPatches = [];
           const capture = surface.isDocument
             ? { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight }
             : surface.getCaptureRect();
@@ -413,16 +445,20 @@
             const repeated = firstPosition && (fixed || external
               || (verticalPin && Math.abs(position.y - firstPosition.y) > 2)
               || (horizontalPin && Math.abs(position.x - firstPosition.x) > 2));
-            const shouldHide = repeated || (bottomFixed && tileIndex < totalTiles - 1);
+            const shouldHide = bottomFixed ? !isLastRow : repeated;
             if (shouldHide) {
               hidden.push(ScionosContentUtils.snapshotInlineStyle(element, 'visibility'));
               element.style.setProperty('visibility', 'hidden', 'important');
+            } else if (bottomFixed) {
+              bottomPatches.push({ left: Math.max(rect.left, capture.left), top: Math.max(rect.top, capture.top),
+                right: Math.min(rect.right, capture.left + capture.width), bottom: Math.min(rect.bottom, capture.top + capture.height) });
             } else if (rect.right > bounds.left && rect.left < bounds.right && rect.bottom > bounds.top && rect.top < bounds.bottom) {
               visible.push(element);
             }
           }
           visible.forEach(element => { if (!seen.has(element)) seen.set(element, position); });
         },
+        getBottomPatches() { return bottomPatches; },
         restore() {
           hidden.forEach(ScionosContentUtils.restoreInlineStyle);
           hidden = [];
@@ -447,12 +483,30 @@
       return current;
     }
 
+    function surfacePointToClient(surface, point) {
+      const rect = surface.getCaptureRect(), position = surface.getPosition();
+      return { x: rect.left + (point.x - position.x) * (rect.scaleX || 1),
+        y: rect.top + (point.y - position.y) * (rect.scaleY || 1) };
+    }
+
+    function clientPointToSurface(surface, clientX, clientY, clamp = false) {
+      const rect = surface.getCaptureRect(), position = surface.getPosition();
+      const x = (clientX - rect.left) / (rect.scaleX || 1), y = (clientY - rect.top) / (rect.scaleY || 1);
+      const metrics = surface.getMetrics();
+      return { x: position.x + (clamp ? Math.max(0, Math.min(metrics.viewportWidth, x)) : x),
+        y: position.y + (clamp ? Math.max(0, Math.min(metrics.viewportHeight, y)) : y) };
+    }
+
+    function surfaceRectToClient(surface, region) {
+      const start = surfacePointToClient(surface, region);
+      const end = surfacePointToClient(surface, { x: region.x + region.width, y: region.y + region.height });
+      return { left: start.x, top: start.y, right: end.x, bottom: end.y };
+    }
+
     function getSurfaceCaptureCrop(surface, image) {
       if (surface.isDocument) {
         const element = surface.element;
-        const scrollbarWidth = Math.max(0, window.innerWidth - element.clientWidth);
-        const rootLeft = document.documentElement.getBoundingClientRect().left;
-        const contentLeft = rootLeft > 0 && rootLeft <= scrollbarWidth + 1 ? rootLeft : 0;
+        const contentLeft = surface.getCaptureRect().left;
         return Utils.computeCaptureViewportMetrics({
           bitmapWidth: image.width, bitmapHeight: image.height,
           innerWidth: window.innerWidth, innerHeight: window.innerHeight,
@@ -469,11 +523,15 @@
       const top = Math.max(0, Math.round(rect.top * metrics.scaleY));
       const right = Math.max(left + 1, Math.min(image.width, Math.round((rect.left + rect.width) * metrics.scaleX)));
       const bottom = Math.max(top + 1, Math.min(image.height, Math.round((rect.top + rect.height) * metrics.scaleY)));
-      return { ...metrics, crop: { x: left, y: top, width: right - left, height: bottom - top } };
+      if (rect.left < -0.5 || rect.top < -0.5 || rect.left + rect.width > window.innerWidth + 0.5
+          || rect.top + rect.height > window.innerHeight + 0.5) throw new Error(text('fullScrollError'));
+      return { ...metrics, scaleX: metrics.scaleX * rect.scaleX, scaleY: metrics.scaleY * rect.scaleY,
+        crop: { x: left, y: top, width: right - left, height: bottom - top } };
     }
 
     return Object.freeze({
       extractDomTextBlocks, getDocumentScrollSurface, getElementScrollSurface,
+      clientPointToSurface, surfacePointToClient, surfaceRectToClient,
       hasScrollRange, isVisibleScrollCandidate, isScrollableElement,
       findScrollSurface, findScrollSurfaceAtPoint, getSurfaceMaxScroll,
       assertSurfacePosition, settleVisibleResources, stabilizePageDimensions,

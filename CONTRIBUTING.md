@@ -15,3 +15,9 @@ Vérifiez les quatre modes de capture, notamment les deux points, le défilement
 Toute nouvelle chaîne doit être ajoutée aux quatre fichiers `_locales/*/messages.json`. Toute permission de manifeste doit être minimale, expliquée dans le README et couverte par la validation du paquet.
 
 Node.js 24 est recommandé pour la vérification complète, notamment l’extraction PDF avec PDF.js 6.3.289 (dépendance de test uniquement). Les contrôles principaux restent compatibles avec Node.js 20.
+
+La synchronisation d’une version non publiée utilise `npm run version:sync -- 1.3.3 --unreleased` ; sous PowerShell, utilisez `npm.cmd run version:sync -- 1.3.3 --unreleased`. Les liens de téléchargement publié restent inchangés.
+
+Appliquez ou annulez les modifications en attente avant tout export. Le flou reste un effet visuel ; utilisez un masque solide pour les secrets. Les captures de conteneurs translatés ou mis à l’échelle sont prises en charge. Les rotations, inclinaisons et perspectives non prises en charge provoquent une erreur explicite.
+
+`npm run test:native` vérifie les quatre modes dans Chrome et Edge installés, avec de vraies captures et des profils temporaires. La permission `activeTab` est accordée par l’action de l’extension ; les profils personnels ne sont pas utilisés.

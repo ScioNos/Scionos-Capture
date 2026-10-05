@@ -454,5 +454,11 @@
   },
   "textLayerLimitedNotice": {
     "message": "The searchable PDF layer is limited to text whose visibility can be verified. The captured image is preserved."
+  },
+  "exportPendingDraft": {
+    "message": "Apply or cancel the pending edit before exporting."
+  },
+  "unsupportedTransformError": {
+    "message": "This surface uses an unsupported rotation, skew or transform. Capture a visible area without this transform."
   }
 }

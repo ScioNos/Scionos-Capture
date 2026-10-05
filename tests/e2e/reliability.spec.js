@@ -50,19 +50,21 @@ async function redRuns(page, x = 30) {
     return runs;
   }, x);
 }
-async function inspectSolidCapture(page, expectedColor) {
-  return page.evaluate(async color => {
+async function inspectSolidCapture(page, expectedColor, inset = 0) {
+  return page.evaluate(async ({ color, inset }) => {
     const image = new globalThis.Image(); image.src = globalThis.__openedCapture.dataUrl; await image.decode();
     const canvas = document.createElement('canvas'); canvas.width = image.width; canvas.height = image.height;
     const context = canvas.getContext('2d'); context.drawImage(image, 0, 0);
     const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
     let mismatches = 0;
     for (let index = 0; index < pixels.length; index += 4) {
+      const x = index / 4 % canvas.width, y = Math.floor(index / 4 / canvas.width);
+      if (x < inset || y < inset || x >= canvas.width - inset || y >= canvas.height - inset) continue;
       if (pixels[index] !== color[0] || pixels[index + 1] !== color[1]
           || pixels[index + 2] !== color[2] || pixels[index + 3] !== 255) mismatches += 1;
     }
     return { width: image.width, height: image.height, mismatches };
-  }, expectedColor);
+  }, { color: expectedColor, inset });
 }
 
 for (const mode of ['fixed', 'sticky', 'dynamic', 'below-fold']) {
@@ -511,4 +513,212 @@ test('undo during asynchronous PDF encoding cannot mix masked pixels with origin
   expect(await page.locator('.searchable-text-layer').textContent()).toContain('PUBLIC_KEEP');
   expect(await page.locator('.searchable-text-layer').textContent()).not.toContain('SECRET_ASYNC');
   await page.close();
+});
+
+test('descendant covers cannot leak text into a generated PDF', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, '<style>html,body{margin:0;background:white}p{position:absolute;left:50px;margin:0}.cover{position:absolute;inset:0;background:white}</style><p style="top:40px">PUBLIC_DESCENDANT</p><p style="top:100px">SECRET_CHILD_NONE<span class="cover" style="pointer-events:none"></span></p><p style="top:180px">SECRET_CHILD_AUTO<span class="cover"></span></p>');
+  await useRealPixels(page); await startCapture(page, 'START_VISIBLE_CAPTURE'); await readOpenedCapture(page);
+  const capture = await page.evaluate(() => globalThis.__openedCapture);
+  expect(capture.textBlocks.map(block => block.text)).toEqual(['PUBLIC_DESCENDANT']);
+  await seedEditor(page, { width:800, height:600, textBlocks:capture.textBlocks });
+  const text = await printText(page);
+  expect(text).toContain('PUBLIC_DESCENDANT'); expect(text).not.toContain('SECRET_CHILD');
+  await page.close();
+});
+
+test('fast freehand masks cover every segment and single clicks across undo and redo', async () => {
+  const page = await context.newPage(); await page.setViewportSize({width:1400,height:900});
+  await seedEditor(page, {width:400,height:250,textBlocks:[{text:'SECRET_FREE_SEGMENT',x:100,y:90,width:170,height:24,fontSize:18}]});
+  await page.locator('#tool-censor').click(); await page.locator('#censor-type').selectOption('color'); await page.locator('#censor-shape').selectOption('free');
+  const canvas = page.locator('#main-canvas'); const box = await canvas.boundingBox();
+  const point = (x,y) => ({x:box.x+x/400*box.width,y:box.y+y/250*box.height});
+  const start = point(30,100), end = point(330,100);
+  await page.mouse.move(start.x,start.y); await page.mouse.down(); await page.mouse.move(end.x,end.y); await page.mouse.up();
+  const pixel = () => canvas.evaluate(c => [...c.getContext('2d').getImageData(180,100,1,1).data]);
+  expect(await pixel()).toEqual([0,0,0,255]); expect(await printText(page)).not.toContain('SECRET_FREE_SEGMENT');
+  await page.locator('#btn-undo').click(); expect(await printText(page)).toContain('SECRET_FREE_SEGMENT');
+  await page.locator('#btn-redo').click(); expect(await pixel()).toEqual([0,0,0,255]);
+  const click=point(30,200); await page.mouse.click(click.x,click.y);
+  expect(await canvas.evaluate(c => [...c.getContext('2d').getImageData(30,200,1,1).data])).toEqual([0,0,0,255]);
+  await page.close();
+});
+
+test('all exports reject a pending mask without cancelling the preview', async () => {
+  const page = await context.newPage(); await seedEditor(page);
+  await page.locator('#tool-censor').click(); await page.locator('#geometry-x').fill('30');
+  await page.evaluate(() => {
+    globalThis.__exportCalls=0;
+    const original=globalThis.HTMLCanvasElement.prototype.toBlob;
+    globalThis.HTMLCanvasElement.prototype.toBlob=function(...args){globalThis.__exportCalls++;return original.apply(this,args);};
+    globalThis.print=()=>{globalThis.__exportCalls++;};
+  });
+  for(const id of ['btn-download','btn-html','btn-copy','btn-pdf']) {
+    await page.locator('#'+id).click();
+    await expect(page.locator('#toast')).toContainText(/Appliquez ou annulez|Apply or cancel/);
+    await expect(page.locator('#geometry-panel')).toBeVisible();
+  }
+  expect(await page.evaluate(()=>globalThis.__exportCalls)).toBe(0);
+  await page.locator('#geometry-cancel').click();
+  await page.locator('#btn-pdf').click();
+  await expect(page.locator('#print-area img')).toHaveAttribute('src',/^blob:/);
+  await page.close();
+});
+
+test('horizontal selected capture retains its last color band without stretching', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page,'<style>html,body{margin:0;width:1600px;height:600px;background:linear-gradient(to right,red 0px,red 400px,lime 400px,lime 800px,blue 800px,blue 1200px,yellow 1200px)}</style>');
+  await useRealPixels(page); await startCapture(page,'START_ZONE_CAPTURE');
+  await page.mouse.move(50,100); await page.mouse.down(); await page.mouse.move(798,300);
+  await expect.poll(()=>page.evaluate(()=>globalThis.scrollX)).toBeGreaterThan(500); await page.mouse.up();
+  const capture=await readOpenedCapture(page); expect(capture.width).toBeGreaterThan(1200); expect(capture.height).toBe(200);
+  const pixels=await page.evaluate(async()=>{
+    const image=new globalThis.Image();image.src=globalThis.__openedCapture.dataUrl;await image.decode();
+    const canvas=document.createElement('canvas');canvas.width=image.width;canvas.height=image.height;const ctx=canvas.getContext('2d');ctx.drawImage(image,0,0);
+    return [100,500,900,1200].map(x=>[...ctx.getImageData(x,100,1,1).data]);
+  });
+  expect(pixels).toEqual([[255,0,0,255],[0,255,0,255],[0,0,255,255],[255,255,0,255]]);
+  await expect.poll(()=>page.evaluate(()=>globalThis.scrollX)).toBe(0); await page.close();
+});
+
+test('inner auto-scroll moves up and down at its own edges without scrolling the page',async()=>{
+  const page=await context.newPage();
+  await prepareFullPageHarness(page,'<style>html,body{margin:0;height:1000px}.app{position:absolute;left:100px;top:100px;width:400px;height:250px;overflow:auto}.inner{height:1000px}</style><div class="app" data-scroll-surface><div class="inner"></div></div>');
+  await page.evaluate(()=>{document.querySelector('.app').scrollTop=300;});
+  await startCapture(page,'START_ZONE_CAPTURE');await page.mouse.move(200,200);await page.mouse.down();await page.mouse.move(300,103);
+  await expect.poll(()=>page.evaluate(()=>document.querySelector('.app').scrollTop)).toBeLessThan(200);
+  await page.mouse.move(300,348);await expect.poll(()=>page.evaluate(()=>document.querySelector('.app').scrollTop)).toBeGreaterThan(500);
+  expect(await page.evaluate(()=>globalThis.scrollY)).toBe(0);await page.mouse.up();await readOpenedCapture(page);
+  await expect.poll(()=>page.evaluate(()=>document.querySelector('.app').scrollTop)).toBe(300);await page.close();
+});
+
+test('vertical scrolling selection freezes its horizontal origin after the first point',async()=>{
+  const page=await context.newPage();await prepareFullPageHarness(page,'<style>html,body{margin:0;width:1600px;height:1200px}</style>');
+  await startCapture(page,'START_SCROLLING_ZONE_CAPTURE');await page.mouse.click(100,200);await page.mouse.move(200,400);await page.mouse.wheel(300,0);
+  expect(await page.evaluate(()=>globalThis.scrollX)).toBe(0);
+  await expect(page.locator('input[name="x"]')).toHaveValue('100');await expect(page.locator('input[name="width"]')).toHaveValue('100');
+  await page.keyboard.press('Escape');await page.close();
+});
+
+test('a footer taller than the final strip is fully retained once',async()=>{
+  const page=await context.newPage();await prepareFullPageHarness(page,'<style>html,body{margin:0;height:650px;background:white}footer{position:fixed;bottom:0;width:100%;height:100px;background:red}</style><footer></footer>');
+  await useRealPixels(page);await startFullPageCapture(page);await readOpenedCapture(page);
+  expect(await redRuns(page)).toEqual([{y:550,height:100}]);await page.close();
+});
+
+for(const action of ['START_ZONE_CAPTURE','START_SCROLLING_ZONE_CAPTURE']) {
+ test('selection works over an existing modal: '+action,async()=>{
+  const page=await context.newPage();await prepareFullPageHarness(page,'<dialog id="original"><div style="width:400px;height:300px;background:red"></div></dialog>');
+  await page.evaluate(()=>document.getElementById('original').showModal());await startCapture(page,action);
+  await page.mouse.move(250,200);await page.mouse.down();await page.mouse.move(400,300);await page.mouse.up();
+  expect(await readOpenedCapture(page)).toMatchObject({width:150,height:100});
+  expect(await page.locator('#original').evaluate(dialog=>dialog.matches(':modal'))).toBe(true);await page.close();
+ });
+}
+
+test('cancellation keeps the lock until a delayed capture finishes and ignores its pixels',async()=>{
+ const page=await context.newPage();await prepareFullPageHarness(page,'<style>html,body{margin:0;height:1000px}</style>');
+ await page.evaluate(()=>{
+  const previous=globalThis.chrome.runtime.sendMessage;
+  globalThis.chrome.runtime.sendMessage=(message,callback)=>{
+   if(message.action==='CAPTURE_VISIBLE_TAB'){globalThis.__releaseCapture=()=>previous(message,callback);}else previous(message,callback);
+  };
+ });
+ await startCapture(page,'START_ZONE_CAPTURE');await page.mouse.move(100,100);await page.mouse.down();await page.mouse.move(300,300);await page.mouse.up();
+ await page.waitForFunction(()=>globalThis.__releaseCapture);await page.keyboard.press('Escape');
+ expect(await startCapture(page,'START_VISIBLE_CAPTURE')).toEqual({status:'busy'});await page.evaluate(()=>globalThis.__releaseCapture());
+ await expect.poll(()=>startCapture(page,'START_ZONE_CAPTURE')).toEqual({status:'started'});
+ expect(await page.evaluate(()=>globalThis.__openedCapture)).toBeNull();await page.keyboard.press('Escape');await page.close();
+});
+
+for(const dpr of [1,1.25,1.5,2]) {
+ test('@windows-scaling transformed internal surface retains dimensions and interior pixels at DPR '+dpr,async()=>{
+  const scaled=await launchExtension(dpr);const page=await scaled.newPage();
+  try {
+   await prepareFullPageHarness(page,'<style>html,body{margin:0;height:600px;overflow:hidden;background:lime}.wrapper{position:absolute;left:100px;top:100px;transform:translate(20px,10px) scale(.5);transform-origin:0 0}.app{width:400px;height:200px;border:4px solid black;overflow:auto}.inner{height:600px;background:rgb(30,120,210)}</style><div class="wrapper"><div class="app" data-scroll-surface><div class="inner"></div></div></div>');
+   await useRealPixels(page);await startFullPageCapture(page);await readOpenedCapture(page);
+   expect(await inspectSolidCapture(page,[30,120,210],1)).toEqual({width:Math.ceil(200*dpr),height:Math.ceil(300*dpr),mismatches:0});
+   await page.evaluate(()=>{globalThis.__openedCapture=null;});await startCapture(page,'START_SCROLLING_ZONE_CAPTURE');
+   for(const [key,value] of Object.entries({x:40,y:40,width:200,height:500})) await page.locator('input[name="'+key+'"]').fill(String(value));
+   await page.locator('[data-scionos-capture="scrolling-controls"] button[type="submit"]').click();await readOpenedCapture(page);
+   expect(await inspectSolidCapture(page,[30,120,210],1)).toEqual({width:Math.ceil(100*dpr),height:Math.ceil(250*dpr),mismatches:0});
+   await page.evaluate(()=>{globalThis.__openedCapture=null;});await startCapture(page,'START_ZONE_CAPTURE');
+   await page.mouse.move(152,150);await page.mouse.down();await page.mouse.move(252,170);await page.mouse.up();await readOpenedCapture(page);
+   expect(await inspectSolidCapture(page,[30,120,210],1)).toEqual({width:Math.ceil(100*dpr),height:Math.ceil(20*dpr),mismatches:0});
+
+  }finally{await scaled.close();}
+ });
+}
+
+test('HTML report embeds one image and exposes correct zoom and the bottom edge',async()=>{
+ const page=await context.newPage();await prepareFullPageHarness(page,'<p>Report fixture</p>');
+ const html=await page.evaluate(()=>{
+  const canvas=document.createElement('canvas');canvas.width=1600;canvas.height=4000;
+  return globalThis.ScionosCaptureUtils.buildHtmlReport({width:1600,height:4000,dataUrl:canvas.toDataURL('image/png'),title:'Long report'});
+ });
+ expect(html.match(/data:image\/png;base64,/g)).toHaveLength(1);
+ await page.setContent(html);await page.locator('#btn-zoom-reset').click();
+ expect(await page.locator('#capture-img').evaluate(img=>img.getBoundingClientRect().width)).toBe(1600);
+ const dimensions=await page.locator('#viewer').evaluate(viewer=>{viewer.scrollTop=viewer.scrollHeight;viewer.scrollLeft=viewer.scrollWidth;return {top:viewer.scrollTop,left:viewer.scrollLeft,height:viewer.clientHeight};});
+ expect(dimensions.top).toBeGreaterThan(3000);expect(dimensions.left).toBeGreaterThan(800);expect(dimensions.height).toBeLessThan(600);
+ await page.locator('#btn-zoom-fit').click();expect(await page.locator('#capture-img').evaluate(img=>img.getBoundingClientRect().width)).toBeCloseTo(752);
+ await page.setViewportSize({width:1000,height:600});await expect.poll(()=>page.locator('#capture-img').evaluate(img=>img.getBoundingClientRect().width)).toBeCloseTo(952);
+ expect(await page.locator('#btn-download').evaluate(link=>link.href===document.getElementById('capture-img').src)).toBe(true);await page.close();
+});
+
+test('blurred freehand paths include the segment between distant points',async()=>{
+ const page=await context.newPage();await seedEditor(page,{width:400,height:200});
+ const result=await page.evaluate(()=>{
+  const canvas=document.createElement('canvas');canvas.width=400;canvas.height=200;const ctx=canvas.getContext('2d');
+  ctx.fillStyle='black';ctx.fillRect(0,0,400,200);ctx.fillStyle='white';for(let x=0;x<400;x+=20)ctx.fillRect(x,0,10,200);
+  const original=[...ctx.getImageData(180,100,1,1).data];
+  globalThis.ScionosEditorOperations.create({captureUtils:globalThis.ScionosCaptureUtils}).applyOperation(canvas,{kind:'censor',type:'blur',shape:'free',radius:12,blur:14,points:[{x:30,y:100},{x:330,y:100}]});
+  return {original,middle:[...ctx.getImageData(180,100,1,1).data],outside:[...ctx.getImageData(180,20,1,1).data]};
+ });
+ expect(result.middle[0]).toBeGreaterThan(50);expect(result.middle[0]).toBeLessThan(200);expect(result.outside).toEqual(result.original);await page.close();
+});
+
+test('text extraction stops after the global block cap while pixels still complete',async()=>{
+ const page=await context.newPage();await prepareFullPageHarness(page,'<style>html,body{margin:0;height:2400px}</style>');
+ const result=await page.evaluate(async()=>{
+  const utils=globalThis.ScionosCaptureUtils;const text=key=>key;const dom=globalThis.ScionosContentDom.create({Utils:utils,text});let calls=0;
+  const capture=globalThis.ScionosContentCapture.create({Utils:utils,text,dom:{...dom,extractDomTextBlocks:()=>{calls++;return Array.from({length:1500},(_,i)=>({text:'word'+i,x:i/10,y:0,width:1,height:1}));}},transfer:globalThis.ScionosContentTransfer.create({Utils:utils,text})});
+  await capture.executeFullPageCapture();return {calls,blocks:globalThis.__openedCapture.textBlocks.length,limited:globalThis.__openedCapture.textLayerLimited};
+ });
+ expect(result).toEqual({calls:1,blocks:1500,limited:true});expect(await readOpenedCapture(page)).toMatchObject({height:2400});await page.close();
+});
+
+test('HTML final size uses encoded bytes rather than string length',async()=>{
+ const page=await context.newPage();await seedEditor(page,{width:100,height:100});
+ await page.evaluate(()=>{
+  globalThis.ScionosCaptureUtils={...globalThis.ScionosCaptureUtils,MAX_HTML_EXPORT_BYTES:30000,buildHtmlReport:()=> 'é'.repeat(20000)};
+  globalThis.__downloaded=false;globalThis.HTMLAnchorElement.prototype.click=function(){globalThis.__downloaded=true;};
+ });
+ await page.locator('#btn-html').click();await expect(page.locator('#toast')).toContainText('size limit');
+ expect(await page.evaluate(()=>globalThis.__downloaded)).toBe(false);await page.close();
+});
+
+for(const action of ['START_FULL_PAGE_CAPTURE','START_ZONE_CAPTURE','START_SCROLLING_ZONE_CAPTURE']) {
+ test('unsupported rotations fail explicitly and release the capture session: '+action,async()=>{
+  const page=await context.newPage();const alerts=[];page.on('dialog',async dialog=>{alerts.push(dialog.message());await dialog.dismiss();});
+  await prepareFullPageHarness(page,'<style>html,body{margin:0;height:600px;overflow:hidden}.app{position:absolute;left:200px;top:100px;width:300px;height:200px;overflow:auto;transform:rotate(5deg)}.inner{height:600px}</style><div class="app" data-scroll-surface><div class="inner"></div></div>');
+  await startCapture(page,action);
+  if(action!=='START_FULL_PAGE_CAPTURE'){await page.mouse.move(250,160);await page.mouse.down();await page.mouse.move(350,250);await page.mouse.up();}
+  await expect.poll(()=>alerts.length).toBe(1);expect(alerts[0]).toContain('transformation non prise en charge');
+  expect(await page.evaluate(()=>globalThis.__openedCapture)).toBeNull();
+  await page.evaluate(()=>{document.querySelector('.app').style.transform='none';});
+  await expect.poll(()=>startCapture(page,'START_VISIBLE_CAPTURE')).toEqual({status:'started'});await readOpenedCapture(page);await page.close();
+ });
+}
+
+test('left scrollbar gutters share the same viewport origin for selection and visible text',async()=>{
+ const page=await context.newPage();await prepareFullPageHarness(page,'<style>html{scrollbar-gutter:stable both-edges}html,body{margin:0}body{height:1200px;background:red}.stripe{position:absolute;left:110px;top:0;width:40px;height:1200px;background:blue}p{position:absolute;left:250px;top:400px;margin:0;color:black}</style><div class="stripe"></div><p>GUTTER_PUBLIC</p>');
+ await useRealPixels(page);await startCapture(page,'START_VISIBLE_CAPTURE');await readOpenedCapture(page);
+ const text=await page.evaluate(()=>({block:globalThis.__openedCapture.textBlocks.find(b=>b.text==='GUTTER_PUBLIC'),left:document.querySelector('p').getBoundingClientRect().left}));
+ expect(text.block.x).toBeCloseTo(text.left);
+ await page.evaluate(()=>{globalThis.__openedCapture=null;});await startCapture(page,'START_ZONE_CAPTURE');
+ await page.mouse.move(100,100);await page.mouse.down();await page.mouse.move(400,300);await page.mouse.up();await readOpenedCapture(page);
+ const pixels=await page.evaluate(async()=>{
+  const image=new globalThis.Image();image.src=globalThis.__openedCapture.dataUrl;await image.decode();const c=document.createElement('canvas');c.width=image.width;c.height=image.height;const ctx=c.getContext('2d');ctx.drawImage(image,0,0);const edge=document.querySelector(".stripe").getBoundingClientRect().left-100;return [edge-5,edge+5].map(x=>[...ctx.getImageData(x,50,1,1).data]);
+ });expect(pixels).toEqual([[255,0,0,255],[0,0,255,255]]);await page.close();
 });

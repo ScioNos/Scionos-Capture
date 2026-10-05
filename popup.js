@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'scrollingInvalidRegion', 'scrollingCapture', 'scrollingToBottom', 'scrollingRestart', 'scrollingCancel',
         'coordinateX', 'coordinateY', 'coordinateWidth', 'coordinateHeight',
         'btnScrollingTitle', 'tabChangedError', 'captureAlreadyRunning',
-        'layoutChangedError', 'captureTooLargeError'
+        'layoutChangedError', 'captureTooLargeError', 'unsupportedTransformError'
       ];
       const response = await chrome.tabs.sendMessage(tab.id, {
         action,

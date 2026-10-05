@@ -2,6 +2,8 @@
 
 [Français](README.md) · [English](README.en.md) · [Español](README.es.md) · [Deutsch](README.de.md)
 
+![Version](https://img.shields.io/badge/version-1.3.3-blue)
+
 A fully local Chrome and Edge screenshot extension. Capture the viewport, a selection, a scrolling area, or a complete page, then draw, mask, crop, and export as PNG, interactive HTML, or PDF.
 
 ## Features
@@ -15,7 +17,7 @@ A fully local Chrome and Edge screenshot extension. Capture the viewport, a sele
 
 ## Installation
 
-Download `scionos-capture-v1.3.2.zip` from the [v1.3.2 release](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.3.2), optionally verify the `.sha256` file, and extract it. Open `chrome://extensions` or `edge://extensions`, enable **Developer mode**, choose **Load unpacked**, and select the extracted folder.
+Download `scionos-capture-v1.3.3.zip` from the [v1.3.3 release](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.3.3), optionally verify the `.sha256` file, and extract it. Open `chrome://extensions` or `edge://extensions`, enable **Developer mode**, choose **Load unpacked**, and select the extracted folder.
 
 To work from source, clone the repository, run `npm ci`, and load the project root as an unpacked extension.
 
@@ -39,8 +41,18 @@ Permanent infinite-scroll pages have no determinable end. A scrolling area is li
 
 Use Node.js 24, then run `npm ci` and `npm run verify`. Verification includes syntax, lint, HTML, unit/integration tests, manifest/locales, packaging, Chromium E2E, and Axe. See [CONTRIBUTING.en.md](CONTRIBUTING.en.md), [CHANGELOG.en.md](CHANGELOG.en.md), and the [MIT License](LICENSE).
 
-### PDF — 1.3.2
+### PDF
+
+Apply or cancel pending edits before any export. Blur remains a visual effect; use a solid mask for secrets.
+
+Translated and scaled capture containers are supported. Unsupported rotations, skews and perspective transforms produce an explicit error.
 
 The searchable PDF layer retains only complete words whose visibility can be verified. Uncertain words are omitted from that layer while the captured image is preserved. Legacy layers with unverified coordinates are also omitted. Use solid censorship to protect confidential pixels; blur is only a visual effect.
 
 Node.js 24 is recommended for full verification, including PDF extraction with PDF.js 6.3.289 (test dependency only). Core checks remain compatible with Node.js 20.
+
+Synchronize an unpublished version with `npm run version:sync -- 1.3.3 --unreleased`; in PowerShell use `npm.cmd run version:sync -- 1.3.3 --unreleased`. Published download links remain unchanged.
+
+<!-- local-package --> Local archive : `scionos-capture-v1.3.3.zip` · SHA-256 : `scionos-capture-v1.3.3.zip.sha256`.
+
+`npm run test:native` checks all four modes in installed Chrome and Edge, using real captures and temporary profiles. The extension action grants `activeTab`; personal profiles are not used.

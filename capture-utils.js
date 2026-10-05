@@ -308,16 +308,18 @@
       }
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
-      min-height: 100vh;
+      height: 100vh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
     header {
+      flex: 0 0 auto;
       background: var(--panel);
       border-bottom: 1px solid var(--line);
       padding: 10px 16px;
@@ -434,10 +436,8 @@
     }
     .viewer {
       flex: 1;
+      min-height: 0;
       overflow: auto;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
       padding: 24px;
       position: relative;
       cursor: grab;
@@ -445,17 +445,17 @@
     }
     .viewer.grabbing { cursor: grabbing; }
     .img-wrap {
-      transform-origin: top center;
-      transition: transform 0.08s ease-out;
+      position: relative;
+      margin: 0 auto;
       box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-      display: inline-block;
       line-height: 0;
       background: #ffffff;
     }
     .img-wrap img {
       display: block;
-      width: 100%;
-      height: auto;
+      position: absolute;
+      max-width: none;
+      transform-origin: top left;
     }
     .toast {
       position: fixed;
@@ -481,9 +481,9 @@
     }
     @media print {
       header, .toast { display: none !important; }
-      body, .viewer { overflow: visible !important; display: block !important; padding: 0 !important; background: #fff !important; }
-      .img-wrap { box-shadow: none !important; transform: none !important; width: 100% !important; }
-      .img-wrap img { width: 100% !important; }
+      body, .viewer { height: auto !important; overflow: visible !important; display: block !important; padding: 0 !important; background: #fff !important; }
+      .img-wrap { box-shadow: none !important; width: 100% !important; height: auto !important; }
+      .img-wrap img { position: static !important; width: 100% !important; height: auto !important; transform: none !important; }
     }
   </style>
 </head>
@@ -534,7 +534,7 @@
       </div>
       <button class="btn" id="btn-copy" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>${escapeHtml(txtCopy)}</button>
       <button class="btn" id="btn-print" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>${escapeHtml(txtPrint)}</button>
-      <a class="btn btn-primary" id="btn-download" href="${dataUrl}" download="Scionos_Capture.png"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 19h16"/></svg>${escapeHtml(txtDownload)}</a>
+      <a class="btn btn-primary" id="btn-download" download="Scionos_Capture.png"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 19h16"/></svg>${escapeHtml(txtDownload)}</a>
     </div>
   </header>
 
@@ -551,6 +551,7 @@
       var viewer = document.getElementById('viewer');
       var imgWrap = document.getElementById('img-wrap');
       var captureImg = document.getElementById('capture-img');
+      document.getElementById('btn-download').href = captureImg.src;
       var zoomVal = document.getElementById('zoom-val');
       var btnZoomIn = document.getElementById('btn-zoom-in');
       var btnZoomOut = document.getElementById('btn-zoom-out');
@@ -561,12 +562,18 @@
       var toast = document.getElementById('toast');
 
       var zoom = 1;
-      var minZoom = 0.1;
+      var fitting = true;
+      var minZoom = 0.01;
       var maxZoom = 4;
 
-      function setZoom(newZoom) {
+      function setZoom(newZoom, fit) {
+        fitting = Boolean(fit);
         zoom = Math.max(minZoom, Math.min(maxZoom, newZoom));
-        imgWrap.style.transform = 'scale(' + zoom + ')';
+        captureImg.style.width = captureImg.naturalWidth + 'px';
+        captureImg.style.height = captureImg.naturalHeight + 'px';
+        captureImg.style.transform = 'scale(' + zoom + ')';
+        imgWrap.style.width = captureImg.naturalWidth * zoom + 'px';
+        imgWrap.style.height = captureImg.naturalHeight * zoom + 'px';
         zoomVal.textContent = Math.round(zoom * 100) + '%';
       }
 
@@ -574,13 +581,14 @@
         if (!captureImg.naturalWidth) return;
         var availableWidth = viewer.clientWidth - 48;
         var scale = availableWidth / captureImg.naturalWidth;
-        setZoom(scale > 1 ? 1 : scale);
+        setZoom(scale > 1 ? 1 : scale, true);
       }
 
       btnZoomIn.addEventListener('click', function() { setZoom(zoom + 0.15); });
       btnZoomOut.addEventListener('click', function() { setZoom(zoom - 0.15); });
       btnZoomReset.addEventListener('click', function() { setZoom(1); });
       btnZoomFit.addEventListener('click', fitToWidth);
+      window.addEventListener('resize', function() { if (fitting) fitToWidth(); });
 
       viewer.addEventListener('wheel', function(e) {
         if (e.ctrlKey || e.metaKey || e.altKey) {

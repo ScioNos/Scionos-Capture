@@ -97,3 +97,55 @@ test('version sync updates all version files after validating a complete lockfil
     await fs.rm(root, { recursive: true, force: true });
   }
 });
+
+test('unreleased synchronization preserves published links and history and is idempotent', async () => {
+  const fs = require('node:fs/promises');
+  const os = require('node:os');
+  const path = require('node:path');
+  const { updateReadmeVersion } = await import('../scripts/update-readme-version.mjs');
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'scionos-unreleased-'));
+  const docs = [
+    'README.md', 'README.en.md', 'README.es.md', 'README.de.md', 'RELEASE_NOTES.md',
+    'SECURITY.md', 'SECURITY.en.md', 'SECURITY.es.md', 'SECURITY.de.md'
+  ];
+  try {
+    for (const file of ['package.json', 'package-lock.json', 'manifest.json', ...docs]) {
+      await fs.copyFile(path.join(__dirname, '..', file), path.join(root, file));
+    }
+    const history = '# Historical audit 1.3.2\nPublished 2026-09-30\n';
+    for (const file of ['CHANGELOG.md', 'AUDIT_1.3.2.md']) await fs.writeFile(path.join(root, file), history);
+    await updateReadmeVersion('1.3.4', root, { unreleased: true });
+    for (const file of docs.filter(file => file.startsWith('README'))) {
+      const text = await fs.readFile(path.join(root, file), 'utf8');
+      assert.ok(text.includes('/badge/version-1.3.4-blue'));
+      assert.ok(text.includes('<!-- source-version --> **1.3.4'));
+      assert.ok(text.includes('/releases/tag/v1.3.2'));
+      assert.ok(text.includes('scionos-capture-v1.3.2.zip'));
+      assert.ok(text.includes('<!-- local-package -->'));
+      assert.ok(text.includes('scionos-capture-v1.3.4.zip'));
+      assert.ok(!text.includes('/releases/tag/v1.3.4'));
+    }
+    assert.deepEqual((await updateReadmeVersion('1.3.4', root, { unreleased: true })).updatedFiles, []);
+    for (const file of ['CHANGELOG.md', 'AUDIT_1.3.2.md']) {
+      assert.equal(await fs.readFile(path.join(root, file), 'utf8'), history);
+    }
+  } finally { await fs.rm(root, { recursive: true, force: true }); }
+});
+
+test('Markdown validation checks relative files and anchors including local ignored documents', async () => {
+  const fs = require('node:fs/promises');
+  const os = require('node:os');
+  const path = require('node:path');
+  const { validateMarkdownDocuments } = await import('../scripts/validate-package.mjs');
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'scionos-markdown-'));
+  try {
+    await fs.writeFile(path.join(root, 'README.md'), '# Documentation\n[Roadmap](ROADMAP.md#étapes)\n[Historical](AUDIT_1.3.2.md)\n');
+    await fs.writeFile(path.join(root, 'ROADMAP.md'), '# Étapes\n');
+    await fs.writeFile(path.join(root, 'AUDIT_1.3.2.md'), '# Audit 1.3.2\n');
+    assert.deepEqual(await validateMarkdownDocuments(root), { documents: 3, links: 2 });
+    await fs.writeFile(path.join(root, 'ROADMAP.md'), '# Other heading\n');
+    await assert.rejects(validateMarkdownDocuments(root), /Missing Markdown anchor/);
+    await fs.rm(path.join(root, 'ROADMAP.md'));
+    await assert.rejects(validateMarkdownDocuments(root), /Missing Markdown link/);
+  } finally { await fs.rm(root, { recursive: true, force: true }); }
+});

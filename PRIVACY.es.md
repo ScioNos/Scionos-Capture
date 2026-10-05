@@ -2,7 +2,7 @@
 
 [Français](PRIVACY.md) · [English](PRIVACY.en.md) · [Español](PRIVACY.es.md) · [Deutsch](PRIVACY.de.md)
 
-Última actualización: 30 de septiembre de 2026.
+Última actualización: 2 de octubre de 2026.
 
 **Editorial responsable:** eyelo SA (IDE: CHE-108.174.302), Vaud, Suiza — Marca **ScioNos** ([scionos.ch](https://scionos.ch)) — Contacto: info@eyelo.ch
 
@@ -17,3 +17,5 @@ Las capturas y sus metadatos de texto permanecen en IndexedDB local. Los fragmen
 El idioma se guarda en `chrome.storage.local` y el vínculo temporal del editor en `chrome.storage.session`. El usuario puede borrar los datos desde la gestión de extensiones o desinstalando. Contacto de privacidad: info@eyelo.ch. Para vulnerabilidades, consulta [SECURITY.es.md](SECURITY.es.md).
 
 La capa de búsqueda del PDF conserva solo palabras completas cuya visibilidad puede verificarse. Las palabras inciertas se omiten de esa capa y se conserva la imagen capturada. También se omiten las capas antiguas con coordenadas no verificadas. Usa censura sólida para proteger píxeles confidenciales; el desenfoque es solo visual.
+
+Aplica o cancela los cambios pendientes antes de exportar. El desenfoque es un efecto visual; usa una máscara sólida para secretos.

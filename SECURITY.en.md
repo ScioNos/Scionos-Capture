@@ -15,3 +15,5 @@ We aim to acknowledge reports within 3 business days and provide an initial asse
 Captures, including scrolling-area tiles, remain in the local extension origin. No remote script runs and scrolling capture adds no permission. Orphaned captures expire after fifteen minutes and are purged on the next wake if the browser was suspended. Use a solid mask for secrets; blur is not cryptographic deletion.
 
 The searchable PDF layer retains only complete words whose visibility can be verified. Uncertain words are omitted from that layer while the captured image is preserved. Legacy layers with unverified coordinates are also omitted. Use solid censorship to protect confidential pixels; blur is only a visual effect.
+
+Apply or cancel pending edits before any export. Blur remains a visual effect; use a solid mask for secrets.

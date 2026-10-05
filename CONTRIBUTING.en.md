@@ -13,3 +13,9 @@ Never attach screenshots containing personal data, credentials, or secrets.
 Test all four capture modes, including the scrolling area's two points, scrolling, partial slices, and geometry fields. Also cover tall and wide pages, DPR, tab switching, Undo/Redo, crop, mask, copy, PNG/PDF, zoom, keyboard access, and all four languages. Add every new string to all `_locales/*/messages.json` files. Keep manifest permissions minimal, documented, and validated.
 
 Node.js 24 is recommended for full verification, including PDF extraction with PDF.js 6.3.289 (test dependency only). Core checks remain compatible with Node.js 20.
+
+Synchronize an unpublished version with `npm run version:sync -- 1.3.3 --unreleased`; in PowerShell use `npm.cmd run version:sync -- 1.3.3 --unreleased`. Published download links remain unchanged.
+
+Apply or cancel pending edits before any export. Blur remains a visual effect; use a solid mask for secrets. Translated and scaled capture containers are supported. Unsupported rotations, skews and perspective transforms produce an explicit error.
+
+`npm run test:native` checks all four modes in installed Chrome and Edge, using real captures and temporary profiles. The extension action grants `activeTab`; personal profiles are not used.

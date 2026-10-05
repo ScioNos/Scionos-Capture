@@ -5,6 +5,7 @@ Describe the problem and solution.
 ## Verification
 
 - [ ] `npm run verify` passes
+- [ ] Pending exports blocked and masked secrets absent from pixels and PDF text
 - [ ] Tested in Chrome and Edge
 - [ ] Relevant keyboard, responsive, and language behavior checked
 - [ ] Scrolling area checked when capture, scrolling, DPR, or stitching is affected

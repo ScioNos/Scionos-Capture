@@ -315,7 +315,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function meaningful(operation) {
     if (!operation) return false;
-    if (operation.kind === 'draw' || operation.kind === 'highlight' || operation.shape === 'free') return operation.points.length > 1;
+    if (operation.kind === 'censor' && operation.shape === 'free') return operation.points.length > 0;
+    if (operation.kind === 'draw' || operation.kind === 'highlight') return operation.points.length > 1;
     if (operation.kind === 'step') return true;
     if (operation.kind === 'text') return Boolean(operation.text && operation.text.trim().length > 0);
     if (operation.kind === 'arrow') {
@@ -836,7 +837,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     getI18nText,
     getLanguage: () => ScionosI18n.language,
     showToast,
-    cancelDraft
+    hasPendingDraft: () => Boolean(draftOperation || pendingTextPoint)
   });
   document.addEventListener('keydown', event => {
     const active = document.activeElement;

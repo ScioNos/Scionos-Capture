@@ -454,5 +454,11 @@
   },
   "textLayerLimitedNotice": {
     "message": "La couche recherchable du PDF est limitée aux textes dont la visibilité est vérifiable. Le rendu de l’image reste conservé."
+  },
+  "exportPendingDraft": {
+    "message": "Appliquez ou annulez la modification en cours avant d’exporter."
+  },
+  "unsupportedTransformError": {
+    "message": "Cette surface utilise une rotation, une inclinaison ou une transformation non prise en charge. Capturez une zone visible sans cette transformation."
   }
 }

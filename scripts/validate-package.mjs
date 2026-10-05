@@ -23,6 +23,48 @@ export function pngDimensions(buffer) {
   return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
 }
 
+export async function validateMarkdownDocuments(projectRoot = root) {
+  const ignored = new Set(['node_modules', '.git', '.codegraph', 'dist', 'test-results', 'playwright-report', 'coverage']);
+  const documents = [];
+  async function visit(directory) {
+    for (const entry of await fs.readdir(directory, { withFileTypes: true })) {
+      const filename = path.join(directory, entry.name);
+      if (entry.isDirectory() && !ignored.has(entry.name)) await visit(filename);
+      else if (entry.isFile() && /\.md$/iu.test(entry.name)) documents.push(filename);
+    }
+  }
+  await visit(projectRoot);
+  const contents = new Map(await Promise.all(documents.map(async file => [file, await fs.readFile(file, 'utf8')])));
+  const anchors = new Map();
+  for (const [file, content] of contents) {
+    const seen = new Map(), ids = new Set();
+    const source = content.replace(/```[\s\S]*?```/gu, '');
+    for (const heading of source.matchAll(/^#{1,6}\s+(.+)$/gmu)) {
+      const base = heading[1].replace(/<[^>]*>/gu, '').toLowerCase().replace(/[^\p{L}\p{N}_\- ]/gu, '').replace(/ /gu, '-');
+      const count = seen.get(base) || 0;
+      seen.set(base, count + 1); ids.add(base + (count ? '-' + count : ''));
+    }
+    anchors.set(file, ids);
+  }
+  let links = 0;
+  for (const [file, content] of contents) {
+    const source = content.replace(/```[\s\S]*?```/gu, '');
+    const destinations = [...source.matchAll(/!?\[[^\]]*\]\(([^\s)]+)(?:\s+"[^"]*")?\)/gu)].map(match => match[1]);
+    destinations.push(...[...source.matchAll(/^\[[^\]]+\]:\s+(\S+)/gmu)].map(match => match[1]));
+    for (const target of destinations) {
+      if (/^[a-z][\w+.-]*:/iu.test(target)) continue;
+      const [relative, fragment] = target.split('#');
+      const destination = relative ? path.resolve(path.dirname(file), decodeURIComponent(relative)) : file;
+      const stat = await fs.stat(destination).catch(() => null);
+      assert(stat, `Missing Markdown link in ${path.relative(projectRoot, file)}: ${target}`);
+      if (fragment && anchors.has(destination)) assert(anchors.get(destination).has(decodeURIComponent(fragment)),
+        `Missing Markdown anchor in ${path.relative(projectRoot, file)}: ${target}`);
+      links += 1;
+    }
+  }
+  return { documents: documents.length, links };
+}
+
 export async function validatePackage() {
   const manifest = await readJson('manifest.json');
   const packageJson = await readJson('package.json');
@@ -78,9 +120,14 @@ export async function validatePackage() {
     assert(content.trim().length > 100, `Documentation is incomplete: ${relativePath}`);
   }));
 
-  const readme = await fs.readFile(path.join(root, 'README.md'), 'utf8');
+  for (const relativePath of ['README.md', 'README.en.md', 'README.es.md', 'README.de.md']) {
+    const readme = await fs.readFile(path.join(root, relativePath), 'utf8');
+    assert(readme.includes(`/badge/version-${manifest.version}-blue`), `README source version is stale: ${relativePath}`);
+    assert(readme.includes(`scionos-capture-v${manifest.version}.zip`), `README local archive version is stale: ${relativePath}`);
+    const sourceMarker = readme.match(/<!-- source-version -->([^\n]+)/u);
+    if (sourceMarker) assert(sourceMarker[1].includes(manifest.version), `README preparation version is stale: ${relativePath}`);
+  }
   const releaseNotes = await fs.readFile(path.join(root, 'RELEASE_NOTES.md'), 'utf8');
-  assert(readme.includes(`scionos-capture-v${manifest.version}.zip`), 'README release archive version is stale');
   assert(releaseNotes.includes(`# Scionos Capture ${manifest.version}`), 'Release notes version is stale');
 
   const supportedLine = chromeSupportedLine(manifest.version);
@@ -89,10 +136,11 @@ export async function validatePackage() {
     assert(content.includes(supportedLine), `Security policy version is stale: ${relativePath}`);
   }));
 
-  return { locales: supportedLocales.length, keys: referenceKeys.length, files: referencedFiles.length + documentFiles.length };
+  const markdown = await validateMarkdownDocuments();
+  return { locales: supportedLocales.length, keys: referenceKeys.length, files: referencedFiles.length + documentFiles.length, markdown };
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const result = await validatePackage();
-  console.log(`Package validation passed: ${result.locales} locales, ${result.keys} keys, ${result.files} references.`);
+  console.log(`Package validation passed: ${result.locales} locales, ${result.keys} keys, ${result.files} references; ${result.markdown.documents} Markdown documents, ${result.markdown.links} local links.`);
 }
