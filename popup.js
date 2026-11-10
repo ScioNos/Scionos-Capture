@@ -4,8 +4,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('btn-full'),
     document.getElementById('btn-visible'),
     document.getElementById('btn-zone'),
-    document.getElementById('btn-scrolling')
+    document.getElementById('btn-scrolling'),
+    document.getElementById('btn-element')
   ];
+  const delaySelect = document.getElementById('capture-delay');
+  const allowedDelays = [0, 3, 5, 10];
+  const normalizeDelay = value => allowedDelays.includes(Number(value)) ? Number(value) : 0;
   const status = document.getElementById('status');
   const shortcutButton = document.getElementById('shortcut-button');
   const shortcutValue = document.getElementById('shortcut-value');
@@ -20,6 +24,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       'txt-zone-desc': 'btnZoneDesc',
       'txt-scrolling-title': 'btnScrollingTitle',
       'txt-scrolling-desc': 'btnScrollingDesc',
+      'txt-element-title': 'elementTitle',
+      'txt-element-desc': 'elementDesc',
+      'delay-label': 'delayLabel',
       'shortcut-label': 'shortcutText',
       'brand-tagline': 'brandTagline'
     };
@@ -32,6 +39,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       helpBtn.setAttribute('aria-label', getI18nText('btnHelp'));
     }
     document.querySelector('[data-i18n="languageAuto"]').textContent = getI18nText('languageAuto');
+    for (const option of delaySelect.options) {
+      const seconds = Number(option.value);
+      option.textContent = seconds === 0 ? getI18nText('delayImmediate') : getI18nText('delaySeconds', { seconds });
+    }
   }
 
   function updateShortcut() {
@@ -76,6 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function setBusy(busy) {
     document.body.setAttribute('aria-busy', String(busy));
     captureButtons.forEach(button => { button.disabled = busy; });
+    delaySelect.disabled = busy;
   }
 
   function getActiveTab() {
@@ -115,7 +127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     await chrome.scripting.executeScript({
       target: { tabId },
-      files: ['capture-utils.js', 'capture-content-utils.js', 'content-dom.js', 'content-transfer.js', 'content-capture.js', 'content.js']
+      files: ['capture-utils.js', 'capture-content-utils.js', 'content-dom.js', 'content-transfer.js', 'content-selection.js', 'content-capture.js', 'content.js']
     });
   }
 
@@ -136,10 +148,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         'scrollingInvalidRegion', 'scrollingCapture', 'scrollingToBottom', 'scrollingRestart', 'scrollingCancel',
         'coordinateX', 'coordinateY', 'coordinateWidth', 'coordinateHeight',
         'btnScrollingTitle', 'tabChangedError', 'captureAlreadyRunning',
-        'layoutChangedError', 'captureTooLargeError', 'unsupportedTransformError'
+        'layoutChangedError', 'captureTooLargeError', 'unsupportedTransformError',
+        'elementTitle', 'elementDesc', 'delayLabel', 'delayImmediate', 'delaySeconds',
+        'selectionTitle', 'selectionCapture', 'selectionRestart', 'selectionCancel',
+        'selectionParent', 'selectionChild', 'elementVisible', 'elementFull',
+        'selectionInstructions', 'countdownStatus', 'countdownCancel', 'elementUnavailable'
       ];
       const response = await chrome.tabs.sendMessage(tab.id, {
         action,
+        delaySeconds: normalizeDelay(delaySelect.value),
         language: ScionosI18n.language,
         messages: ScionosI18n.getMessageBundle(messageKeys)
       });
@@ -155,6 +172,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       setBusy(false);
     }
   }
+
+  delaySelect.disabled = true;
+  try {
+    const stored = await chrome.storage.local.get('captureDelaySeconds');
+    delaySelect.value = String(normalizeDelay(stored.captureDelaySeconds));
+  } catch (error) {
+    console.warn('Capture delay preference unavailable:', error);
+    delaySelect.value = '0';
+  }
+  delaySelect.disabled = false;
+  delaySelect.addEventListener('change', async () => {
+    const captureDelaySeconds = normalizeDelay(delaySelect.value);
+    delaySelect.value = String(captureDelaySeconds);
+    try { await chrome.storage.local.set({ captureDelaySeconds }); }
+    catch (error) { console.warn('Capture delay preference could not be saved:', error); }
+  });
 
   await initI18n();
   const languageMenu = ScionosI18n.setupLanguageMenu({
@@ -199,4 +232,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   captureButtons[1].addEventListener('click', () => startCapture('START_VISIBLE_CAPTURE', 'statusVisible'));
   captureButtons[2].addEventListener('click', () => startCapture('START_ZONE_CAPTURE', 'statusZone'));
   captureButtons[3].addEventListener('click', () => startCapture('START_SCROLLING_ZONE_CAPTURE', 'statusScrolling'));
+  captureButtons[4].addEventListener('click', () => startCapture('START_ELEMENT_CAPTURE', 'elementTitle'));
 });

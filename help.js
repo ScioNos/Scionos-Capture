@@ -15,6 +15,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       'mode-zone-desc': 'helpModeZone',
       'mode-scrolling-title': 'btnScrollingTitle',
       'mode-scrolling-desc': 'helpModeScrolling',
+      'mode-element-title': 'elementTitle',
+      'mode-element-desc': 'helpModeElement',
+      'mode-delay-title': 'delayLabel',
+      'mode-delay-desc': 'helpCaptureDelay',
       'sec-editor-title': 'helpEditorHeader',
       'sec-editor-text': 'helpEditorText',
       'sec-shortcuts-title': 'helpShortcutsHeader',
@@ -39,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const manifestVersion = (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getManifest)
       ? chrome.runtime.getManifest().version
-      : '1.3.1';
+      : '1.4.0';
     const versionElement = document.getElementById('help-version');
     if (versionElement) {
       versionElement.textContent = getI18nText('helpVersionLabel', { version: manifestVersion });

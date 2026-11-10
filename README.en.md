@@ -2,13 +2,15 @@
 
 [Français](README.md) · [English](README.en.md) · [Español](README.es.md) · [Deutsch](README.de.md)
 
-![Version](https://img.shields.io/badge/version-1.3.3-blue)
+![Version](https://img.shields.io/badge/version-1.4.0-blue)
 
 A fully local Chrome and Edge screenshot extension. Capture the viewport, a selection, a scrolling area, or a complete page, then draw, mask, crop, and export as PNG, interactive HTML, or PDF.
 
 ## Features
 
-- Visible, selected, scrolling-area, and two-dimensional full-page capture.
+- Five modes: full page, visible area, selected area, scrolling area, and element capture.
+- Resize handles and coordinates with confirmation before capture; parent/child navigation for element selection.
+- Immediate capture or a cancellable 3, 5, or 10-second delay, remembered locally.
 - Vertical scrolling areas defined with two points or keyboard X/Y/width/height fields.
 - Local editor with drawing, solid masking, visual blur, crop, Undo/Redo, keyboard geometry, and 20–300% zoom.
 - Responsive, keyboard-accessible UI in French, English, Spanish, and German.
@@ -17,25 +19,25 @@ A fully local Chrome and Edge screenshot extension. Capture the viewport, a sele
 
 ## Installation
 
-Download `scionos-capture-v1.3.3.zip` from the [v1.3.3 release](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.3.3), optionally verify the `.sha256` file, and extract it. Open `chrome://extensions` or `edge://extensions`, enable **Developer mode**, choose **Load unpacked**, and select the extracted folder.
+Download `scionos-capture-v1.4.0.zip` from the [v1.4.0 release](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.4.0), optionally verify the `.sha256` file, and extract it. Open `chrome://extensions` or `edge://extensions`, enable **Developer mode**, choose **Load unpacked**, and select the extracted folder.
 
 To work from source, clone the repository, run `npm ci`, and load the project root as an unpacked extension.
 
 ## Usage and shortcuts
 
-Choose **Full page**, **Visible area**, **Selected area**, or **Scrolling area**. For a scrolling area, click the first corner, scroll vertically, and click the opposite corner. `Escape` cancels, **Start over** clears the first point, and X/Y/width/height fields provide a keyboard alternative. The suggested browser shortcut is `Alt+Shift+C`; the popup displays the shortcut actually configured.
+Choose **Immediate**, **3**, **5**, or **10 seconds**, then **Full page**, **Visible area**, **Selected area**, **Scrolling area**, or **Element capture**. For a selected area, draw the region, adjust its handles or coordinates, and choose **Capture**. For an element, hover over a block, choose its parent/child if needed and its visible portion or the entire content of a genuinely scrollable container, then click the block. Adjust coordinates and confirm with **Capture**. The delay starts after confirmation for selected areas, scrolling areas, and elements; for full-page and visible-area captures it starts on launch. **Escape** cancels the countdown. For a scrolling area, click the first corner, scroll vertically, and click the opposite corner. `Escape` cancels, **Start over** clears the first point, and X/Y/width/height fields provide a keyboard alternative. The suggested browser shortcut is `Alt+Shift+C`; the popup displays the shortcut actually configured.
 
 In the editor, `V`, `D`, `M`, and `C` select tools; `Ctrl+Z`/`Ctrl+Y` undo and redo; `+`, `-`, and `0` control zoom. Use a solid mask for secrets—blur is visual only.
 
 ## Permissions and privacy
 
-`activeTab` and `scripting` capture only after an explicit action; `storage` keeps language and temporary editor mapping; `unlimitedStorage` prevents quota failures for large local images; `alarms` expires temporary captures.
+`activeTab` and `scripting` capture only after an explicit action; `storage` keeps language, capture delay, and temporary editor mapping; `unlimitedStorage` prevents quota failures for large local images; `alarms` expires temporary captures.
 
 Transfer chunks remain only in local IndexedDB and are deleted after assembly or fifteen minutes of inactivity (on the next wake-up if the browser is suspended). The final capture is retained while a matching editor is open, including reloads and beyond fifteen minutes. It is deleted when the last editor closes; without an editor, it becomes eligible for cleanup fifteen minutes after creation. See [PRIVACY.en.md](PRIVACY.en.md) and [SECURITY.en.md](SECURITY.en.md).
 
 ## Known limitations
 
-Permanent infinite-scroll pages have no determinable end. A scrolling area is limited to the visible width at the first point and is not stitched horizontally. Continuously changing or sticky content may differ between tiles. Browser internal pages and extension stores cannot be injected. Images above 16 million pixels or 16,384 px per side are reduced automatically.
+Permanent infinite-scroll pages have no determinable end. A scrolling area is limited to the visible width at the first point and is not stitched horizontally. Continuously changing or sticky content may differ between tiles. Browser internal pages and extension stores cannot be injected. The element selector does not traverse iframe contents: a frame can be captured as a visible element, but its inner elements cannot be selected individually. Images above 16 million pixels or 16,384 px per side are reduced automatically.
 
 ## Development
 
@@ -51,8 +53,8 @@ The searchable PDF layer retains only complete words whose visibility can be ver
 
 Node.js 24 is recommended for full verification, including PDF extraction with PDF.js 6.3.289 (test dependency only). Core checks remain compatible with Node.js 20.
 
-Synchronize an unpublished version with `npm run version:sync -- 1.3.3 --unreleased`; in PowerShell use `npm.cmd run version:sync -- 1.3.3 --unreleased`. Published download links remain unchanged.
+Synchronize an unpublished version with `npm run version:sync -- 1.4.0 --unreleased`; in PowerShell use `npm.cmd run version:sync -- 1.4.0 --unreleased`. Published download links remain unchanged.
 
-<!-- local-package --> Local archive : `scionos-capture-v1.3.3.zip` · SHA-256 : `scionos-capture-v1.3.3.zip.sha256`.
+<!-- local-package --> Local archive : `scionos-capture-v1.4.0.zip` · SHA-256 : `scionos-capture-v1.4.0.zip.sha256`.
 
-`npm run test:native` checks all four modes in installed Chrome and Edge, using real captures and temporary profiles. The extension action grants `activeTab`; personal profiles are not used.
+`npm run test:native` checks all five modes and a delayed capture in installed Chrome and Edge, using real captures and temporary profiles. The extension action grants `activeTab`; personal profiles are not used.

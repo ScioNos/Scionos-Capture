@@ -56,6 +56,23 @@
   "btnScrollingDesc": {
     "message": "Choose an area across several screens"
   },
+  "elementTitle": { "message": "Element capture" },
+  "elementDesc": { "message": "Choose a block on the page" },
+  "delayLabel": { "message": "Capture delay" },
+  "delayImmediate": { "message": "Immediate" },
+  "delaySeconds": { "message": "{seconds} s" },
+  "selectionTitle": { "message": "Adjust selection" },
+  "selectionCapture": { "message": "Capture" },
+  "selectionRestart": { "message": "Start over" },
+  "selectionCancel": { "message": "Cancel" },
+  "selectionParent": { "message": "Parent element" },
+  "selectionChild": { "message": "Child element" },
+  "elementVisible": { "message": "Visible part" },
+  "elementFull": { "message": "Entire element" },
+  "selectionInstructions": { "message": "Click an element or draw an area. Adjust the handles or coordinates, then choose Capture. Escape cancels." },
+  "countdownStatus": { "message": "Capturing in {seconds} s…" },
+  "countdownCancel": { "message": "Cancel countdown" },
+  "elementUnavailable": { "message": "This element cannot be captured. Choose another element or draw an area." },
   "shortcutText": {
     "message": "Shortcut"
   },
@@ -393,13 +410,19 @@
     "message": "Full page: automatically scrolls and stitches the entire document, even on very tall pages."
   },
   "helpModeVisible": {
-    "message": "Visible area: instantly captures what is currently on screen without scrolling."
+    "message": "Visible area: captures what is displayed without scrolling, after the chosen delay."
   },
   "helpModeZone": {
-    "message": "Selected zone: drag a rectangle with the mouse. Reach screen edges to trigger continuous auto-scroll."
+    "message": "Selected area: draw a rectangle; screen edges trigger auto-scroll. Then adjust handles or coordinates and confirm with Capture. Arrow keys move the selection or a handle; Shift changes the step from 1 to 10 CSS pixels."
   },
   "helpModeScrolling": {
-    "message": "Scrolling zone: click two opposite corners while scrolling to target a precise internal container."
+    "message": "Scrolling area: choose two corners while scrolling, then adjust and confirm the region. Its width remains bounded by the width chosen at the first point."
+  },
+  "helpModeElement": {
+    "message": "Element capture: hover over a block, choose its parent or child if needed, then its displayed portion or the entire content of a genuinely scrollable container. Click the block, adjust the selection, and confirm. Iframe contents are not traversed."
+  },
+  "helpCaptureDelay": {
+    "message": "Choose Immediate, 3, 5, or 10 seconds. The preference is stored locally. The delay starts after confirmation for areas and elements, on launch for Visible area and Full page. Escape or Cancel stops the countdown."
   },
   "helpEditorHeader": {
     "message": "Editing & Export Formats"

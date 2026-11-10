@@ -5,7 +5,7 @@
   const Utils = ScionosCaptureUtils;
   const ACTIONS = new Set([
     'PING', 'START_FULL_PAGE_CAPTURE', 'START_VISIBLE_CAPTURE',
-    'START_ZONE_CAPTURE', 'START_SCROLLING_ZONE_CAPTURE'
+    'START_ZONE_CAPTURE', 'START_SCROLLING_ZONE_CAPTURE', 'START_ELEMENT_CAPTURE'
   ]);
   let captureRunning = false;
   let activeMessages = {};
@@ -28,7 +28,10 @@
     if (captureRunning) { sendResponse({ status: 'busy' }); return; }
     captureRunning = true;
     activeMessages = request.messages && typeof request.messages === 'object' ? request.messages : {};
-    const operation = request.action === 'START_FULL_PAGE_CAPTURE'
+    capture.setDelay(request.delaySeconds);
+    const operation = request.action === 'START_ELEMENT_CAPTURE'
+      ? capture.executeElementCapture()
+      : request.action === 'START_FULL_PAGE_CAPTURE'
       ? capture.executeFullPageCapture()
       : request.action === 'START_ZONE_CAPTURE'
         ? capture.executeZoneCapture()

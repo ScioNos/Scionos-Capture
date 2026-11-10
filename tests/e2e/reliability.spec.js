@@ -2,6 +2,12 @@ const path = require('node:path');
 const { test, expect, chromium } = require('@playwright/test');
 const { frenchMessages, prepareFullPageHarness, startFullPageCapture, readOpenedCapture } = require('./helpers/capture');
 
+async function confirmSelection(page) {
+  const adjustment = page.locator('[data-scionos-capture="adjustment"]');
+  await expect(adjustment).toBeVisible();
+  await adjustment.locator('[data-selection-action="capture"]').click();
+}
+
 let context;
 let editorUrl;
 async function launchExtension(deviceScaleFactor = 1) {
@@ -89,13 +95,23 @@ for (const mode of ['fixed', 'sticky', 'dynamic', 'below-fold']) {
   });
 }
 
+test('zero-height fixed portal retains its cookie banner once at the bottom', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, '<style>html,body{margin:0}body{height:2600px;background:white}.portal{position:fixed;bottom:0;width:100%;height:0}.banner{position:absolute;bottom:0;width:100%;height:152px;background:red}</style><div class="portal"><div class="banner"><button>Accepter tous les cookies</button></div></div>');
+  await useRealPixels(page);
+  await startFullPageCapture(page); await readOpenedCapture(page);
+  expect(await redRuns(page, 300)).toEqual([{ y:2448, height:152 }]);
+  expect(await page.locator('.banner').evaluate(element => element.style.visibility)).toBe('');
+  await page.close();
+});
+
 test('scrolling region deduplicates a header that becomes fixed after scrolling', async () => {
   const page = await context.newPage();
   await prepareFullPageHarness(page, '<style>html,body{margin:0}body{height:2600px;background:white}header{position:absolute;top:0;height:60px;width:100%;background:red}</style><header></header><script>addEventListener("scroll",()=>document.querySelector("header").style.position=scrollY>200?"fixed":"absolute")</script>');
   await useRealPixels(page);
   await startCapture(page, 'START_SCROLLING_ZONE_CAPTURE');
   for (const [key, value] of Object.entries({ x: 0, y: 0, width: 400, height: 2000 })) await page.locator('input[name="' + key + '"]').fill(String(value));
-  await page.locator('[data-scionos-capture="scrolling-controls"] button', { hasText: 'Capturer' }).click();
+  await page.locator('[data-scionos-capture="scrolling-controls"] button', { hasText: 'Capturer' }).click(); await confirmSelection(page);
   await readOpenedCapture(page);
   expect(await redRuns(page)).toEqual([{ y: 0, height: 60 }]);
   await page.close();
@@ -107,10 +123,148 @@ test('document auto-scroll selection completes and restores its starting positio
   await startCapture(page, 'START_ZONE_CAPTURE');
   await page.mouse.move(100, 100); await page.mouse.down(); await page.mouse.move(400, 598);
   await expect.poll(() => page.evaluate(() => globalThis.scrollY)).toBeGreaterThan(100);
-  await page.mouse.up();
+  await page.mouse.up(); await confirmSelection(page);
   const result = await readOpenedCapture(page);
   expect(result.width).toBe(300); expect(result.height).toBeGreaterThan(598);
   await expect.poll(() => page.evaluate(() => globalThis.scrollY)).toBe(0);
+  await page.close();
+});
+
+test('selected capture retains real pixels when a feed appends content during capture', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, '<style>html,body{margin:0}body{height:2600px;background:rgb(20,80,160)}</style>');
+  await useRealPixels(page);
+  await page.evaluate(() => {
+    const previous = globalThis.chrome.runtime.sendMessage;
+    globalThis.chrome.runtime.sendMessage = (message, callback) => {
+      if (message.action === 'CAPTURE_VISIBLE_TAB') document.body.style.height = '5200px';
+      return previous(message, callback);
+    };
+  });
+  await startCapture(page, 'START_ZONE_CAPTURE');
+  await page.mouse.move(100, 100); await page.mouse.down(); await page.mouse.move(400, 598);
+  await expect.poll(() => page.evaluate(() => globalThis.scrollY)).toBeGreaterThan(100);
+  await page.mouse.up(); await confirmSelection(page);
+  await readOpenedCapture(page);
+  const result = await inspectSolidCapture(page, [20, 80, 160]);
+  expect(result.width).toBe(300);
+  expect(result.height).toBeGreaterThan(598);
+  expect(result.mismatches).toBe(0);
+  await expect.poll(() => page.evaluate(() => globalThis.scrollY)).toBe(0);
+  await page.close();
+});
+
+test('element capture picks a block and waits for adjustment confirmation before capturing real pixels', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, '<style>html,body{margin:0;height:600px;background:white}#card{position:absolute;left:100px;top:100px;width:240px;height:180px;background:rgb(20,80,160)}</style><div id="card"></div>');
+  await useRealPixels(page);
+  expect(await startCapture(page, 'START_ELEMENT_CAPTURE')).toEqual({ status: 'started' });
+  await expect(page.locator('[data-scionos-capture="element-selection"]')).toBeVisible();
+  await page.mouse.move(180, 180); await page.mouse.click(180, 180);
+  const adjustment = page.locator('[data-scionos-capture="adjustment"]');
+  await expect(adjustment).toBeVisible();
+  await expect(adjustment.locator('input[name="width"]')).toHaveValue('240');
+  await expect(adjustment.locator('input[name="height"]')).toHaveValue('180');
+  expect(await page.evaluate(() => globalThis.__openedCapture)).toBeNull();
+  await confirmSelection(page); await readOpenedCapture(page);
+  expect(await inspectSolidCapture(page, [20, 80, 160])).toEqual({ width: 240, height: 180, mismatches: 0 });
+  await page.close();
+});
+
+test('element capture includes the whole chosen scrolling container', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, '<style>html,body{margin:0;height:600px;background:white}#card{position:absolute;left:100px;top:100px;width:240px;height:180px;overflow:auto}.inside{height:700px;background:rgb(20,80,160)}</style><div id="card" data-scroll-surface><div class="inside"></div></div>');
+  await useRealPixels(page);
+  await startCapture(page, 'START_ELEMENT_CAPTURE');
+  await page.mouse.move(180,180);
+  await page.locator('[data-scionos-capture="element-selection"] button', { hasText: frenchMessages.selectionParent }).click();
+  await page.locator('[data-scionos-capture="element-selection"] select').selectOption('full');
+  await page.locator('[data-scionos-capture="element-selection"] button', { hasText: frenchMessages.selectionCapture }).click();
+  await confirmSelection(page); await readOpenedCapture(page);
+  const result = await inspectSolidCapture(page, [20,80,160]);
+  expect(result.height).toBe(700); expect(result.mismatches).toBe(0);
+  await page.close();
+});
+
+test('element parent choice survives returning the pointer to its child', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, '<style>html,body{margin:0;height:600px}#card{position:absolute;left:100px;top:100px;width:240px;height:220px}a{display:block;width:80px;height:40px}</style><div id="card"><a href="https://example.com/">Link</a></div>');
+  await startCapture(page, 'START_ELEMENT_CAPTURE');
+  await page.mouse.move(120,120);
+  await page.locator('[data-scionos-capture="element-selection"] button', { hasText:frenchMessages.selectionParent }).click();
+  await page.mouse.move(120,120); await page.mouse.click(120,120);
+  await expect(page.locator('[data-scionos-capture="adjustment"] input[name="width"]')).toHaveValue('240');
+  expect(page.url()).toBe('about:blank');
+  await page.keyboard.press('Escape'); await page.close();
+});
+
+test('element moved during countdown fails without capturing stale coordinates', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, '<style>html,body{margin:0;height:600px}#card{position:absolute;left:100px;top:100px;width:240px;height:220px}</style><div id="card"></div>');
+  await page.evaluate(messages => globalThis.__captureListener({action:'START_ELEMENT_CAPTURE',delaySeconds:3,messages}, {}, () => {}), frenchMessages);
+  await page.mouse.move(120,120); await page.mouse.click(120,120); await confirmSelection(page);
+  await page.evaluate(()=>{ document.querySelector('#card').style.left='200px'; });
+  const alert = page.waitForEvent('dialog');
+  const dialog = await alert; expect(dialog.message()).toContain(frenchMessages.elementUnavailable); await dialog.dismiss();
+  expect(await page.evaluate(()=>globalThis.__capturePositions.length)).toBe(0);
+  await page.close();
+});
+
+test('element parent keeps its header when it contains a scrolling descendant', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, '<style>html,body{margin:0;height:600px;background:white}#card{position:absolute;left:100px;top:100px;width:240px;height:220px;background:rgb(20,80,160)}header{height:40px}.list{height:180px;overflow:auto}.inside{height:700px}</style><div id="card"><header></header><div class="list"><div class="inside"></div></div></div>');
+  await useRealPixels(page); await startCapture(page, 'START_ELEMENT_CAPTURE');
+  await page.mouse.move(150,120);
+  await page.locator('[data-scionos-capture="element-selection"] button', { hasText: frenchMessages.selectionParent }).click();
+  await page.locator('[data-scionos-capture="element-selection"] button', { hasText: frenchMessages.selectionCapture }).click();
+  await expect(page.locator('[data-scionos-capture="adjustment"] input[name="height"]')).toHaveValue('220');
+  await confirmSelection(page); await readOpenedCapture(page);
+  expect(await inspectSolidCapture(page, [20,80,160])).toEqual({width:240,height:220,mismatches:0});
+  await page.close();
+});
+
+test('scrolling adjustment locks horizontal geometry while retaining vertical editing', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, '<style>html,body{margin:0}body{height:2000px;background:white}</style>');
+  await startCapture(page, 'START_SCROLLING_ZONE_CAPTURE');
+  for (const [name,value] of Object.entries({x:100,y:100,width:250,height:900})) await page.locator('[data-scionos-capture="scrolling-controls"] input[name="'+name+'"]').fill(String(value));
+  await page.locator('[data-scionos-capture="scrolling-controls"] button[type="submit"]').click();
+  const adjustment=page.locator('[data-scionos-capture="adjustment"]');
+  await expect(adjustment.locator('input[name="x"]')).toBeDisabled();
+  await expect(adjustment.locator('input[name="width"]')).toBeDisabled();
+  await expect(adjustment.locator('[data-handle="e"]')).toBeHidden();
+  await adjustment.locator('input[name="height"]').fill('800');
+  await confirmSelection(page);
+  expect(await readOpenedCapture(page)).toMatchObject({width:250,height:800});
+  await page.close();
+});
+
+test('adjustment dragging accumulates fractional deltas on scaled surfaces', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, '<style>html,body{margin:0;height:600px;background:white}.surface{position:absolute;left:20px;top:20px;width:200px;height:150px;overflow:auto;transform:scale(3);transform-origin:0 0}.inside{height:500px}</style><div class="surface"><div class="inside"></div></div>');
+  await page.evaluate(() => {
+    globalThis.__adjustment = globalThis.ScionosContentSelection.create({dom:globalThis.ScionosContentDom.create({Utils:globalThis.ScionosCaptureUtils,text:key=>key}),text:key=>key})
+      .adjust(globalThis.ScionosContentDom.create({Utils:globalThis.ScionosCaptureUtils,text:key=>key}).getElementScrollSurface(document.querySelector('.surface')), {x:20,y:20,width:50,height:50});
+  });
+  await page.mouse.move(120,120); await page.mouse.down();
+  for(let dx=1;dx<=9;dx++) await page.mouse.move(120+dx,120);
+  await page.mouse.up();
+  await expect(page.locator('[data-scionos-capture="adjustment"] input[name="x"]')).toHaveValue('23');
+  await page.locator('[data-selection-action="cancel"]').click();
+  await page.close();
+});
+
+test('delayed visible capture waits before acquisition and rejects unsupported delays', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, '<style>body{background:white}</style>');
+  const started = Date.now();
+  await page.evaluate(messages => globalThis.__captureListener({action:'START_VISIBLE_CAPTURE',delaySeconds:3,messages}, {}, () => {}), frenchMessages);
+  expect(await page.evaluate(() => globalThis.__capturePositions.length)).toBe(0);
+  await readOpenedCapture(page);
+  expect(Date.now()-started).toBeGreaterThanOrEqual(2900);
+  await page.evaluate(messages => { globalThis.__openedCapture=null; globalThis.__captureListener({action:'START_VISIBLE_CAPTURE',delaySeconds:999,messages}, {}, () => {}); }, frenchMessages);
+  await readOpenedCapture(page);
+  await expect(page.locator('[data-scionos-capture="progress"]')).toHaveCount(0);
   await page.close();
 });
 
@@ -147,7 +301,7 @@ for (const dpr of [1, 1.25, 1.5, 2]) {
       })).toBe(true);
       await page.evaluate(() => { globalThis.__openedCapture = null; });
       await startCapture(page, 'START_ZONE_CAPTURE');
-      await page.mouse.move(100, 100); await page.mouse.down(); await page.mouse.move(400, 300); await page.mouse.up();
+      await page.mouse.move(100, 100); await page.mouse.down(); await page.mouse.move(400, 300); await page.mouse.up(); await confirmSelection(page);
       expect(await readOpenedCapture(page)).toMatchObject({ width: Math.round(300 * dpr), height: Math.round(200 * dpr) });
       const selected = await page.evaluate(() => globalThis.__openedCapture);
       expect(selected.textBlocks[0].x).toBeCloseTo(50 * dpr);
@@ -406,7 +560,7 @@ for (const dpr of [1.25, 1.5]) {
       for (const [key, value] of Object.entries({ x: 0, y: 0, width: 800, height: 1109 })) {
         await page.locator('input[name="' + key + '"]').fill(String(value));
       }
-      await page.locator('[data-scionos-capture="scrolling-controls"] button', { hasText: 'Capturer' }).click();
+      await page.locator('[data-scionos-capture="scrolling-controls"] button', { hasText: 'Capturer' }).click(); await confirmSelection(page);
       const scrolling = await readOpenedCapture(page);
       expect(scrolling).toMatchObject({ width: Math.ceil(800 * dpr), height: Math.ceil(1109 * dpr) });
       expect(await inspectSolidCapture(page, color)).toMatchObject({ mismatches: 0 });
@@ -570,7 +724,7 @@ test('horizontal selected capture retains its last color band without stretching
   await prepareFullPageHarness(page,'<style>html,body{margin:0;width:1600px;height:600px;background:linear-gradient(to right,red 0px,red 400px,lime 400px,lime 800px,blue 800px,blue 1200px,yellow 1200px)}</style>');
   await useRealPixels(page); await startCapture(page,'START_ZONE_CAPTURE');
   await page.mouse.move(50,100); await page.mouse.down(); await page.mouse.move(798,300);
-  await expect.poll(()=>page.evaluate(()=>globalThis.scrollX)).toBeGreaterThan(500); await page.mouse.up();
+  await expect.poll(()=>page.evaluate(()=>globalThis.scrollX)).toBeGreaterThan(500); await page.mouse.up(); await confirmSelection(page);
   const capture=await readOpenedCapture(page); expect(capture.width).toBeGreaterThan(1200); expect(capture.height).toBe(200);
   const pixels=await page.evaluate(async()=>{
     const image=new globalThis.Image();image.src=globalThis.__openedCapture.dataUrl;await image.decode();
@@ -588,7 +742,7 @@ test('inner auto-scroll moves up and down at its own edges without scrolling the
   await startCapture(page,'START_ZONE_CAPTURE');await page.mouse.move(200,200);await page.mouse.down();await page.mouse.move(300,103);
   await expect.poll(()=>page.evaluate(()=>document.querySelector('.app').scrollTop)).toBeLessThan(200);
   await page.mouse.move(300,348);await expect.poll(()=>page.evaluate(()=>document.querySelector('.app').scrollTop)).toBeGreaterThan(500);
-  expect(await page.evaluate(()=>globalThis.scrollY)).toBe(0);await page.mouse.up();await readOpenedCapture(page);
+  expect(await page.evaluate(()=>globalThis.scrollY)).toBe(0);await page.mouse.up(); await confirmSelection(page);await readOpenedCapture(page);
   await expect.poll(()=>page.evaluate(()=>document.querySelector('.app').scrollTop)).toBe(300);await page.close();
 });
 
@@ -610,7 +764,7 @@ for(const action of ['START_ZONE_CAPTURE','START_SCROLLING_ZONE_CAPTURE']) {
  test('selection works over an existing modal: '+action,async()=>{
   const page=await context.newPage();await prepareFullPageHarness(page,'<dialog id="original"><div style="width:400px;height:300px;background:red"></div></dialog>');
   await page.evaluate(()=>document.getElementById('original').showModal());await startCapture(page,action);
-  await page.mouse.move(250,200);await page.mouse.down();await page.mouse.move(400,300);await page.mouse.up();
+  await page.mouse.move(250,200);await page.mouse.down();await page.mouse.move(400,300);await page.mouse.up(); await confirmSelection(page);
   expect(await readOpenedCapture(page)).toMatchObject({width:150,height:100});
   expect(await page.locator('#original').evaluate(dialog=>dialog.matches(':modal'))).toBe(true);await page.close();
  });
@@ -624,7 +778,7 @@ test('cancellation keeps the lock until a delayed capture finishes and ignores i
    if(message.action==='CAPTURE_VISIBLE_TAB'){globalThis.__releaseCapture=()=>previous(message,callback);}else previous(message,callback);
   };
  });
- await startCapture(page,'START_ZONE_CAPTURE');await page.mouse.move(100,100);await page.mouse.down();await page.mouse.move(300,300);await page.mouse.up();
+ await startCapture(page,'START_ZONE_CAPTURE');await page.mouse.move(100,100);await page.mouse.down();await page.mouse.move(300,300);await page.mouse.up(); await confirmSelection(page);
  await page.waitForFunction(()=>globalThis.__releaseCapture);await page.keyboard.press('Escape');
  expect(await startCapture(page,'START_VISIBLE_CAPTURE')).toEqual({status:'busy'});await page.evaluate(()=>globalThis.__releaseCapture());
  await expect.poll(()=>startCapture(page,'START_ZONE_CAPTURE')).toEqual({status:'started'});
@@ -640,10 +794,10 @@ for(const dpr of [1,1.25,1.5,2]) {
    expect(await inspectSolidCapture(page,[30,120,210],1)).toEqual({width:Math.ceil(200*dpr),height:Math.ceil(300*dpr),mismatches:0});
    await page.evaluate(()=>{globalThis.__openedCapture=null;});await startCapture(page,'START_SCROLLING_ZONE_CAPTURE');
    for(const [key,value] of Object.entries({x:40,y:40,width:200,height:500})) await page.locator('input[name="'+key+'"]').fill(String(value));
-   await page.locator('[data-scionos-capture="scrolling-controls"] button[type="submit"]').click();await readOpenedCapture(page);
+   await page.locator('[data-scionos-capture="scrolling-controls"] button[type="submit"]').click(); await confirmSelection(page);await readOpenedCapture(page);
    expect(await inspectSolidCapture(page,[30,120,210],1)).toEqual({width:Math.ceil(100*dpr),height:Math.ceil(250*dpr),mismatches:0});
    await page.evaluate(()=>{globalThis.__openedCapture=null;});await startCapture(page,'START_ZONE_CAPTURE');
-   await page.mouse.move(152,150);await page.mouse.down();await page.mouse.move(252,170);await page.mouse.up();await readOpenedCapture(page);
+   await page.mouse.move(152,150);await page.mouse.down();await page.mouse.move(252,170);await page.mouse.up(); await confirmSelection(page);await readOpenedCapture(page);
    expect(await inspectSolidCapture(page,[30,120,210],1)).toEqual({width:Math.ceil(100*dpr),height:Math.ceil(20*dpr),mismatches:0});
 
   }finally{await scaled.close();}
@@ -717,7 +871,7 @@ test('left scrollbar gutters share the same viewport origin for selection and vi
  const text=await page.evaluate(()=>({block:globalThis.__openedCapture.textBlocks.find(b=>b.text==='GUTTER_PUBLIC'),left:document.querySelector('p').getBoundingClientRect().left}));
  expect(text.block.x).toBeCloseTo(text.left);
  await page.evaluate(()=>{globalThis.__openedCapture=null;});await startCapture(page,'START_ZONE_CAPTURE');
- await page.mouse.move(100,100);await page.mouse.down();await page.mouse.move(400,300);await page.mouse.up();await readOpenedCapture(page);
+ await page.mouse.move(100,100);await page.mouse.down();await page.mouse.move(400,300);await page.mouse.up(); await confirmSelection(page);await readOpenedCapture(page);
  const pixels=await page.evaluate(async()=>{
   const image=new globalThis.Image();image.src=globalThis.__openedCapture.dataUrl;await image.decode();const c=document.createElement('canvas');c.width=image.width;c.height=image.height;const ctx=c.getContext('2d');ctx.drawImage(image,0,0);const edge=document.querySelector(".stripe").getBoundingClientRect().left-100;return [edge-5,edge+5].map(x=>[...ctx.getImageData(x,50,1,1).data]);
  });expect(pixels).toEqual([[255,0,0,255],[0,0,255,255]]);await page.close();

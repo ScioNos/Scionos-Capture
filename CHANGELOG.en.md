@@ -6,6 +6,20 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-11-10
+
+### Added
+
+- Fifth mode, Element capture: hover highlighting, parent/child selection, and capture of the visible part or entire content of a scrolling container.
+- Selection confirmation with resize handles, X/Y/width/height fields, and keyboard controls.
+- Immediate capture or a locally remembered 3, 5, or 10-second delay, with a cancellable countdown after selection confirmation.
+- UI and help in French, English, Spanish, and German. Element selection does not traverse iframe contents.
+
+### Fixed
+
+- Visible banners inside zero-height fixed wrappers, including X.com’s cookie banner, no longer repeat in every capture tile; they are retained once at the bottom of the image.
+- Appending content to a dynamic feed, such as X.com, no longer interrupts a bounded selection. Width, viewport, and shrinking-height checks remain; full-page capture stays strict.
+
 ## [1.3.3] - 2026-10-05
 
 - Capture: shared rectangular stitching, horizontal selections without stretching, correct coordinates for translated or scaled containers; unsupported complex transforms fail explicitly.
@@ -150,7 +164,7 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Canvas-clipping zoom, non-responsive toolbar, incomplete translations, hard-coded shortcut, contrast, and accessible names.
 - Locale descriptions above 132 characters, editor reload data loss, and inaccurate retention wording.
 
-[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.3...HEAD
+[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.4.0...HEAD
 [1.3.3]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.0...v1.3.1
@@ -159,3 +173,5 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 [1.1.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0
 [1.0.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0
+
+[1.4.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.3...v1.4.0

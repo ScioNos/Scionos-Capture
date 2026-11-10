@@ -56,6 +56,23 @@
   "btnScrollingDesc": {
     "message": "Elegir un área en varias pantallas"
   },
+  "elementTitle": { "message": "Capturar un elemento" },
+  "elementDesc": { "message": "Elegir un bloque de la página" },
+  "delayLabel": { "message": "Retardo de captura" },
+  "delayImmediate": { "message": "Inmediato" },
+  "delaySeconds": { "message": "{seconds} s" },
+  "selectionTitle": { "message": "Ajustar la selección" },
+  "selectionCapture": { "message": "Capturar" },
+  "selectionRestart": { "message": "Reiniciar" },
+  "selectionCancel": { "message": "Cancelar" },
+  "selectionParent": { "message": "Elemento padre" },
+  "selectionChild": { "message": "Elemento hijo" },
+  "elementVisible": { "message": "Parte visible" },
+  "elementFull": { "message": "Elemento completo" },
+  "selectionInstructions": { "message": "Haz clic en un elemento o dibuja un área. Ajusta los tiradores o las coordenadas y elige Capturar. Escape cancela." },
+  "countdownStatus": { "message": "Captura en {seconds} s…" },
+  "countdownCancel": { "message": "Cancelar la cuenta atrás" },
+  "elementUnavailable": { "message": "No se puede capturar este elemento. Elige otro elemento o dibuja un área." },
   "shortcutText": {
     "message": "Atajo"
   },
@@ -393,13 +410,19 @@
     "message": "Página entera: se desplaza y une automáticamente todo el documento, incluso en páginas muy largas."
   },
   "helpModeVisible": {
-    "message": "Zona visible: captura al instante lo que se muestra en pantalla sin desplazamiento."
+    "message": "Área visible: captura lo que se muestra sin desplazamiento, tras el retardo elegido."
   },
   "helpModeZone": {
-    "message": "Zona seleccionada: trace un rectángulo con el ratón. Acérquese a los bordes para activar el desplazamiento automático continuo."
+    "message": "Zona seleccionada: dibuja un rectángulo; los bordes activan el desplazamiento automático. Ajusta tiradores o coordenadas y confirma con Capturar. Las flechas mueven la selección o un tirador; Mayús cambia el paso de 1 a 10 píxeles CSS."
   },
   "helpModeScrolling": {
-    "message": "Zona desplazable: defina dos esquinas desplazándose manualmente para capturar un contenedor interno específico."
+    "message": "Área desplazable: define dos esquinas desplazándote y luego ajusta y confirma la zona. Su ancho queda limitado al elegido en el primer punto."
+  },
+  "helpModeElement": {
+    "message": "Captura de elementos: pasa el cursor sobre un bloque, elige su padre o hijo si hace falta y su parte mostrada o el contenido completo de un contenedor realmente desplazable. Haz clic, ajusta la selección y confirma. No se recorre el contenido de iframes."
+  },
+  "helpCaptureDelay": {
+    "message": "Elige Inmediato, 3, 5 o 10 segundos. La preferencia se guarda localmente. El retardo comienza tras confirmar zonas y elementos, o al iniciar Área visible y Página completa. Escape o Cancelar detiene la cuenta atrás."
   },
   "helpEditorHeader": {
     "message": "Edición y Formatos de exportación"

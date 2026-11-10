@@ -3,7 +3,7 @@ import fsp from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import archiver from 'archiver';
+import { ZipArchive } from 'archiver';
 import { validatePackage } from './validate-package.mjs';
 import { RELEASE_ZIP_FILES } from './release-files.mjs';
 
@@ -20,7 +20,7 @@ await fsp.rm(zipPath, { force: true });
 
 await new Promise((resolve, reject) => {
   const output = fs.createWriteStream(zipPath);
-  const archive = archiver('zip', { zlib: { level: 9 } });
+  const archive = new ZipArchive({ zlib: { level: 9 } });
   output.on('close', resolve);
   output.on('error', reject);
   archive.on('error', reject);

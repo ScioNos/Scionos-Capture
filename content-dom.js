@@ -429,7 +429,20 @@
                 || rect.bottom <= capture.top || rect.top >= capture.top + capture.height) continue;
             const styles = getComputedStyle(element);
             if (styles.visibility === 'hidden' || styles.display === 'none') continue;
-            const fixed = styles.position === 'fixed';
+            // Some portals (including X's cookie banner) use a zero-sized
+            // fixed wrapper with a visible absolutely positioned child.
+            let fixed = styles.position === 'fixed';
+            if (!fixed && styles.position === 'absolute') {
+              for (let ancestor = element.parentElement; ancestor && ancestor !== document.body; ancestor = ancestor.parentElement) {
+                const ancestorStyle = getComputedStyle(ancestor);
+                if (ancestorStyle.position === 'fixed') {
+                  const ancestorRect = ancestor.getBoundingClientRect();
+                  fixed = !ancestorRect.width || !ancestorRect.height;
+                  break;
+                }
+                if (ancestorStyle.transform && ancestorStyle.transform !== 'none') break;
+              }
+            }
             const sticky = styles.position === 'sticky';
             const top = parseFloat(styles.top), bottom = parseFloat(styles.bottom);
             const left = parseFloat(styles.left), right = parseFloat(styles.right);
@@ -472,10 +485,16 @@
       return error;
     }
 
-    function assertStableMetrics(surface, baseline) {
+    function assertStableMetrics(surface, baseline, boundedRegion = null) {
       const current = surface.getMetrics();
+      // Infinite feeds may append content beyond a bounded selection. Keep its
+      // original tile plan, but reject shrinking content or changed viewport geometry.
+      const heightChanged = boundedRegion
+        ? current.fullHeight < baseline.fullHeight - 2
+          || boundedRegion.y + boundedRegion.height > current.fullHeight + 2
+        : Math.abs(current.fullHeight - baseline.fullHeight) > 2;
       if (Math.abs(current.fullWidth - baseline.fullWidth) > 2
-          || Math.abs(current.fullHeight - baseline.fullHeight) > 2
+          || heightChanged
           || Math.abs(current.viewportWidth - baseline.viewportWidth) > 2
           || Math.abs(current.viewportHeight - baseline.viewportHeight) > 2) {
         throw layoutChangedError();

@@ -4,6 +4,33 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const Utils = require('../capture-utils.js');
 
+function metricsHarness() {
+  const context = vm.createContext({ console });
+  vm.runInContext(fs.readFileSync(require.resolve('../content-dom.js'), 'utf8'), context);
+  const dom = context.ScionosContentDom.create({ Utils, text: key => key });
+  const baseline = { fullHeight: 2000, fullWidth: 800, viewportHeight: 600, viewportWidth: 800 };
+  let current = { ...baseline };
+  return { dom, baseline, surface: { getMetrics: () => current }, set: metrics => { current = { ...baseline, ...metrics }; } };
+}
+
+test('bounded selections tolerate appended feed content but full-page captures remain strict', () => {
+  const { dom, baseline, surface, set } = metricsHarness();
+  set({ fullHeight: 4000 });
+  assert.doesNotThrow(() => dom.assertStableMetrics(surface, baseline, { y: 100, height: 1000 }));
+  assert.throws(() => dom.assertStableMetrics(surface, baseline), { code: 'LAYOUT_CHANGED' });
+});
+
+test('bounded selections still reject shrinking content, viewport changes and insufficient bounds', () => {
+  const { dom, baseline, surface, set } = metricsHarness();
+  const region = { y: 100, height: 1000 };
+  for (const metrics of [{ fullHeight: 1900 }, { fullWidth: 900 }, { viewportHeight: 580 }, { viewportWidth: 780 }]) {
+    set(metrics);
+    assert.throws(() => dom.assertStableMetrics(surface, baseline, region), { code: 'LAYOUT_CHANGED' });
+  }
+  set({ fullHeight: 4000 });
+  assert.throws(() => dom.assertStableMetrics(surface, baseline, { y: 3500, height: 1000 }), { code: 'LAYOUT_CHANGED' });
+});
+
 test('the stabilization deadline bounds inner scroll loops on very tall pages', async () => {
   let now = 0;
   let y = 0;

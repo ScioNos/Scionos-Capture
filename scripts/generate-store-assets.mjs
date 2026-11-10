@@ -146,7 +146,7 @@ const slide1Html = `<!DOCTYPE html>
   <div class="header">
     <div class="badge">🇨🇭 100 % Local & Sans Télémétrie • Par eyelo SA</div>
     <h1>Capture d’Écran & <span class="gradient-text">Éditeur d’Annotations Pro</span></h1>
-    <p class="subtitle">Onglet visible, page complète, sélection et zone défilante multi-écrans.</p>
+    <p class="subtitle">Cinq modes, dont l’élément au clic, les sélections ajustables et la capture différée.</p>
   </div>
   <div class="mockup">
     <div class="toolbar">
@@ -280,8 +280,8 @@ const slide2Html = `<!DOCTYPE html>
     </div>
     <div class="card">
       <div class="card-icon" style="background:rgba(34, 197, 94, 0.15); color:#4ADE80;">🔒</div>
-      <h3>Zéro Serveur / RGPD</h3>
-      <p>Vos captures restent sur votre appareil. Aucune image ni URL n'est transmise. Conformité suisse nDPA & RGPD.</p>
+      <h3>Traitement local</h3>
+      <p>Vos captures sont traitées et stockées dans votre navigateur. Aucune capture ni URL n’est envoyée à un serveur par l’extension.</p>
     </div>
   </div>
   <div style="text-align:center; color:#64748B; font-size:14px;">

@@ -2,7 +2,7 @@
 
 [Français](PRIVACY.md) · [English](PRIVACY.en.md) · [Español](PRIVACY.es.md) · [Deutsch](PRIVACY.de.md)
 
-Last updated: October 2, 2026.
+Last updated: November 10, 2026 — version 1.4.0.
 
 **Publisher:** eyelo SA (UID: CHE-108.174.302), Vaud, Switzerland — Brand **ScioNos** ([scionos.ch](https://scionos.ch)) — Contact: info@eyelo.ch
 
@@ -14,7 +14,7 @@ No screenshot, URL, or browsing data is sent to eyelo SA, ScioNos, or any third 
 
 Captures and their text metadata remain in local IndexedDB. Transfer chunks are deleted after assembly or fifteen minutes of inactivity; a suspended browser may delay cleanup until wake-up. The final capture is retained while a matching editor tab is open, including reloads and beyond fifteen minutes. It is deleted when its last editor closes. Without an editor, it becomes eligible for cleanup fifteen minutes after creation. Associations are reconciled with open tabs on worker wake-up and browser restart.
 
-The selected language is kept in `chrome.storage.local`. The editor-tab mapping uses `chrome.storage.session` and ends with the browser session. Users can remove all local data from the extension management page or by uninstalling the extension.
+The selected language and capture delay (`captureDelaySeconds`, 0, 3, 5, or 10 seconds) are kept in `chrome.storage.local`. Element selection and the countdown remain local and add no permission or network destination. Delayed capture starts only after an explicit action and can be cancelled. The editor-tab mapping uses `chrome.storage.session` and ends with the browser session. Users can remove all local data from the extension management page or by uninstalling the extension.
 
 For privacy inquiries: info@eyelo.ch. For vulnerabilities, use [SECURITY.en.md](SECURITY.en.md).
 

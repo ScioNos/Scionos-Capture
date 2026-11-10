@@ -6,6 +6,20 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-11-10
+
+### Ajouté
+
+- Cinquième mode « Élément au clic » : surbrillance au survol, choix du bloc parent/enfant et capture de la partie visible ou du contenu entier d’un conteneur défilant.
+- Confirmation de sélection avant capture avec poignées de redimensionnement, coordonnées X/Y/largeur/hauteur et commandes clavier.
+- Délai immédiat ou de 3, 5 ou 10 secondes, mémorisé localement, avec compte à rebours annulable après confirmation de la sélection.
+- Interface et aide traduites en français, anglais, espagnol et allemand. Le sélecteur d’élément ne parcourt pas les contenus internes des iframes.
+
+### Corrigé
+
+- Les bandeaux visibles placés dans un parent fixe à hauteur nulle, notamment le bandeau cookies de X.com, ne se répètent plus à chaque portion de capture ; ils sont conservés une seule fois en bas de l’image.
+- Sélection défilante : l’ajout de contenu en bas d’un fil dynamique, comme sur X.com, n’interrompt plus une capture bornée à une zone. Les changements de largeur, de fenêtre et les réductions de hauteur restent contrôlés ; la capture de page entière conserve son contrôle strict.
+
 ## [1.3.3] - 2026-10-05
 
 - Captures : assemblage rectangulaire commun, sélection horizontale sans étirement, coordonnées corrigées pour les conteneurs translatés ou mis à l’échelle ; transformations complexes refusées explicitement.
@@ -155,7 +169,7 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 - Descriptions localisées dépassant la limite de 132 caractères.
 - Conservation temporaire plus longue que celle annoncée et perte au rechargement de l’éditeur.
 
-[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.3...HEAD
+[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.4.0...HEAD
 [1.3.3]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.0...v1.3.1
@@ -164,3 +178,5 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 [1.1.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0
 [1.0.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0
+
+[1.4.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.3...v1.4.0

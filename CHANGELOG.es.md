@@ -4,6 +4,20 @@
 
 ## [Sin publicar]
 
+## [1.4.0] - 2026-11-10
+
+### Añadido
+
+- Quinto modo, Capturar un elemento: resaltado al pasar el cursor, selección padre/hijo y captura de la parte visible o del contenido completo de un contenedor desplazable.
+- Confirmación de selección con tiradores, campos X/Y/ancho/alto y controles de teclado.
+- Captura inmediata o retardo de 3, 5 o 10 segundos guardado localmente, con cuenta atrás cancelable después de confirmar la selección.
+- Interfaz y ayuda en francés, inglés, español y alemán. El selector de elementos no recorre el contenido de iframes.
+
+### Corregido
+
+- Los avisos visibles dentro de un contenedor fijo de altura cero, incluido el aviso de cookies de X.com, ya no se repiten en cada fragmento; se conservan una sola vez al final de la imagen.
+- Añadir contenido al final de un feed dinámico, como X.com, ya no interrumpe una selección limitada. Se mantienen las comprobaciones de ancho, ventana y reducción de altura; la captura de página completa sigue siendo estricta.
+
 ## [1.3.3] - 2026-10-05
 
 - Capturas: ensamblado rectangular común, selecciones horizontales sin estiramiento y coordenadas correctas en contenedores trasladados o escalados; rechazo explícito de transformaciones complejas no compatibles.
@@ -141,7 +155,7 @@
 - Soporte completo en 4 idiomas: francés, inglés, español y alemán.
 - Accesibilidad total (WCAG, alto contraste, navegación por teclado, lectores de pantalla).
 
-[Sin publicar]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.3...HEAD
+[Sin publicar]: https://github.com/ScioNos/Scionos-Capture/compare/v1.4.0...HEAD
 [1.3.3]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.0...v1.3.1
@@ -150,3 +164,5 @@
 [1.1.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0
 [1.0.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0
+
+[1.4.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.3...v1.4.0

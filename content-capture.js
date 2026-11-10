@@ -13,6 +13,8 @@
       assertStableMetrics,
       getSurfaceCaptureCrop
     } = dom;
+    const selection = globalThis.ScionosContentSelection.create({ dom, text });
+    let requestedDelay = 0;
     let activeSession = null;
     let sessionId = 0;
     function checkpoint() {
@@ -77,6 +79,7 @@
 
     async function executeVisibleCapture() {
       try {
+        await countdown();
         const response = await captureVisibleTab();
         const origin = dom.clientPointToSurface(getDocumentScrollSurface(), 0, 0);
         const textBlocks = extractDomTextBlocks({
@@ -101,6 +104,7 @@
       let originalPosition = { x: 0, y: 0 };
 
       try {
+        await countdown();
         root.style.setProperty('scroll-behavior', 'auto');
         restoreMotion = suspendPageMotion();
         progress = createProgressIndicator();
@@ -131,6 +135,79 @@
       }
     }
 
+    async function countdown() {
+      checkpoint();
+      if (!requestedDelay) return;
+      const indicator = createProgressIndicator();
+      const status = document.createElement('span');
+      const cancel = document.createElement('button'); cancel.textContent = text('countdownCancel');
+      const previousCancel = activeSession.onCancel;
+      activeSession.onCancel = () => { indicator.remove(); };
+      cancel.addEventListener('click', () => { activeSession.cancelled = true; indicator.remove(); });
+      indicator.append(status, cancel);
+      try {
+        for (let seconds = requestedDelay; seconds > 0; seconds -= 1) {
+          status.textContent = text('countdownStatus', { seconds });
+          await delay(1000);
+        }
+      } finally { indicator.remove(); activeSession.onCancel = previousCancel; }
+      await waitForPaint();
+    }
+
+    async function executeElementCapture() {
+      let original, surface, restoreMotion = () => {}, progress;
+      try {
+        const picked = await selection.pickElement();
+        checkpoint(); if (!picked) return;
+        const element = picked.element;
+        const rect = element.getBoundingClientRect();
+        // Validate the chosen element itself, even when its capture surface is
+        // the document; an unrelated scrollable descendant must never replace it.
+        dom.getElementScrollSurface(element).getCaptureRect();
+        surface = getDocumentScrollSurface();
+        for (let ancestor = element; ancestor && ancestor !== document.body && ancestor !== document.documentElement;
+          ancestor = ancestor.parentElement || ancestor.getRootNode().host) {
+          if (dom.isScrollableElement(ancestor)) { surface = dom.getElementScrollSurface(ancestor); break; }
+        }
+        const style = getComputedStyle(element);
+        const scrollable = (element.scrollHeight > element.clientHeight + 2 && ['auto','scroll','overlay'].includes(style.overflowY))
+          || (element.scrollWidth > element.clientWidth + 2 && ['auto','scroll','overlay'].includes(style.overflowX));
+        if (picked.full && scrollable && surface.element !== element) surface = dom.getElementScrollSurface(element);
+        original = surface.getPosition();
+        const geometry = surface.getCaptureRect();
+        const start = dom.clientPointToSurface(surface, Math.max(rect.left, geometry.left), Math.max(rect.top, geometry.top));
+        const metrics = surface.getMetrics();
+        const visibleWidth = Math.min(rect.right, geometry.left + geometry.width, window.innerWidth) - Math.max(rect.left, geometry.left, 0);
+        const visibleHeight = Math.min(rect.bottom, geometry.top + geometry.height, window.innerHeight) - Math.max(rect.top, geometry.top, 0);
+        let region = picked.full && scrollable && !surface.isDocument && surface.element === element
+          ? { x: 0, y: 0, width: metrics.fullWidth, height: metrics.fullHeight }
+          : { x: Math.max(0,start.x), y: Math.max(0,start.y), width: Math.min(visibleWidth / (geometry.scaleX || 1), metrics.fullWidth-start.x), height: Math.min(visibleHeight / (geometry.scaleY || 1), metrics.fullHeight-start.y) };
+        if (region.width < 5 || region.height < 5) throw new Error(text('elementUnavailable'));
+        const initialRegion = { ...region };
+        do { region = await selection.adjust(surface, initialRegion, { element, cancelled: () => activeSession.cancelled }); } while (region?.restart);
+        checkpoint(); if (!region) return;
+        const elementOrigin = element === surface.element ? { x: rect.left, y: rect.top }
+          : dom.clientPointToSurface(surface, rect.left, rect.top);
+        const assertElementGeometry = () => {
+          const current = element.getBoundingClientRect();
+          dom.getElementScrollSurface(element).getCaptureRect();
+          const origin = element === surface.element ? { x: current.left, y: current.top }
+            : dom.clientPointToSurface(surface, current.left, current.top);
+          if (!element.isConnected || ['width','height'].some(key => Math.abs(current[key] - rect[key]) > 2)
+            || Math.abs(origin.x-elementOrigin.x)>2 || Math.abs(origin.y-elementOrigin.y)>2) {
+            throw new Error(text('elementUnavailable'));
+          }
+        };
+        await countdown();
+        assertElementGeometry();
+        restoreMotion = suspendPageMotion(); progress = createProgressIndicator();
+        const baseline = await stabilizePageDimensions(surface, region);
+        assertElementGeometry();
+        await openPreparedCapture(await captureRegionAttempt(surface, region, baseline, progress));
+      } catch (error) { if (error.name !== 'AbortError') alert(text('zoneError') + error.message); }
+      finally { if (surface && original) surface.scrollTo(original.x, original.y); restoreMotion(); removeProgressIndicator(progress); }
+    }
+
     async function openPreparedCapture(prepared) {
       checkpoint();
       await transfer.openEditor(prepared.blob, prepared.scale, prepared.textBlocks, prepared.textLayerLimited, checkpoint,
@@ -153,10 +230,10 @@
     }
 
     function captureFullPageAttempt(surface, baseline, progress) {
-      return captureRegionAttempt(surface, { x: 0, y: 0, width: baseline.fullWidth, height: baseline.fullHeight }, baseline, progress);
+      return captureRegionAttempt(surface, { x: 0, y: 0, width: baseline.fullWidth, height: baseline.fullHeight }, baseline, progress, false);
     }
 
-    async function captureRegionAttempt(surface, region, baseline, progress) {
+    async function captureRegionAttempt(surface, region, baseline, progress, bounded = true) {
       const xs = Utils.buildRegionCapturePlan(region.x, region.width, baseline.viewportWidth, baseline.fullWidth);
       const ys = Utils.buildRegionCapturePlan(region.y, region.height, baseline.viewportHeight, baseline.fullHeight);
       const initial = surface.getPosition();
@@ -176,7 +253,7 @@
           surface.scrollTo(xTile.scrollY, yTile.scrollY);
           await waitForPaint();
           await delay(140);
-          assertStableMetrics(surface, baseline);
+          assertStableMetrics(surface, baseline, bounded ? region : null);
           const actual = assertSurfacePosition(surface, { x: xTile.scrollY, y: yTile.scrollY });
           const currentGeometry = surface.getCaptureRect();
           if (Math.abs(currentGeometry.width - geometry.width) > 0.5 || Math.abs(currentGeometry.height - geometry.height) > 0.5) throw layoutChangedError();
@@ -330,8 +407,15 @@
           hide();
           try {
             checkpoint();
-            const region = regionForPointer();
+            let region = regionForPointer();
             if (region.width < 5 || region.height < 5) return;
+            const initial = { ...region };
+            do {
+              region = await selection.adjust(surface, initial, { cancelled: () => activeSession.cancelled });
+            } while (region?.restart);
+            checkpoint();
+            if (!region) return;
+            await countdown();
             restoreMotion = suspendPageMotion(); progress = createProgressIndicator();
             const baseline = hasScrolled ? await stabilizePageDimensions(surface, region) : surface.getMetrics();
             const prepared = await captureRegionAttempt(surface, region, baseline, progress);
@@ -359,6 +443,14 @@
         root.style.setProperty('scroll-behavior', 'auto');
         selected = await selectScrollingRegion(originalDocument.x);
         if (!selected) return;
+        const initialRegion = { ...selected.region };
+        let adjusted;
+        do { adjusted = await selection.adjust(selected.surface, initialRegion, { cancelled: () => activeSession.cancelled, lockHorizontal: true }); } while (adjusted?.restart);
+        checkpoint(); if (!adjusted) return;
+        selected.region = Utils.normalizeScrollingRegion({ x: adjusted.x, y: adjusted.y },
+          { x: adjusted.x + adjusted.width, y: adjusted.y + adjusted.height },
+          { x: initialRegion.x, width: initialRegion.width }, selected.surface.getMetrics().fullHeight);
+        await countdown();
         if (selected.surface && !selected.surface.isDocument && selected.surface.element) {
           selected.surface.element.style.setProperty('scroll-behavior', 'auto');
         }
@@ -680,6 +772,8 @@
     }
 
     return Object.freeze({
+      setDelay: value => { requestedDelay = [0, 3, 5, 10].includes(value) ? value : 0; },
+      executeElementCapture: () => runSession(executeElementCapture),
       executeVisibleCapture: () => runSession(executeVisibleCapture),
       executeFullPageCapture: () => runSession(executeFullPageCapture),
       executeZoneCapture: () => runSession(executeZoneCapture),

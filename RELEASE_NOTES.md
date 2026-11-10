@@ -1,55 +1,49 @@
-# Scionos Capture 1.3.3
+# Scionos Capture 1.4.0
 
-**Date de version : 5 octobre 2026 (2026-10-05).**
+**Version 1.4.0 — 2026-11-10.**
 
 ## Français
 
-**1.3.3 — 2026-10-05**
-
-- Captures : assemblage rectangulaire commun, sélection horizontale sans étirement, coordonnées corrigées pour les conteneurs translatés ou mis à l’échelle ; transformations complexes refusées explicitement.
-- Sélection : défilement automatique aux bords du conteneur choisi, largeur et origine horizontale verrouillées dans le mode vertical, surcouches utilisables au-dessus des dialogues modaux.
-- Assemblage : pied de page fixe conservé intégralement lorsque la dernière tranche est plus courte ; restauration après annulation et réponses tardives ignorées.
-- Confidentialité : texte recouvert par un descendant exclu du PDF ; masque libre continu, y compris entre points éloignés et lors d’un simple clic.
-- Exports : validation ou annulation obligatoire des modifications en attente ; pixels et métadonnées issus de la même révision pour PNG, HTML, copie et PDF.
-- HTML : image incorporée une seule fois, contrôle de taille en octets, défilement des longues images et zoom 100 % corrigés ; extraction textuelle arrêtée au plafond de 1 500 blocs.
-- Maintenance : version 1.3.3 distincte des téléchargements publiés, synchronisation `--unreleased`, vérification des Markdown et régressions sur pixels réels, PDF et quatre DPR.
+- **Élément au clic :** survolez un bloc, choisissez au besoin son parent ou son enfant, puis cliquez pour préparer la capture. La partie affichée est choisie par défaut ; le contenu entier est disponible pour les conteneurs réellement défilants.
+- **Sélection ajustable :** après le tracé ou le choix d’un élément, ajustez les huit poignées ou les champs X/Y/largeur/hauteur, puis confirmez avec **Capturer**. Les flèches déplacent la sélection ou une poignée ; Maj augmente le pas de 1 à 10 pixels CSS. Échap annule.
+- **Capture différée :** choisissez **Immédiat**, **3**, **5** ou **10 secondes**. Le délai est mémorisé localement. Il commence après confirmation pour les sélections et les éléments, dès le lancement pour la zone visible et la page entière. Le compte à rebours est annulable.
+- **Fils dynamiques :** une sélection bornée tolère l’ajout de contenu en bas de page. Le correctif a été développé après reproduction sur X.com et vérifié par tests automatisés ; le fonctionnement après correction a été confirmé par l’utilisateur sur X.com, y compris après correction du bandeau cookies répété.
+- Les cinq modes restent locaux, sans nouvelle permission ni transmission de capture. Le sélecteur ne parcourt pas l’intérieur des iframes ni les shadow roots fermés ; les contenus virtualisés peuvent rester incomplets. Le flou est visuel : utilisez un masque solide pour les secrets.
 
 ## English
 
-**1.3.3 — 2026-10-05**
+**Version 1.4.0 — 2026-11-10.**
 
-- Capture: shared rectangular stitching, horizontal selections without stretching, correct coordinates for translated or scaled containers; unsupported complex transforms fail explicitly.
-- Selection: auto-scroll at the selected container edges, locked horizontal origin and width in vertical mode, overlays usable above modal dialogs.
-- Stitching: retain the complete fixed footer when the final strip is shorter; restore state after cancellation and ignore late responses.
-- Privacy: omit text covered by descendants from searchable PDFs; continuous freehand masks across distant points and single clicks.
-- Exports: apply or cancel pending edits before exporting; PNG, HTML, clipboard and PDF use pixels and metadata from the same revision.
-- HTML: embed the image once, check the final byte size, fix long-image scrolling and 100% zoom; stop text extraction at 1,500 blocks.
-- Maintenance: separate version 1.3.3 from published downloads, add `--unreleased` synchronization, verify Markdown, and add real-pixel, PDF and four-DPR regressions.
+- **Element capture:** hover over a block, optionally choose its parent or child, then click to prepare the capture. The displayed portion is the default; entire content is available for genuinely scrollable containers.
+- **Adjustable selection:** after drawing or choosing an element, adjust eight handles or the X/Y/width/height fields and confirm with **Capture**. Arrow keys move the selection or a handle; Shift changes the step from 1 to 10 CSS pixels. Escape cancels.
+- **Delayed capture:** choose **Immediate**, **3**, **5**, or **10 seconds**. The preference is stored locally. The delay starts after confirmation for selections and elements, immediately after launch for visible-area and full-page captures. The countdown can be cancelled.
+- **Dynamic feeds:** bounded selections tolerate content appended below the page. The fix follows reproduction on X.com and automated regression tests; the user confirmed operation on X.com after updating, including the repeated cookie-banner fix.
+- All five modes remain local, without new permissions or screenshot transfer. The picker does not traverse iframe contents or closed shadow roots; virtualized content may remain incomplete. Blur is visual only: use a solid mask for secrets.
 
 ## Español
 
-**1.3.3 — 2026-10-05**
+**Versión 1.4.0 — 2026-11-10.**
 
-- Capturas: ensamblado rectangular común, selecciones horizontales sin estiramiento y coordenadas correctas en contenedores trasladados o escalados; rechazo explícito de transformaciones complejas no compatibles.
-- Selección: desplazamiento automático en los bordes del contenedor elegido, origen horizontal y ancho bloqueados en el modo vertical, selección sobre diálogos modales.
-- Ensamblado: pie fijo completo incluso si el último fragmento es más corto; restauración al cancelar y respuestas tardías ignoradas.
-- Privacidad: texto cubierto por descendientes omitido del PDF; máscaras libres continuas entre puntos distantes y con un solo clic.
-- Exportaciones: aplicar o cancelar cambios pendientes antes de exportar; PNG, HTML, portapapeles y PDF usan píxeles y metadatos de la misma revisión.
-- HTML: imagen integrada una sola vez, tamaño final verificado en bytes, desplazamiento de imágenes largas y zoom 100 % corregidos; extracción limitada a 1.500 bloques.
-- Mantenimiento: versión 1.3.3 separada de las descargas publicadas, sincronización `--unreleased`, revisión de Markdown y regresiones con píxeles reales, PDF y cuatro DPR.
+- **Captura de elementos:** pasa el cursor sobre un bloque, elige su padre o hijo si hace falta y haz clic para preparar la captura. La parte mostrada es la opción predeterminada; el contenido completo está disponible para contenedores realmente desplazables.
+- **Selección ajustable:** tras dibujar o elegir un elemento, ajusta los ocho tiradores o los campos X/Y/ancho/alto y confirma con **Capturar**. Las flechas mueven la selección o un tirador; Mayús cambia el paso de 1 a 10 píxeles CSS. Escape cancela.
+- **Captura diferida:** elige **Inmediato**, **3**, **5** o **10 segundos**. La preferencia se guarda localmente. El retardo comienza tras confirmar zonas y elementos, o al iniciar capturas visibles y completas. La cuenta atrás se puede cancelar.
+- **Contenidos dinámicos:** las selecciones acotadas toleran contenido añadido al final de la página. La corrección se basa en una reproducción en X.com y pruebas automatizadas; el usuario confirmó el funcionamiento en X.com tras actualizar, incluida la corrección del aviso de cookies repetido.
+- Los cinco modos siguen siendo locales, sin nuevos permisos ni transferencia de capturas. El selector no recorre iframes ni shadow roots cerrados; el contenido virtualizado puede quedar incompleto. El desenfoque es visual: usa una máscara sólida para secretos.
 
 ## Deutsch
 
-**1.3.3 — 2026-10-05**
+**Version 1.4.0 — 2026-11-10.**
 
-- Aufnahmen: gemeinsame rechteckige Kachelzusammensetzung, horizontale Auswahl ohne Streckung, korrekte Koordinaten für verschobene oder skalierte Container; explizite Ablehnung komplexer Transformationen.
-- Auswahl: automatisches Scrollen an den Rändern des gewählten Containers, feste horizontale Position und Breite im vertikalen Modus, Auswahl über modalen Dialogen.
-- Zusammensetzung: vollständige feste Fußzeile auch bei kürzerem letzten Abschnitt; Zustand nach Abbruch wiederhergestellt und verspätete Antworten ignoriert.
-- Datenschutz: durch Nachfahren verdeckten Text aus PDFs entfernen; durchgehende freie Maskierung zwischen entfernten Punkten und bei einzelnen Klicks.
-- Exporte: ausstehende Änderungen vor Export übernehmen oder verwerfen; PNG, HTML, Zwischenablage und PDF verwenden Bild und Metadaten derselben Revision.
-- HTML: Bild nur einmal einbetten, endgültige Byte-Größe prüfen, Scrollen langer Bilder und 100-%-Zoom korrigieren; Textextraktion bei 1.500 Blöcken beenden.
-- Wartung: Version 1.3.3 von veröffentlichten Downloads trennen, `--unreleased`-Synchronisierung, Markdown-Prüfung sowie Regressionen mit echten Pixeln, PDF und vier DPR.
+- **Elementaufnahme:** einen Block mit der Maus hervorheben, bei Bedarf das über- oder untergeordnete Element wählen und per Klick die Aufnahme vorbereiten. Standardmäßig wird der angezeigte Teil aufgenommen; der gesamte Inhalt ist für tatsächlich scrollbare Container verfügbar.
+- **Anpassbare Auswahl:** nach dem Zeichnen oder der Elementwahl acht Griffe oder X/Y/Breite/Höhe anpassen und mit **Aufnehmen** bestätigen. Pfeiltasten verschieben die Auswahl oder einen Griff; Umschalt erhöht den Schritt von 1 auf 10 CSS-Pixel. Escape bricht ab.
+- **Verzögerte Aufnahme:** **Sofort**, **3**, **5** oder **10 Sekunden** wählen. Die Einstellung wird lokal gespeichert. Bei Auswahl und Elementen beginnt die Verzögerung nach Bestätigung, bei sichtbarem Bereich und ganzer Seite beim Start. Der Countdown kann abgebrochen werden.
+- **Dynamische Feeds:** begrenzte Auswahlen tolerieren am Seitenende hinzugefügten Inhalt. Die Korrektur basiert auf einer Reproduktion auf X.com und automatisierten Tests; der Nutzer bestätigte die Funktion auf X.com nach der Aktualisierung, einschließlich der Korrektur des wiederholten Cookie-Banners.
+- Alle fünf Modi arbeiten lokal, ohne neue Berechtigungen oder Übertragung von Aufnahmen. Die Elementauswahl durchsucht weder iframe-Inhalte noch geschlossene Shadow Roots; virtualisierte Inhalte können unvollständig bleiben. Unschärfe ist nur visuell: Geheimnisse deckend maskieren.
 
-Archive ZIP / ZIP archive : `scionos-capture-v1.3.3.zip` · SHA-256 : `scionos-capture-v1.3.3.zip.sha256`.
+## Validation / Validation status
 
-Validation locale : `npm run verify` sous Node.js 24 — 59 tests unitaires et 68 tests E2E Chromium réussis. Archive de 29 fichiers et SHA-256 vérifié. La CI couvre également les contrôles principaux sous Node.js 20 et les régressions Windows.
+Les tests automatisés et essais natifs sont consignés séparément lors de la préparation du livrable final. La soumission au Chrome Web Store reste distincte de la release GitHub.
+
+Automated checks and native browser trials are recorded separately when the final local package is prepared. Chrome Web Store submission is separate from the GitHub release.
+
+Archive locale / Local archive : `scionos-capture-v1.4.0.zip` · SHA-256 : `scionos-capture-v1.4.0.zip.sha256`.

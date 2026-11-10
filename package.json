@@ -1,13 +1,13 @@
 {
   "name": "scionos-capture",
-  "version": "1.3.3",
+  "version": "1.4.0",
   "private": true,
   "license": "MIT",
   "description": "Extension Manifest V3 de capture d’écran locale pour Chrome et Edge.",
   "scripts": {
     "clean": "node scripts/clean.mjs",
     "version:sync": "node scripts/update-readme-version.mjs",
-    "check": "node --check background.js && node --check capture-utils.js && node --check capture-content-utils.js && node --check capture-store.js && node --check content-dom.js && node --check content-transfer.js && node --check content-capture.js && node --check content.js && node --check editor-operations.js && node --check editor-export.js && node --check editor.js && node --check help.js && node --check i18n.js && node --check popup.js",
+    "check": "node --check background.js && node --check capture-utils.js && node --check capture-content-utils.js && node --check capture-store.js && node --check content-dom.js && node --check content-transfer.js && node --check content-selection.js && node --check content-capture.js && node --check content.js && node --check editor-operations.js && node --check editor-export.js && node --check editor.js && node --check help.js && node --check i18n.js && node --check popup.js",
     "lint": "eslint . && html-validate popup.html editor.html help.html",
     "validate": "node scripts/validate-package.mjs",
     "test": "node scripts/test.mjs",
@@ -24,10 +24,16 @@
     "@axe-core/playwright": "^4.12.1",
     "@eslint/js": "^9.39.5",
     "@playwright/test": "^1.62.1",
-    "archiver": "^7.0.1",
+    "archiver": "^8.0.0",
     "eslint": "^9.39.5",
     "fake-indexeddb": "^6.2.5",
     "html-validate": "^9.7.1",
     "pdfjs-dist": "6.3.289"
+  },
+  "overrides": {
+    "glob": "14.0.2",
+    "readdir-glob": {
+      "minimatch": "11.0.1"
+    }
   }
 }

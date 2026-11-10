@@ -2,7 +2,7 @@
 
 [Français](PRIVACY.md) · [English](PRIVACY.en.md) · [Español](PRIVACY.es.md) · [Deutsch](PRIVACY.de.md)
 
-Dernière mise à jour : 2 octobre 2026.
+Dernière mise à jour : 10 novembre 2026 — version 1.4.0.
 
 **Éditeur responsable :** eyelo SA (IDE : CHE-108.174.302), Vaud, Suisse — Marque **ScioNos** ([scionos.ch](https://scionos.ch)) — Contact : info@eyelo.ch
 
@@ -14,7 +14,7 @@ L’extension n’envoie aucune capture, URL ou donnée de navigation à eyelo S
 
 La capture et ses métadonnées textuelles restent dans IndexedDB local. Les fragments sont supprimés après assemblage ou après quinze minutes sans activité ; un navigateur suspendu peut différer ce nettoyage jusqu’au réveil. La capture finale est conservée tant qu’un onglet éditeur correspondant est ouvert, y compris après rechargement et au-delà de quinze minutes. Elle est supprimée à la fermeture de son dernier éditeur. Sans éditeur, elle devient éligible au nettoyage quinze minutes après sa création. Les associations sont réconciliées avec les onglets ouverts au réveil et au redémarrage.
 
-La langue choisie est conservée dans `chrome.storage.local`. La correspondance entre l’onglet éditeur et la capture utilise `chrome.storage.session` et disparaît avec la session du navigateur.
+La langue choisie et le délai de capture (`captureDelaySeconds`, 0, 3, 5 ou 10 secondes) sont conservés dans `chrome.storage.local`. La sélection d’un élément et le compte à rebours restent locaux ; ils n’ajoutent aucune permission ni destination réseau. La capture différée ne commence qu’après une action explicite et peut être annulée. La correspondance entre l’onglet éditeur et la capture utilise `chrome.storage.session` et disparaît avec la session du navigateur.
 
 L’utilisateur peut supprimer toutes les données locales depuis la page de gestion des extensions ou en désinstallant Scionos Capture.
 

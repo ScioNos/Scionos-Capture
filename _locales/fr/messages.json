@@ -56,6 +56,23 @@
   "btnScrollingDesc": {
     "message": "Choisir une zone sur plusieurs écrans"
   },
+  "elementTitle": { "message": "Élément au clic" },
+  "elementDesc": { "message": "Choisir un bloc de la page" },
+  "delayLabel": { "message": "Délai avant capture" },
+  "delayImmediate": { "message": "Immédiat" },
+  "delaySeconds": { "message": "{seconds} s" },
+  "selectionTitle": { "message": "Ajuster la sélection" },
+  "selectionCapture": { "message": "Capturer" },
+  "selectionRestart": { "message": "Recommencer" },
+  "selectionCancel": { "message": "Annuler" },
+  "selectionParent": { "message": "Élément parent" },
+  "selectionChild": { "message": "Élément enfant" },
+  "elementVisible": { "message": "Partie visible" },
+  "elementFull": { "message": "Élément entier" },
+  "selectionInstructions": { "message": "Cliquez sur un élément ou tracez une zone. Ajustez les poignées ou les coordonnées, puis choisissez Capturer. Échap annule." },
+  "countdownStatus": { "message": "Capture dans {seconds} s…" },
+  "countdownCancel": { "message": "Annuler le compte à rebours" },
+  "elementUnavailable": { "message": "Cet élément ne peut pas être capturé. Choisissez un autre élément ou tracez une zone." },
   "shortcutText": {
     "message": "Raccourci"
   },
@@ -393,13 +410,19 @@
     "message": "Page entière : défile et assemble automatiquement l’ensemble du document, même sur les pages très longues."
   },
   "helpModeVisible": {
-    "message": "Zone visible : capture instantanément ce qui est affiché à l’écran sans défilement."
+    "message": "Zone visible : capture ce qui est affiché à l’écran sans défilement, après le délai choisi."
   },
   "helpModeZone": {
-    "message": "Zone sélectionnée : tracez un rectangle à la souris. Approchez les bords de l’écran pour activer le défilement automatique continu."
+    "message": "Zone sélectionnée : tracez un rectangle ; les bords activent le défilement automatique. Ajustez ensuite les poignées ou les coordonnées, puis confirmez avec Capturer. Les flèches déplacent la sélection ou une poignée ; Maj augmente le pas de 1 à 10 pixels CSS."
   },
   "helpModeScrolling": {
-    "message": "Zone défilante : définissez deux coins en faisant défiler manuellement pour cibler un conteneur interne précis."
+    "message": "Zone défilante : définissez deux coins en faisant défiler, puis ajustez et confirmez la zone. La largeur reste bornée à celle choisie au premier point."
+  },
+  "helpModeElement": {
+    "message": "Élément au clic : survolez un bloc, choisissez son parent ou son enfant si nécessaire, puis sa partie affichée ou le contenu entier d’un conteneur réellement défilant. Cliquez sur le bloc, ajustez la sélection et confirmez. Les contenus internes des iframes ne sont pas parcourus."
+  },
+  "helpCaptureDelay": {
+    "message": "Choisissez Immédiat, 3, 5 ou 10 secondes. Le délai est mémorisé localement et commence après confirmation des zones ou éléments, dès le lancement pour Zone visible et Page entière. Échap ou Annuler arrête le compte à rebours."
   },
   "helpEditorHeader": {
     "message": "Édition & Formats d’export"

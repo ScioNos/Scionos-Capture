@@ -56,6 +56,23 @@
   "btnScrollingDesc": {
     "message": "Bereich über mehrere Ansichten wählen"
   },
+  "elementTitle": { "message": "Element aufnehmen" },
+  "elementDesc": { "message": "Einen Bereich der Seite auswählen" },
+  "delayLabel": { "message": "Aufnahmeverzögerung" },
+  "delayImmediate": { "message": "Sofort" },
+  "delaySeconds": { "message": "{seconds} s" },
+  "selectionTitle": { "message": "Auswahl anpassen" },
+  "selectionCapture": { "message": "Aufnehmen" },
+  "selectionRestart": { "message": "Neu beginnen" },
+  "selectionCancel": { "message": "Abbrechen" },
+  "selectionParent": { "message": "Übergeordnetes Element" },
+  "selectionChild": { "message": "Untergeordnetes Element" },
+  "elementVisible": { "message": "Sichtbarer Teil" },
+  "elementFull": { "message": "Gesamtes Element" },
+  "selectionInstructions": { "message": "Ein Element anklicken oder einen Bereich ziehen. Griffe oder Koordinaten anpassen und Aufnehmen wählen. Escape bricht ab." },
+  "countdownStatus": { "message": "Aufnahme in {seconds} s…" },
+  "countdownCancel": { "message": "Countdown abbrechen" },
+  "elementUnavailable": { "message": "Dieses Element kann nicht aufgenommen werden. Ein anderes Element wählen oder einen Bereich ziehen." },
   "shortcutText": {
     "message": "Tastenkürzel"
   },
@@ -393,13 +410,19 @@
     "message": "Ganze Seite: scrollt und fügt das gesamte Dokument automatisch zusammen, auch bei sehr langen Seiten."
   },
   "helpModeVisible": {
-    "message": "Sichtbarer Bereich: erfasst sofort das, was aktuell auf dem Bildschirm zu sehen ist."
+    "message": "Sichtbarer Bereich: nimmt den angezeigten Inhalt ohne Scrollen nach der gewählten Verzögerung auf."
   },
   "helpModeZone": {
-    "message": "Ausgewählter Bereich: Ziehen Sie ein Rechteck mit der Maus. Erreichen Sie die Bildschirmränder für automatisches Scrollen."
+    "message": "Ausgewählter Bereich: ein Rechteck ziehen; an den Rändern beginnt automatisches Scrollen. Danach Griffe oder Koordinaten anpassen und mit Aufnehmen bestätigen. Pfeiltasten bewegen Auswahl oder Griff; Umschalt erhöht den Schritt von 1 auf 10 CSS-Pixel."
   },
   "helpModeScrolling": {
-    "message": "Scrollender Bereich: Definieren Sie zwei Ecken durch manuelles Scrollen, um einen internen Container zu erfassen."
+    "message": "Scrollbereich: beim Scrollen zwei Ecken wählen, dann den Bereich anpassen und bestätigen. Seine Breite bleibt auf die beim ersten Punkt gewählte Breite begrenzt."
+  },
+  "helpModeElement": {
+    "message": "Elementaufnahme: einen Block hervorheben, bei Bedarf das über- oder untergeordnete Element wählen und den angezeigten Teil oder den gesamten Inhalt eines tatsächlich scrollbaren Containers auswählen. Den Block anklicken, Auswahl anpassen und bestätigen. Iframe-Inhalte werden nicht durchsucht."
+  },
+  "helpCaptureDelay": {
+    "message": "Sofort, 3, 5 oder 10 Sekunden wählen. Die Einstellung wird lokal gespeichert. Bei Bereichen und Elementen beginnt die Verzögerung nach Bestätigung, bei sichtbarem Bereich und ganzer Seite beim Start. Escape oder Abbrechen beendet den Countdown."
   },
   "helpEditorHeader": {
     "message": "Bearbeitung & Exportformate"

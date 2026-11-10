@@ -15,7 +15,7 @@ const server = http.createServer((request, response) => {
   response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
   response.end('<!doctype html><title>Scionos native capture fixture</title><style>html,body{margin:0;background:rgb(30,120,210);'
     + (full ? 'width:1000px;height:650px' : 'width:800px;height:1200px')
-    + '}footer{position:fixed;bottom:0;width:100%;height:100px;background:red}</style>' + (full ? '<footer></footer>' : ''));
+    + '}footer{position:fixed;bottom:0;width:100%;height:100px;background:red}#target{position:absolute;left:100px;top:100px;width:300px;height:250px}</style>' + (full ? '<footer></footer>' : '<div id="target"></div>'));
 });
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const baseUrl = 'http://127.0.0.1:' + server.address().port;
@@ -29,7 +29,7 @@ try {
     try {
       const cdp = await context.browser().newBrowserCDPSession();
       const extension = await cdp.send('Extensions.loadUnpacked', { path: root });
-      for (const mode of ['visible', 'full', 'zone', 'scrolling']) {
+      for (const mode of ['visible', 'full', 'zone', 'scrolling', 'element']) {
         const page = await context.newPage();
         const errors = [];
         page.on('dialog', async dialog => { errors.push(dialog.message()); await dialog.dismiss(); });
@@ -42,6 +42,8 @@ try {
         const popup = await context.newPage();
         await popup.goto('chrome-extension://' + extension.id + '/popup.html');
         await popup.waitForFunction(() => globalThis.document.getElementById('txt-visible-title').textContent);
+        if (mode === 'visible') await popup.locator('#capture-delay').selectOption('3');
+        else await popup.locator('#capture-delay').selectOption('0');
         await page.bringToFront();
         const opened = context.waitForEvent('page', { timeout: 30000 });
         // Headless has no toolbar popup surface; run its unchanged UI in an inactive tab.
@@ -53,10 +55,16 @@ try {
           await page.locator('[data-scionos-capture="scrolling-controls"]').waitFor();
           for (const [name, value] of Object.entries({ x: 100, y: 100, width: 300, height: 900 })) await page.locator('input[name="' + name + '"]').fill(String(value));
           await page.locator('[data-scionos-capture="scrolling-controls"] button[type="submit"]').click();
+        } else if (mode === 'element') {
+          await page.locator('[data-scionos-capture="element-selection"]').waitFor();
+          await page.mouse.move(200, 200); await page.mouse.click(200, 200);
         }
+        if (['zone','scrolling','element'].includes(mode)) await page.locator('[data-selection-action="capture"]').click();
         const editor = await opened;
         await editor.waitForURL('**/editor.html?capture=*');
-        await editor.waitForFunction(() => globalThis.document.getElementById('tool-text').disabled === false);
+        await editor.waitForFunction(() => globalThis.document.getElementById('tool-text').disabled === false
+          && globalThis.document.getElementById('empty-state').hidden
+          && !(globalThis.document.getElementById('main-canvas').width === 300 && globalThis.document.getElementById('main-canvas').height === 150));
         const result = await editor.locator('#main-canvas').evaluate((canvas, mode) => {
           const pixels = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
           let mismatches = 0;
@@ -67,7 +75,7 @@ try {
           }
           return { width: canvas.width, height: canvas.height, mismatches };
         }, mode);
-        const expected = { visible: [800, 600], full: [1000, 650], zone: [300, 250], scrolling: [300, 900] }[mode];
+        const expected = { visible: [800, 600], full: [1000, 650], zone: [300, 250], scrolling: [300, 900], element: [300, 250] }[mode];
         assert.deepEqual(errors, [], 'Native capture errors: ' + errors.join('; '));
         assert.deepEqual(result, { width: expected[0], height: expected[1], mismatches: 0 });
         assert.equal(await page.evaluate(() => globalThis.scrollX + globalThis.scrollY), 0);

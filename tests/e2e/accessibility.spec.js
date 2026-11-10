@@ -2,6 +2,12 @@ const path = require('node:path');
 const { test, expect, chromium } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
 
+async function confirmSelection(page) {
+  const adjustment = page.locator('[data-scionos-capture="adjustment"]');
+  await expect(adjustment).toBeVisible();
+  await adjustment.locator('[data-selection-action="capture"]').click();
+}
+
 let context;
 let extensionId;
 const { frenchMessages, prepareFullPageHarness, startFullPageCapture, readOpenedCapture } = require('./helpers/capture');
@@ -173,7 +179,7 @@ test('scrolling-area capture targets and restores an internal container', async 
   await page.locator('input[name="y"]').fill('20');
   await page.locator('input[name="width"]').fill('200');
   await page.locator('input[name="height"]').fill('900');
-  await page.locator('[data-scionos-capture="scrolling-controls"] button', { hasText: 'Capturer' }).click();
+  await page.locator('[data-scionos-capture="scrolling-controls"] button', { hasText: 'Capturer' }).click(); await confirmSelection(page);
   const result = await readOpenedCapture(page);
   expect({ width: result.width, height: result.height }).toEqual({ width: 200, height: 900 });
   expect(result.positions.map(item => item.surfaceY)).toEqual([20, 320, 620]);
@@ -222,7 +228,7 @@ test('scrolling-area cancellation and restart restore nested scroll state and in
   await page.locator('input[name="y"]').fill('20');
   await page.locator('input[name="width"]').fill('200');
   await page.locator('input[name="height"]').fill('900');
-  await page.locator('[data-scionos-capture="scrolling-controls"] button', { hasText: 'Capturer' }).click();
+  await page.locator('[data-scionos-capture="scrolling-controls"] button', { hasText: 'Capturer' }).click(); await confirmSelection(page);
   await readOpenedCapture(page);
   await expect.poll(() => page.locator('[data-scroll-surface]').evaluate(element => element.scrollTop)).toBe(120);
   expect(await page.locator('[data-scroll-surface]').evaluate(element => ({
@@ -260,7 +266,7 @@ test('scrolling-area capture targets a chat dock container on a long scrollable 
   await page.locator('input[name="y"]').fill('20');
   await page.locator('input[name="width"]').fill('280');
   await page.locator('input[name="height"]').fill('1000');
-  await page.locator('[data-scionos-capture="scrolling-controls"] button', { hasText: 'Capturer' }).click();
+  await page.locator('[data-scionos-capture="scrolling-controls"] button', { hasText: 'Capturer' }).click(); await confirmSelection(page);
 
   const result = await readOpenedCapture(page);
   expect({ width: result.width, height: result.height }).toEqual({ width: 280, height: 1000 });
@@ -288,7 +294,7 @@ test('zone capture crops a static visible selection', async () => {
   await page.mouse.move(100, 100);
   await page.mouse.down();
   await page.mouse.move(400, 350);
-  await page.mouse.up();
+  await page.mouse.up(); await confirmSelection(page);
 
   const result = await readOpenedCapture(page);
   expect({ width: result.width, height: result.height }).toEqual({ width: 300, height: 250 });
@@ -310,7 +316,7 @@ test('zone capture uses viewport pixels when classic scrollbars reduce the conte
   await page.mouse.move(100, 100);
   await page.mouse.down();
   await page.mouse.move(400, 350);
-  await page.mouse.up();
+  await page.mouse.up(); await confirmSelection(page);
 
   const result = await readOpenedCapture(page);
   expect({ width: result.width, height: result.height }).toEqual({ width: 300, height: 250 });
@@ -338,7 +344,7 @@ test('zone capture auto-scrolls an internal container and stitches the region', 
   await page.mouse.down();
   await page.mouse.move(280, 590, { steps: 20 });
   await expect.poll(() => page.locator('[data-scroll-surface]').evaluate(element => element.scrollTop), { timeout: 15000 }).toBeGreaterThan(300);
-  await page.mouse.up();
+  await page.mouse.up(); await confirmSelection(page);
 
   const scrolledResult = await readOpenedCapture(page);
   expect(scrolledResult.width).toBe(160);
@@ -395,6 +401,7 @@ test('scrolling-area overlay supports pointer, keyboard and exact multi-screen c
   await page.addScriptTag({ path: path.resolve(__dirname, '../../capture-content-utils.js') });
   await page.addScriptTag({ path: path.resolve(__dirname, '../../content-dom.js') });
   await page.addScriptTag({ path: path.resolve(__dirname, '../../content-transfer.js') });
+  await page.addScriptTag({ path: path.resolve(__dirname, '../../content-selection.js') });
   await page.addScriptTag({ path: path.resolve(__dirname, '../../content-capture.js') });
   await page.addScriptTag({ path: path.resolve(__dirname, '../../content.js') });
   const messages = Object.fromEntries(Object.entries(require('../../_locales/fr/messages.json'))
@@ -440,7 +447,7 @@ test('scrolling-area overlay supports pointer, keyboard and exact multi-screen c
   await page.locator('input[name="y"]').fill('100');
   await page.locator('input[name="width"]').fill('240');
   await page.locator('input[name="height"]').fill('1600');
-  await page.locator('[data-scionos-capture="scrolling-controls"] button', { hasText: 'Capturer' }).click();
+  await page.locator('[data-scionos-capture="scrolling-controls"] button', { hasText: 'Capturer' }).click(); await confirmSelection(page);
   await page.waitForFunction(() => Boolean(globalThis.__openedCapture));
   const result = await page.evaluate(() => new Promise((resolve, reject) => {
     const image = new globalThis.Image();
@@ -487,13 +494,54 @@ test('scrolling-area overlay supports pointer, keyboard and exact multi-screen c
   await page.locator('input[name="width"]').fill('240');
   await page.locator('input[name="height"]').fill('1000');
   const dialogPromise = page.waitForEvent('dialog');
-  await page.locator('[data-scionos-capture="scrolling-controls"] button', { hasText: 'Capturer' }).click();
+  await page.locator('[data-scionos-capture="scrolling-controls"] button', { hasText: 'Capturer' }).click(); await confirmSelection(page);
   const dialog = await dialogPromise;
   expect(dialog.message()).toContain(messages.tabChangedError);
   await dialog.dismiss();
   await expect.poll(() => page.evaluate(() => globalThis.scrollY)).toBe(200);
   await expect(page.locator('header')).toHaveCSS('visibility', 'visible');
   await expect(page.locator('[data-scionos-capture="motion"]')).toHaveCount(0);
+});
+
+test('selection adjustment requires confirmation and supports keyboard movement and handle resizing', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, '<html lang="fr"><title>Ajustement</title><style>html,body{margin:0;height:1200px}</style><main>Selection</main></html>');
+  await page.evaluate(messages => new Promise(resolve => globalThis.__captureListener({ action: 'START_ZONE_CAPTURE', messages }, {}, resolve)), frenchMessages);
+  await page.mouse.move(100, 100); await page.mouse.down(); await page.mouse.move(300, 250); await page.mouse.up();
+  const adjustment = page.locator('[data-scionos-capture="adjustment"]');
+  await expect(adjustment).toBeVisible();
+  expect(await page.evaluate(() => globalThis.__openedCapture)).toBeNull();
+  expect(await page.evaluate(() => globalThis.__capturePositions.length)).toBe(0);
+  await page.keyboard.press('ArrowRight'); await page.keyboard.press('Shift+ArrowDown');
+  await expect(adjustment.locator('input[name="x"]')).toHaveValue('101');
+  await expect(adjustment.locator('input[name="y"]')).toHaveValue('110');
+  const handle = adjustment.locator('[data-handle="se"]');
+  await handle.focus(); await page.keyboard.press('Shift+ArrowRight');
+  await expect(adjustment.locator('input[name="width"]')).toHaveValue('210');
+  const bounds = await handle.boundingBox();
+  await page.mouse.move(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+  await page.mouse.down(); await page.mouse.move(bounds.x + bounds.width / 2 + 20, bounds.y + bounds.height / 2 + 15); await page.mouse.up();
+  await expect(adjustment.locator('input[name="width"]')).toHaveValue('230');
+  await expect(adjustment.locator('input[name="height"]')).toHaveValue('165');
+  await confirmSelection(page);
+  expect(await readOpenedCapture(page)).toMatchObject({ width: 230, height: 165 });
+  await page.close();
+});
+
+test('delayed capture can be cancelled before any screenshot and releases its session', async () => {
+  const page = await context.newPage();
+  await prepareFullPageHarness(page, '<style>html,body{margin:0;height:1000px}</style>');
+  await page.evaluate(messages => new Promise(resolve => globalThis.__captureListener({ action: 'START_VISIBLE_CAPTURE', delaySeconds: 3, messages }, {}, resolve)), frenchMessages);
+  const countdown = page.locator('[data-scionos-capture="progress"]');
+  await expect(countdown.locator('button')).toBeVisible();
+  expect(await page.evaluate(() => globalThis.__capturePositions.length)).toBe(0);
+  await countdown.locator('button').click();
+  await expect(countdown).toHaveCount(0);
+  expect(await page.evaluate(() => globalThis.__openedCapture)).toBeNull();
+  expect(await page.evaluate(() => globalThis.__capturePositions.length)).toBe(0);
+  await expect.poll(() => page.evaluate(messages => new Promise(resolve => globalThis.__captureListener({ action: 'START_ZONE_CAPTURE', messages }, {}, resolve)), frenchMessages)).toEqual({ status: 'started' });
+  await page.keyboard.press('Escape');
+  await page.close();
 });
 
 test('editor empty state remains accessible at a narrow viewport', async () => {

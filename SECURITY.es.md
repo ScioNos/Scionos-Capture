@@ -2,7 +2,7 @@
 
 [Français](SECURITY.md) · [English](SECURITY.en.md) · [Español](SECURITY.es.md) · [Deutsch](SECURITY.de.md)
 
-La última release publicada recibe correcciones de seguridad; la línea compatible actual es `1.3.x`.
+Política actualizada el 10 de noviembre de 2026 para la versión 1.4.0. La línea compatible es `1.4.x`; su última versión recibe correcciones de seguridad.
 
 No abras una issue pública para una vulnerabilidad explotable. Usa el [informe privado de GitHub](https://github.com/ScioNos/Scionos-Capture/security/advisories/new) o contacta con `info@eyelo.ch` e incluye versión, impacto, pasos y una prueba no destructiva cuando sea posible.
 

@@ -55,6 +55,7 @@ async function prepareFullPageHarness(page, html) {
   await page.addScriptTag({ path: path.resolve(__dirname, '../../../capture-content-utils.js') });
   await page.addScriptTag({ path: path.resolve(__dirname, '../../../content-dom.js') });
   await page.addScriptTag({ path: path.resolve(__dirname, '../../../content-transfer.js') });
+  await page.addScriptTag({ path: path.resolve(__dirname, '../../../content-selection.js') });
   await page.addScriptTag({ path: path.resolve(__dirname, '../../../content-capture.js') });
   await page.addScriptTag({ path: path.resolve(__dirname, '../../../content.js') });
 }
