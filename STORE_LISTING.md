@@ -8,13 +8,14 @@
 
 **Description :**
 
-Capturez une page web, une zone visible, une sélection, un conteneur défilant ou un élément au clic. Ajustez votre sélection avant de capturer et utilisez un délai de 3, 5 ou 10 secondes pour préparer la page.
+**Descriptions complètes localisées (source de la fiche Store) :**
 
-Annotez vos captures dans l’éditeur intégré : dessin, surligneur, flèches, formes, texte, pastilles numérotées, masquage solide et rognage. Annulez ou rétablissez vos modifications, puis exportez en PNG, rapport HTML autonome ou PDF via l’impression du navigateur. Copiez aussi l’image dans le presse-papiers.
+- [Français](store-assets/listing-fr.txt)
+- [English](store-assets/listing-en.txt)
+- [Español](store-assets/listing-es.txt)
+- [Deutsch](store-assets/listing-de.txt)
 
-Le traitement se fait localement dans votre navigateur. Aucun compte, aucune publicité et aucune télémétrie. L’extension n’envoie pas vos captures à un serveur. La langue est disponible en français, anglais, espagnol et allemand.
-
-Les captures sont conservées temporairement pendant leur édition. Les pages internes du navigateur et certaines pages protégées ne peuvent pas être capturées. Les contenus animés ou virtualisés peuvent présenter des limites. La couche recherchable du PDF dépend du texte dont la visibilité est vérifiable. Pour protéger des secrets, utilisez le masque solide ; le flou est uniquement visuel.
+Ces textes conservent la présentation détaillée des versions précédentes et ajoutent les nouveautés de la 1.4.0. Les captures et les métadonnées restent traitées localement ; les limites de capture et de confidentialité sont précisées dans les descriptions.
 
 ## Liens
 

@@ -1,0 +1,57 @@
+Scionos Capture — Capture, annotate and export web pages with privacy in mind.
+
+Scionos Capture is an extension for Chrome and Microsoft Edge with 100% local processing. Capture a page, an excerpt or a conversation, add annotations and export the result without sending your screenshots to a server.
+
+Developed and published by eyelo SA (Switzerland), under the ScioNos brand.
+
+🆕 WHAT’S NEW IN VERSION 1.4.0 — 10 NOVEMBER 2026
+• New Element capture mode: hover over a block, choose its parent or child, then prepare its capture. Capture the displayed portion or the entire content of a genuinely scrollable container.
+• Adjust your selection before confirming: eight resize handles, movement, X/Y/width/height fields and keyboard controls. Arrow keys move the selection or a handle by 1 CSS pixel; Shift increases the step to 10 pixels. Escape cancels.
+• Capture immediately or after 3, 5 or 10 seconds, with a cancellable countdown and a locally remembered preference. For selections and elements, the delay starts after confirmation; for visible-area and full-page captures, it starts at launch.
+• Bounded selections now tolerate a dynamic feed growing in height, including on X.com. Fixed cookie banners inside zero-height fixed wrappers that could repeat across stitched portions.
+
+---
+
+🚀 5 CAPTURE MODES
+• Full page: stitch page portions vertically and horizontally, including supported internal scrolling containers.
+• Visible area: capture only what is displayed in the window.
+• Selected area: draw a region by dragging, with automatic scrolling at the edges, then adjust and confirm it.
+• Scrolling area: keep a conversation or a vertical region spanning several screens. Define two points or enter X/Y/width/height coordinates; use “To the bottom” to extend the region. This mode preserves the chosen visible width and does not stitch horizontally.
+• Element capture: visually choose a page block, navigate between parent and child, and confirm its bounds in the adjustment panel.
+
+🎨 BUILT-IN ANNOTATION EDITOR
+Work directly in the local editor: freehand drawing, a translucent highlighter (H), arrows (A), outlined or filled rectangles and ellipses (S), text (T) and numbered step markers (P).
+Cover information with an opaque solid mask or apply visual blur. Use solid masking to protect secrets: blur is not reliable data protection.
+Crop the image, undo or redo changes with Ctrl+Z/Ctrl+Y, and adjust zoom from 20 to 300%.
+
+📄 EXPORTS
+• Download your screenshot as PNG.
+• Use your browser’s print function to print or save a paginated PDF. A searchable text layer and clickable links are retained where their visibility can be verified.
+• Masked or cropped words, and words whose visibility cannot be established, are excluded from the PDF text layer; the captured image is retained.
+• Copy the image to the clipboard to paste it into an email, a support ticket or a document.
+Apply or cancel pending edits before exporting.
+
+🌐 SELF-CONTAINED INTERACTIVE HTML REPORT
+Create a standalone HTML file embedding your screenshot image and its viewer: zoom, pan, copy, print and PNG download.
+The report includes the title, source link, date, time and dimensions. It opens offline in a browser without hosting or an external service. It preserves the captured page image, not an interactive copy of the original website.
+
+🖥️ COMFORT AND PRODUCTIVITY
+Enjoy a dark interface and captures suited to HiDPI displays, including Windows scaling at 125% and 150%.
+The suggested Alt+Shift+C shortcut opens the extension if assigned by your browser. Configure it on the browser’s shortcuts page; the popup shows the combination actually assigned.
+In the editor: V for the cursor, D to draw, H to highlight, A for arrows, S for shapes, T for text, P for steps, M to mask and C to crop. Use 0, + and − for zoom.
+Screenshots and transfer fragments are temporarily stored in IndexedDB on your device. A screenshot is kept while its editor remains open, including after a reload. It is deleted when the last associated editor closes. Orphaned screenshots become eligible for cleanup after fifteen minutes; abandoned transfers expire after fifteen minutes of inactivity. A suspended browser may defer cleanup until it wakes.
+
+🔒 PRIVACY AND DATA
+All screenshot processing takes place locally. No processing server, screenshot uploads, telemetry or advertising. No account is required. Screenshot pixels, visible text and metadata remain on your device; your chosen language and capture delay are remembered locally.
+Internal browser pages and some protected pages cannot be captured. The element picker does not traverse iframe contents; animated or virtualized content and infinite feeds may have limitations. Very large images may be reduced automatically.
+
+💻 OPEN SOURCE AND SUPPORT
+Explore the source code, contribute or report a problem:
+https://github.com/ScioNos/Scionos-Capture
+Support: https://github.com/ScioNos/Scionos-Capture/issues
+Privacy: https://github.com/ScioNos/Scionos-Capture/blob/main/PRIVACY.md
+Contact: info@eyelo.ch
+Publisher: eyelo SA, Switzerland — ScioNos brand.
+
+🌍 INTERNATIONAL
+The interface and help are available in French, English, Spanish and German. The language follows your browser automatically and can be changed manually from the language menu in the dark interface.

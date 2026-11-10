@@ -1,0 +1,57 @@
+Scionos Capture — Webseiten unter Wahrung deiner Privatsphäre aufnehmen, kommentieren und exportieren.
+
+Scionos Capture ist eine Erweiterung für Chrome und Microsoft Edge mit vollständig lokaler Verarbeitung. Nimm eine Seite, einen Ausschnitt oder eine Unterhaltung auf, füge Anmerkungen hinzu und exportiere das Ergebnis, ohne deine Aufnahmen an einen Server zu senden.
+
+Entwickelt und herausgegeben von eyelo SA (Schweiz) unter der Marke ScioNos.
+
+🆕 NEU IN VERSION 1.4.0 — 10. NOVEMBER 2026
+• Neuer Modus Element aufnehmen: einen Block mit der Maus hervorheben, bei Bedarf sein über- oder untergeordnetes Element wählen und die Aufnahme vorbereiten. Den angezeigten Teil oder den gesamten Inhalt eines tatsächlich scrollbaren Containers aufnehmen.
+• Auswahl vor der Bestätigung anpassen: acht Griffe, Verschieben, X/Y/Breite/Höhe und Tastatursteuerung. Pfeiltasten verschieben die Auswahl oder einen Griff um 1 CSS-Pixel; Umschalt erhöht den Schritt auf 10 Pixel. Escape bricht ab.
+• Sofortige Aufnahme oder eine Verzögerung von 3, 5 oder 10 Sekunden mit abbrechbarem Countdown und lokal gespeicherter Einstellung. Bei Auswahlen und Elementen beginnt die Verzögerung nach Bestätigung, bei sichtbarem Bereich und ganzer Seite beim Start.
+• Begrenzte Auswahlen tolerieren nun wachsende dynamische Feeds, etwa auf X.com. Cookie-Banner in fixierten Containern mit Höhe null, die sich in zusammengesetzten Abschnitten wiederholen konnten, wurden korrigiert.
+
+---
+
+🚀 5 AUFNAHMEMODI
+• Ganze Seite: Seitenabschnitte vertikal und horizontal zusammensetzen, einschließlich unterstützter interner Scrollcontainer.
+• Sichtbarer Bereich: nur den im Fenster angezeigten Inhalt aufnehmen.
+• Ausgewählter Bereich: einen Bereich durch Ziehen markieren, an den Rändern automatisch scrollen lassen, anschließend anpassen und bestätigen.
+• Scrollbereich: eine Unterhaltung oder einen vertikalen Bereich über mehrere Bildschirme hinweg erfassen. Zwei Punkte festlegen oder X/Y/Breite/Höhe eingeben; mit „Bis nach unten“ den Bereich erweitern. Dieser Modus behält die gewählte sichtbare Breite bei und setzt nicht horizontal zusammen.
+• Element aufnehmen: einen Seitenblock visuell auswählen, zwischen über- und untergeordneten Elementen wechseln und seine Grenzen im Anpassungsbereich bestätigen.
+
+🎨 INTEGRIERTER ANNOTATIONSEDITOR
+Direkt im lokalen Editor arbeiten: Freihandzeichnung, halbtransparenter Textmarker (H), Pfeile (A), Rechtecke und Ellipsen als Umriss oder gefüllt (S), Text (T) und nummerierte Schrittmarkierungen (P).
+Informationen mit einer deckenden Fläche abdecken oder optisch weichzeichnen. Geheimnisse mit einer deckenden Maske schützen: Weichzeichnung bietet keinen zuverlässigen Datenschutz.
+Das Bild zuschneiden, Änderungen mit Strg+Z/Strg+Y rückgängig machen oder wiederholen und den Zoom von 20 bis 300 % einstellen.
+
+📄 EXPORTE
+• Die Aufnahme als PNG herunterladen.
+• Über die Druckfunktion des Browsers drucken oder als PDF mit Seitenaufteilung speichern. Durchsuchbarer Text und anklickbare Links bleiben erhalten, wenn ihre Sichtbarkeit überprüft werden kann.
+• Maskierte oder angeschnittene Wörter sowie Wörter mit unklarer Sichtbarkeit werden aus der PDF-Textebene ausgeschlossen; das aufgenommene Bild bleibt erhalten.
+• Das Bild in die Zwischenablage kopieren und in eine E-Mail, ein Supportticket oder ein Dokument einfügen.
+Ausstehende Änderungen vor dem Export übernehmen oder verwerfen.
+
+🌐 EIGENSTÄNDIGER INTERAKTIVER HTML-BERICHT
+Eine eigenständige HTML-Datei erstellen, die das Aufnahmebild und einen Betrachter enthält: Zoom, Verschieben, Kopieren, Drucken und PNG-Download.
+Der Bericht umfasst Titel, Quellenlink, Datum, Uhrzeit und Abmessungen. Er lässt sich offline in einem Browser öffnen, ohne Hosting oder externen Dienst. Er bewahrt das aufgenommene Seitenbild, keine interaktive Kopie der ursprünglichen Website.
+
+🖥️ KOMFORT UND PRODUKTIVITÄT
+Dunkle Oberfläche und für HiDPI-Displays geeignete Aufnahmen, einschließlich Windows-Skalierung mit 125 % und 150 %.
+Die vorgeschlagene Tastenkombination Alt+Umschalt+C öffnet die Erweiterung, sofern der Browser sie zuweist. Sie lässt sich auf der Tastenkombinationsseite des Browsers einstellen; das Popup zeigt die tatsächlich zugewiesene Kombination.
+Im Editor: V für den Zeiger, D zum Zeichnen, H zum Hervorheben, A für Pfeile, S für Formen, T für Text, P für Schritte, M zum Maskieren und C zum Zuschneiden. Den Zoom mit 0, + und − steuern.
+Aufnahmen und Übertragungsfragmente werden vorübergehend in IndexedDB auf deinem Gerät gespeichert. Eine Aufnahme bleibt erhalten, solange ihr Editor geöffnet ist, auch nach erneutem Laden. Sie wird beim Schließen des letzten zugehörigen Editors gelöscht. Verwaiste Aufnahmen können nach fünfzehn Minuten bereinigt werden; abgebrochene Übertragungen laufen nach fünfzehn Minuten ohne Aktivität ab. Ein pausierter Browser kann die Bereinigung bis zum Aufwachen verschieben.
+
+🔒 PRIVATSPHÄRE UND DATEN
+Die Verarbeitung erfolgt vollständig lokal. Kein Verarbeitungsserver, kein Versand von Aufnahmen, keine Telemetrie und keine Werbung. Kein Konto erforderlich. Pixel, sichtbarer Text und Metadaten bleiben auf deinem Gerät; Sprache und Aufnahmeverzögerung werden lokal gespeichert.
+Interne Browserseiten und manche geschützten Seiten können nicht aufgenommen werden. Die Elementauswahl durchsucht keine iframe-Inhalte; animierte oder virtualisierte Inhalte und endlose Feeds können Einschränkungen aufweisen. Sehr große Bilder können automatisch verkleinert werden.
+
+💻 OPEN SOURCE UND SUPPORT
+Quellcode ansehen, beitragen oder ein Problem melden:
+https://github.com/ScioNos/Scionos-Capture
+Support: https://github.com/ScioNos/Scionos-Capture/issues
+Datenschutz: https://github.com/ScioNos/Scionos-Capture/blob/main/PRIVACY.md
+Kontakt: info@eyelo.ch
+Herausgeber: eyelo SA, Schweiz — Marke ScioNos.
+
+🌍 INTERNATIONAL
+Oberfläche und Hilfe sind auf Französisch, Englisch, Spanisch und Deutsch verfügbar. Die Sprache folgt automatisch dem Browser und lässt sich im Sprachmenü der dunklen Oberfläche manuell ändern.

@@ -1,0 +1,57 @@
+Scionos Capture — Captura, anota y exporta páginas web respetando tu privacidad.
+
+Scionos Capture es una extensión para Chrome y Microsoft Edge con procesamiento 100 % local. Captura una página, un fragmento o una conversación, añade anotaciones y exporta el resultado sin enviar tus capturas a un servidor.
+
+Desarrollada y editada por eyelo SA (Suiza), bajo la marca ScioNos.
+
+🆕 NOVEDADES DE LA VERSIÓN 1.4.0 — 10 DE NOVIEMBRE DE 2026
+• Nuevo modo Capturar un elemento: pasa el cursor sobre un bloque, elige su padre o hijo y prepara su captura. Captura la parte mostrada o el contenido completo de un contenedor realmente desplazable.
+• Ajusta la selección antes de confirmarla: ocho tiradores, desplazamiento, campos X/Y/ancho/alto y controles de teclado. Las flechas mueven la selección o un tirador en pasos de 1 píxel CSS; Mayús aumenta el paso a 10 píxeles. Escape cancela.
+• Captura inmediata o tras 3, 5 o 10 segundos, con cuenta atrás cancelable y preferencia guardada localmente. En zonas y elementos, el retardo comienza tras confirmar; en capturas visibles y completas, comienza al iniciarlas.
+• Las selecciones acotadas toleran ahora el crecimiento de los contenidos dinámicos, también en X.com. Se corrigen los avisos de cookies dentro de contenedores fijos de altura cero que podían repetirse entre los fragmentos ensamblados.
+
+---
+
+🚀 5 MODOS DE CAPTURA
+• Página completa: ensambla fragmentos de la página en altura y anchura, incluidos los contenedores internos desplazables compatibles.
+• Área visible: captura únicamente lo que aparece en la ventana.
+• Área seleccionada: dibuja una región arrastrando, con desplazamiento automático en los bordes, y después ajústala y confírmala.
+• Área desplazable: conserva una conversación o región vertical que abarque varias pantallas. Define dos puntos o introduce X/Y/ancho/alto; utiliza «Hasta abajo» para ampliar la región. Este modo conserva la anchura visible elegida y no ensambla horizontalmente.
+• Capturar un elemento: elige visualmente un bloque de la página, navega entre padre e hijo y confirma sus límites en el panel de ajuste.
+
+🎨 EDITOR DE ANOTACIONES INTEGRADO
+Trabaja directamente en el editor local: dibujo libre, resaltador semitransparente (H), flechas (A), rectángulos y elipses de contorno o rellenos (S), texto (T) y marcadores de pasos numerados (P).
+Cubre información con una máscara sólida opaca o aplica desenfoque visual. Para proteger secretos, utiliza una máscara sólida: el desenfoque no protege los datos de forma fiable.
+Recorta la imagen, deshaz o rehace cambios con Ctrl+Z/Ctrl+Y y ajusta el zoom del 20 al 300 %.
+
+📄 EXPORTACIONES
+• Descarga tu captura en PNG.
+• Utiliza la impresión del navegador para imprimir o guardar un PDF paginado. La capa de texto buscable y los enlaces se conservan cuando puede verificarse su visibilidad.
+• Las palabras enmascaradas, recortadas o cuya visibilidad no pueda establecerse se excluyen de la capa textual del PDF; la imagen capturada se conserva.
+• Copia la imagen al portapapeles para pegarla en un correo, un ticket de soporte o un documento.
+Aplica o cancela las modificaciones pendientes antes de exportar.
+
+🌐 INFORME HTML INTERACTIVO AUTÓNOMO
+Crea un archivo HTML autónomo que integra la imagen de tu captura y su visor: zoom, desplazamiento, copia, impresión y descarga PNG.
+El informe incluye el título, el enlace de origen, la fecha, la hora y las dimensiones. Se abre sin conexión en un navegador, sin alojamiento ni servicios externos. Conserva la imagen capturada de la página, no una copia interactiva del sitio original.
+
+🖥️ COMODIDAD Y PRODUCTIVIDAD
+Disfruta de una interfaz oscura y capturas adaptadas a pantallas HiDPI, incluidas las escalas de Windows del 125 % y 150 %.
+El atajo sugerido Alt+Mayús+C abre la extensión si el navegador lo asigna. Configúralo en la página de atajos del navegador; la ventana emergente muestra la combinación realmente asignada.
+En el editor: V para el cursor, D para dibujar, H para resaltar, A para flechas, S para formas, T para texto, P para pasos, M para enmascarar y C para recortar. Utiliza 0, + y − para el zoom.
+Las capturas y los fragmentos de transferencia se guardan temporalmente en IndexedDB en tu dispositivo. Una captura se conserva mientras su editor permanezca abierto, incluso después de recargarlo. Se elimina al cerrar el último editor asociado. Las capturas huérfanas pueden limpiarse después de quince minutos; las transferencias abandonadas caducan tras quince minutos de inactividad. Un navegador suspendido puede aplazar la limpieza hasta reactivarse.
+
+🔒 PRIVACIDAD Y DATOS
+Todo el procesamiento de las capturas se realiza localmente. Sin servidor de procesamiento, envío de capturas, telemetría ni publicidad. No se necesita cuenta. Los píxeles, textos visibles y metadatos permanecen en tu dispositivo; el idioma y el retardo elegidos se recuerdan localmente.
+Las páginas internas del navegador y algunas páginas protegidas no pueden capturarse. El selector no recorre el interior de iframes; el contenido animado o virtualizado y los feeds infinitos pueden presentar limitaciones. Las imágenes muy grandes pueden reducirse automáticamente.
+
+💻 CÓDIGO ABIERTO Y SOPORTE
+Consulta el código fuente, contribuye o comunica un problema:
+https://github.com/ScioNos/Scionos-Capture
+Soporte: https://github.com/ScioNos/Scionos-Capture/issues
+Privacidad: https://github.com/ScioNos/Scionos-Capture/blob/main/PRIVACY.md
+Contacto: info@eyelo.ch
+Editor: eyelo SA, Suiza — marca ScioNos.
+
+🌍 INTERNACIONAL
+Interfaz y ayuda disponibles en francés, inglés, español y alemán. El idioma sigue automáticamente al navegador y puede cambiarse manualmente desde el menú de idioma de la interfaz oscura.
