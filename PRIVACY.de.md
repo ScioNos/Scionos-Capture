@@ -2,7 +2,7 @@
 
 [Français](PRIVACY.md) · [English](PRIVACY.en.md) · [Español](PRIVACY.es.md) · [Deutsch](PRIVACY.de.md)
 
-Zuletzt aktualisiert: 10. November 2026 — Version 1.4.0.
+Zuletzt aktualisiert: 14. November 2026 — Version 1.5.0.
 
 **Verantwortlicher Herausgeber:** eyelo SA (UID: CHE-108.174.302), Waadt (Vaud), Schweiz — Marke **ScioNos** ([scionos.ch](https://scionos.ch)) — Kontakt: info@eyelo.ch
 
@@ -14,8 +14,20 @@ Keine Aufnahme, URL oder Browserdaten werden an eyelo SA, ScioNos oder Dritte ge
 
 Aufnahmen und Textmetadaten bleiben in lokalem IndexedDB. Fragmente werden nach dem Zusammensetzen oder nach fünfzehn Minuten Inaktivität gelöscht; ein angehaltener Browser kann die Bereinigung bis zum Aufwachen verzögern. Die endgültige Aufnahme bleibt erhalten, solange ein zugehöriger Editor-Tab geöffnet ist, auch nach Neuladen und über fünfzehn Minuten hinaus. Beim Schließen des letzten Editors wird sie gelöscht. Ohne Editor kann sie fünfzehn Minuten nach ihrer Erstellung bereinigt werden. Zuordnungen werden beim Aufwachen und Browserneustart mit offenen Tabs abgeglichen.
 
-Sprache und Aufnahmeverzögerung (`captureDelaySeconds`, 0, 3, 5 oder 10 Sekunden) liegen in `chrome.storage.local`, die temporäre Editor-Zuordnung in `chrome.storage.session`. Elementauswahl und Countdown bleiben lokal und benötigen keine weiteren Berechtigungen oder Netzwerkziele. Verzögerte Aufnahmen werden ausdrücklich gestartet und können abgebrochen werden. Alle lokalen Daten können über die Erweiterungsverwaltung oder Deinstallation entfernt werden. Datenschutz-Kontakt: info@eyelo.ch. Für Schwachstellen siehe [SECURITY.de.md](SECURITY.de.md).
+Sprache und Aufnahmeverzögerung (`captureDelaySeconds`, 0, 3, 5 oder 10 Sekunden) liegen in `chrome.storage.local`, die temporäre Editor-Zuordnung in `chrome.storage.session`. Elementauswahl und Countdown bleiben lokal und benötigen keine weiteren Berechtigungen oder Netzwerkziele. Verzögerte Aufnahmen werden ausdrücklich gestartet und können abgebrochen werden. Von der Erweiterung gespeicherte Daten können über die Erweiterungsverwaltung oder Deinstallation entfernt werden. Exportierte Dateien oder auf dem Gerät gespeicherte Projekte müssen Benutzer separat löschen. Datenschutz-Kontakt: info@eyelo.ch. Für Schwachstellen siehe [SECURITY.de.md](SECURITY.de.md).
 
 Die durchsuchbare PDF-Ebene enthält nur vollständige Wörter mit überprüfbarer Sichtbarkeit. Unsichere Wörter werden aus dieser Ebene ausgelassen; das aufgenommene Bild bleibt erhalten. Ältere Ebenen mit ungeprüften Koordinaten werden ebenfalls ausgelassen. Vertrauliche Pixel müssen deckend maskiert werden; Unschärfe ist nur ein visueller Effekt.
 
 Ausstehende Änderungen vor jedem Export übernehmen oder verwerfen. Unschärfe bleibt ein visueller Effekt; Geheimnisse deckend maskieren.
+
+## Datenschutzumfang der Version 1.5.0
+
+Dieser Abschnitt beschreibt den Datenschutzumfang der veröffentlichten Version 1.5.0.
+
+Der Import von Bilddateien, ausdrücklich angefordertes Einfügen aus der Zwischenablage und die Komposition mehrerer Bilder verarbeiten lokal die gewählten Bilder sowie Titel, Bildunterschriften, Schritte und vorhandene Quellen-/Datumsmetadaten. Diese Vorgänge übertragen keine Daten an einen Server.
+
+Version 1.5.0 verwendet das portable lokale Format `.scionos` v2 mit einzeln bearbeitbaren Annotationen und dem Öffnen von v1-Projekten; deren Annotationen bleiben zusammengeführt. Beim Speichern werden deckende Masken und Zuschnitte unumkehrbar auf die gespeicherten Bilder angewendet; betroffene Annotationen werden konservativ entfernt. Importierte Dateien und v1-Projekte besitzen keine zuverlässige Textebene. Beim Speichern nach einem Zuschnitt werden alle vorherigen Annotationen zusammengeführt, um Darstellung und Reihenfolge zu erhalten.
+
+PNG-, JPEG-, WebP-, HTML-, Markdown/ZIP- und PDF-Exporte sowie Ausdrucke können Bilder und gewählte Kompositionsinformationen enthalten. Titel, Quellen, Datumsangaben und Inhalt vor dem Teilen eines Exports oder Projekts prüfen. Gespeicherte Dateien bleiben am vom Benutzer gewählten Ort auf dem Gerät; temporäre Bereinigung und Deinstallation der Erweiterung löschen sie nicht. Benutzer verwalten Aufbewahrung, Weitergabe und Löschung.
+
+Eine dauerhafte lokale Bibliothek mit ausdrücklichem Speichern ist verfügbar: Vorschaubilder, Suche, Umbenennen, Duplizieren und Löschen. Benutzer wählen 0, 7, 30 oder 90 Tage und ein Kontingent von 64 bis 1.024 MiB, standardmäßig 256 MiB; 0 Tage bedeutet keine automatische Ablaufzeit. Lokal gespeicherte Projekte können Bilder, Annotationen und Metadaten enthalten. Vertrauliche Pixel müssen weiterhin deckend maskiert werden; Unschärfe ist nur ein visueller Effekt.

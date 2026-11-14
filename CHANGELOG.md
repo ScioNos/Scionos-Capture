@@ -6,6 +6,21 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-11-14
+
+### Ajouté
+
+- Composition multi-images avec import local ou collage, réordonnancement, assemblage vertical/horizontal, titres, légendes et étapes numérotées.
+- Exports PNG, JPEG, WebP, HTML, Markdown/ZIP, PDF et impression avec réglages de qualité et de présentation.
+- Annotations individuellement éditables et projets portables `.scionos` v2, avec lecture des projets v1 aplatis et application irréversible des masques/rognages à la sauvegarde.
+- Bibliothèque locale durable avec enregistrement explicite, recherche, renommage, duplication, suppression, rétention configurable et quota borné.
+- Aide plus visible et affichage de la version réellement chargée.
+
+### Corrigé
+
+- Les sauvegardes rapprochées de bibliothèque suivent l’ordre des clics et restent liées au bon document, même si un autre projet est ouvert pendant l’encodage.
+- Les annotations déplacées ou dupliquées au-delà des bords restent sauvegardables et réouvrables, avec des coordonnées bornées.
+
 ## [1.4.0] - 2026-11-10
 
 ### Ajouté
@@ -169,7 +184,7 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 - Descriptions localisées dépassant la limite de 132 caractères.
 - Conservation temporaire plus longue que celle annoncée et perte au rechargement de l’éditeur.
 
-[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.5.0...HEAD
 [1.3.3]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.0...v1.3.1
@@ -179,4 +194,5 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 [1.1.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0
 [1.0.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0
 
+[1.5.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.3...v1.4.0

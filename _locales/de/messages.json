@@ -3,7 +3,7 @@
     "message": "Scionos Capture"
   },
   "appDesc": {
-    "message": "Seiten sowie sichtbare, ausgewählte oder scrollbare Bereiche lokal aufnehmen und als PNG oder PDF exportieren."
+    "message": "Bilder aufnehmen, annotieren und zusammenstellen. Lokale Projekte und Bibliothek; PNG, JPEG, WebP, HTML, Markdown und PDF."
   },
   "languagePicker": {
     "message": "Sprache wählen"
@@ -391,6 +391,22 @@
   "btnHelp": {
     "message": "Hilfe & Über"
   },
+  "popupCompose": { "message": "Komposition / Bilder öffnen" },
+  "popupLibrary": { "message": "Projektbibliothek" },
+  "helpAnnotationsHeader": { "message": "Anmerkungen und Maskierung" },
+  "helpAnnotationsText": { "message": "Wählen Sie eine Anmerkung aus, um sie zu verschieben, ihre Größe oder Eigenschaften zu ändern. Deckende Masken und Zuschnitte werden beim Speichern dauerhaft auf Bilder angewendet: Verdeckte oder entfernte Pixel lassen sich aus dem Projekt nicht wiederherstellen. Unschärfe ist nur ein visueller Effekt; verwenden Sie für Geheimnisse eine deckende Maske." },
+  "helpLibraryHeader": { "message": "Lokale Bibliothek" },
+  "helpLibraryText": { "message": "Öffnen Sie die Bibliothek im Erweiterungsfenster, um lokal gespeicherte Projekte zu finden, zu durchsuchen, umzubenennen, zu duplizieren oder zu löschen. Das Speichern erfolgt ausdrücklich. Stellen Sie Aufbewahrungsdauer und Speichergrenze ein; geben Sie bei unzureichendem Kontingent Speicher frei und versuchen Sie es erneut. Exportierte Projekte bleiben separate Dateien." },
+  "popupHelpShort": { "message": "Hilfe" },
+  "helpCompositionHeader": { "message": "Mehrere Aufnahmen zusammenstellen" },
+  "helpImportHeader": { "message": "Bilder importieren" },
+  "helpImportText": { "message": "Wählen Sie im Erweiterungsfenster Komposition / Bilder öffnen, um den Editor ohne Seitenaufnahme zu öffnen. Öffnen Sie lokale Bilder oder fügen Sie ein Bild aus der Zwischenablage ein. Bilder werden lokal verarbeitet." },
+  "helpComposeHeader": { "message": "Komposition anordnen" },
+  "helpComposeText": { "message": "Fügen Sie Bilder hinzu oder entfernen Sie sie, ändern Sie ihre Reihenfolge und ordnen Sie sie vertikal oder horizontal an. Passen Sie Hintergrund und Abstand an und ergänzen Sie einen Titel, Bildunterschriften oder nummerierte Schritte." },
+  "helpExportHeader": { "message": "Dokument exportieren" },
+  "helpExportText": { "message": "Exportieren Sie die Komposition als PNG, JPEG oder WebP, als HTML-Bericht, PDF oder Markdown mit Bildern. JPEG und WebP bieten eine einstellbare Qualität. PDF-Optionen passen das Seitenlayout an. Bildgrößen werden vor dem Export auf Grenzwerte geprüft." },
+  "helpSaveHeader": { "message": "Arbeit aufbewahren" },
+  "helpSaveText": { "message": "Speichern und öffnen Sie eine .scionos-Datei erneut, um die Zusammenstellung fortzusetzen. Schema 2 bewahrt bearbeitbare Anmerkungen; Projekte mit Schema 1 bleiben kompatibel, ihre bisherigen Anmerkungen sind jedoch bereits eingebrannt. Der Rückgängig-/Wiederholen-Verlauf beginnt beim Öffnen neu. Ungeprüfter Quelltext wird für die PDF-Suche nicht wiederhergestellt. Die angezeigte Nummer entspricht der tatsächlich geladenen Version." },
   "helpTitle": {
     "message": "Hilfe — Scionos Capture"
   },

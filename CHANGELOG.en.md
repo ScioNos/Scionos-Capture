@@ -6,6 +6,21 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-11-14
+
+### Added
+
+- Multi-image composition with local import or clipboard paste, reordering, vertical/horizontal layout, titles, captions, and numbered steps.
+- PNG, JPEG, WebP, HTML, Markdown/ZIP, PDF, and printing exports with quality and presentation settings.
+- Individually editable annotations and portable `.scionos` v2 projects, with flattened v1 project support and irreversible mask/crop application on save.
+- Durable local library with explicit saving, search, rename, duplication, deletion, configurable retention, and bounded quota.
+- More visible help access and display of the version actually loaded.
+
+### Fixed
+
+- Overlapping library saves preserve click order and document identity, including when another project opens during encoding.
+- Annotations moved or duplicated beyond image edges remain saveable and reopenable with bounded coordinates.
+
 ## [1.4.0] - 2026-11-10
 
 ### Added
@@ -164,7 +179,7 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Canvas-clipping zoom, non-responsive toolbar, incomplete translations, hard-coded shortcut, contrast, and accessible names.
 - Locale descriptions above 132 characters, editor reload data loss, and inaccurate retention wording.
 
-[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.5.0...HEAD
 [1.3.3]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.0...v1.3.1
@@ -174,4 +189,5 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 [1.1.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0
 [1.0.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0
 
+[1.5.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.3...v1.4.0

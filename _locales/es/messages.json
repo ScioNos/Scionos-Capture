@@ -3,7 +3,7 @@
     "message": "Scionos Capture"
   },
   "appDesc": {
-    "message": "Captura una página, un área visible, seleccionada o desplazable; anota y exporta localmente en PNG o PDF."
+    "message": "Captura, anota y compone imágenes. Proyectos y biblioteca local; exporta PNG, JPEG, WebP, HTML, Markdown y PDF."
   },
   "languagePicker": {
     "message": "Elegir idioma"
@@ -391,6 +391,22 @@
   "btnHelp": {
     "message": "Ayuda y Acerca de"
   },
+  "popupCompose": { "message": "Componer / Abrir imágenes" },
+  "popupLibrary": { "message": "Biblioteca de proyectos" },
+  "helpAnnotationsHeader": { "message": "Anotaciones y ocultación" },
+  "helpAnnotationsText": { "message": "Selecciona una anotación para moverla, cambiar su tamaño o sus propiedades. Al guardar, las máscaras sólidas y los recortes se aplican definitivamente a las imágenes: los píxeles ocultos o eliminados no se pueden recuperar del proyecto. El desenfoque es solo visual; usa una máscara sólida para secretos." },
+  "helpLibraryHeader": { "message": "Biblioteca local" },
+  "helpLibraryText": { "message": "Abre la biblioteca desde la ventana de la extensión para encontrar los proyectos guardados localmente, buscarlos, renombrarlos, duplicarlos o eliminarlos. El guardado es explícito. Configura el tiempo de conservación y el límite de almacenamiento; si la cuota es insuficiente, libera espacio y vuelve a intentarlo. Los proyectos exportados son archivos independientes." },
+  "popupHelpShort": { "message": "Ayuda" },
+  "helpCompositionHeader": { "message": "Componer varias capturas" },
+  "helpImportHeader": { "message": "Importar imágenes" },
+  "helpImportText": { "message": "Elige Componer / Abrir imágenes en la ventana de la extensión para abrir el editor sin capturar una página. Abre imágenes locales o pega una imagen del portapapeles. Las imágenes se procesan localmente." },
+  "helpComposeHeader": { "message": "Organizar la composición" },
+  "helpComposeText": { "message": "Añade o elimina imágenes, cambia su orden y colócalas vertical u horizontalmente. Ajusta el fondo y el espaciado y añade un título, leyendas o pasos numerados." },
+  "helpExportHeader": { "message": "Exportar el documento" },
+  "helpExportText": { "message": "Exporta la composición en PNG, JPEG o WebP, como informe HTML, PDF o Markdown con sus imágenes. JPEG y WebP ofrecen calidad ajustable. Las opciones PDF permiten adaptar la página. Los límites de dimensiones se comprueban antes de exportar." },
+  "helpSaveHeader": { "message": "Conservar el trabajo" },
+  "helpSaveText": { "message": "Guarda y vuelve a abrir un archivo .scionos para retomar la composición. El esquema 2 conserva las anotaciones editables; los proyectos del esquema 1 siguen siendo compatibles, pero sus anotaciones anteriores ya están aplanadas. El historial Deshacer/Rehacer se reinicia al abrir. El texto de origen no verificado no se restaura para la búsqueda en PDF. El número mostrado corresponde a la versión realmente cargada." },
   "helpTitle": {
     "message": "Ayuda — Scionos Capture"
   },

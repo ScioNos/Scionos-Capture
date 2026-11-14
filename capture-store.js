@@ -1,14 +1,19 @@
-// Temporary, extension-origin storage for screenshots and chunked transfers.
+// Extension-origin storage: temporary captures/transfers and an explicitly saved library.
 (function registerCaptureStore(globalScope, factory) {
   const api = factory();
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   globalScope.CaptureStore = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this, () => {
   const DATABASE_NAME = 'scionos-capture';
-  const DATABASE_VERSION = 2;
+  const DATABASE_VERSION = 3;
   const CAPTURE_STORE = 'captures';
   const TRANSFER_STORE = 'transfers';
   const CHUNK_STORE = 'captureChunks';
+  const LIBRARY_META = 'libraryProjects';
+  const LIBRARY_CONTENT = 'libraryContents';
+  const LIBRARY_CONFIG = 'librarySettings';
+  const MIB = 1024 * 1024;
+  const DEFAULT_LIBRARY_SETTINGS = Object.freeze({ quotaBytes: 256 * MIB, retentionDays: null });
 
   const MIGRATIONS = {
     1: (database, transaction) => {
@@ -36,6 +41,14 @@
       if (!chunks.indexNames.contains('transferId')) {
         chunks.createIndex('transferId', 'transferId', { unique: false });
       }
+    },
+    3: (database, transaction) => {
+      const projects = database.objectStoreNames.contains(LIBRARY_META)
+        ? transaction.objectStore(LIBRARY_META)
+        : database.createObjectStore(LIBRARY_META, { keyPath: 'id' });
+      if (!projects.indexNames.contains('expiresAt')) projects.createIndex('expiresAt', 'expiresAt', { unique: false });
+      if (!database.objectStoreNames.contains(LIBRARY_CONTENT)) database.createObjectStore(LIBRARY_CONTENT, { keyPath: 'id' });
+      if (!database.objectStoreNames.contains(LIBRARY_CONFIG)) database.createObjectStore(LIBRARY_CONFIG, { keyPath: 'key' });
     }
   };
 
@@ -57,8 +70,13 @@
         const newVersion = (event && event.newVersion) || DATABASE_VERSION;
         applyMigrations(database, transaction, oldVersion, newVersion);
       };
-      request.onsuccess = () => resolve(request.result);
+      request.onsuccess = () => {
+        const database = request.result;
+        database.onversionchange = () => database.close();
+        resolve(database);
+      };
       request.onerror = () => reject(request.error || new Error('Impossible d’ouvrir le stockage temporaire.'));
+      request.onblocked = () => reject(new Error('La mise à jour du stockage est bloquée par une autre page. Fermez les anciennes pages puis réessayez.'));
     });
   }
 
@@ -120,11 +138,22 @@
     try {
       await new Promise((resolve, reject) => {
         const transaction = database.transaction([TRANSFER_STORE, CHUNK_STORE], 'readwrite');
-        transaction.objectStore(CHUNK_STORE).put(chunk);
-        transaction.objectStore(TRANSFER_STORE).put(transfer);
+        const transfers = transaction.objectStore(TRANSFER_STORE);
+        const request = transfers.get(transfer.id);
+        request.onsuccess = () => {
+          const current = request.result;
+          if (!current || current.ownerTabId !== transfer.ownerTabId || current.expiresAt <= Date.now()
+              || current.nextIndex !== chunk.index || current.receivedBytes + chunk.size > current.expectedBytes) {
+            transaction.abort();
+            return;
+          }
+          transaction.objectStore(CHUNK_STORE).add(chunk);
+          transfers.put(transfer);
+        };
+        request.onerror = () => { reject(request.error || new Error('Lecture du transfert impossible.')); };
         transaction.oncomplete = resolve;
         transaction.onerror = () => reject(transaction.error || new Error('Écriture du fragment impossible.'));
-        transaction.onabort = () => reject(transaction.error || new Error('Écriture du fragment annulée.'));
+        transaction.onabort = () => reject(transaction.error || new Error('Écriture du fragment annulée ou état modifié.'));
       });
     } finally {
       database.close();
@@ -221,7 +250,181 @@
     } finally { database.close(); }
   }
 
+  function libraryError(code, message) {
+    const error = new Error(message);
+    error.code = code;
+    return error;
+  }
+
+  function validId(id) {
+    if (typeof id !== 'string' || !id.trim() || id.length > 256) throw libraryError('INVALID_LIBRARY_INPUT', 'Invalid project id.');
+    return id;
+  }
+
+  function validSettings(value) {
+    if (!value || typeof value !== 'object') throw libraryError('INVALID_LIBRARY_INPUT', 'Invalid library settings.');
+    const quotaBytes = value.quotaBytes;
+    const retentionDays = value.retentionDays;
+    if (!Number.isSafeInteger(quotaBytes) || quotaBytes < 64 * MIB || quotaBytes > 1024 * MIB ||
+        (retentionDays !== null && (!Number.isSafeInteger(retentionDays) || retentionDays < 1 || retentionDays > 36500))) {
+      throw libraryError('INVALID_LIBRARY_INPUT', 'Invalid library quota or retention.');
+    }
+    return { quotaBytes, retentionDays };
+  }
+
+  function libraryRequest(request) {
+    return new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error || new Error('Library request failed.'));
+    });
+  }
+
+  // All library read-modify-write operations share these stores, so IndexedDB
+  // serializes quota and revision checks across tabs as well as this instance.
+  async function libraryTransaction(mode, operation) {
+    const database = await openDatabase();
+    try {
+      return await new Promise((resolve, reject) => {
+        const transaction = database.transaction([LIBRARY_META, LIBRARY_CONTENT, LIBRARY_CONFIG], mode);
+        let result, failure;
+        transaction.oncomplete = () => resolve(result);
+        transaction.onabort = () => reject(failure || transaction.error || new Error('Library transaction aborted.'));
+        transaction.onerror = () => { /* onabort reports the final failure */ };
+        Promise.resolve().then(() => operation(transaction)).then(value => { result = value; }, error => {
+          failure = error;
+          try { transaction.abort(); } catch { reject(error); }
+        });
+      });
+    } finally { database.close(); }
+  }
+
+  function checkRevision(current, expectedRevision) {
+    if (expectedRevision === null) {
+      if (current) throw libraryError('LIBRARY_CONFLICT', 'Project already exists.');
+    } else if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 1) {
+      throw libraryError('INVALID_LIBRARY_INPUT', 'Expected revision must be null or a positive integer.');
+    } else if (!current || current.revision !== expectedRevision) {
+      throw libraryError('LIBRARY_CONFLICT', 'Project revision conflict.');
+    }
+  }
+
+  function checkMetadata(record) {
+    validId(record.id);
+    for (const field of ['title', 'source']) {
+      if (record[field] !== undefined && (typeof record[field] !== 'string' || record[field].length > 8192)) throw libraryError('INVALID_LIBRARY_INPUT', `Invalid project ${field}.`);
+    }
+    if (!(record.blob instanceof Blob) || record.blob.size < 1 || (record.thumbnail != null && !(record.thumbnail instanceof Blob))) throw libraryError('INVALID_LIBRARY_INPUT', 'Invalid project data.');
+    if (record.thumbnail && record.thumbnail.size > MIB) throw libraryError('INVALID_LIBRARY_INPUT', 'Thumbnail exceeds 1 MiB.');
+    if (record.expiresAt !== undefined && record.expiresAt !== null && (!Number.isSafeInteger(record.expiresAt) || record.expiresAt < 0)) throw libraryError('INVALID_LIBRARY_INPUT', 'Invalid expiration.');
+  }
+
+  async function getLibrarySettings() {
+    const stored = await runRequest(LIBRARY_CONFIG, 'readonly', store => store.get('settings'));
+    return stored ? validSettings(stored) : { ...DEFAULT_LIBRARY_SETTINGS };
+  }
+
+  async function setLibrarySettings(settings) {
+    const normalized = validSettings(settings);
+    return libraryTransaction('readwrite', async transaction => {
+      const records = await libraryRequest(transaction.objectStore(LIBRARY_META).getAll());
+      const usedBytes = records.reduce((sum, record) => sum + record.size, 0);
+      if (usedBytes > normalized.quotaBytes) throw libraryError('LIBRARY_QUOTA_EXCEEDED', 'Current library exceeds the requested quota.');
+      transaction.objectStore(LIBRARY_CONFIG).put({ key: 'settings', ...normalized });
+      return normalized;
+    });
+  }
+
+  async function listLibraryProjects() {
+    return runRequest(LIBRARY_META, 'readonly', store => store.getAll());
+  }
+
+  async function getLibraryProject(id) {
+    validId(id);
+    return libraryTransaction('readonly', async transaction => {
+      const [metadata, content] = await Promise.all([
+        libraryRequest(transaction.objectStore(LIBRARY_META).get(id)),
+        libraryRequest(transaction.objectStore(LIBRARY_CONTENT).get(id))
+      ]);
+      if (!metadata && !content) return undefined;
+      if (!metadata || !content || !(content.blob instanceof Blob)) throw libraryError('LIBRARY_CORRUPT', 'Project metadata and content do not match.');
+      return { ...metadata, blob: content.blob };
+    });
+  }
+
+  async function writeLibraryProject(transaction, record, expectedRevision, now) {
+    checkMetadata(record);
+    const metaStore = transaction.objectStore(LIBRARY_META);
+    const [current, all, config] = await Promise.all([
+      libraryRequest(metaStore.get(record.id)), libraryRequest(metaStore.getAll()),
+      libraryRequest(transaction.objectStore(LIBRARY_CONFIG).get('settings'))
+    ]);
+    checkRevision(current, expectedRevision);
+    const settings = config ? validSettings(config) : DEFAULT_LIBRARY_SETTINGS;
+    const size = record.blob.size + (record.thumbnail?.size || 0);
+    const total = all.reduce((sum, item) => sum + item.size, 0) - (current?.size || 0) + size;
+    if (total > settings.quotaBytes) throw libraryError('LIBRARY_QUOTA_EXCEEDED', 'Library storage quota exceeded.');
+    const expiresAt = record.expiresAt !== undefined ? record.expiresAt : settings.retentionDays === null ? null : now + settings.retentionDays * 86400000;
+    const metadata = { id: record.id, title: record.title || '', source: record.source || '', thumbnail: record.thumbnail || null,
+      createdAt: current?.createdAt ?? now, updatedAt: now, expiresAt, revision: (current?.revision || 0) + 1, size };
+    metaStore.put(metadata);
+    transaction.objectStore(LIBRARY_CONTENT).put({ id: record.id, blob: record.blob });
+    return metadata;
+  }
+
+  async function saveLibraryProject(record, { expectedRevision } = {}) {
+    if (!record || typeof record !== 'object') throw libraryError('INVALID_LIBRARY_INPUT', 'Invalid project.');
+    checkMetadata(record);
+    return libraryTransaction('readwrite', transaction => writeLibraryProject(transaction, record, expectedRevision, Date.now()));
+  }
+
+  async function deleteLibraryProject(id, expectedRevision) {
+    validId(id);
+    if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 1) throw libraryError('INVALID_LIBRARY_INPUT', 'A positive expected revision is required.');
+    return libraryTransaction('readwrite', async transaction => {
+      const metaStore = transaction.objectStore(LIBRARY_META);
+      const current = await libraryRequest(metaStore.get(id));
+      checkRevision(current, expectedRevision);
+      metaStore.delete(id);
+      transaction.objectStore(LIBRARY_CONTENT).delete(id);
+      return true;
+    });
+  }
+
+  async function duplicateLibraryProject(id, newId, { title, expectedRevision } = {}) {
+    validId(id); validId(newId);
+    if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 1) throw libraryError('INVALID_LIBRARY_INPUT', 'A positive expected revision is required.');
+    return libraryTransaction('readwrite', async transaction => {
+      const [source, content] = await Promise.all([
+        libraryRequest(transaction.objectStore(LIBRARY_META).get(id)),
+        libraryRequest(transaction.objectStore(LIBRARY_CONTENT).get(id))
+      ]);
+      checkRevision(source, expectedRevision);
+      if (!content || !(content.blob instanceof Blob)) throw libraryError('LIBRARY_CORRUPT', 'Project content is missing.');
+      return writeLibraryProject(transaction, { id: newId, title: title === undefined ? source.title : title,
+        source: source.source, thumbnail: source.thumbnail, blob: content.blob }, null, Date.now());
+    });
+  }
+
+  async function purgeExpiredLibraryProjects(now = Date.now()) {
+    if (!Number.isSafeInteger(now) || now < 0) throw libraryError('INVALID_LIBRARY_INPUT', 'Invalid purge time.');
+    return libraryTransaction('readwrite', transaction => new Promise((resolve, reject) => {
+      const ids = [];
+      const request = transaction.objectStore(LIBRARY_META).index('expiresAt').openCursor(IDBKeyRange.upperBound(now));
+      request.onsuccess = () => {
+        const cursor = request.result;
+        if (!cursor) { resolve(ids); return; }
+        ids.push(cursor.primaryKey);
+        transaction.objectStore(LIBRARY_CONTENT).delete(cursor.primaryKey);
+        cursor.delete();
+        cursor.continue();
+      };
+      request.onerror = () => reject(request.error || new Error('Library purge failed.'));
+    }));
+  }
+
   return {
+    saveLibraryProject, getLibraryProject, listLibraryProjects, deleteLibraryProject, duplicateLibraryProject,
+    purgeExpiredLibraryProjects, getLibrarySettings, setLibrarySettings, DEFAULT_LIBRARY_SETTINGS,
     putCapture, getCapture, listCaptures, deleteCapture, purgeExpiredCaptures,
     putTransfer, getTransfer, listTransfers, putTransferChunk, getTransferChunk, appendTransferChunk,
     listTransferChunks, deleteTransfer, purgeExpiredTransfers, listTransfersByOwner,

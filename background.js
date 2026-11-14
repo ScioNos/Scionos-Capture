@@ -6,12 +6,19 @@ const CAPTURE_TTL_MS = 15 * 60 * 1000;
 const TRANSFER_TTL_MS = 15 * 60 * 1000;
 const CAPTURE_ALARM_PREFIX = 'capture-expiry:';
 const TRANSFER_ALARM_PREFIX = 'capture-transfer-expiry:';
+// Durable projects have their own retention policy and never use capture TTLs.
+const LIBRARY_EXPIRY_ALARM = 'library-project-expiry';
+const LIBRARY_RETRY_MS = 60 * 1000;
 const TAB_MAPPING_PREFIX = 'capture-tab:';
 const MAX_METADATA_LENGTH = 4096;
+const MAX_TEXT_BLOCKS = 1500;
+const MAX_TEXT_BLOCK_SERIALIZED_BYTES = 4 * 1024 * 1024;
+const transferQueues = new Map();
 
 let captureQueue = Promise.resolve();
 let lastCaptureStartedAt = 0;
 let storageInitialization = Promise.resolve();
+let libraryReconciliation = Promise.resolve();
 
 const alarmName = captureId => CAPTURE_ALARM_PREFIX + captureId;
 const transferAlarmName = transferId => TRANSFER_ALARM_PREFIX + transferId;
@@ -85,8 +92,35 @@ async function getOpenCaptureIds(excludedTabId = null) {
   return captureIds;
 }
 
+// The store performs expiry checks and deletion atomically: a retention change
+// concurrent with this wake-up cannot cause an unexpired project to be erased.
+function reconcileLibrary() {
+  libraryReconciliation = libraryReconciliation.catch(() => undefined).then(async () => {
+    if (typeof CaptureStore.purgeExpiredLibraryProjects !== 'function' ||
+        typeof CaptureStore.listLibraryProjects !== 'function') return;
+    try {
+      await CaptureStore.purgeExpiredLibraryProjects(Date.now());
+      const projects = await CaptureStore.listLibraryProjects();
+      const nextExpiry = projects.reduce((earliest, project) => {
+        const value = project.expiresAt;
+        return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 ? Math.min(earliest, value) : earliest;
+      }, Infinity);
+      if (Number.isFinite(nextExpiry)) await chrome.alarms.create(LIBRARY_EXPIRY_ALARM, { when: Math.max(Date.now(), nextExpiry) });
+      else await chrome.alarms.clear(LIBRARY_EXPIRY_ALARM);
+    } catch (error) {
+      console.warn('Library project expiry failed:', error);
+      // Retry even if this was a one-shot alarm. Failure must not block captures.
+      try { await chrome.alarms.create(LIBRARY_EXPIRY_ALARM, { when: Date.now() + LIBRARY_RETRY_MS }); }
+      catch (alarmError) { console.warn('Library project expiry retry scheduling failed:', alarmError); }
+    }
+  });
+  return libraryReconciliation;
+}
+
 function initializeStorage() {
-  storageInitialization = storageInitialization.then(reconcileStorage);
+  storageInitialization = storageInitialization.catch(() => undefined).then(async () => {
+    await Promise.all([reconcileStorage(), reconcileLibrary()]);
+  });
   return storageInitialization;
 }
 
@@ -176,6 +210,31 @@ function safeMetadata(value, fallback = '') {
   return typeof value === 'string' ? value.slice(0, MAX_METADATA_LENGTH) : fallback;
 }
 
+function safeTextBlocks(value) {
+  if (!Array.isArray(value) || value.length > MAX_TEXT_BLOCKS) return [];
+  const blocks = value.filter(block => block && typeof block === 'object' && !Array.isArray(block))
+    .map(block => ({
+      text: typeof block.text === 'string' ? block.text.slice(0, MAX_METADATA_LENGTH) : '',
+      x: Number(block.x), y: Number(block.y), width: Number(block.width), height: Number(block.height),
+      fontSize: Number(block.fontSize), url: safeMetadata(block.url)
+    }))
+    .filter(block => block.text && [block.x, block.y, block.width, block.height, block.fontSize].every(Number.isFinite)
+      && block.width > 0 && block.height > 0 && block.fontSize > 0);
+  try {
+    if (JSON.stringify(blocks).length > MAX_TEXT_BLOCK_SERIALIZED_BYTES) return [];
+  } catch { return []; }
+  return blocks;
+}
+
+function withTransferLock(transferId, operation) {
+  const previous = transferQueues.get(transferId) || Promise.resolve();
+  const current = previous.catch(() => undefined).then(operation);
+  transferQueues.set(transferId, current);
+  return current.finally(() => {
+    if (transferQueues.get(transferId) === current) transferQueues.delete(transferId);
+  });
+}
+
 function decodeChunk(base64) {
   const maximumLength = Math.ceil(ScionosCaptureUtils.TRANSFER_CHUNK_BYTES * 4 / 3) + 16;
   if (typeof base64 !== 'string' || base64.length > maximumLength || !/^[A-Za-z0-9+/]*={0,2}$/.test(base64)) {
@@ -206,7 +265,7 @@ async function openEditorFromBlob(blob, metadata = {}) {
     url: safeMetadata(metadata.url),
     timestamp: new Date(createdAt).toISOString(),
     scale: Number.isFinite(numericScale) ? Math.max(0.01, Math.min(1, numericScale)) : 1,
-    textBlocks: Array.isArray(metadata.textBlocks) ? metadata.textBlocks : [],
+    textBlocks: safeTextBlocks(metadata.textBlocks),
     textCoordinateSpace: metadata.textCoordinateSpace === 'bitmap' ? 'bitmap' : null,
     textLayerLimited: Boolean(metadata.textLayerLimited),
     createdAt,
@@ -239,7 +298,7 @@ async function beginTransfer(message, senderTab) {
     expectedBytes, expectedChunks, receivedBytes: 0, nextIndex: 0,
     title: safeMetadata(message.title, 'Screenshot'), url: safeMetadata(message.url),
     scale: Number.isFinite(Number(message.scale)) ? Math.max(0.01, Math.min(1, Number(message.scale))) : 1,
-    textBlocks: Array.isArray(message.textBlocks) ? message.textBlocks : [],
+    textBlocks: safeTextBlocks(message.textBlocks),
     textCoordinateSpace: message.textCoordinateSpace === 'bitmap' ? 'bitmap' : null,
     textLayerLimited: Boolean(message.textLayerLimited),
     createdAt, expiresAt: createdAt + TRANSFER_TTL_MS
@@ -252,7 +311,7 @@ async function beginTransfer(message, senderTab) {
 async function getOwnedTransfer(transferId, senderTab) {
   const transfer = await CaptureStore.getTransfer(transferId);
   if (!transfer || transfer.ownerTabId !== senderTab.id) throw new Error('Capture transfer is unavailable.');
-  if (transfer.expiresAt <= Date.now()) {
+  if (!Number.isSafeInteger(transfer.expiresAt) || transfer.expiresAt <= 0 || transfer.expiresAt <= Date.now()) {
     await cleanupTransfer(transfer.id);
     throw new Error('Capture transfer expired.');
   }
@@ -260,6 +319,7 @@ async function getOwnedTransfer(transferId, senderTab) {
 }
 
 async function appendTransferChunk(message, senderTab) {
+  return withTransferLock(message.transferId, async () => {
   const transfer = await getOwnedTransfer(message.transferId, senderTab);
   const index = Number(message.index);
   if (!Number.isInteger(index) || index < 0 || index >= transfer.expectedChunks) throw new Error('Invalid capture chunk index.');
@@ -283,9 +343,11 @@ async function appendTransferChunk(message, senderTab) {
   );
   await scheduleTransferExpiry(transfer);
   return { success: true, nextIndex: transfer.nextIndex };
+  });
 }
 
 async function completeTransfer(message, senderTab) {
+  return withTransferLock(message.transferId, async () => {
   const transfer = await getOwnedTransfer(message.transferId, senderTab);
   if (transfer.nextIndex !== transfer.expectedChunks || transfer.receivedBytes !== transfer.expectedBytes) throw new Error('Capture transfer is incomplete.');
   const chunks = await CaptureStore.listTransferChunks(transfer.id);
@@ -300,10 +362,13 @@ async function completeTransfer(message, senderTab) {
     await cleanupTransfer(transfer.id).catch(() => undefined);
     throw error;
   }
+  });
 }
 
 function isTrustedTabSender(sender) {
-  return sender && sender.id === chrome.runtime.id && sender.tab && Number.isInteger(sender.tab.id);
+  return sender && sender.id === chrome.runtime.id && sender.tab
+    && Number.isInteger(sender.tab.id) && sender.tab.id >= 0
+    && Number.isInteger(sender.tab.windowId) && sender.tab.windowId >= 0;
 }
 
 function isEditorSender(sender) {
@@ -316,6 +381,19 @@ function isEditorSender(sender) {
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message?.action === 'LIBRARY_PROJECTS_CHANGED') {
+    // Only extension pages can change library retention; content scripts cannot
+    // trigger repeated database sweeps on behalf of arbitrary websites.
+    if (!sender || sender.id !== chrome.runtime.id || typeof sender.url !== 'string') return;
+    try {
+      const url = new URL(sender.url);
+      const extension = new URL(chrome.runtime.getURL('/'));
+      if (url.protocol !== extension.protocol || url.host !== extension.host) return;
+    } catch { return; }
+    reconcileLibrary().then(() => sendResponse({ success: true }))
+      .catch(error => sendResponse({ success: false, error: error.message }));
+    return true;
+  }
   if (!message || typeof message.action !== 'string' || !isTrustedTabSender(sender)) return;
   if (!['CAPTURE_VISIBLE_TAB', 'BEGIN_CAPTURE_TRANSFER', 'APPEND_CAPTURE_CHUNK',
     'COMPLETE_CAPTURE_TRANSFER', 'ABORT_CAPTURE_TRANSFER', 'ACK_CAPTURE_LOADED'].includes(message.action)) return;
@@ -325,8 +403,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     else if (message.action === 'BEGIN_CAPTURE_TRANSFER') operation = beginTransfer(message, sender.tab);
     else if (message.action === 'APPEND_CAPTURE_CHUNK') operation = appendTransferChunk(message, sender.tab);
     else if (message.action === 'COMPLETE_CAPTURE_TRANSFER') operation = completeTransfer(message, sender.tab);
-    else if (message.action === 'ABORT_CAPTURE_TRANSFER') operation = getOwnedTransfer(message.transferId, sender.tab)
-      .then(transfer => cleanupTransfer(transfer.id)).then(() => ({ success: true }));
+    else if (message.action === 'ABORT_CAPTURE_TRANSFER') operation = withTransferLock(message.transferId, async () => {
+      const transfer = await getOwnedTransfer(message.transferId, sender.tab);
+      await cleanupTransfer(transfer.id);
+      return { success: true };
+    });
     else if (message.action === 'ACK_CAPTURE_LOADED' && isEditorSender(sender)) {
       operation = chrome.storage.session.get(mappingKey(sender.tab.id)).then(async stored => {
         const key = mappingKey(sender.tab.id);
@@ -347,7 +428,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 chrome.alarms.onAlarm.addListener(async alarm => {
   await storageInitialization;
   try {
-    if (alarm.name.startsWith(CAPTURE_ALARM_PREFIX)) {
+    if (alarm.name === LIBRARY_EXPIRY_ALARM) {
+      await reconcileLibrary();
+    } else if (alarm.name.startsWith(CAPTURE_ALARM_PREFIX)) {
       const id = alarm.name.slice(CAPTURE_ALARM_PREFIX.length);
       const openCaptureIds = await getOpenCaptureIds();
       if (openCaptureIds.has(id)) {
@@ -360,7 +443,7 @@ chrome.alarms.onAlarm.addListener(async alarm => {
     } else if (alarm.name.startsWith(TRANSFER_ALARM_PREFIX)) {
       const id = alarm.name.slice(TRANSFER_ALARM_PREFIX.length);
       const transfer = await CaptureStore.getTransfer(id);
-      if (transfer && transfer.expiresAt > Date.now()) await scheduleTransferExpiry(transfer);
+      if (transfer && Number.isSafeInteger(transfer.expiresAt) && transfer.expiresAt > Date.now()) await scheduleTransferExpiry(transfer);
       else await cleanupTransfer(id, { clearAlarm: false });
     }
   } catch (error) { console.warn('Temporary capture expiry failed:', error); }

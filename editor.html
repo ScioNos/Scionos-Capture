@@ -188,10 +188,46 @@
       .geometry-panel { max-width: calc(100vw - 24px); right: 12px; left: 12px; transform: none; }
     }
 
+    .editor-body { display: grid; grid-template-columns: 292px minmax(0, 1fr); min-height: 0; }
+    .composition-panel { min-height: 0; overflow: auto; padding: 14px; border-right: 1px solid var(--line); background: var(--panel); }
+    .composition-panel h2 { margin: 14px 0 8px; font-size: 13px; }
+    .composition-panel h2:first-child { margin-top: 0; }
+    .composition-panel .field { display: grid; gap: 5px; margin: 9px 0; white-space: normal; }
+    .composition-panel input[type="text"], .export-dialog input[type="text"] { width: 100%; min-height: 34px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--ink); color: var(--text); }
+    .composition-panel select { width: 100%; }
+    .composition-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+    .composition-actions button { min-height: 36px; font-size: 12px; }
+    .item-list { display: grid; gap: 6px; list-style: none; padding: 0; margin: 10px 0; max-height: 220px; overflow: auto; }
+    .item-list button { display: flex; align-items: center; gap: 8px; width: 100%; padding: 7px; border: 1px solid var(--line); border-radius: 6px; color: var(--text); background: var(--ink); text-align: left; cursor: pointer; }
+    .item-list button[aria-pressed="true"] { border-color: var(--cyan); background: var(--cyan-dark); }
+    .item-list img { width: 44px; height: 34px; object-fit: contain; flex: 0 0 auto; }
+    .item-list span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .composition-preview { max-height: 220px; overflow: auto; padding: 8px; border: 1px solid var(--line); border-radius: 6px; }
+    .composition-preview-track { display: flex; width: fit-content; max-width: 100%; margin: auto; }
+    .composition-preview-track figure { margin: 0; flex-shrink: 0; min-width: 0; }
+    .composition-preview-track img { display: block; max-width: 100%; height: auto; }
+    .composition-preview-track figcaption, .preview-heading { margin: 0; padding: 4px; color: #111; overflow-wrap: anywhere; font-size: 10px; }
+    .preview-doc-title { font-size: 12px; overflow-wrap: anywhere; }
+    .version-label { font-size: 11px; color: var(--muted); white-space: nowrap; }
+    .export-dialog { max-width: min(560px, calc(100vw - 28px)); width: 480px; max-height: 85vh; overflow: auto; padding: 22px; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+    .export-dialog::backdrop { background: rgba(0,0,0,.65); }
+    .export-dialog h2 { margin-top: 0; font-size: 18px; }
+    .export-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .export-fields .field { display: grid; gap: 5px; white-space: normal; }
+    .export-fields input[type="number"], .export-fields select { width: 100%; }
+    #btn-help .action-label { display: inline; }
+    @media (max-width: 720px) {
+      body { overflow: auto; height: auto; min-height: 100%; grid-template-rows: auto auto minmax(500px, 1fr); }
+      .editor-body { grid-template-columns: minmax(0, 1fr); }
+      .composition-panel { max-height: 310px; border-right: 0; border-bottom: 1px solid var(--line); }
+      .workspace { min-height: 420px; }
+      .export-fields { grid-template-columns: 1fr; }
+    }
+
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; } }
 
     @media print {
-      header, .toolbar, .zoom-bar, .geometry-panel, .toast, .workspace, #empty-state { display: none !important; }
+      header, .toolbar, .editor-body, .export-dialog, .zoom-bar, .geometry-panel, .toast, .workspace, #empty-state { display: none !important; }
       body { background: #fff !important; color: #111 !important; }
       #print-area { display: block !important; background: #fff; color: #111; padding: 0; margin: 0; }
       #print-area .print-header { border-bottom: 2px solid #075985; padding-bottom: 12px; margin-bottom: 16px; }
@@ -239,6 +275,7 @@
       <div class="title-wrap">
         <h1 id="page-title"></h1>
         <p id="page-meta"></p>
+        <span id="editor-version" class="version-label"></span>
         <span id="capture-notice" class="capture-notice" role="status"></span>
       </div>
     </div>
@@ -319,6 +356,50 @@
     </div>
   </div>
 
+  <div id="annotation-controls" class="toolbar" hidden role="group" aria-label="Annotation sélectionnée">
+    <label class="field" for="annotation-color"><span id="annotation-color-label">Couleur</span><input id="annotation-color" type="color"></label>
+    <label class="field" for="annotation-width"><span id="annotation-width-label">Épaisseur / taille</span><input id="annotation-width" type="number" min="1" max="256"></label>
+    <label class="field" for="annotation-text"><span id="annotation-text-label">Texte</span><input id="annotation-text" type="text" maxlength="5000"></label>
+    <button id="annotation-delete" type="button" class="compact-button">Supprimer</button>
+    <button id="annotation-duplicate" type="button" class="compact-button">Dupliquer</button>
+  </div>
+  <div class="editor-body">
+  <aside class="composition-panel" aria-labelledby="composition-heading">
+    <h2 id="composition-heading" data-compose="document">Document</h2>
+    <div class="composition-actions">
+      <button id="btn-import-images" class="compact-button" type="button" data-compose="import">Importer des images</button>
+      <button id="btn-open-project" class="compact-button" type="button" data-compose="open">Ouvrir un projet</button>
+      <button id="btn-save-project" class="compact-button" type="button" data-compose="save" disabled>Enregistrer le projet</button>
+      <button id="btn-save-library" class="compact-button" type="button" disabled>Enregistrer dans la bibliothèque</button>
+      <button id="btn-open-library" class="compact-button" type="button">Bibliothèque</button>
+    </div>
+    <input id="image-files" type="file" accept="image/png,image/jpeg,image/webp" multiple hidden>
+    <input id="project-file" type="file" accept=".scionos" hidden>
+    <p class="warning" id="project-security-notice">À la sauvegarde, les masques et rognages sont intégrés définitivement aux images. Les annotations touchées par un masque sont supprimées et celles avant un rognage sont aplaties. Seul l’outil masque protège les données : une forme pleine ne les masque pas. Vérifiez les fichiers avant partage.</p>
+    <label class="field" for="composition-title"><span data-compose="documentTitle">Titre du document</span><input id="composition-title" type="text" maxlength="500"></label>
+    <h2><span data-compose="images">Images</span> <span id="composition-count">0 / 30</span></h2>
+    <p class="warning" data-compose="historyNotice">L’ajout et la suppression ne sont pas annulables et réinitialisent l’historique de composition.</p>
+    <ol id="composition-items" class="item-list"></ol>
+    <div class="composition-actions">
+      <button id="item-up" class="compact-button" type="button" data-compose="up" disabled>Monter</button>
+      <button id="item-down" class="compact-button" type="button" data-compose="down" disabled>Descendre</button>
+      <button id="item-remove" class="compact-button" type="button" data-compose="remove" disabled>Supprimer</button>
+    </div>
+    <label class="field" for="item-title"><span data-compose="itemTitle">Titre de l’image</span><input id="item-title" type="text" maxlength="500" disabled></label>
+    <label class="field" for="item-caption"><span data-compose="caption">Légende</span><input id="item-caption" type="text" maxlength="2000" disabled></label>
+    <h2 data-compose="layout">Composition</h2>
+    <div class="composition-actions">
+      <button id="composition-undo" class="compact-button" type="button" data-compose="compositionUndo" disabled>Annuler la composition</button>
+      <button id="composition-redo" class="compact-button" type="button" data-compose="compositionRedo" disabled>Rétablir la composition</button>
+    </div>
+    <label class="field" for="composition-direction"><span data-compose="direction">Disposition</span><select id="composition-direction"><option value="vertical" data-compose="vertical">Verticale</option><option value="horizontal" data-compose="horizontal">Horizontale</option></select></label>
+    <label class="field" for="composition-gap"><span data-compose="gap">Espacement (px)</span><input id="composition-gap" type="number" min="0" max="200" value="0"></label>
+    <label class="field" for="composition-padding"><span data-compose="padding">Marge (px)</span><input id="composition-padding" type="number" min="0" max="200" value="0"></label>
+    <label class="field" for="composition-background"><span data-compose="background">Fond</span><input id="composition-background" type="color" value="#ffffff"></label>
+    <label class="field" for="composition-numbered"><span><input id="composition-numbered" type="checkbox"> <span data-compose="numbered">Numéroter les images</span></span></label>
+    <h2 data-compose="preview">Aperçu de la composition</h2>
+    <div id="composition-preview" class="composition-preview" aria-live="polite"></div>
+  </aside>
   <main class="workspace" id="workspace">
     <div id="empty-state" class="empty-state"></div>
     <div class="canvas-container" id="canvas-container" hidden>
@@ -326,6 +407,42 @@
       <textarea id="text-input-overlay" class="text-input-overlay" hidden></textarea>
     </div>
   </main>
+  </div>
+
+  <dialog id="export-dialog" class="export-dialog" aria-labelledby="export-heading">
+    <h2 id="export-heading" data-compose="export">Exporter</h2>
+    <div class="export-fields">
+      <label class="field" for="export-format"><span data-compose="format">Format</span><select id="export-format"><option value="png">PNG</option><option value="jpeg">JPEG</option><option value="webp">WebP</option><option value="markdown">Markdown ZIP</option><option value="html">HTML</option><option value="pdf">PDF</option></select></label>
+      <label class="field" id="export-quality-field" for="export-quality"><span data-compose="quality">Qualité (%)</span><input id="export-quality" type="number" min="10" max="100" value="90"></label>
+    </div>
+    <fieldset id="pdf-settings" hidden>
+      <legend data-compose="pdfSettings">Présentation PDF</legend>
+      <div class="export-fields">
+        <label class="field" for="pdf-paper"><span data-compose="paper">Papier</span><select id="pdf-paper"><option value="A4">A4</option><option value="Letter">Letter</option></select></label>
+        <label class="field" for="pdf-orientation"><span data-compose="orientation">Orientation</span><select id="pdf-orientation"><option value="portrait" data-compose="portrait">Portrait</option><option value="landscape" data-compose="landscape">Paysage</option></select></label>
+        <label class="field" for="pdf-margin"><span data-compose="pdfMargin">Marges (mm)</span><input id="pdf-margin" type="number" min="5" max="30" value="12"></label>
+        <label class="field" for="pdf-scale"><span data-compose="scale">Échelle (%)</span><input id="pdf-scale" type="number" min="25" max="100" value="100"></label>
+      </div>
+      <label class="field" for="pdf-fit"><input id="pdf-fit" type="checkbox" checked><span data-compose="fit">Ajuster à la largeur</span></label>
+      <fieldset><legend><label for="pdf-header"><input id="pdf-header" type="checkbox" checked><span data-compose="header">En-tête</span></label></legend>
+        <label for="pdf-header-title"><input id="pdf-header-title" type="checkbox" checked><span data-compose="documentTitle">Titre du document</span></label>
+        <label for="pdf-header-source"><input id="pdf-header-source" type="checkbox" checked><span data-compose="source">Source</span></label>
+        <label for="pdf-header-date"><input id="pdf-header-date" type="checkbox" checked><span data-compose="date">Date</span></label>
+        <label for="pdf-header-pagination"><input id="pdf-header-pagination" type="checkbox"><span data-compose="pagination">Pagination</span></label>
+      </fieldset>
+      <fieldset><legend><label for="pdf-footer"><input id="pdf-footer" type="checkbox" checked><span data-compose="footer">Pied de page</span></label></legend>
+        <label for="pdf-footer-title"><input id="pdf-footer-title" type="checkbox"><span data-compose="documentTitle">Titre du document</span></label>
+        <label for="pdf-footer-source"><input id="pdf-footer-source" type="checkbox"><span data-compose="source">Source</span></label>
+        <label for="pdf-footer-date"><input id="pdf-footer-date" type="checkbox"><span data-compose="date">Date</span></label>
+        <label for="pdf-footer-pagination"><input id="pdf-footer-pagination" type="checkbox" checked><span data-compose="pagination">Pagination</span></label>
+      </fieldset>
+    </fieldset>
+    <p id="export-status" role="status" aria-live="polite"></p>
+    <div class="composition-actions">
+      <button id="export-confirm" class="action-button primary" type="button" data-compose="export">Exporter</button>
+      <button id="export-cancel" class="action-button" type="button" data-compose="cancel">Annuler</button>
+    </div>
+  </dialog>
 
   <section id="geometry-panel" class="geometry-panel" aria-labelledby="geometry-title" hidden>
     <h2 id="geometry-title"></h2>
@@ -351,7 +468,10 @@
   <script src="capture-store.js"></script>
   <script src="i18n.js"></script>
   <script src="editor-operations.js"></script>
+  <script src="annotation-model.js"></script>
   <script src="editor-export.js"></script>
+  <script src="composition-utils.js"></script>
+  <script src="composition-export.js"></script>
   <script src="editor.js"></script>
 </body>
 </html>

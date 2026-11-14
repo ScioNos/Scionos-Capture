@@ -323,7 +323,29 @@
       targetContext.restore();
     }
 
-    return Object.freeze({ createSurface, normalizeBounds, normalizeCrop, operationBounds, applyOperation, drawCropPreview });
+    // Overlay uses image coordinates; caller supplies current zoom so handles stay
+    // the same size on screen. The committed surface is never modified.
+    function drawAnnotationSelection(targetContext, operation, zoom = 1) {
+      const model = globalScope.ScionosAnnotationModel;
+      if (!model || !model.isValid(operation)) return;
+      const box = model.bounds(operation, { context: targetContext });
+      const scale = Number.isFinite(zoom) && zoom > 0 ? zoom : 1;
+      const size = 8 / scale;
+      targetContext.save();
+      targetContext.strokeStyle = '#38bdf8';
+      targetContext.fillStyle = '#ffffff';
+      targetContext.lineWidth = 1.5 / scale;
+      targetContext.setLineDash([5 / scale, 3 / scale]);
+      targetContext.strokeRect(box.x, box.y, box.width, box.height);
+      targetContext.setLineDash([]);
+      for (const point of Object.values(model.handles(box))) {
+        targetContext.fillRect(point.x - size / 2, point.y - size / 2, size, size);
+        targetContext.strokeRect(point.x - size / 2, point.y - size / 2, size, size);
+      }
+      targetContext.restore();
+    }
+
+    return Object.freeze({ createSurface, normalizeBounds, normalizeCrop, operationBounds, applyOperation, drawCropPreview, drawAnnotationSelection });
   }
 
   globalScope.ScionosEditorOperations = Object.freeze({ create: createEditorOperations });

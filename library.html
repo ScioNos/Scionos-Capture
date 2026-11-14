@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bibliothèque — Scionos Capture</title>
+  <style>
+    :root { color-scheme: dark; --ink:#07111f; --panel:#101d2f; --line:#31435b; --text:#f8fafc; --muted:#a9bad0; --cyan:#38bdf8; --amber:#fbbf24; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:"Segoe UI Variable Text","Segoe UI",system-ui,sans-serif; color:var(--text); background:var(--ink); }
+    button,input,select { font:inherit; }
+    button,input,select { border:1px solid var(--line); border-radius:8px; color:var(--text); background:var(--panel); }
+    button { cursor:pointer; min-height:38px; padding:7px 12px; }
+    button:hover { border-color:var(--cyan); }
+    button:disabled { cursor:wait; opacity:.55; }
+    :focus-visible { outline:3px solid var(--amber); outline-offset:2px; }
+    [hidden] { display:none !important; }
+    header { display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:16px clamp(16px,4vw,48px); border-bottom:1px solid var(--line); background:var(--panel); }
+    header img { width:32px; height:32px; }
+    h1 { font-size:20px; margin:0; flex:1; }
+    main { max-width:1400px; margin:auto; padding:24px clamp(16px,4vw,48px) 48px; }
+    .intro { color:var(--muted); margin:0 0 20px; }
+    .controls { display:flex; align-items:end; flex-wrap:wrap; gap:12px; margin-bottom:20px; }
+    label.field { display:grid; gap:6px; font-size:13px; color:var(--muted); }
+    .search { flex:1; min-width:220px; }
+    input,select { min-height:40px; padding:8px 10px; max-width:100%; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; padding:0; list-style:none; }
+    .card { background:var(--panel); border:1px solid var(--line); border-radius:12px; overflow:hidden; display:flex; flex-direction:column; min-width:0; }
+    .thumbnail { width:100%; height:150px; object-fit:contain; background:#050b14; display:block; }
+    .card-content { padding:14px; display:grid; gap:8px; }
+    .card h2 { font-size:16px; margin:0; overflow-wrap:anywhere; }
+    .meta { color:var(--muted); font-size:12px; overflow-wrap:anywhere; margin:0; }
+    .actions { display:flex; flex-wrap:wrap; gap:6px; }
+    .actions button { font-size:12px; min-height:36px; padding:6px 9px; }
+    .danger { color:#fecdd3; }
+    .settings { margin-top:28px; padding:20px; border:1px solid var(--line); border-radius:12px; background:var(--panel); }
+    .settings h2 { margin:0 0 14px; font-size:17px; }
+    .settings-grid { display:flex; align-items:end; flex-wrap:wrap; gap:14px; }
+    .settings-grid input { width:130px; }
+    .storage { color:var(--muted); font-size:13px; }
+    .notice { color:var(--muted); margin-block:12px; }
+    .status { min-height:1.4em; color:#7dd3fc; }
+    .status.error { color:#fecdd3; }
+    .language-switcher { position:relative; }
+    .language-button { display:flex; align-items:center; gap:7px; }
+    .language-button img,.language-option img { width:24px; height:16px; border-radius:2px; }
+    .language-menu { position:absolute; right:0; top:calc(100% + 7px); width:230px; padding:6px; z-index:5; border:1px solid var(--line); border-radius:10px; background:#0c1828; }
+    .language-option { width:100%; border:0; background:transparent; display:grid; grid-template-columns:26px 1fr 18px; align-items:center; gap:9px; text-align:left; }
+    .language-check,.auto-icon { color:var(--cyan); text-align:center; }
+    @media(max-width:600px) { .grid { grid-template-columns:1fr; } header h1 { flex-basis:calc(100% - 115px); } }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="images/icon48.png" alt="">
+    <h1 data-text="title">Bibliothèque</h1>
+    <button id="new-project" type="button" data-text="newProject">Nouveau document</button>
+    <div class="language-switcher">
+      <button id="language-button" class="language-button" type="button" aria-haspopup="menu" aria-expanded="false"><img id="language-flag" src="images/flags/fr.svg" alt=""><span id="language-code">FR</span><span aria-hidden="true">▼</span></button>
+      <div id="language-menu" class="language-menu" role="menu" hidden>
+        <button class="language-option" type="button" role="menuitemradio" data-language-mode="auto"><span class="auto-icon" aria-hidden="true">◎</span><span class="language-label" data-i18n="languageAuto">Automatique</span><span class="language-check"></span></button>
+        <button class="language-option" type="button" role="menuitemradio" data-language-mode="fr"><img src="images/flags/fr.svg" alt=""><span class="language-label">Français</span><span class="language-check"></span></button>
+        <button class="language-option" type="button" role="menuitemradio" data-language-mode="en"><img src="images/flags/en.svg" alt=""><span class="language-label">English</span><span class="language-check"></span></button>
+        <button class="language-option" type="button" role="menuitemradio" data-language-mode="es"><img src="images/flags/es.svg" alt=""><span class="language-label">Español</span><span class="language-check"></span></button>
+        <button class="language-option" type="button" role="menuitemradio" data-language-mode="de"><img src="images/flags/de.svg" alt=""><span class="language-label">Deutsch</span><span class="language-check"></span></button>
+      </div>
+    </div>
+  </header>
+  <main>
+    <p class="intro" data-text="intro">Vos projets sont conservés localement dans ce navigateur.</p>
+    <div class="controls"><label class="field search" for="library-search"><span data-text="search">Rechercher par titre ou source</span><input id="library-search" type="search" autocomplete="off"></label></div>
+    <p id="library-status" class="status" role="status" aria-live="polite"></p>
+    <p id="library-empty" class="notice" hidden></p>
+    <ul id="project-list" class="grid"></ul>
+    <section class="settings" aria-labelledby="storage-title">
+      <h2 id="storage-title" data-text="settings">Stockage local</h2>
+      <div class="settings-grid">
+        <label class="field" for="retention-days"><span data-text="retention">Durée de conservation</span><select id="retention-days"><option value="0" data-text="forever">Sans expiration</option><option value="7" data-text="days7">7 jours</option><option value="30" data-text="days30">30 jours</option><option value="90" data-text="days90">90 jours</option></select></label>
+        <label class="field" for="budget-mib"><span data-text="budget">Limite (Mio)</span><input id="budget-mib" type="number" min="64" max="1024" step="1" value="256"></label>
+        <button id="save-preferences" type="button" data-text="saveSettings">Enregistrer les réglages</button>
+      </div>
+      <p id="storage-estimate" class="storage" aria-live="polite"></p>
+      <p class="notice" data-text="retentionHelp">Les projets expirés sont supprimés automatiquement. Exportez vos projets pour les conserver séparément.</p>
+      <button id="delete-all" class="danger" type="button" data-text="deleteAll">Supprimer tous les projets</button>
+    </section>
+  </main>
+  <script src="capture-store.js"></script>
+  <script src="composition-utils.js"></script>
+  <script src="i18n.js"></script>
+  <script src="library.js"></script>
+</body>
+</html>

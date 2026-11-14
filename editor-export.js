@@ -101,6 +101,7 @@
           const title = current.captureRecord && current.captureRecord.title ? current.captureRecord.title : getI18nText('captureTitle');
           const safeUrl = ScionosCaptureUtils.sanitizeUrl(current.captureRecord && current.captureRecord.url ? current.captureRecord.url : '');
           const rawUrl = current.captureRecord && current.captureRecord.url ? current.captureRecord.url : '';
+          const displayUrl = safeUrl || (rawUrl ? ScionosCaptureUtils.sanitizeUrl(rawUrl) : '');
           const dateFormatted = current.captureRecord && current.captureRecord.timestamp
             ? new Date(current.captureRecord.timestamp).toLocaleString(getLanguage())
             : new Date().toLocaleString(getLanguage());
@@ -116,7 +117,7 @@
             <div class="print-header">
               <h1>${escapedTitle}</h1>
               <div class="print-meta">
-                ${rawUrl ? (safeUrl ? `<span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportSource'))} :</strong> <a href="${ScionosCaptureUtils.escapeHtml(safeUrl)}">${ScionosCaptureUtils.escapeHtml(rawUrl)}</a></span>` : `<span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportSource'))} :</strong> <span>${ScionosCaptureUtils.escapeHtml(rawUrl)}</span></span>`) : ''}
+                ${displayUrl ? `<span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportSource'))} :</strong> ${safeUrl ? `<a href="${ScionosCaptureUtils.escapeHtml(safeUrl)}">${ScionosCaptureUtils.escapeHtml(displayUrl)}</a>` : `<span>${ScionosCaptureUtils.escapeHtml(displayUrl)}</span>`}</span>` : ''}
                 <span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportDate'))} :</strong> ${ScionosCaptureUtils.escapeHtml(dateFormatted)}</span>
                 <span><strong>${ScionosCaptureUtils.escapeHtml(getI18nText('reportDimensions'))} :</strong> ${imageWidth} × ${imageHeight} px</span>
               </div>

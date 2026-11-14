@@ -573,8 +573,15 @@ test('editor zoom, crop, undo and redo keep the complete canvas reachable', asyn
   });
   await page.goto(`chrome-extension://${extensionId}/editor.html?capture=e2e-capture`);
   await expect(page.locator('#main-canvas')).toHaveAttribute('width', '640');
+  const initialWidth = await page.locator('#canvas-container').evaluate(element => element.getBoundingClientRect().width);
+  const initialZoom = Number((await page.locator('#zoom-text').textContent()).replace('%', ''));
   await page.locator('#zoom-in').click();
-  await expect(page.locator('#canvas-container')).toHaveCSS('width', '736px');
+  await expect.poll(() => page.locator('#canvas-container').evaluate(element => element.getBoundingClientRect().width)).toBeGreaterThan(initialWidth);
+  await expect(page.locator('#zoom-text')).toHaveText(`${initialZoom + 15}%`);
+  const canvasBounds = await page.locator('#main-canvas').boundingBox();
+  const workspaceBounds = await page.locator('#workspace').boundingBox();
+  expect(canvasBounds.x + canvasBounds.width).toBeGreaterThan(workspaceBounds.x);
+  expect(canvasBounds.x).toBeLessThan(workspaceBounds.x + workspaceBounds.width);
   await page.locator('#tool-crop').click();
   await page.locator('#geometry-x').fill('10');
   await page.locator('#geometry-y').fill('10');

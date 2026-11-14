@@ -14,7 +14,7 @@ function eventHook() {
   return { addListener(value) { listener = value; }, get listener() { return listener; } };
 }
 
-async function createHarness() {
+async function createHarness(store = CaptureStore) {
   const messageEvent = eventHook();
   const alarmEvent = eventHook();
   const removedEvent = eventHook();
@@ -64,7 +64,7 @@ async function createHarness() {
     }
   };
   const context = vm.createContext({
-    chrome, CaptureStore, ScionosCaptureUtils, Blob, URL, Uint8Array, fetch: globalThis.fetch,
+    chrome, CaptureStore: store, ScionosCaptureUtils, Blob, URL, Uint8Array, fetch: globalThis.fetch,
     atob: globalThis.atob, console: { ...console, error() {} }, setTimeout: globalThis.setTimeout,
     clearTimeout: globalThis.clearTimeout, crypto: { randomUUID: crypto.randomUUID }
   });
@@ -83,6 +83,83 @@ function send(listener, message, sender) {
     if (keepAlive !== true) reject(new Error('Message was not accepted'));
   });
 }
+
+test('library retention reconciles at wake-up and reschedules without deleting future projects', async () => {
+  const now = Date.now();
+  const projects = new Map([
+    ['expired', { id: 'expired', expiresAt: now - 1000 }],
+    ['future', { id: 'future', expiresAt: now + 300000 }],
+    ['permanent', { id: 'permanent', expiresAt: null }]
+  ]);
+  const store = Object.assign({}, CaptureStore, {
+    async listLibraryProjects() { return [...projects.values()]; },
+    async purgeExpiredLibraryProjects(cutoff) {
+      const deleted = [];
+      for (const [id, project] of projects) {
+        if (typeof project.expiresAt === 'number' && project.expiresAt <= cutoff) { projects.delete(id); deleted.push(id); }
+      }
+      return deleted;
+    }
+  });
+  const h = await createHarness(store);
+  assert.equal(projects.has('expired'), false);
+  assert.equal(projects.has('future'), true);
+  assert.equal(projects.has('permanent'), true);
+  assert.equal(h.alarms.get('library-project-expiry').when, now + 300000);
+  // A retention update immediately before an old alarm must win atomically.
+  projects.get('future').expiresAt = now + 600000;
+  await h.chrome.alarms.onAlarm.listener({ name: 'library-project-expiry' });
+  assert.equal(projects.has('future'), true);
+  assert.equal(h.alarms.get('library-project-expiry').when, now + 600000);
+  projects.get('future').expiresAt = null;
+  const response = await send(h.messageEvent.listener, { action: 'LIBRARY_PROJECTS_CHANGED' }, {
+    id: 'test-extension', url: 'chrome-extension://test-extension/editor.html'
+  });
+  assert.equal(response.success, true);
+  assert.equal(h.alarms.has('library-project-expiry'), false);
+  assert.equal(projects.has('future'), true);
+  assert.equal(h.messageEvent.listener({ action: 'LIBRARY_PROJECTS_CHANGED' }, {
+    id: 'test-extension', url: 'https://example.com/'
+  }, () => {}), undefined);
+});
+
+test('real library expiry purge removes only due projects from both stores', async () => {
+  const id = 'background-library-' + crypto.randomUUID();
+  const now = Date.now();
+  const ids = [id + '-expired', id + '-future', id + '-permanent'];
+  try {
+    await CaptureStore.saveLibraryProject({ id: ids[0], blob: new Blob(['a']), expiresAt: now - 1 }, { expectedRevision: null });
+    await CaptureStore.saveLibraryProject({ id: ids[1], blob: new Blob(['b']), expiresAt: now + 300000 }, { expectedRevision: null });
+    await CaptureStore.saveLibraryProject({ id: ids[2], blob: new Blob(['c']), expiresAt: null }, { expectedRevision: null });
+    const h = await createHarness();
+    assert.equal(await CaptureStore.getLibraryProject(ids[0]), undefined);
+    assert.ok(await CaptureStore.getLibraryProject(ids[1]));
+    assert.ok(await CaptureStore.getLibraryProject(ids[2]));
+    assert.equal(h.alarms.get('library-project-expiry').when, now + 300000);
+  } finally {
+    for (const projectId of ids) {
+      const project = await CaptureStore.getLibraryProject(projectId);
+      if (project) await CaptureStore.deleteLibraryProject(projectId, project.revision);
+    }
+  }
+});
+
+test('library expiry failure schedules a retry and leaves temporary capture cleanup operational', async () => {
+  let fail = true;
+  const store = Object.assign({}, CaptureStore, {
+    async purgeExpiredLibraryProjects() { if (fail) throw new Error('database unavailable'); return []; },
+    async listLibraryProjects() { return []; }
+  });
+  const h = await createHarness(store);
+  assert.ok(h.alarms.get('library-project-expiry').when > Date.now());
+  const past = Date.now() - 1200000;
+  await CaptureStore.putCapture({ id: 'library-failure-capture', createdAt: past, expiresAt: past + 900000, blob: new Blob(['image']) });
+  await h.chrome.runtime.onStartup.listener();
+  assert.equal(await CaptureStore.getCapture('library-failure-capture'), undefined);
+  fail = false;
+  await h.chrome.alarms.onAlarm.listener({ name: 'library-project-expiry' });
+  assert.equal(h.alarms.has('library-project-expiry'), false);
+});
 
 test('service worker persists a chunked PNG, opens the editor, keeps it after acknowledgement until the editor closes', async () => {
   const harness = await createHarness();
@@ -112,6 +189,41 @@ test('service worker persists a chunked PNG, opens the editor, keeps it after ac
   await harness.chrome.tabs.remove(editorTabId);
   assert.equal(await CaptureStore.getCapture(complete.captureId), undefined);
   assert.equal(harness.sessionValues[mapping[0]], undefined);
+});
+
+test('service worker bounds transfer text metadata and strips invalid entries', async () => {
+  const harness = await createHarness();
+  const sender = { id: 'test-extension', tab: { id: 7, windowId: 3 }, url: 'https://example.com' };
+  const begin = await send(harness.messageEvent.listener, {
+    action: 'BEGIN_CAPTURE_TRANSFER', expectedBytes: 1, expectedChunks: 1,
+    textBlocks: [{ text: 'valid', x: 0, y: 0, width: 10, height: 10, fontSize: 12 }, { text: 'bad', x: 'nope' }]
+  }, sender);
+  assert.equal(begin.success, true);
+  const transfer = await CaptureStore.getTransfer(begin.transferId);
+  assert.deepEqual(transfer.textBlocks, [{ text: 'valid', x: 0, y: 0, width: 10, height: 10, fontSize: 12, url: '' }]);
+  await send(harness.messageEvent.listener, { action: 'ABORT_CAPTURE_TRANSFER', transferId: begin.transferId }, sender);
+});
+
+test('concurrent transfer appends are serialized and duplicate payloads cannot overwrite', async () => {
+  const original = CaptureStore.appendTransferChunk;
+  let release;
+  const gate = new Promise(resolve => { release = resolve; });
+  const store = Object.assign({}, CaptureStore, {
+    async appendTransferChunk(...args) { await gate; return original(...args); }
+  });
+  const harness = await createHarness(store);
+  const sender = { id: 'test-extension', tab: { id: 7, windowId: 3 }, url: 'https://example.com' };
+  const begin = await send(harness.messageEvent.listener, { action: 'BEGIN_CAPTURE_TRANSFER', expectedBytes: 1, expectedChunks: 1 }, sender);
+  const first = send(harness.messageEvent.listener, { action: 'APPEND_CAPTURE_CHUNK', transferId: begin.transferId, index: 0, data: 'AA==' }, sender);
+  const second = send(harness.messageEvent.listener, { action: 'APPEND_CAPTURE_CHUNK', transferId: begin.transferId, index: 0, data: 'AQ==' }, sender);
+  await Promise.resolve();
+  await Promise.resolve();
+  release();
+  const responses = await Promise.all([first, second]);
+  assert.equal(responses.filter(response => response.success).length, 2);
+  assert.equal(responses.filter(response => response.duplicate).length, 1);
+  assert.deepEqual(await (await CaptureStore.getTransferChunk(begin.transferId, 0)).blob.arrayBuffer().then(bytes => [...new Uint8Array(bytes)]), [0]);
+  await send(harness.messageEvent.listener, { action: 'ABORT_CAPTURE_TRANSFER', transferId: begin.transferId }, sender);
 });
 
 test('service worker rejects out-of-order chunks', async () => {

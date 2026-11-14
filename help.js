@@ -21,6 +21,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       'mode-delay-desc': 'helpCaptureDelay',
       'sec-editor-title': 'helpEditorHeader',
       'sec-editor-text': 'helpEditorText',
+      'sec-composition-title': 'helpCompositionHeader',
+      'help-import-title': 'helpImportHeader',
+      'help-import-text': 'helpImportText',
+      'help-compose-title': 'helpComposeHeader',
+      'help-compose-text': 'helpComposeText',
+      'help-export-title': 'helpExportHeader',
+      'help-export-text': 'helpExportText',
+      'help-save-title': 'helpSaveHeader',
+      'help-save-text': 'helpSaveText',
+      'help-annotations-title': 'helpAnnotationsHeader',
+      'help-annotations-text': 'helpAnnotationsText',
+      'help-library-title': 'helpLibraryHeader',
+      'help-library-text': 'helpLibraryText',
       'sec-shortcuts-title': 'helpShortcutsHeader',
       'sc-activation': 'helpShortcutActivation',
       'sc-select': 'helpShortcutSelect',
@@ -43,10 +56,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const manifestVersion = (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getManifest)
       ? chrome.runtime.getManifest().version
-      : '1.4.0';
+      : '';
     const versionElement = document.getElementById('help-version');
     if (versionElement) {
-      versionElement.textContent = getI18nText('helpVersionLabel', { version: manifestVersion });
+      versionElement.hidden = !manifestVersion;
+      versionElement.textContent = manifestVersion ? getI18nText('helpVersionLabel', { version: manifestVersion }) : '';
     }
 
     const autoLang = document.querySelector('[data-i18n="languageAuto"]');

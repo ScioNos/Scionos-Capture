@@ -2,7 +2,7 @@
 
 [Français](PRIVACY.md) · [English](PRIVACY.en.md) · [Español](PRIVACY.es.md) · [Deutsch](PRIVACY.de.md)
 
-Última actualización: 10 de noviembre de 2026 — versión 1.4.0.
+Última actualización: 14 de noviembre de 2026 — versión 1.5.0.
 
 **Editorial responsable:** eyelo SA (IDE: CHE-108.174.302), Vaud, Suiza — Marca **ScioNos** ([scionos.ch](https://scionos.ch)) — Contacto: info@eyelo.ch
 
@@ -14,8 +14,20 @@ No se envía ninguna captura, URL ni dato de navegación a eyelo SA, ScioNos o a
 
 Las capturas y sus metadatos de texto permanecen en IndexedDB local. Los fragmentos se eliminan tras el ensamblado o quince minutos de inactividad; un navegador suspendido puede retrasar la limpieza hasta despertar. La captura final se conserva mientras haya una pestaña de editor correspondiente abierta, incluso tras recargar y más allá de quince minutos. Se elimina al cerrar su último editor. Sin editor, puede limpiarse quince minutos después de su creación. Las asociaciones se reconcilian con las pestañas abiertas al despertar y reiniciar el navegador.
 
-El idioma y el retardo de captura (`captureDelaySeconds`, 0, 3, 5 o 10 segundos) se guardan en `chrome.storage.local`. La selección de elementos y la cuenta atrás son locales y no añaden permisos ni destinos de red. La captura diferida requiere una acción explícita y puede cancelarse. El vínculo temporal del editor se guarda en `chrome.storage.session`. El usuario puede borrar los datos desde la gestión de extensiones o desinstalando. Contacto de privacidad: info@eyelo.ch. Para vulnerabilidades, consulta [SECURITY.es.md](SECURITY.es.md).
+El idioma y el retardo de captura (`captureDelaySeconds`, 0, 3, 5 o 10 segundos) se guardan en `chrome.storage.local`. La selección de elementos y la cuenta atrás son locales y no añaden permisos ni destinos de red. La captura diferida requiere una acción explícita y puede cancelarse. El vínculo temporal del editor se guarda en `chrome.storage.session`. El usuario puede borrar los datos almacenados por la extensión desde su gestión o desinstalándola. Debe eliminar por separado los archivos exportados o proyectos guardados en el dispositivo. Contacto de privacidad: info@eyelo.ch. Para vulnerabilidades, consulta [SECURITY.es.md](SECURITY.es.md).
 
 La capa de búsqueda del PDF conserva solo palabras completas cuya visibilidad puede verificarse. Las palabras inciertas se omiten de esa capa y se conserva la imagen capturada. También se omiten las capas antiguas con coordenadas no verificadas. Usa censura sólida para proteger píxeles confidenciales; el desenfoque es solo visual.
 
 Aplica o cancela los cambios pendientes antes de exportar. El desenfoque es un efecto visual; usa una máscara sólida para secretos.
+
+## Alcance de privacidad de la versión 1.5.0
+
+Esta sección describe el alcance de privacidad de la versión publicada 1.5.0.
+
+La importación de archivos de imagen, el pegado solicitado explícitamente desde el portapapeles y la composición de varias imágenes procesan localmente las imágenes elegidas y los títulos, leyendas, pasos y metadatos de fuente/fecha presentes en el documento. Estas operaciones no transfieren datos a un servidor.
+
+La 1.5.0 utiliza el formato portátil local `.scionos` v2 con anotaciones editables individualmente y apertura de proyectos v1, cuyas anotaciones permanecen aplanadas. Al guardar, las máscaras sólidas y los recortes se aplican irreversiblemente a las imágenes conservadas; las anotaciones afectadas se eliminan de forma conservadora. Los archivos importados y los proyectos v1 no tienen una capa de texto fiable. Al guardar después de un recorte, todas las anotaciones anteriores se aplanan para preservar su aspecto y orden.
+
+Las exportaciones PNG, JPEG, WebP, HTML, Markdown/ZIP, PDF y la impresión pueden incluir las imágenes y la información de composición seleccionada. Revisa títulos, fuentes, fechas y contenido antes de compartir un proyecto o una exportación. Los archivos guardados permanecen en el dispositivo en la ubicación elegida; ni la limpieza temporal ni la desinstalación de la extensión los eliminan. El usuario gestiona su conservación, uso compartido y eliminación.
+
+Hay una biblioteca local duradera con guardado explícito: miniaturas, búsqueda, cambio de nombre, duplicación y eliminación. El usuario elige una duración de 0, 7, 30 o 90 días y una cuota de 64 a 1.024 MiB, 256 MiB por defecto; 0 días significa sin expiración automática. Los proyectos locales pueden contener imágenes, anotaciones y metadatos. La máscara sólida sigue siendo necesaria para proteger píxeles confidenciales; el desenfoque es solo visual.

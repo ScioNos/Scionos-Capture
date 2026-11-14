@@ -2,9 +2,24 @@
 
 [Français](README.md) · [English](README.en.md) · [Español](README.es.md) · [Deutsch](README.de.md)
 
-![Version](https://img.shields.io/badge/version-1.4.0-blue)
+![Version](https://img.shields.io/badge/version-1.5.0-blue)
+
+<!-- source-version --> **Version 1.5.0.**
 
 Vollständig lokale Screenshot-Erweiterung für Chrome und Edge. Sichtbaren, ausgewählten oder scrollbaren Bereich sowie ganze Seiten aufnehmen, anschließend bearbeiten und als PNG, interaktives HTML oder PDF exportieren.
+
+## Version 1.5.0
+
+Version 1.5.0 ergänzt die unten beschriebene Komposition mehrerer Bilder, Dokumentexporte, portable Projekte und lokale Bibliothek.
+
+- Komposition mehrerer Bilder: lokale Dateien importieren oder aus der Zwischenablage einfügen, Bilder hinzufügen/entfernen und umordnen, vertikal oder horizontal anordnen sowie Abstand, Hintergrund, Titel, Bildunterschriften und nummerierte Schritte einstellen.
+- Export als PNG, JPEG und WebP (einstellbare Qualität für die entsprechenden Formate), HTML, Markdown samt Bildern in einer ZIP-Datei, PDF und Drucken; Einstellungen für Ränder, Ausrichtung, Skalierung sowie Kopf-/Fußzeilen mit Titel, Quelle, Datum und Seitennummerierung, innerhalb der Größenlimits.
+- Einzeln bearbeitbare Annotationen und portable `.scionos`-Projekte v2, rückwärtskompatibel zu v1-Projekten, deren Annotationen zusammengeführt bleiben. Beim Speichern werden deckende Masken und Zuschnitte unumkehrbar angewendet; betroffene Annotationen werden konservativ entfernt. Beim Speichern nach einem Zuschnitt werden alle vorherigen Annotationen zusammengeführt, um Darstellung und Reihenfolge zu erhalten.
+- Dauerhafte lokale Bibliothek mit ausdrücklichem Speichern, Vorschaubildern, Suche, Umbenennen, Duplizieren und Löschen. Aufbewahrung: 0, 7, 30 oder 90 Tage; einstellbares Kontingent 64 bis 1.024 MiB, standardmäßig 256 MiB. 0 Tage bedeutet keine automatische Ablaufzeit.
+- Importierte Dateien und aus einem Projekt wiederhergestellte Bilder liefern keine zuverlässige Textebene: Eine originalgetreue Textsuche in ihren PDFs wird nicht zugesagt. Vertrauliche Pixel deckend maskieren.
+- Besser sichtbarer Hilfezugang und Anzeige der tatsächlich geladenen Version.
+
+Die `.scionos`-Datei und Exporte werden auf Wunsch lokal gespeichert. Sie können Bilder, Kompositionstext, Titel, Quellen und Datumsangaben enthalten: vor dem Teilen prüfen. Benutzer verwalten die Löschung.
 
 ## Funktionen
 
@@ -19,7 +34,7 @@ Vollständig lokale Screenshot-Erweiterung für Chrome und Edge. Sichtbaren, aus
 
 ## Installation
 
-`scionos-capture-v1.4.0.zip` aus dem [Release v1.4.0](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.4.0) herunterladen, optional `.sha256` prüfen und entpacken. `chrome://extensions` oder `edge://extensions` öffnen, **Entwicklermodus** aktivieren, **Entpackte Erweiterung laden** wählen und den Ordner auswählen.
+`scionos-capture-v1.5.0.zip` aus dem [Release v1.5.0](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.0) herunterladen, optional `.sha256` prüfen und entpacken. `chrome://extensions` oder `edge://extensions` öffnen, **Entwicklermodus** aktivieren, **Entpackte Erweiterung laden** wählen und den Ordner auswählen.
 
 Aus dem Quellcode: Repository klonen, `npm ci` ausführen und die Projektwurzel als entpackte Erweiterung laden.
 
@@ -45,8 +60,8 @@ Die durchsuchbare PDF-Ebene enthält nur vollständige Wörter mit überprüfbar
 
 Node.js 24 wird für die vollständige Prüfung empfohlen, einschließlich PDF-Textextraktion mit PDF.js 6.3.289 (nur als Testabhängigkeit). Die Hauptprüfungen bleiben mit Node.js 20 kompatibel.
 
-Eine unveröffentlichte Version mit `npm run version:sync -- 1.4.0 --unreleased` synchronisieren; in PowerShell `npm.cmd run version:sync -- 1.4.0 --unreleased` verwenden. Veröffentlichte Download-Links bleiben erhalten.
+Eine Version mit `npm run version:sync -- 1.5.0` synchronisieren; in PowerShell `npm.cmd run version:sync -- 1.5.0` verwenden.
 
-<!-- local-package --> Lokales Archiv : `scionos-capture-v1.4.0.zip` · SHA-256 : `scionos-capture-v1.4.0.zip.sha256`.
+<!-- local-package --> Lokales Archiv : `scionos-capture-v1.5.0.zip` · SHA-256 : `scionos-capture-v1.5.0.zip.sha256`.
 
 `npm run test:native` prüft alle fünf Modi und eine verzögerte Aufnahme in installiertem Chrome und Edge mit echten Aufnahmen und temporären Profilen. Die Erweiterungsaktion gewährt `activeTab`; persönliche Profile werden nicht verwendet.

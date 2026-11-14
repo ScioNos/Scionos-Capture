@@ -3,7 +3,7 @@
     "message": "Scionos Capture"
   },
   "appDesc": {
-    "message": "Capture a page, visible area, selection, or scrolling area, then annotate and export locally as PNG or PDF."
+    "message": "Capture, annotate and compose images. Local projects and library; export PNG, JPEG, WebP, HTML, Markdown and PDF."
   },
   "languagePicker": {
     "message": "Choose language"
@@ -391,6 +391,22 @@
   "btnHelp": {
     "message": "Help & About"
   },
+  "popupCompose": { "message": "Compose / Open images" },
+  "popupLibrary": { "message": "Project library" },
+  "helpAnnotationsHeader": { "message": "Editable annotations and masking" },
+  "helpAnnotationsText": { "message": "Select an annotation to move, resize, or change its properties. Solid masks and crops are permanently applied to images when saving: hidden or removed pixels cannot be recovered from the project. Blur is only a visual effect; use a solid mask for secrets." },
+  "helpLibraryHeader": { "message": "Local library" },
+  "helpLibraryText": { "message": "Open the library from the extension popup to find locally saved projects, search, rename, duplicate, or delete them. Saving is explicit. Set retention and storage limits; if the quota is insufficient, free space and try again. Exported projects remain separate files." },
+  "popupHelpShort": { "message": "Help" },
+  "helpCompositionHeader": { "message": "Compose multiple captures" },
+  "helpImportHeader": { "message": "Import images" },
+  "helpImportText": { "message": "Choose Compose / Open images in the extension popup to open the editor without capturing a page. Open local images or paste an image from the clipboard. Images are processed locally." },
+  "helpComposeHeader": { "message": "Arrange the composition" },
+  "helpComposeText": { "message": "Add or remove images, change their order, and arrange them vertically or horizontally. Adjust the background and spacing, then add a title, captions, or numbered steps." },
+  "helpExportHeader": { "message": "Export the document" },
+  "helpExportText": { "message": "Export the composition as PNG, JPEG, or WebP, an HTML report, a PDF, or Markdown with its images. JPEG and WebP offer adjustable quality. PDF options let you adjust the page layout. Image dimension limits are checked before export." },
+  "helpSaveHeader": { "message": "Keep your work" },
+  "helpSaveText": { "message": "Save and reopen a .scionos file to resume your composition. Schema 2 retains editable annotations; schema 1 projects remain compatible, but their earlier annotations are already flattened. Undo/Redo history resets on reopening. Unverified source text is not restored for PDF search. The version shown is the version actually loaded." },
   "helpTitle": {
     "message": "Help — Scionos Capture"
   },

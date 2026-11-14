@@ -9,7 +9,7 @@ const browserGlobals = Object.fromEntries([
 ].map(name => [name, 'readonly']));
 
 module.exports = [
-  { ignores: ['dist/**', 'node_modules/**'] },
+  { ignores: ['dist/**', 'node_modules/**', 'del/**', '.codegraph/**'] },
   js.configs.recommended,
   {
     files: ['*.js'],

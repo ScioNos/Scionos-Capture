@@ -112,6 +112,7 @@ test('escapes HTML special characters correctly', () => {
 
 test('sanitizes URLs safely to prevent javascript: or malicious protocol injection', () => {
   assert.equal(sanitizeUrl('https://example.com/page?test=1'), 'https://example.com/page?test=1');
+  assert.equal(sanitizeUrl('https://alice:secret@example.com/private'), 'https://example.com/private');
   assert.equal(sanitizeUrl('http://localhost:3000'), 'http://localhost:3000/');
   assert.equal(sanitizeUrl('javascript:alert(1)'), '');
   assert.equal(sanitizeUrl('data:text/html,bad'), '');

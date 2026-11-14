@@ -338,9 +338,15 @@ async function applyRectangle(page, tool, rect) {
 async function printText(page) {
   await page.evaluate(() => { globalThis.print = () => {}; document.getElementById('print-area').innerHTML = ''; });
   await page.locator('#btn-pdf').click();
+  await expect(page.locator('#export-dialog')).toBeVisible();
+  await page.locator('#export-confirm').click();
+  await expect(page.locator('#export-dialog')).not.toBeVisible();
   await expect(page.locator('#print-area img').first()).toHaveAttribute('src', /^blob:/);
   await page.evaluate(async () => { await Promise.all([...document.querySelectorAll('#print-area img')].map(image => image.decode())); });
-  const pdf = await page.pdf({ format: 'A4', printBackground: true });
+  return printedPdfText(page);
+}
+async function printedPdfText(page) {
+  const pdf = await page.pdf({ preferCSSPageSize: true, printBackground: true });
   const { getDocument } = await import('pdfjs-dist/legacy/build/pdf.mjs');
   const task = getDocument({ data: new Uint8Array(pdf), isEvalSupported: false, useSystemFonts: true });
   const document = await task.promise;
@@ -375,7 +381,12 @@ test('long source URLs cannot expand the editor grid or move the image offscreen
   await seedEditor(page, { width: 1871, height: 2622, url: 'https://example.com/?tracking=' + 'x'.repeat(1800) });
   const bounds = await page.locator('#main-canvas').boundingBox();
   expect(bounds.x).toBeGreaterThanOrEqual(0); expect(bounds.x + bounds.width).toBeLessThanOrEqual(1907);
-  expect(await page.locator('#workspace').evaluate(element => element.clientWidth)).toBe(1907);
+  const workspace = await page.locator('#workspace').boundingBox();
+  expect(workspace.x).toBeGreaterThanOrEqual(0);
+  expect(workspace.x + workspace.width).toBeLessThanOrEqual(1907);
+  expect(bounds.x).toBeGreaterThanOrEqual(workspace.x);
+  expect(bounds.x + bounds.width).toBeLessThanOrEqual(workspace.x + workspace.width);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(1907);
   await page.close();
 });
 
@@ -398,34 +409,20 @@ test('text entry stays focused, native undo preserves image history, and redo ad
   await page.close();
 });
 
-test('a delayed history consolidation cannot restore an undone operation', async () => {
+test('annotations stay editable beyond 100 operations without flattening', async () => {
   const page = await context.newPage(); await seedEditor(page, { width: 400, height: 300 });
-  await page.evaluate(() => {
-    const original = globalThis.createImageBitmap;
-    globalThis.createImageBitmap = async (...args) => {
-      const bitmap = await original(...args);
-      if (args[0] instanceof globalThis.HTMLCanvasElement) {
-        globalThis.__flattenPending = true;
-        await new Promise(resolve => { globalThis.__releaseFlatten = resolve; });
-      }
-      return bitmap;
-    };
-  });
   await page.locator('#tool-step').click();
-  await page.locator('#main-canvas').evaluate(canvas => {
-    for (let i = 0; i < 100; i++) canvas.dispatchEvent(new globalThis.PointerEvent('pointerdown', { bubbles: true, button: 0, clientX: canvas.getBoundingClientRect().left + 50, clientY: canvas.getBoundingClientRect().top + 50 }));
-  });
-  await page.waitForFunction(() => globalThis.__flattenPending);
+  for (let index = 0; index < 101; index++) {
+    const box = await page.locator('#main-canvas').boundingBox();
+    await page.mouse.click(box.x + 30 + (index % 12) * 25, box.y + 30 + Math.floor(index / 12) * 25);
+  }
+  await expect(page.locator('#btn-undo')).toBeEnabled();
   await page.locator('#btn-undo').click();
-  await page.evaluate(() => globalThis.__releaseFlatten());
   await expect(page.locator('#btn-redo')).toBeEnabled();
   await expect(page.locator('#btn-undo')).toBeEnabled();
-  await expect(page.locator('#step-counter-badge')).toContainText('100');
-  // Finish one valid consolidation and verify the buttons reflect the empty history.
+  await expect(page.locator('#step-counter-badge')).toContainText('101');
   await page.locator('#btn-redo').click();
-  await page.waitForFunction(() => globalThis.__flattenPending);
-  await page.evaluate(() => globalThis.__releaseFlatten());
-  await expect(page.locator('#btn-undo')).toBeDisabled(); await expect(page.locator('#btn-redo')).toBeDisabled();
+  await expect(page.locator('#btn-undo')).toBeEnabled();
   await page.close();
 });
 
@@ -627,7 +624,7 @@ test('wide sticky headers retain both columns and appear only on the first row',
 });
 
 
-test('PDF text remains censored after a successful history consolidation', async () => {
+test('PDF text remains censored with more than 100 editable annotations', async () => {
   const page = await context.newPage();
   await seedEditor(page, { width: 400, height: 300, textBlocks: [
     { text: 'SECRET_FLATTEN', x: 100, y: 100, width: 150, height: 24, fontSize: 18 },
@@ -635,11 +632,12 @@ test('PDF text remains censored after a successful history consolidation', async
   ] });
   await applyRectangle(page, 'censor', { x: 90, y: 90, width: 170, height: 50 });
   await page.locator('#tool-step').click();
-  await page.locator('#main-canvas').evaluate(canvas => {
-    const rect = canvas.getBoundingClientRect();
-    for (let i = 0; i < 99; i++) canvas.dispatchEvent(new globalThis.PointerEvent('pointerdown', { bubbles: true, button: 0, clientX: rect.left + 300, clientY: rect.top + 250 }));
-  });
-  await expect(page.locator('#btn-undo')).toBeDisabled();
+  const canvas = page.locator('#main-canvas');
+  for (let i = 0; i < 101; i++) {
+    const rect = await canvas.boundingBox();
+    await page.mouse.click(rect.x + 300 + (i % 3) * 10, rect.y + 250 - (i % 4) * 10);
+  }
+  await expect(page.locator('#btn-undo')).toBeEnabled();
   const text = await printText(page);
   expect(text).toContain('PUBLIC_KEEP'); expect(text).not.toContain('SECRET_FLATTEN');
   await page.close();
@@ -656,16 +654,31 @@ test('undo during asynchronous PDF encoding cannot mix masked pixels with origin
     globalThis.print = () => {};
     const original = globalThis.HTMLCanvasElement.prototype.toBlob;
     globalThis.HTMLCanvasElement.prototype.toBlob = function (callback, ...args) {
+      // Hold only the document snapshot encoding. Page raster encoding must finish normally.
+      globalThis.HTMLCanvasElement.prototype.toBlob = original;
       original.call(this, blob => { globalThis.__releasePdfEncoding = () => callback(blob); }, ...args);
     };
   });
-  await page.locator('#btn-pdf').evaluate(button => button.click());
+  await page.locator('#btn-pdf').click();
+  await expect(page.locator('#export-dialog')).toBeVisible();
+  await page.locator('#export-confirm').click();
   await page.waitForFunction(() => globalThis.__releasePdfEncoding);
-  await page.locator('#btn-undo').click();
+  // The modal makes the toolbar inert to pointer input. Invoke its native handler
+  // to exercise a history change racing the already-frozen export snapshot.
+  await page.locator('#btn-undo').evaluate(button => button.click());
   await page.evaluate(() => globalThis.__releasePdfEncoding());
-  await expect(page.locator('#print-area img').first()).toHaveAttribute('src', /^blob:/);
-  expect(await page.locator('.searchable-text-layer').textContent()).toContain('PUBLIC_KEEP');
-  expect(await page.locator('.searchable-text-layer').textContent()).not.toContain('SECRET_ASYNC');
+  await expect(page.locator('#export-dialog')).not.toBeVisible();
+  const raster = page.locator('#print-area img').first();
+  await expect(raster).toHaveAttribute('src', /^blob:/);
+  expect(await raster.evaluate(async image => {
+    await image.decode(); const canvas = document.createElement('canvas');
+    canvas.width = image.naturalWidth; canvas.height = image.naturalHeight;
+    const context = canvas.getContext('2d'); context.drawImage(image, 0, 0);
+    return [...context.getImageData(130, 120, 1, 1).data];
+  })).toEqual([0, 0, 0, 255]);
+  const text = await printedPdfText(page);
+  expect(text).toContain('PUBLIC_KEEP');
+  expect(text).not.toContain('SECRET_ASYNC');
   await page.close();
 });
 
@@ -709,13 +722,16 @@ test('all exports reject a pending mask without cancelling the preview', async (
   });
   for(const id of ['btn-download','btn-html','btn-copy','btn-pdf']) {
     await page.locator('#'+id).click();
-    await expect(page.locator('#toast')).toContainText(/Appliquez ou annulez|Apply or cancel/);
+    await expect(page.locator('#toast')).toContainText(/Validez ou annulez|Appliquez ou annulez|Apply or cancel/);
     await expect(page.locator('#geometry-panel')).toBeVisible();
   }
   expect(await page.evaluate(()=>globalThis.__exportCalls)).toBe(0);
   await page.locator('#geometry-cancel').click();
   await page.locator('#btn-pdf').click();
-  await expect(page.locator('#print-area img')).toHaveAttribute('src',/^blob:/);
+  await expect(page.locator('#export-dialog')).toBeVisible();
+  await page.locator('#export-confirm').click();
+  await expect(page.locator('#export-dialog')).not.toBeVisible();
+  await expect(page.locator('#print-area img').first()).toHaveAttribute('src',/^blob:/);
   await page.close();
 });
 
@@ -804,6 +820,18 @@ for(const dpr of [1,1.25,1.5,2]) {
  });
 }
 
+test('print output removes URL credentials from visible source text and links',async()=>{
+ const page=await context.newPage();
+ const marker='PRINT_SECRET_'+require('node:crypto').randomUUID().replaceAll('-','');
+ await seedEditor(page,{url:'https://alice:'+marker+'@example.com/private'});
+ await page.evaluate(()=>{globalThis.print=()=>{};});
+ await page.locator('#btn-pdf').click();await page.locator('#export-confirm').click();
+ await expect(page.locator('#print-area img').first()).toHaveAttribute('src',/^blob:/);
+ const markup=await page.locator('#print-area').innerHTML();
+ expect(markup).not.toContain(marker);expect(markup).not.toContain('https://alice:');expect(markup).toContain('https://example.com/private');
+ await page.close();
+});
+
 test('HTML report embeds one image and exposes correct zoom and the bottom edge',async()=>{
  const page=await context.newPage();await prepareFullPageHarness(page,'<p>Report fixture</p>');
  const html=await page.evaluate(()=>{
@@ -845,10 +873,14 @@ test('text extraction stops after the global block cap while pixels still comple
 test('HTML final size uses encoded bytes rather than string length',async()=>{
  const page=await context.newPage();await seedEditor(page,{width:100,height:100});
  await page.evaluate(()=>{
-  globalThis.ScionosCaptureUtils={...globalThis.ScionosCaptureUtils,MAX_HTML_EXPORT_BYTES:30000,buildHtmlReport:()=> 'é'.repeat(20000)};
+  // Exercise the real UTF-8 Blob measurement with fewer than 64 Mi characters.
+   globalThis.FileReader.prototype.readAsDataURL=function(){
+    Object.defineProperty(this,'result',{value:'data:image/png;base64,'+'é'.repeat(32*1024*1024)});
+    this.onload();
+   };
   globalThis.__downloaded=false;globalThis.HTMLAnchorElement.prototype.click=function(){globalThis.__downloaded=true;};
  });
- await page.locator('#btn-html').click();await expect(page.locator('#toast')).toContainText('size limit');
+ await page.locator('#btn-html').click();await expect(page.locator('#toast')).toContainText('64 MiB');
  expect(await page.evaluate(()=>globalThis.__downloaded)).toBe(false);await page.close();
 });
 

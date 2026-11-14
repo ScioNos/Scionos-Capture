@@ -4,6 +4,21 @@
 
 ## [Unveröffentlicht]
 
+## [1.5.0] - 2026-11-14
+
+### Hinzugefügt
+
+- Komposition mehrerer Bilder mit lokalem Import oder Einfügen, Umordnung, vertikaler/horizontaler Anordnung, Titeln, Bildunterschriften und nummerierten Schritten.
+- PNG-, JPEG-, WebP-, HTML-, Markdown/ZIP-, PDF- und Druckexporte mit Qualitäts- und Darstellungseinstellungen.
+- Einzeln bearbeitbare Annotationen und portable `.scionos`-Projekte v2, mit Öffnen zusammengeführter v1-Projekte und unumkehrbarer Masken-/Zuschnittanwendung beim Speichern.
+- Dauerhafte lokale Bibliothek mit ausdrücklichem Speichern, Suche, Umbenennen, Duplizieren, Löschen, konfigurierbarer Aufbewahrung und begrenztem Kontingent.
+- Besser sichtbarer Hilfezugang und Anzeige der tatsächlich geladenen Version.
+
+### Behoben
+
+- Gleichzeitige Bibliotheksspeicherungen erhalten Klickreihenfolge und Dokumentidentität, auch wenn beim Kodieren ein anderes Projekt geöffnet wird.
+- Über Bildränder verschobene oder duplizierte Annotationen bleiben mit begrenzten Koordinaten speicherbar und erneut lesbar.
+
 ## [1.4.0] - 2026-11-10
 
 ### Hinzugefügt
@@ -155,7 +170,7 @@
 - Vollständige 4-Sprachen-Unterstützung: Französisch, Englisch, Spanisch und Deutsch.
 - Volle Barrierefreiheit (WCAG, hohe Kontraste, Tastaturnavigation, Screenreader).
 
-[Unveröffentlicht]: https://github.com/ScioNos/Scionos-Capture/compare/v1.4.0...HEAD
+[Unveröffentlicht]: https://github.com/ScioNos/Scionos-Capture/compare/v1.5.0...HEAD
 [1.3.3]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.0...v1.3.1
@@ -165,4 +180,5 @@
 [1.1.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.1.0
 [1.0.0]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.0.0
 
+[1.5.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.3...v1.4.0

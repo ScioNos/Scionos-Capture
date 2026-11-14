@@ -24,8 +24,10 @@
     body {
       width: 340px;
       margin: 0;
-      padding: 16px;
-      overflow: hidden;
+      padding: 12px;
+      max-height: 600px;
+      overflow-x: hidden;
+      overflow-y: auto;
       font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
       background:
         radial-gradient(circle at 105% -5%, rgba(56, 189, 248, 0.18), transparent 38%),
@@ -76,16 +78,19 @@
 
     .header-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
     .help-button {
-      width: 34px;
-      height: 38px;
-      display: grid;
-      place-items: center;
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 6px 10px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--panel);
-      color: var(--muted);
+      color: var(--text);
       cursor: pointer;
-      font: 700 13px ui-monospace, monospace;
+      font-size: 12px;
+      font-weight: 600;
       transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
     }
     .help-button:hover { border-color: var(--cyan); color: var(--cyan); background: var(--panel-hover); }
@@ -159,15 +164,15 @@
     .delay-control { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; color: var(--muted); font-size: 12px; }
     .delay-control select { min-height: 34px; padding: 5px 9px; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); color: var(--text); }
     .delay-control select:disabled { opacity: 0.55; }
-    .capture-list { display: grid; gap: 10px; margin-top: 14px; }
+    .capture-list { display: grid; gap: 5px; margin-top: 8px; }
     .capture-button {
       width: 100%;
-      min-height: 64px;
+      min-height: 55px;
       display: grid;
       grid-template-columns: 38px 1fr 18px;
       align-items: center;
       gap: 11px;
-      padding: 10px 12px;
+      padding: 8px 12px;
       border: 1px solid var(--line);
       border-radius: 10px;
       background: linear-gradient(110deg, var(--panel), #0d1929);
@@ -194,8 +199,12 @@
     .capture-description { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; line-height: 1.35; }
     .capture-arrow { color: var(--cyan); font-size: 18px; }
 
+    .compose-button { min-height: 42px; grid-template-columns: 1fr 18px; }
+    .support-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; }
+    .popup-version { color: var(--muted); font-size: 11px; white-space: nowrap; }
+
     .footer {
-      margin-top: 14px;
+      margin-top: 10px;
       padding-top: 11px;
       border-top: 1px solid var(--line);
       display: flex;
@@ -254,7 +263,6 @@
     <div class="brand-mark"><img src="images/icon48.png" alt=""></div>
     <div class="brand-copy"><h1>Scionos Capture</h1><p id="brand-tagline"></p></div>
     <div class="header-actions">
-      <button id="btn-help" class="help-button" type="button" aria-label="Aide &amp; À propos"><span aria-hidden="true">?</span></button>
       <div class="language-switcher">
         <button id="language-button" class="language-button" type="button" aria-haspopup="menu" aria-expanded="false">
           <img id="language-flag" src="images/flags/fr.svg" alt="">
@@ -304,7 +312,18 @@
       <span class="capture-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h10v10H7zM12 1v4M12 19v4M1 12h4M19 12h4"/></svg></span>
       <span class="capture-copy"><span id="txt-element-title" class="capture-title"></span><span id="txt-element-desc" class="capture-description"></span></span><span class="capture-arrow" aria-hidden="true">›</span>
     </button>
+    <button id="btn-compose" class="capture-button compose-button" type="button">
+      <span id="txt-compose" class="capture-title"></span><span class="capture-arrow" aria-hidden="true">›</span>
+    </button>
+    <button id="btn-library" class="capture-button compose-button" type="button">
+      <span id="txt-library" class="capture-title"></span><span class="capture-arrow" aria-hidden="true">›</span>
+    </button>
   </main>
+
+  <div class="support-row">
+    <button id="btn-help" class="help-button" type="button"><span aria-hidden="true">?</span><span id="txt-help"></span></button>
+    <span id="popup-version" class="popup-version"></span>
+  </div>
 
   <footer class="footer"><span id="shortcut-label"></span><button id="shortcut-button" class="shortcut-button" type="button"><kbd id="shortcut-value"></kbd></button></footer>
 

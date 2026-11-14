@@ -4,7 +4,7 @@
 
 ## Versions prises en charge
 
-Politique mise à jour le 10 novembre 2026 pour la version 1.4.0. La ligne prise en charge est `1.4.x` ; la dernière version de cette ligne reçoit les correctifs de sécurité.
+Politique mise à jour le 14 novembre 2026 pour la version 1.5.0. La ligne prise en charge est `1.5.x` ; la dernière version de cette ligne reçoit les correctifs de sécurité.
 
 ## Signaler une vulnérabilité
 

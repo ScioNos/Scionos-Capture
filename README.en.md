@@ -2,9 +2,24 @@
 
 [Français](README.md) · [English](README.en.md) · [Español](README.es.md) · [Deutsch](README.de.md)
 
-![Version](https://img.shields.io/badge/version-1.4.0-blue)
+![Version](https://img.shields.io/badge/version-1.5.0-blue)
+
+<!-- source-version --> **Version 1.5.0.**
 
 A fully local Chrome and Edge screenshot extension. Capture the viewport, a selection, a scrolling area, or a complete page, then draw, mask, crop, and export as PNG, interactive HTML, or PDF.
+
+## Version 1.5.0
+
+Version 1.5.0 adds the multi-image composition, document exports, portable projects, and local library described below.
+
+- Multi-image composition: import local files or paste from the clipboard, add/remove and reorder images, arrange vertically or horizontally, and set spacing, background, titles, captions, and numbered steps.
+- PNG, JPEG, and WebP exports (adjustable quality for the applicable formats), HTML, Markdown with its images in a ZIP, PDF, and printing; margin, orientation, scale, and header/footer settings with title, source, date, and pagination, subject to size limits.
+- Individually editable annotations and portable `.scionos` v2 projects, backward compatible with v1 projects whose annotations remain flattened. On save, solid masks and crops are applied irreversibly; affected annotations are conservatively removed. When saving after a crop, all preceding annotations are flattened to preserve their appearance and order.
+- An explicitly saved durable local library with thumbnails, search, rename, duplicate and delete. Retention choices: 0, 7, 30 or 90 days; configurable quota from 64 to 1,024 MiB, default 256 MiB. 0 days means no automatic expiration.
+- Imported files and images restored from a project provide no reliable text layer: faithful text search is not promised in their PDFs. Use a solid mask to protect confidential pixels.
+- More visible help access and display of the version actually loaded.
+
+The `.scionos` file and exports are saved locally on demand. They may contain images, composition text, titles, sources and dates: review them before sharing. Users manage deletion of these files.
 
 ## Features
 
@@ -19,7 +34,7 @@ A fully local Chrome and Edge screenshot extension. Capture the viewport, a sele
 
 ## Installation
 
-Download `scionos-capture-v1.4.0.zip` from the [v1.4.0 release](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.4.0), optionally verify the `.sha256` file, and extract it. Open `chrome://extensions` or `edge://extensions`, enable **Developer mode**, choose **Load unpacked**, and select the extracted folder.
+Download `scionos-capture-v1.5.0.zip` from the [v1.5.0 release](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.0), optionally verify the `.sha256` file, and extract it. Open `chrome://extensions` or `edge://extensions`, enable **Developer mode**, choose **Load unpacked**, and select the extracted folder.
 
 To work from source, clone the repository, run `npm ci`, and load the project root as an unpacked extension.
 
@@ -53,8 +68,8 @@ The searchable PDF layer retains only complete words whose visibility can be ver
 
 Node.js 24 is recommended for full verification, including PDF extraction with PDF.js 6.3.289 (test dependency only). Core checks remain compatible with Node.js 20.
 
-Synchronize an unpublished version with `npm run version:sync -- 1.4.0 --unreleased`; in PowerShell use `npm.cmd run version:sync -- 1.4.0 --unreleased`. Published download links remain unchanged.
+Synchronize the published version with `npm run version:sync -- 1.5.0`; in PowerShell use `npm.cmd run version:sync -- 1.5.0`.
 
-<!-- local-package --> Local archive : `scionos-capture-v1.4.0.zip` · SHA-256 : `scionos-capture-v1.4.0.zip.sha256`.
+<!-- local-package --> Local archive : `scionos-capture-v1.5.0.zip` · SHA-256 : `scionos-capture-v1.5.0.zip.sha256`.
 
 `npm run test:native` checks all five modes and a delayed capture in installed Chrome and Edge, using real captures and temporary profiles. The extension action grants `activeTab`; personal profiles are not used.

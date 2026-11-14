@@ -4,7 +4,7 @@
 
 ## Supported versions
 
-Policy updated on November 10, 2026 for version 1.4.0. The supported line is `1.4.x`; its latest version receives security updates.
+Policy updated on November 14, 2026 for version 1.5.0. The supported line is `1.5.x`; its latest version receives security updates.
 
 ## Reporting a vulnerability
 

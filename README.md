@@ -4,8 +4,23 @@
 
 Extension Chrome et Edge de capture d’écran entièrement locale. Capturez la zone visible, une sélection, une zone défilante ou une page complète, puis dessinez, masquez, rognez et exportez en PNG, HTML interactif ou PDF.
 
-![Version](https://img.shields.io/badge/version-1.4.0-blue) ![Manifest](https://img.shields.io/badge/Manifest-V3-4285F4) ![Licence](https://img.shields.io/badge/licence-MIT-green)
+![Version](https://img.shields.io/badge/version-1.5.0-blue) ![Manifest](https://img.shields.io/badge/Manifest-V3-4285F4) ![Licence](https://img.shields.io/badge/licence-MIT-green)
 
+<!-- source-version --> **Version 1.5.0.**
+
+
+## Version 1.5.0
+
+La version 1.5.0 ajoute la composition multi-images, les exports de documents, les projets portables et la bibliothèque locale décrits ci-dessous.
+
+- Composition multi-images : import de fichiers locaux ou collage depuis le presse-papiers, ajout/retrait et réordonnancement, assemblage vertical ou horizontal, espacement, fond, titres, légendes et étapes numérotées.
+- Exports PNG, JPEG et WebP (qualité réglable pour les formats concernés), HTML, Markdown avec ses images dans un ZIP, PDF et impression ; réglages de marges, orientation, échelle et en-têtes/pieds de page avec titre, source, date et pagination, sous réserve des limites de taille.
+- Annotations individuellement éditables et projet portable `.scionos` v2, rétrocompatible avec les projets v1 dont les annotations restent aplaties. À la sauvegarde, les masques solides et rognages sont appliqués irréversiblement ; les annotations touchées sont supprimées de manière conservative. À la sauvegarde après rognage, toutes les annotations antérieures sont aplaties afin de préserver leur rendu et leur ordre.
+- Bibliothèque locale durable activée par enregistrement explicite, avec vignettes, recherche, renommage, duplication et suppression. Durées proposées : 0, 7, 30 ou 90 jours ; quota réglable de 64 à 1 024 Mio, 256 Mio par défaut. Le choix 0 jour signifie sans expiration automatique.
+- Les fichiers importés et les images restaurées d’un projet n’apportent pas de couche texte fiable : aucune recherche textuelle fidèle n’est promise dans leurs PDF. Utilisez un masque solide pour protéger les pixels confidentiels.
+- Accès à l’aide plus visible et affichage de la version réellement chargée.
+
+Le fichier `.scionos` et les exports sont enregistrés localement à la demande. Ils peuvent contenir les images, textes de composition, titres, sources et dates choisis : vérifiez-les avant partage. Leur suppression relève de l’utilisateur.
 
 ## Fonctionnalités
 
@@ -23,7 +38,7 @@ Extension Chrome et Edge de capture d’écran entièrement locale. Capturez la 
 
 ### Depuis la release GitHub
 
-1. Téléchargez `scionos-capture-v1.4.0.zip` depuis la [release v1.4.0](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.4.0).
+1. Téléchargez `scionos-capture-v1.5.0.zip` depuis la [release v1.5.0](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.0).
 2. Vérifiez éventuellement le fichier `.sha256`, puis extrayez le ZIP.
 3. Ouvrez `chrome://extensions` ou `edge://extensions`.
 4. Activez le **Mode développeur**, choisissez **Charger l’extension non empaquetée** et sélectionnez le dossier extrait.
@@ -79,8 +94,8 @@ La couche recherchable du PDF conserve uniquement les mots complets dont la visi
 
 Node.js 24 est recommandé pour la vérification complète, notamment l’extraction PDF avec PDF.js 6.3.289 (dépendance de test uniquement). Les contrôles principaux restent compatibles avec Node.js 20.
 
-La synchronisation d’une version non publiée utilise `npm run version:sync -- 1.4.0 --unreleased` ; sous PowerShell, utilisez `npm.cmd run version:sync -- 1.4.0 --unreleased`. Les liens de téléchargement publié restent inchangés.
+La synchronisation de la version publiée utilise `npm run version:sync -- 1.5.0` ; sous PowerShell, utilisez `npm.cmd run version:sync -- 1.5.0`.
 
-<!-- local-package --> Archive locale : `scionos-capture-v1.4.0.zip` · SHA-256 : `scionos-capture-v1.4.0.zip.sha256`.
+<!-- local-package --> Archive locale : `scionos-capture-v1.5.0.zip` · SHA-256 : `scionos-capture-v1.5.0.zip.sha256`.
 
 `npm run test:native` vérifie les cinq modes et une capture différée dans Chrome et Edge installés, avec de vraies captures et des profils temporaires. La permission `activeTab` est accordée par l’action de l’extension ; les profils personnels ne sont pas utilisés.

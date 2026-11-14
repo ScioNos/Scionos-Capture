@@ -24,7 +24,7 @@ export function pngDimensions(buffer) {
 }
 
 export async function validateMarkdownDocuments(projectRoot = root) {
-  const ignored = new Set(['node_modules', '.git', '.codegraph', 'dist', 'test-results', 'playwright-report', 'coverage']);
+  const ignored = new Set(['node_modules', '.git', '.codegraph', 'dist', 'del', 'test-results', 'playwright-report', 'coverage']);
   const documents = [];
   async function visit(directory) {
     for (const entry of await fs.readdir(directory, { withFileTypes: true })) {
@@ -95,7 +95,7 @@ export async function validatePackage() {
     manifest.action.default_popup,
     ...Object.values(manifest.icons),
     manifest.action.default_icon,
-    'editor.html', 'help.html', 'capture-utils.js', 'capture-content-utils.js', 'capture-store.js', 'content-dom.js', 'content-transfer.js', 'content-capture.js', 'content.js', 'editor-operations.js', 'editor-export.js', 'editor.js', 'help.js', 'i18n.js', 'popup.js'
+    'editor.html', 'help.html', 'capture-utils.js', 'capture-content-utils.js', 'capture-store.js', 'content-dom.js', 'content-transfer.js', 'content-capture.js', 'content.js', 'editor-operations.js', 'editor-export.js', 'composition-utils.js', 'composition-export.js', 'annotation-model.js', 'editor.js', 'library.html', 'library.js', 'help.js', 'i18n.js', 'popup.js'
   ];
   await Promise.all(referencedFiles.map(async relativePath => {
     const stat = await fs.stat(path.join(root, relativePath));

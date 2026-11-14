@@ -3,7 +3,7 @@
     "message": "Scionos Capture"
   },
   "appDesc": {
-    "message": "Capturez une page, une zone visible, sélectionnée ou défilante, puis annotez et exportez localement en PNG ou PDF."
+    "message": "Capturez, annotez et composez vos images. Projets et bibliothèque locale ; exports PNG, JPEG, WebP, HTML, Markdown et PDF."
   },
   "languagePicker": {
     "message": "Choisir la langue"
@@ -391,6 +391,22 @@
   "btnHelp": {
     "message": "Aide & À propos"
   },
+  "popupCompose": { "message": "Composer / Ouvrir des images" },
+  "popupLibrary": { "message": "Bibliothèque de projets" },
+  "helpAnnotationsHeader": { "message": "Annotations et masquage" },
+  "helpAnnotationsText": { "message": "Sélectionnez une annotation pour la déplacer, la redimensionner ou modifier ses propriétés. Les masques solides et les rognages sont appliqués définitivement aux images lors de l’enregistrement : les pixels cachés ou retirés ne sont plus récupérables dans le projet. Le flou est seulement visuel ; utilisez un masque solide pour les secrets." },
+  "helpLibraryHeader": { "message": "Bibliothèque locale" },
+  "helpLibraryText": { "message": "Ouvrez la bibliothèque depuis la fenêtre de l’extension pour retrouver les projets enregistrés localement, les rechercher, les renommer, les dupliquer ou les supprimer. L’enregistrement est explicite. Réglez la durée de conservation et la limite de stockage ; en cas de quota insuffisant, libérez de l’espace puis réessayez. Les projets exportés restent des fichiers distincts." },
+  "popupHelpShort": { "message": "Aide" },
+  "helpCompositionHeader": { "message": "Composition de plusieurs captures" },
+  "helpImportHeader": { "message": "Importer des images" },
+  "helpImportText": { "message": "Depuis la fenêtre de l’extension, choisissez Composer / Ouvrir des images pour ouvrir l’éditeur sans capturer de page. Ouvrez des images locales ou collez une image du presse-papiers. Les images restent traitées localement." },
+  "helpComposeHeader": { "message": "Organiser la composition" },
+  "helpComposeText": { "message": "Ajoutez ou retirez des images, changez leur ordre et assemblez-les verticalement ou horizontalement. Réglez le fond et l’espacement, puis ajoutez un titre, des légendes ou une numérotation des étapes." },
+  "helpExportHeader": { "message": "Exporter le document" },
+  "helpExportText": { "message": "Exportez la composition en PNG, JPEG ou WebP, en rapport HTML, en PDF ou en Markdown accompagné de ses images. JPEG et WebP proposent une qualité réglable. Les options PDF permettent d’adapter la mise en page. Les limites de dimensions sont contrôlées avant l’export." },
+  "helpSaveHeader": { "message": "Conserver son travail" },
+  "helpSaveText": { "message": "Enregistrez et rouvrez un fichier .scionos pour reprendre votre composition. Le schéma 2 conserve les annotations modifiables ; les projets de schéma 1 restent compatibles mais leurs anciennes annotations sont déjà aplaties. L’historique Annuler/Refaire repart à zéro à la réouverture. Le texte source non vérifié n’est pas rétabli pour la recherche PDF. Le numéro affiché correspond à la version réellement chargée." },
   "helpTitle": {
     "message": "Aide — Scionos Capture"
   },

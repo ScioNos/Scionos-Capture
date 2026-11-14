@@ -30,6 +30,12 @@ Thumbs.db
 Desktop.ini
 .codegraph/
 
+# Local quarantine: files reviewed for deletion
+/del/
+
+# Local permission recovery records
+/.permissions-recovery/
+
 # Local internal roadmaps and planning
 ROADMAP*.md
 

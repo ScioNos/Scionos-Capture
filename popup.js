@@ -28,7 +28,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       'txt-element-desc': 'elementDesc',
       'delay-label': 'delayLabel',
       'shortcut-label': 'shortcutText',
-      'brand-tagline': 'brandTagline'
+      'brand-tagline': 'brandTagline',
+      'txt-compose': 'popupCompose',
+      'txt-library': 'popupLibrary',
+      'txt-help': 'popupHelpShort'
     };
     Object.entries(mappings).forEach(([id, key]) => {
       document.getElementById(id).textContent = getI18nText(key);
@@ -38,6 +41,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       helpBtn.title = getI18nText('btnHelp');
       helpBtn.setAttribute('aria-label', getI18nText('btnHelp'));
     }
+    const version = chrome.runtime.getManifest().version;
+    const versionElement = document.getElementById('popup-version');
+    versionElement.textContent = `v${version}`;
+    versionElement.title = getI18nText('helpVersionLabel', { version });
+    versionElement.setAttribute('aria-label', versionElement.title);
     document.querySelector('[data-i18n="languageAuto"]').textContent = getI18nText('languageAuto');
     for (const option of delaySelect.options) {
       const seconds = Number(option.value);
@@ -203,6 +211,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateTexts();
     updateShortcut();
     languageMenu.update();
+  });
+
+  document.getElementById('btn-compose').addEventListener('click', () => {
+    chrome.tabs.create({ url: chrome.runtime.getURL('editor.html') });
+  });
+
+  document.getElementById('btn-library').addEventListener('click', () => {
+    chrome.tabs.create({ url: chrome.runtime.getURL('library.html') });
   });
 
   const helpButton = document.getElementById('btn-help');

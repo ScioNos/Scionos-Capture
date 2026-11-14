@@ -4,8 +4,14 @@ Scionos Capture es una extensión para Chrome y Microsoft Edge con procesamiento
 
 Desarrollada y editada por eyelo SA (Suiza), bajo la marca ScioNos.
 
-🆕 NOVEDADES DE LA VERSIÓN 1.4.0 — 10 DE NOVIEMBRE DE 2026
-• Nuevo modo Capturar un elemento: pasa el cursor sobre un bloque, elige su padre o hijo y prepara su captura. Captura la parte mostrada o el contenido completo de un contenedor realmente desplazable.
+🆕 NOVEDADES DE LA VERSIÓN 1.5.0
+• Compón un documento a partir de varias imágenes locales o pegadas desde el portapapeles.
+• Exporta en PNG, JPEG, WebP, HTML, Markdown con imágenes en un ZIP, PDF o impresión, con nuevos ajustes de presentación.
+• Trabaja con anotaciones editables y proyectos portátiles .scionos v2, compatibles con proyectos v1.
+• Guarda explícitamente proyectos en una biblioteca local con búsqueda, cuota y plazo de conservación ajustables.
+
+🎯 CAPTURA Y SELECCIÓN
+• Modo Capturar un elemento: pasa el cursor sobre un bloque, elige su padre o hijo y prepara su captura. Captura la parte mostrada o el contenido completo de un contenedor realmente desplazable.
 • Ajusta la selección antes de confirmarla: ocho tiradores, desplazamiento, campos X/Y/ancho/alto y controles de teclado. Las flechas mueven la selección o un tirador en pasos de 1 píxel CSS; Mayús aumenta el paso a 10 píxeles. Escape cancela.
 • Captura inmediata o tras 3, 5 o 10 segundos, con cuenta atrás cancelable y preferencia guardada localmente. En zonas y elementos, el retardo comienza tras confirmar; en capturas visibles y completas, comienza al iniciarlas.
 • Las selecciones acotadas toleran ahora el crecimiento de los contenidos dinámicos, también en X.com. Se corrigen los avisos de cookies dentro de contenedores fijos de altura cero que podían repetirse entre los fragmentos ensamblados.
@@ -19,16 +25,26 @@ Desarrollada y editada por eyelo SA (Suiza), bajo la marca ScioNos.
 • Área desplazable: conserva una conversación o región vertical que abarque varias pantallas. Define dos puntos o introduce X/Y/ancho/alto; utiliza «Hasta abajo» para ampliar la región. Este modo conserva la anchura visible elegida y no ensambla horizontalmente.
 • Capturar un elemento: elige visualmente un bloque de la página, navega entre padre e hijo y confirma sus límites en el panel de ajuste.
 
+🧩 COMPOSICIÓN DE VARIAS IMÁGENES
+Importa archivos de imagen locales o pega imágenes desde el portapapeles. Añade, elimina y reordena imágenes; elige una disposición vertical u horizontal, el espaciado y el fondo. Completa el documento con títulos, leyendas y pasos numerados.
+
+📚 BIBLIOTECA LOCAL
+Guarda explícitamente proyectos para conservarlos después de cerrar el editor. Encuéntralos mediante miniaturas y búsqueda; cambia su nombre, duplícalos o elimínalos. Elige una duración de 0, 7, 30 o 90 días: 0 días significa sin expiración automática. Ajusta la cuota local de 64 a 1.024 MiB, con 256 MiB por defecto.
+
 🎨 EDITOR DE ANOTACIONES INTEGRADO
 Trabaja directamente en el editor local: dibujo libre, resaltador semitransparente (H), flechas (A), rectángulos y elipses de contorno o rellenos (S), texto (T) y marcadores de pasos numerados (P).
 Cubre información con una máscara sólida opaca o aplica desenfoque visual. Para proteger secretos, utiliza una máscara sólida: el desenfoque no protege los datos de forma fiable.
 Recorta la imagen, deshaz o rehace cambios con Ctrl+Z/Ctrl+Y y ajusta el zoom del 20 al 300 %.
+Las anotaciones se pueden editar individualmente. Guarda y vuelve a abrir un proyecto portátil .scionos v2; los proyectos v1 siguen siendo compatibles, con sus anotaciones aplanadas. Al guardar, las máscaras sólidas y los recortes se aplican de forma irreversible y las anotaciones afectadas se eliminan de forma conservadora. Tras un recorte, todas las anotaciones anteriores se aplanan al guardar para conservar su apariencia y orden.
 
 📄 EXPORTACIONES
-• Descarga tu captura en PNG.
+• Descarga tu captura o composición en PNG, JPEG o WebP; ajusta la calidad en los formatos correspondientes.
+• Exporta el documento en Markdown con sus imágenes en un ZIP.
 • Utiliza la impresión del navegador para imprimir o guardar un PDF paginado. La capa de texto buscable y los enlaces se conservan cuando puede verificarse su visibilidad.
 • Las palabras enmascaradas, recortadas o cuya visibilidad no pueda establecerse se excluyen de la capa textual del PDF; la imagen capturada se conserva.
 • Copia la imagen al portapapeles para pegarla en un correo, un ticket de soporte o un documento.
+Ajusta los márgenes, la orientación, la escala y los encabezados/pies con título, fuente, fecha y paginación, sujetos a límites de tamaño.
+Los archivos importados y las imágenes restauradas de un proyecto no proporcionan una capa de texto fiable: no se promete una búsqueda textual fiel en sus PDF.
 Aplica o cancela las modificaciones pendientes antes de exportar.
 
 🌐 INFORME HTML INTERACTIVO AUTÓNOMO
@@ -39,10 +55,11 @@ El informe incluye el título, el enlace de origen, la fecha, la hora y las dime
 Disfruta de una interfaz oscura y capturas adaptadas a pantallas HiDPI, incluidas las escalas de Windows del 125 % y 150 %.
 El atajo sugerido Alt+Mayús+C abre la extensión si el navegador lo asigna. Configúralo en la página de atajos del navegador; la ventana emergente muestra la combinación realmente asignada.
 En el editor: V para el cursor, D para dibujar, H para resaltar, A para flechas, S para formas, T para texto, P para pasos, M para enmascarar y C para recortar. Utiliza 0, + y − para el zoom.
-Las capturas y los fragmentos de transferencia se guardan temporalmente en IndexedDB en tu dispositivo. Una captura se conserva mientras su editor permanezca abierto, incluso después de recargarlo. Se elimina al cerrar el último editor asociado. Las capturas huérfanas pueden limpiarse después de quince minutos; las transferencias abandonadas caducan tras quince minutos de inactividad. Un navegador suspendido puede aplazar la limpieza hasta reactivarse.
+Las capturas no guardadas en la biblioteca y los fragmentos de transferencia se guardan temporalmente en IndexedDB en tu dispositivo. Una captura se conserva mientras su editor permanezca abierto, incluso después de recargarlo. Se elimina al cerrar el último editor asociado. Las capturas huérfanas pueden limpiarse después de quince minutos; las transferencias abandonadas caducan tras quince minutos de inactividad. Un navegador suspendido puede aplazar la limpieza hasta reactivarse.
 
 🔒 PRIVACIDAD Y DATOS
 Todo el procesamiento de las capturas se realiza localmente. Sin servidor de procesamiento, envío de capturas, telemetría ni publicidad. No se necesita cuenta. Los píxeles, textos visibles y metadatos permanecen en tu dispositivo; el idioma y el retardo elegidos se recuerdan localmente.
+Los proyectos .scionos y las exportaciones se guardan localmente cuando lo solicitas. Pueden contener imágenes, textos de composición, títulos, leyendas, fuentes y fechas: revísalos antes de compartirlos. Tú gestionas la conservación y eliminación de esos archivos.
 Las páginas internas del navegador y algunas páginas protegidas no pueden capturarse. El selector no recorre el interior de iframes; el contenido animado o virtualizado y los feeds infinitos pueden presentar limitaciones. Las imágenes muy grandes pueden reducirse automáticamente.
 
 💻 CÓDIGO ABIERTO Y SOPORTE
