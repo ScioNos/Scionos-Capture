@@ -14,7 +14,7 @@
 
 **[Version 1.5.0 herunterladen](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.0)** · **[Chrome-Web-Store-Eintrag ansehen](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe)** · **[Hilfe erhalten](https://github.com/ScioNos/Scionos-Capture/issues)**
 
-<!-- source-version --> **Version 1.5.0 ist auf GitHub verfügbar.** Die Aktualisierung des Chrome-Web-Store-Eintrags wird vorbereitet; seine Version kann vom Repository abweichen.
+<!-- source-version --> Version 1.5.0 ist auf GitHub verfügbar. Die Aktualisierung des Chrome-Web-Store-Eintrags wird vorbereitet; seine Version kann vom Repository abweichen.
 
 ![Scionos-Capture-Editor 1.5.0: Bildannotation und Vorschau einer horizontalen Komposition](store-assets/screenshot-real-1-composition-v1.5.0.png)
 
@@ -132,7 +132,7 @@ npm run verify
 
 Versionsabgleich: `npm run version:sync -- 1.5.0`; in PowerShell: `npm.cmd run version:sync -- 1.5.0`.
 
-<!-- local-package --> Lokales Archiv: `scionos-capture-v1.5.0.zip` · SHA-256: `scionos-capture-v1.5.0.zip.sha256`.
+<!-- local-package --> Lokales Archiv: scionos-capture-v1.5.0.zip · SHA-256: scionos-capture-v1.5.0.zip.sha256.
 
 [Beitragen](CONTRIBUTING.de.md) · [Änderungen](CHANGELOG.de.md) · [Versionshinweise](RELEASE_NOTES.md) · [Problem melden](https://github.com/ScioNos/Scionos-Capture/issues) · [Sicherheitslücke melden](SECURITY.de.md)
 
