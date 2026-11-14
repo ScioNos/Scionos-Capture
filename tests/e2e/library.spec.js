@@ -67,6 +67,9 @@ test('library preferences, expiration choice and confirmed clear work', async ()
   const page = await context.newPage();
   try {
     await page.goto(origin + '/library.html');
+    // Initial settings load is async; wait for its render before editing controls.
+    await expect(page.locator('#storage-estimate')).not.toBeEmpty();
+    await expect(page.locator('#library-status')).toBeEmpty();
     await page.locator('#retention-days').selectOption('7');
     await page.locator('#budget-mib').fill('128');
     await page.locator('#save-preferences').click();
