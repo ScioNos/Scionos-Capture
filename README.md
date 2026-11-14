@@ -1,101 +1,141 @@
-# Scionos Capture
+<p align="center">
+  <img src="images/icon128.png" width="88" height="88" alt="Logo Scionos Capture">
+</p>
 
-[Français](README.md) · [English](README.en.md) · [Español](README.es.md) · [Deutsch](README.de.md)
+<h1 align="center">Scionos Capture</h1>
 
-Extension Chrome et Edge de capture d’écran entièrement locale. Capturez la zone visible, une sélection, une zone défilante ou une page complète, puis dessinez, masquez, rognez et exportez en PNG, HTML interactif ou PDF.
+<p align="center"><strong>Capturez une page. Composez un document.<br>Gardez vos données sur votre appareil.</strong></p>
 
-![Version](https://img.shields.io/badge/version-1.5.0-blue) ![Manifest](https://img.shields.io/badge/Manifest-V3-4285F4) ![Licence](https://img.shields.io/badge/licence-MIT-green)
+<p align="center">Une extension locale pour Chrome et Microsoft Edge, de la capture à la bibliothèque de projets.</p>
 
-<!-- source-version --> **Version 1.5.0.**
+[Français](README.md) · [English](README.en.md) · [Deutsch](README.de.md) · [Español](README.es.md)
 
+[![Version](https://img.shields.io/badge/version-1.5.0-blue)](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.0) [![Vérification](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml/badge.svg)](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml) [![Licence MIT](https://img.shields.io/badge/licence-MIT-green)](LICENSE) ![Chrome et Edge](https://img.shields.io/badge/Chrome_%26_Edge-Manifest_V3-4285F4)
 
-## Version 1.5.0
+**[Télécharger la version 1.5.0](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.0)** · **[Voir la fiche Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe)** · **[Obtenir de l’aide](https://github.com/ScioNos/Scionos-Capture/issues)**
 
-La version 1.5.0 ajoute la composition multi-images, les exports de documents, les projets portables et la bibliothèque locale décrits ci-dessous.
+<!-- source-version --> **Version 1.5.0 disponible sur GitHub.** La mise à jour de la fiche Chrome Web Store est en préparation ; sa version peut différer de celle du dépôt.
 
-- Composition multi-images : import de fichiers locaux ou collage depuis le presse-papiers, ajout/retrait et réordonnancement, assemblage vertical ou horizontal, espacement, fond, titres, légendes et étapes numérotées.
-- Exports PNG, JPEG et WebP (qualité réglable pour les formats concernés), HTML, Markdown avec ses images dans un ZIP, PDF et impression ; réglages de marges, orientation, échelle et en-têtes/pieds de page avec titre, source, date et pagination, sous réserve des limites de taille.
-- Annotations individuellement éditables et projet portable `.scionos` v2, rétrocompatible avec les projets v1 dont les annotations restent aplaties. À la sauvegarde, les masques solides et rognages sont appliqués irréversiblement ; les annotations touchées sont supprimées de manière conservative. À la sauvegarde après rognage, toutes les annotations antérieures sont aplaties afin de préserver leur rendu et leur ordre.
-- Bibliothèque locale durable activée par enregistrement explicite, avec vignettes, recherche, renommage, duplication et suppression. Durées proposées : 0, 7, 30 ou 90 jours ; quota réglable de 64 à 1 024 Mio, 256 Mio par défaut. Le choix 0 jour signifie sans expiration automatique.
-- Les fichiers importés et les images restaurées d’un projet n’apportent pas de couche texte fiable : aucune recherche textuelle fidèle n’est promise dans leurs PDF. Utilisez un masque solide pour protéger les pixels confidentiels.
-- Accès à l’aide plus visible et affichage de la version réellement chargée.
+![Éditeur Scionos Capture 1.5.0 : annotation d’une image et aperçu d’une composition horizontale](store-assets/screenshot-real-1-composition-v1.5.0.png)
 
-Le fichier `.scionos` et les exports sont enregistrés localement à la demande. Ils peuvent contenir les images, textes de composition, titres, sources et dates choisis : vérifiez-les avant partage. Leur suppression relève de l’utilisateur.
+*Interface réelle de la version 1.5.0, avec un contenu de démonstration local.*
 
-## Fonctionnalités
+## De la page web au document
 
-- Cinq modes : page entière, zone visible, zone sélectionnée, zone défilante et élément au clic.
-- Sélection ajustable par poignées et coordonnées, avec confirmation avant capture et navigation parent/enfant pour les éléments.
-- Capture immédiate ou différée de 3, 5 ou 10 secondes, avec compte à rebours annulable et préférence mémorisée localement.
-- Zone défilante verticale définie par deux points ou par coordonnées X/Y/largeur/hauteur au clavier.
-- Éditeur local avec dessin, masquage solide, flou visuel, rognage, Annuler/Refaire et zoom 20–300 %.
-- Interface responsive et navigable au clavier en français, anglais, espagnol et allemand.
-- Langue automatique du navigateur avec remplacement manuel depuis le menu à drapeaux.
-- Export PNG, rapport HTML interactif autonome, copie dans le presse-papiers et impression/enregistrement PDF par le navigateur.
-- Aucun serveur, compte, suivi analytique, publicité ou transmission de capture.
+Préparez une explication visuelle, documentez un problème ou conservez un extrait utile. Scionos Capture réunit la sélection, l’annotation, la composition et la reprise de projets dans une même extension.
 
-## Installation
+| Capturer précisément | Expliquer et composer | Retrouver son travail |
+| --- | --- | --- |
+| Page entière, zone visible, sélection, région défilante ou élément au clic. | Dessin, texte, flèches et masques ; plusieurs images avec titres et légendes. | Projets portables et bibliothèque locale avec recherche, renommage et duplication. |
 
-### Depuis la release GitHub
+**Sans compte, télémétrie ni serveur de traitement.** Les images et métadonnées restent sur l’appareil. Vous décidez de ce que vous enregistrez et partagez.
+
+## Installer en quelques minutes
+
+### Depuis GitHub — version 1.5.0
 
 1. Téléchargez `scionos-capture-v1.5.0.zip` depuis la [release v1.5.0](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.0).
-2. Vérifiez éventuellement le fichier `.sha256`, puis extrayez le ZIP.
-3. Ouvrez `chrome://extensions` ou `edge://extensions`.
-4. Activez le **Mode développeur**, choisissez **Charger l’extension non empaquetée** et sélectionnez le dossier extrait.
+2. Vérifiez son empreinte avec le fichier `.sha256` fourni, puis extrayez l’archive.
+3. Ouvrez `chrome://extensions` ou `edge://extensions` et activez le **Mode développeur**.
+4. Choisissez **Charger l’extension non empaquetée** et sélectionnez le dossier extrait contenant le manifeste.
+5. Épinglez Scionos Capture dans la barre d’outils et ouvrez une page web ordinaire.
 
-### Depuis les sources
+La [fiche Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe) permet l’installation depuis la boutique. Vérifiez la version qui y est proposée : la publication GitHub et la validation Google suivent deux circuits distincts.
 
-Clonez le dépôt, exécutez `npm ci` puis chargez la racine du projet comme extension non empaquetée.
+## Trois façons de travailler
 
-## Utilisation
+### 1. Capturer la bonne zone
 
-Choisissez d’abord un délai (**Immédiat**, **3**, **5** ou **10 secondes**), puis **Page entière**, **Zone visible**, **Zone sélectionnée**, **Zone défilante** ou **Élément au clic**. En mode sélection, tracez la zone puis ajustez ses poignées ou ses coordonnées et choisissez **Capturer**. En mode élément, survolez un bloc, choisissez au besoin son **Élément parent/enfant** et la **Partie visible** ou le contenu entier d’un conteneur réellement défilant, puis cliquez sur le bloc. Ajustez ensuite les coordonnées et confirmez avec **Capturer**. Le délai commence après confirmation pour les zones sélectionnées, les zones défilantes et les éléments ; pour la page entière et la zone visible, il commence dès le lancement. **Échap** annule le compte à rebours. Pour **Zone défilante**, cliquez sur le premier coin, faites défiler verticalement, puis cliquez sur le coin opposé. `Échap` annule, « Recommencer » efface le premier point et les champs X/Y/largeur/hauteur offrent une utilisation entièrement au clavier. Le raccourci suggéré est `Alt+Shift+C`; le menu affiche toujours le raccourci réellement configuré par le navigateur.
+Choisissez l’un des cinq modes, ajustez la sélection par poignées ou coordonnées, puis confirmez. La sélection d’un élément permet de remonter vers son parent ou de choisir son enfant. Un délai de **3, 5 ou 10 secondes**, annulable avec **Échap**, laisse le temps de préparer un menu ou un état temporaire.
 
-Dans l’éditeur, les raccourcis `V`, `D`, `M`, `C` sélectionnent les outils; `Ctrl+Z` et `Ctrl+Y` annulent/refont; `+`, `-` et `0` contrôlent le zoom. Le masquage solide est recommandé pour les secrets : le flou est uniquement visuel.
+Une zone défilante peut être définie par deux points ou au clavier. Elle conserve la largeur visible choisie et assemble verticalement les portions prises en charge.
 
-## Permissions et confidentialité
+<details>
+<summary>Voir la sélection et ses réglages</summary>
 
-- `activeTab` et `scripting` : exécuter une capture uniquement après une action explicite.
-- `storage` : mémoriser la langue, le délai de capture et la correspondance temporaire avec l’éditeur.
-- `unlimitedStorage` : conserver localement les grandes captures sans échec de quota.
-- `alarms` : supprimer les captures temporaires expirées.
+![Sélection ajustable : poignées, coordonnées et confirmation avant capture](store-assets/screenshot-real-4-selection-v1.5.0.png)
 
-Les fragments de transfert restent uniquement dans IndexedDB local et sont supprimés après assemblage ou après quinze minutes sans activité (au prochain réveil si le navigateur est suspendu). La capture finale est conservée tant qu’un éditeur correspondant est ouvert, même au-delà de quinze minutes et après rechargement. Elle est supprimée à la fermeture du dernier éditeur ; sans éditeur, elle devient éligible au nettoyage quinze minutes après sa création. Consultez [PRIVACY.md](PRIVACY.md) et [SECURITY.md](SECURITY.md).
+</details>
 
-## Limites connues
+### 2. Annoter et composer
 
-- Les pages à défilement infini permanent ne peuvent pas avoir de fin déterminée.
-- Une zone défilante reste limitée à la largeur visible au moment du premier point; elle n’assemble pas horizontalement.
-- Certains éléments `sticky` ou contenus qui changent continuellement peuvent encore apparaître différemment entre les tuiles.
-- Les pages internes du navigateur et les boutiques d’extensions ne sont pas injectables.
-- Le sélecteur d’élément ne parcourt pas le contenu des iframes : le cadre peut être capturé comme élément visible, mais ses éléments internes ne sont pas sélectionnables individuellement.
-- Les images dépassant 16 millions de pixels ou 16 384 px par côté sont réduites automatiquement.
+Importez ou collez plusieurs images, changez leur ordre et choisissez une disposition verticale ou horizontale. Ajoutez titres, légendes et étapes numérotées ; ajustez l’espacement, les marges et le fond.
 
-## Développement
+Dans l’éditeur, sélectionnez et modifiez les annotations prises en charge. Dessin, surligneur, flèches, formes, texte et pastilles servent à expliquer ; le masque solide sert à protéger les informations confidentielles. Annuler/Refaire et le zoom permettent d’affiner le résultat.
 
-Prérequis : Node.js 24.
+| Résultat souhaité | Possibilités |
+| --- | --- |
+| Une image à partager | PNG, JPEG ou WebP, copie dans le presse-papiers. |
+| Un document à consulter | Rapport HTML autonome ou Markdown accompagné de ses images dans un ZIP. |
+| Une version imprimée | Impression/PDF, avec marges, orientation, échelle et en-têtes/pieds de page. |
+| Un travail à reprendre | Projet portable `.scionos` v2 ; lecture des projets v1 avec annotations aplaties. |
+
+<details>
+<summary>Voir les réglages d’export et de présentation</summary>
+
+![Dialogue d’export : présentation PDF, marges, orientation et pagination](store-assets/screenshot-real-3-export-v1.5.0.png)
+
+</details>
+
+### 3. Enregistrer et retrouver ses projets
+
+La bibliothèque conserve les projets **sur enregistrement explicite**, au-delà de la fermeture de l’éditeur. Parcourez les vignettes, recherchez par titre ou source, puis rouvrez, renommez, dupliquez, exportez ou supprimez un projet.
+
+Choisissez une durée de **0, 7, 30 ou 90 jours** et un quota de **64 à 1 024 Mio** — **256 Mio** par défaut. Le choix **0 jour** signifie sans expiration automatique. Un fichier portable permet de conserver une copie séparée de la bibliothèque.
+
+![Bibliothèque locale : projets enregistrés, actions et réglages de conservation](store-assets/screenshot-real-2-bibliotheque-v1.5.0.png)
+
+## Confidentialité et maîtrise des données
+
+- **Traitement local.** L’extension ne transmet pas vos captures, URL ou données de navigation à ScioNos ou à un tiers. Aucun code distant n’est exécuté.
+- **Conservation choisie.** Les captures temporaires et fragments sont nettoyés selon leur cycle de vie. Les projets de bibliothèque suivent la rétention choisie ; les fichiers enregistrés séparément restent sous votre responsabilité.
+- **Masquage solide pour les secrets.** Le flou est un effet visuel. À la sauvegarde d’un projet, masques et rognages deviennent irréversibles ; les annotations touchées sont retirées de manière conservative. Après rognage, les annotations antérieures sont aplaties pour préserver leur rendu et leur ordre.
+- **Vérification avant partage.** Les projets et exports peuvent contenir images, titres, légendes, sources et dates.
+
+Consultez la [politique de confidentialité](PRIVACY.md) et le [modèle de sécurité](SECURITY.md).
+
+<details>
+<summary>Comprendre les permissions et le stockage temporaire</summary>
+
+| Permission | Usage |
+| --- | --- |
+| `activeTab` et `scripting` | Capturer l’onglet choisi et injecter les outils après une action explicite. |
+| `storage` | Mémoriser langue, délai, préférences de bibliothèque et associations temporaires. |
+| `unlimitedStorage` | Conserver localement les grandes images et projets ; la bibliothèque garde son quota applicatif. |
+| `alarms` | Nettoyer les données temporaires expirées et les projets arrivés à échéance. |
+
+Les fragments restent dans IndexedDB local et sont supprimés après assemblage ou quinze minutes sans activité. Une capture finale reste disponible tant qu’un éditeur correspondant est ouvert, y compris après rechargement. Elle est supprimée à la fermeture du dernier éditeur ; sans éditeur, elle devient éligible au nettoyage quinze minutes après sa création. Un navigateur suspendu peut différer le nettoyage jusqu’à son réveil.
+
+</details>
+
+## Ce qu’il faut savoir
+
+- Les pages internes du navigateur et les boutiques d’extensions sont protégées contre l’injection.
+- Les contenus animés, virtualisés ou sans fin peuvent rester incomplets. Certains éléments fixes ou `sticky` peuvent varier entre les portions.
+- Le sélecteur ne parcourt pas l’intérieur des iframes ni les shadow roots fermés.
+- Les images dépassant **16 millions de pixels** ou **16 384 px par côté** peuvent être réduites. Les rotations, inclinaisons et perspectives non prises en charge sont refusées explicitement.
+- Le texte recherchable d’un PDF est conservé uniquement lorsque sa visibilité est vérifiable. Les images importées et restaurées d’un projet ne fournissent pas de couche texte fiable ; les mots incertains sont omis de la couche textuelle, sans retirer l’image.
+- Validez ou annulez les modifications en attente avant un export.
+
+## Développer et contribuer
+
+L’interface et l’aide existent en **français, anglais, allemand et espagnol**. Le projet utilise Manifest V3 et n’a aucune dépendance JavaScript d’exécution externe.
+
+Prérequis conseillé : **Node.js 24**. Les contrôles principaux restent compatibles avec Node.js 20.
 
 ```bash
 npm ci
 npm run verify
 ```
 
-`verify` exécute syntaxe, ESLint, validation HTML, tests, contrôle du manifeste/locales, packaging et tests E2E Axe dans Chromium. `npm run package` crée le ZIP et son SHA-256 dans `dist/`.
+`verify` contrôle la syntaxe, le lint, le HTML, les tests unitaires, les traductions, le paquet et les régressions navigateur/accessibilité. `npm run test:native` teste les cinq modes dans Chrome et Edge installés avec de vraies captures et des profils jetables, sans profil personnel. `npm run package` génère l’archive et son empreinte dans `dist/`.
 
-Consultez [CONTRIBUTING.md](CONTRIBUTING.md), [CHANGELOG.md](CHANGELOG.md) et la [licence MIT](LICENSE).
-
-### PDF
-
-Appliquez ou annulez les modifications en attente avant tout export. Le flou reste un effet visuel ; utilisez un masque solide pour les secrets.
-
-Les captures de conteneurs translatés ou mis à l’échelle sont prises en charge. Les rotations, inclinaisons et perspectives non prises en charge provoquent une erreur explicite.
-
-La couche recherchable du PDF conserve uniquement les mots complets dont la visibilité est vérifiable. Les mots incertains sont omis de cette couche ; l’image capturée est conservée. Les anciens calques aux coordonnées non vérifiables sont également omis. Le masquage solide reste nécessaire pour protéger les pixels confidentiels ; le flou est seulement visuel.
-
-Node.js 24 est recommandé pour la vérification complète, notamment l’extraction PDF avec PDF.js 6.3.289 (dépendance de test uniquement). Les contrôles principaux restent compatibles avec Node.js 20.
-
-La synchronisation de la version publiée utilise `npm run version:sync -- 1.5.0` ; sous PowerShell, utilisez `npm.cmd run version:sync -- 1.5.0`.
+Synchronisation de version : `npm run version:sync -- 1.5.0` ; sous PowerShell : `npm.cmd run version:sync -- 1.5.0`.
 
 <!-- local-package --> Archive locale : `scionos-capture-v1.5.0.zip` · SHA-256 : `scionos-capture-v1.5.0.zip.sha256`.
 
-`npm run test:native` vérifie les cinq modes et une capture différée dans Chrome et Edge installés, avec de vraies captures et des profils temporaires. La permission `activeTab` est accordée par l’action de l’extension ; les profils personnels ne sont pas utilisés.
+[Contribuer](CONTRIBUTING.md) · [Changements](CHANGELOG.md) · [Notes de version](RELEASE_NOTES.md) · [Signaler un problème](https://github.com/ScioNos/Scionos-Capture/issues) · [Signaler une vulnérabilité](SECURITY.md)
+
+---
+
+Développé par **eyelo SA, Suisse**, sous la marque **ScioNos**. [Site](https://scionos.ch) · [Contact](mailto:info@eyelo.ch) · [Licence MIT](LICENSE)
