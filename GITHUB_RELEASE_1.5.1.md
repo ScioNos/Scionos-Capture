@@ -13,7 +13,7 @@ Scionos Capture 1.5.1 améliore la confidentialité des sources partagées et la
 - **Imports :** PNG/JPEG/WebP au-delà de 16 millions de pixels ou de 16 384 px par côté refusés avant décodage, au lieu d’être réduits. Cumul inchangé à 32 millions de pixels.
 - **Confidentialité :** diagnostic local sur activation explicite, sans télémétrie ni nouvelle permission. Chemins d’URL, images, titres, légendes et dates peuvent rester sensibles : vérifiez-les avant partage. Utilisez un masque solide pour les secrets.
 
-La version 1.5.0 reste disponible sur le [Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe). La mise à jour 1.5.1 a été soumise à l’examen Google et attend son approbation ; la fiche Store affichera la nouvelle version après publication par Google. GitHub publie cette release v1.5.1. L’archive contient 36 fichiers, SHA-256 `1f714882b9b955efc525779723ccbe6f722ea437a48fc5959df12b15d7ff93c2`.
+La version 1.5.0 reste disponible sur le [Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe). La mise à jour 1.5.1 a été soumise à l’examen Google et attend son approbation ; la fiche Store affichera la nouvelle version après publication par Google. GitHub publie cette release v1.5.1. L’archive validée contient 36 fichiers ; SHA-256 `cd9a63914d4d407862494ef50d35b706e11653d704b0f09173796d794f442564` (également fourni dans le fichier `.sha256` joint).
 
 ## English
 
@@ -24,7 +24,7 @@ Scionos Capture 1.5.1 improves shared-source privacy and the robustness of impor
 - **Imports:** PNG/JPEG/WebP above 16 million pixels or 16,384 px per side rejected before decoding instead of being reduced. Total limit unchanged at 32 million pixels.
 - **Privacy:** local opt-in diagnostics, without telemetry or new permissions. URL paths, images, titles, captions and dates may remain sensitive: review them before sharing. Use solid masks for secrets.
 
-Version 1.5.0 remains available on the [Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe). The 1.5.1 update has been submitted for Google review and awaits approval; the Store listing will show it after Google publishes it. GitHub publishes this v1.5.1 release. The archive contains 36 files; SHA-256 `1f714882b9b955efc525779723ccbe6f722ea437a48fc5959df12b15d7ff93c2`.
+Version 1.5.0 remains available on the [Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe). The 1.5.1 update has been submitted for Google review and awaits approval; the Store listing will show it after Google publishes it. GitHub publishes this v1.5.1 release. The verified archive contains 36 files; SHA-256 `cd9a63914d4d407862494ef50d35b706e11653d704b0f09173796d794f442564` (also provided in the attached `.sha256` file).
 
 ## Español
 
@@ -35,7 +35,7 @@ Scionos Capture 1.5.1 mejora la privacidad de las fuentes compartidas y la robus
 - **Importaciones:** PNG/JPEG/WebP por encima de 16 millones de píxeles o 16.384 px por lado rechazados antes de decodificar, en vez de reducirse. Límite acumulado sin cambios en 32 millones de píxeles.
 - **Privacidad:** diagnóstico local de activación voluntaria, sin telemetría ni nuevos permisos. Rutas de URL, imágenes, títulos, leyendas y fechas pueden seguir siendo sensibles: revísalos antes de compartir. Usa máscaras sólidas para secretos.
 
-La versión 1.5.0 sigue disponible en [Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe). La actualización 1.5.1 se ha enviado a revisión de Google y espera aprobación; la ficha de la tienda la mostrará cuando Google la publique. GitHub publica esta versión v1.5.1. El archivo contiene 36 elementos; SHA-256 `1f714882b9b955efc525779723ccbe6f722ea437a48fc5959df12b15d7ff93c2`.
+La versión 1.5.0 sigue disponible en [Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe). La actualización 1.5.1 se ha enviado a revisión de Google y espera aprobación; la ficha de la tienda la mostrará cuando Google la publique. GitHub publica esta versión v1.5.1. El archivo validado contiene 36 elementos; SHA-256 `cd9a63914d4d407862494ef50d35b706e11653d704b0f09173796d794f442564` (también incluido en el archivo `.sha256` adjunto).
 
 ## Deutsch
 
@@ -46,4 +46,4 @@ Version 1.5.1 verbessert den Datenschutz für Quellen, Bildimporte sowie die Ver
 - **Importe:** PNG/JPEG/WebP über 16 Millionen Pixel oder 16.384 px pro Seite vor dem Dekodieren ablehnen statt verkleinern. Gesamtlimit unverändert bei 32 Millionen Pixel.
 - **Datenschutz:** lokale, ausdrücklich aktivierte Diagnose ohne Telemetrie oder neue Berechtigungen. URL-Pfade, Bilder, Titel, Bildunterschriften und Datumsangaben können vertraulich bleiben: vor dem Teilen prüfen. Geheimnisse deckend maskieren.
 
-Version 1.5.0 bleibt im [Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe) verfügbar. Die Aktualisierung 1.5.1 wurde zur Google-Prüfung eingereicht und wartet auf die Genehmigung; der Store-Eintrag zeigt sie nach der Veröffentlichung durch Google. GitHub veröffentlicht dieses v1.5.1-Release. Das Archiv enthält 36 Dateien; SHA-256 `1f714882b9b955efc525779723ccbe6f722ea437a48fc5959df12b15d7ff93c2`.
+Version 1.5.0 bleibt im [Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe) verfügbar. Die Aktualisierung 1.5.1 wurde zur Google-Prüfung eingereicht und wartet auf die Genehmigung; der Store-Eintrag zeigt sie nach der Veröffentlichung durch Google. GitHub veröffentlicht dieses v1.5.1-Release. Das Archiv enthält 36 Dateien; SHA-256 `cd9a63914d4d407862494ef50d35b706e11653d704b0f09173796d794f442564`.
