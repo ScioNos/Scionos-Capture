@@ -3,7 +3,7 @@
     "message": "Scionos Capture"
   },
   "appDesc": {
-    "message": "Capturez, annotez et composez vos images. Projets et bibliothèque locale ; exports PNG, JPEG, WebP, HTML, Markdown et PDF."
+    "message": "Capturez et annotez des pages web, composez des documents et conservez vos projets dans une bibliothèque locale."
   },
   "languagePicker": {
     "message": "Choisir la langue"
@@ -400,13 +400,13 @@
   "popupHelpShort": { "message": "Aide" },
   "helpCompositionHeader": { "message": "Composition de plusieurs captures" },
   "helpImportHeader": { "message": "Importer des images" },
-  "helpImportText": { "message": "Depuis la fenêtre de l’extension, choisissez Composer / Ouvrir des images pour ouvrir l’éditeur sans capturer de page. Ouvrez des images locales ou collez une image du presse-papiers. Les images restent traitées localement." },
+  "helpImportText": { "message": "Depuis la fenêtre de l’extension, choisissez Composer / Ouvrir des images, puis ouvrez des images locales PNG, JPEG ou WebP ou collez une image. Au-delà de 16 millions de pixels ou de 16 384 px par côté, l’import est refusé avant décodage, sans réduction. Le cumul reste limité à 32 millions de pixels. Le traitement est local." },
   "helpComposeHeader": { "message": "Organiser la composition" },
   "helpComposeText": { "message": "Ajoutez ou retirez des images, changez leur ordre et assemblez-les verticalement ou horizontalement. Réglez le fond et l’espacement, puis ajoutez un titre, des légendes ou une numérotation des étapes." },
   "helpExportHeader": { "message": "Exporter le document" },
-  "helpExportText": { "message": "Exportez la composition en PNG, JPEG ou WebP, en rapport HTML, en PDF ou en Markdown accompagné de ses images. JPEG et WebP proposent une qualité réglable. Les options PDF permettent d’adapter la mise en page. Les limites de dimensions sont contrôlées avant l’export." },
+  "helpExportText": { "message": "Exportez en PNG, JPEG, WebP, HTML, PDF ou Markdown avec images. JPEG et WebP proposent une qualité réglable ; les options PDF règlent la présentation. Dans le panneau Document, choisissez sanitized (défaut : sans requête ni fragment d’URL), none (sans sources) ou full (sources conservées), pour les projets et exports. Les identifiants HTTP(S) sont toujours retirés. L’export de bibliothèque utilise toujours sanitized, même pour les anciens projets." },
   "helpSaveHeader": { "message": "Conserver son travail" },
-  "helpSaveText": { "message": "Enregistrez et rouvrez un fichier .scionos pour reprendre votre composition. Le schéma 2 conserve les annotations modifiables ; les projets de schéma 1 restent compatibles mais leurs anciennes annotations sont déjà aplaties. L’historique Annuler/Refaire repart à zéro à la réouverture. Le texte source non vérifié n’est pas rétabli pour la recherche PDF. Le numéro affiché correspond à la version réellement chargée." },
+  "helpSaveText": { "message": "Enregistrez un fichier .scionos v2 ; les projets v1 et v2 restent lisibles, avec annotations v1 aplaties. Les sources retirées à la sauvegarde ne peuvent pas être restaurées en changeant ensuite de mode. L’historique Annuler/Refaire repart à zéro et le texte non vérifié n’est pas rétabli pour la recherche PDF. Le numéro affiché est celui de la version chargée." },
   "helpTitle": {
     "message": "Aide — Scionos Capture"
   },
@@ -417,7 +417,7 @@
     "message": "Confidentialité 100 % locale"
   },
   "helpPrivacyText": {
-    "message": "Scionos Capture s’exécute entièrement dans votre navigateur. Aucune capture, métadonnée ou texte n’est transmis à un serveur externe. Zéro compte, zéro pistage, zéro dépendance réseau."
+    "message": "Scionos Capture traite les données localement, sans compte ni télémétrie. Le diagnostic local exige une activation explicite. Les chemins d’URL, images, titres, légendes et dates peuvent rester sensibles même en mode sanitized : vérifiez-les avant partage. Utilisez un masque solide pour les secrets ; le flou est seulement visuel."
   },
   "helpModesHeader": {
     "message": "Modes de capture"

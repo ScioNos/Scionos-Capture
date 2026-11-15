@@ -377,6 +377,8 @@
     <input id="project-file" type="file" accept=".scionos" hidden>
     <p class="warning" id="project-security-notice">À la sauvegarde, les masques et rognages sont intégrés définitivement aux images. Les annotations touchées par un masque sont supprimées et celles avant un rognage sont aplaties. Seul l’outil masque protège les données : une forme pleine ne les masque pas. Vérifiez les fichiers avant partage.</p>
     <label class="field" for="composition-title"><span data-compose="documentTitle">Titre du document</span><input id="composition-title" type="text" maxlength="500"></label>
+    <label class="field" for="source-policy"><span data-compose="sourcePolicy">Sources et liens enregistrés</span><select id="source-policy" aria-describedby="source-policy-help"><option value="sanitized" data-compose="sourceSanitized">Liens sans paramètres ni fragments</option><option value="none" data-compose="sourceNone">Exclure les sources et liens</option><option value="full" data-compose="sourceFull">URL complètes</option></select></label>
+    <p class="warning" id="source-policy-help" data-compose="sourceHelp">S’applique aux projets et exports. Les chemins, titres, légendes et dates peuvent rester sensibles. Les informations retirées d’un projet enregistré ne sont pas récupérables.</p>
     <h2><span data-compose="images">Images</span> <span id="composition-count">0 / 30</span></h2>
     <p class="warning" data-compose="historyNotice">L’ajout et la suppression ne sont pas annulables et réinitialisent l’historique de composition.</p>
     <ol id="composition-items" class="item-list"></ol>

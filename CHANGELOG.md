@@ -6,6 +6,18 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 
 ## [Unreleased]
 
+## 1.5.1 — mise à jour préparée pour le Chrome Web Store
+
+La version 1.5.0 est déjà publiée sur la fiche Chrome Web Store. Le paquet 1.5.1 est préparé pour cette fiche ; sa soumission attend une reconnexion au tableau développeur, puis l’approbation Google. La release GitHub reste en 1.5.0.
+
+### Confidentialité et robustesse
+
+- Politique de sources dans le panneau Document : sanitized par défaut retire requête et fragment, none omet les sources, full les conserve ; identifiants HTTP(S) toujours retirés. Le choix s’applique aux projets et exports ; les sources retirées à la sauvegarde ne sont pas récupérables. L’export de bibliothèque utilise toujours sanitized, anciens projets compris.
+- Les chemins d’URL, titres, légendes, dates et pixels peuvent encore être sensibles ; diagnostic local sur activation explicite, sans télémétrie. Permissions inchangées.
+- Exports et projets : un instantané PNG par image ; vignettes de bibliothèque produites directement et nettoyage tenant compte d’une impression en cours.
+- Imports PNG/JPEG/WebP : refus avant décodage au-delà de 16 millions de pixels ou de 16 384 px par côté, au lieu d’une réduction ; cumul de composition inchangé à 32 millions de pixels.
+- Lecture des projets v1/v2 et écriture v2 conservées ; renommage limité aux métadonnées avec une validation du codec, en préservant les PNG.
+
 ## [1.5.0] - 2026-11-14
 
 ### Ajouté

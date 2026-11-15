@@ -4,6 +4,18 @@
 
 ## [Sin publicar]
 
+## 1.5.1 — actualización preparada para Chrome Web Store
+
+La versión 1.5.0 ya está publicada en la ficha de Chrome Web Store. El paquete 1.5.1 está preparado para esa ficha; el envío espera una nueva autenticación en el panel de desarrollador y, después, la aprobación de Google. La versión de GitHub sigue en 1.5.0.
+
+### Privacidad y robustez
+
+- Política de fuentes en el panel Documento: sanitized por defecto elimina consulta y fragmento, none omite las fuentes, full las conserva; las credenciales HTTP(S) siempre se eliminan. Se aplica a proyectos y exportaciones; las fuentes eliminadas al guardar no se recuperan. La biblioteca siempre exporta con sanitized, incluidos los proyectos antiguos.
+- Las rutas de URL, títulos, leyendas, fechas y píxeles aún pueden ser sensibles; diagnóstico local de activación voluntaria, sin telemetría. Permisos sin cambios.
+- Exportaciones y proyectos: una instantánea PNG por imagen; miniaturas de biblioteca generadas directamente y limpieza que tiene en cuenta una impresión en curso.
+- Importaciones PNG/JPEG/WebP: rechazo antes de decodificar por encima de 16 millones de píxeles o 16.384 px por lado, en vez de reducir; límite acumulado sin cambios en 32 millones de píxeles.
+- Se mantiene la lectura de proyectos v1/v2 y la escritura v2; cambio de nombre solo en metadatos con una validación del códec, conservando los PNG.
+
 ## [1.5.0] - 2026-11-14
 
 ### Añadido

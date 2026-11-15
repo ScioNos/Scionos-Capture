@@ -3,7 +3,7 @@
     "message": "Scionos Capture"
   },
   "appDesc": {
-    "message": "Captura, anota y compone imágenes. Proyectos y biblioteca local; exporta PNG, JPEG, WebP, HTML, Markdown y PDF."
+    "message": "Captura y anota páginas web, compón documentos y conserva tus proyectos en una biblioteca local."
   },
   "languagePicker": {
     "message": "Elegir idioma"
@@ -400,13 +400,13 @@
   "popupHelpShort": { "message": "Ayuda" },
   "helpCompositionHeader": { "message": "Componer varias capturas" },
   "helpImportHeader": { "message": "Importar imágenes" },
-  "helpImportText": { "message": "Elige Componer / Abrir imágenes en la ventana de la extensión para abrir el editor sin capturar una página. Abre imágenes locales o pega una imagen del portapapeles. Las imágenes se procesan localmente." },
+  "helpImportText": { "message": "Elige Componer / Abrir imágenes en la ventana de la extensión y abre imágenes locales PNG, JPEG o WebP o pega una imagen. Por encima de 16 millones de píxeles o 16.384 px por lado, se rechazan antes de decodificar, sin reducirse. El límite acumulado sigue en 32 millones de píxeles. El procesamiento es local." },
   "helpComposeHeader": { "message": "Organizar la composición" },
   "helpComposeText": { "message": "Añade o elimina imágenes, cambia su orden y colócalas vertical u horizontalmente. Ajusta el fondo y el espaciado y añade un título, leyendas o pasos numerados." },
   "helpExportHeader": { "message": "Exportar el documento" },
-  "helpExportText": { "message": "Exporta la composición en PNG, JPEG o WebP, como informe HTML, PDF o Markdown con sus imágenes. JPEG y WebP ofrecen calidad ajustable. Las opciones PDF permiten adaptar la página. Los límites de dimensiones se comprueban antes de exportar." },
+  "helpExportText": { "message": "Exporta en PNG, JPEG, WebP, HTML, PDF o Markdown con imágenes. JPEG y WebP ofrecen calidad ajustable; las opciones PDF controlan la presentación. En el panel Documento, elige sanitized (por defecto: sin consulta ni fragmento de URL), none (sin fuentes) o full (conservar fuentes), para proyectos y exportaciones. Las credenciales HTTP(S) siempre se eliminan. La biblioteca siempre exporta con sanitized, incluidos proyectos antiguos." },
   "helpSaveHeader": { "message": "Conservar el trabajo" },
-  "helpSaveText": { "message": "Guarda y vuelve a abrir un archivo .scionos para retomar la composición. El esquema 2 conserva las anotaciones editables; los proyectos del esquema 1 siguen siendo compatibles, pero sus anotaciones anteriores ya están aplanadas. El historial Deshacer/Rehacer se reinicia al abrir. El texto de origen no verificado no se restaura para la búsqueda en PDF. El número mostrado corresponde a la versión realmente cargada." },
+  "helpSaveText": { "message": "Guarda un archivo .scionos v2; los proyectos v1 y v2 siguen siendo legibles, con anotaciones v1 aplanadas. Las fuentes eliminadas al guardar no se recuperan al cambiar de modo después. El historial Deshacer/Rehacer se reinicia y el texto no verificado no se restaura para buscar en PDF. Se muestra la versión realmente cargada." },
   "helpTitle": {
     "message": "Ayuda — Scionos Capture"
   },
@@ -417,7 +417,7 @@
     "message": "Privacidad 100 % local"
   },
   "helpPrivacyText": {
-    "message": "Scionos Capture se ejecuta completamente en su navegador. Ninguna captura, metadato o texto se transmite a un servidor externo. Cero cuentas, cero rastreo, cero dependencias de red."
+    "message": "Scionos Capture procesa los datos localmente, sin cuenta ni telemetría. El diagnóstico local requiere activación explícita. Rutas de URL, imágenes, títulos, leyendas y fechas pueden seguir siendo sensibles incluso en modo sanitized: revísalos antes de compartir. Usa máscaras sólidas para secretos; el desenfoque es solo visual."
   },
   "helpModesHeader": {
     "message": "Modos de captura"

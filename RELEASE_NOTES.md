@@ -1,3 +1,41 @@
+# Scionos Capture 1.5.1
+
+**La 1.5.0 est publiée sur le Chrome Web Store ; la soumission 1.5.1 attend la reconnexion développeur / Version 1.5.0 is published on the Chrome Web Store; 1.5.1 submission awaits developer reauthentication / La 1.5.0 está publicada en Chrome Web Store; el envío 1.5.1 espera la reautenticación del desarrollador / Version 1.5.0 ist im Chrome Web Store veröffentlicht; die Einreichung von 1.5.1 wartet auf die erneute Entwickler-Anmeldung.**
+
+## Français
+
+- Dans le panneau Document, la politique de sources s’applique aux projets et exports : `sanitized` par défaut retire paramètres de requête et fragments, `none` omet les sources et `full` les conserve. Les identifiants HTTP(S) sont toujours retirés. Les sources supprimées à la sauvegarde ne peuvent pas être restaurées ; la bibliothèque exporte toujours en mode `sanitized`, anciens projets compris.
+- Les chemins d’URL, images, titres, légendes et dates peuvent encore être sensibles. Diagnostic local sur activation explicite, sans télémétrie ; permissions inchangées.
+- Un instantané PNG par image pour les exports et projets ; vignette de bibliothèque générée directement et nettoyage tenant compte d’une impression en cours. Le renommage modifie les métadonnées avec une validation du codec et préserve les PNG.
+- Imports PNG/JPEG/WebP : au-delà de 16 millions de pixels ou de 16 384 px par côté, refus avant décodage au lieu d’une réduction. Le cumul de composition reste à 32 millions de pixels. Lecture des projets v1/v2 et écriture v2 conservées.
+- La version 1.5.0 est publiée sur le [Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe) et sur GitHub. Le paquet 1.5.1 est validé localement. Sa soumission attend la reconnexion au tableau développeur ; il n’a pas encore été téléversé ni envoyé à Google. La disponibilité dépendra ensuite de l’approbation Google. GitHub reste à la version 1.5.0.
+
+## English
+
+- In the Document panel, source policy applies to projects and exports: default `sanitized` removes query parameters and fragments, `none` omits sources and `full` retains them. HTTP(S) credentials are always removed. Sources removed on save cannot be restored; the library always exports using `sanitized`, including older projects.
+- URL paths, images, titles, captions and dates may still be sensitive. Local opt-in diagnostics, without telemetry; permissions unchanged.
+- One PNG snapshot per image for exports and projects; directly generated library thumbnails and cleanup that accounts for printing in progress. Rename changes metadata with one codec validation and preserves PNGs.
+- PNG/JPEG/WebP imports: above 16 million pixels or 16,384 px per side, reject before decoding instead of reducing. The total composition limit remains 32 million pixels. Project v1/v2 reading and v2 writing retained.
+- Version 1.5.0 is published on the [Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe) and GitHub. Package 1.5.1 is validated locally. Submission awaits developer-dashboard reauthentication; it has not yet been uploaded or sent to Google. Availability will then depend on Google approval. GitHub remains at version 1.5.0.
+
+## Español
+
+- En el panel Documento, la política de fuentes se aplica a proyectos y exportaciones: `sanitized` por defecto elimina parámetros de consulta y fragmentos, `none` omite las fuentes y `full` las conserva. Las credenciales HTTP(S) siempre se eliminan. Las fuentes eliminadas al guardar no se recuperan; la biblioteca siempre exporta con `sanitized`, incluidos los proyectos antiguos.
+- Las rutas de URL, imágenes, títulos, leyendas y fechas aún pueden ser sensibles. Diagnóstico local de activación voluntaria, sin telemetría; permisos sin cambios.
+- Una instantánea PNG por imagen para exportaciones y proyectos; miniaturas de biblioteca generadas directamente y limpieza que tiene en cuenta una impresión en curso. El cambio de nombre modifica metadatos con una validación del códec y conserva los PNG.
+- Importaciones PNG/JPEG/WebP: por encima de 16 millones de píxeles o 16.384 px por lado, rechazo antes de decodificar, en vez de reducir. El límite acumulado sigue en 32 millones de píxeles. Lectura de proyectos v1/v2 y escritura v2 conservadas.
+- La versión 1.5.0 está publicada en [Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe) y GitHub. El paquete 1.5.1 está validado localmente. El envío espera una nueva autenticación en el panel de desarrollador; todavía no se ha cargado ni enviado a Google. La disponibilidad dependerá luego de la aprobación de Google. GitHub sigue en la versión 1.5.0.
+
+## Deutsch
+
+- Im Bereich Dokument gilt die Quellenrichtlinie für Projekte und Exporte: Standard `sanitized` entfernt Abfrageparameter und Fragmente, `none` lässt Quellen weg und `full` behält sie bei. HTTP(S)-Zugangsdaten werden immer entfernt. Beim Speichern entfernte Quellen sind nicht wiederherstellbar; die Bibliothek exportiert immer mit `sanitized`, auch ältere Projekte.
+- URL-Pfade, Bilder, Titel, Bildunterschriften und Datumsangaben können weiterhin vertraulich sein. Lokale, ausdrücklich aktivierte Diagnose ohne Telemetrie; Berechtigungen unverändert.
+- Ein PNG-Abbild pro Bild für Exporte und Projekte; direkt erzeugte Bibliotheksvorschaubilder und Bereinigung unter Berücksichtigung laufender Druckvorgänge. Umbenennen ändert Metadaten mit einer Codec-Validierung und behält PNGs bei.
+- PNG-/JPEG-/WebP-Importe: über 16 Millionen Pixel oder 16.384 px pro Seite vor dem Dekodieren ablehnen statt verkleinern. Gesamtlimit weiterhin 32 Millionen Pixel. Projekte v1/v2 bleiben lesbar, geschrieben wird v2.
+- Version 1.5.0 ist im [Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe) und auf GitHub veröffentlicht. Paket 1.5.1 wurde lokal validiert. Die Einreichung wartet auf eine erneute Anmeldung im Entwickler-Dashboard; es wurde noch nicht hochgeladen oder an Google gesendet. Die Verfügbarkeit hängt anschließend von der Genehmigung durch Google ab. GitHub bleibt bei Version 1.5.0.
+
+---
+
 # Scionos Capture 1.5.0
 
 **Version du 14 novembre 2026 / Release dated November 14, 2026 / Versión del 14 de noviembre de 2026 / Version vom 14. November 2026.**

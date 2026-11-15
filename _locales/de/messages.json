@@ -3,7 +3,7 @@
     "message": "Scionos Capture"
   },
   "appDesc": {
-    "message": "Bilder aufnehmen, annotieren und zusammenstellen. Lokale Projekte und Bibliothek; PNG, JPEG, WebP, HTML, Markdown und PDF."
+    "message": "Webseiten aufnehmen und annotieren, Dokumente zusammenstellen und Projekte in einer lokalen Bibliothek speichern."
   },
   "languagePicker": {
     "message": "Sprache wählen"
@@ -400,13 +400,13 @@
   "popupHelpShort": { "message": "Hilfe" },
   "helpCompositionHeader": { "message": "Mehrere Aufnahmen zusammenstellen" },
   "helpImportHeader": { "message": "Bilder importieren" },
-  "helpImportText": { "message": "Wählen Sie im Erweiterungsfenster Komposition / Bilder öffnen, um den Editor ohne Seitenaufnahme zu öffnen. Öffnen Sie lokale Bilder oder fügen Sie ein Bild aus der Zwischenablage ein. Bilder werden lokal verarbeitet." },
+  "helpImportText": { "message": "Wählen Sie Komposition / Bilder öffnen im Erweiterungsfenster und öffnen Sie lokale PNG-, JPEG- oder WebP-Bilder oder fügen Sie ein Bild ein. Über 16 Millionen Pixel oder 16.384 px pro Seite werden Importe vor dem Dekodieren ohne Verkleinerung abgelehnt. Das Gesamtlimit bleibt bei 32 Millionen Pixel. Die Verarbeitung ist lokal." },
   "helpComposeHeader": { "message": "Komposition anordnen" },
   "helpComposeText": { "message": "Fügen Sie Bilder hinzu oder entfernen Sie sie, ändern Sie ihre Reihenfolge und ordnen Sie sie vertikal oder horizontal an. Passen Sie Hintergrund und Abstand an und ergänzen Sie einen Titel, Bildunterschriften oder nummerierte Schritte." },
   "helpExportHeader": { "message": "Dokument exportieren" },
-  "helpExportText": { "message": "Exportieren Sie die Komposition als PNG, JPEG oder WebP, als HTML-Bericht, PDF oder Markdown mit Bildern. JPEG und WebP bieten eine einstellbare Qualität. PDF-Optionen passen das Seitenlayout an. Bildgrößen werden vor dem Export auf Grenzwerte geprüft." },
+  "helpExportText": { "message": "Exportieren Sie als PNG, JPEG, WebP, HTML, PDF oder Markdown mit Bildern. JPEG und WebP bieten einstellbare Qualität; PDF-Optionen steuern das Layout. Im Bereich Dokument wählen Sie sanitized (Standard: ohne URL-Abfrage und Fragment), none (ohne Quellen) oder full (Quellen behalten), für Projekte und Exporte. HTTP(S)-Zugangsdaten werden immer entfernt. Bibliotheksexporte verwenden immer sanitized, auch für ältere Projekte." },
   "helpSaveHeader": { "message": "Arbeit aufbewahren" },
-  "helpSaveText": { "message": "Speichern und öffnen Sie eine .scionos-Datei erneut, um die Zusammenstellung fortzusetzen. Schema 2 bewahrt bearbeitbare Anmerkungen; Projekte mit Schema 1 bleiben kompatibel, ihre bisherigen Anmerkungen sind jedoch bereits eingebrannt. Der Rückgängig-/Wiederholen-Verlauf beginnt beim Öffnen neu. Ungeprüfter Quelltext wird für die PDF-Suche nicht wiederhergestellt. Die angezeigte Nummer entspricht der tatsächlich geladenen Version." },
+  "helpSaveText": { "message": "Speichern Sie eine .scionos-v2-Datei; Projekte v1 und v2 bleiben lesbar, mit zusammengeführten v1-Annotationen. Beim Speichern entfernte Quellen lassen sich durch einen späteren Moduswechsel nicht wiederherstellen. Rückgängig/Wiederholen beginnt neu; ungeprüfter Text wird für die PDF-Suche nicht wiederhergestellt. Angezeigt wird die tatsächlich geladene Version." },
   "helpTitle": {
     "message": "Hilfe — Scionos Capture"
   },
@@ -417,7 +417,7 @@
     "message": "100 % lokale Privatsphäre"
   },
   "helpPrivacyText": {
-    "message": "Scionos Capture läuft vollständig in Ihrem Browser. Es werden keine Screenshots, Metadaten oder Texte an externe Server übertragen. Keine Konten, kein Tracking, keine Netzwerkabhängigkeiten."
+    "message": "Scionos Capture verarbeitet Daten lokal, ohne Konto oder Telemetrie. Die lokale Diagnose muss ausdrücklich aktiviert werden. URL-Pfade, Bilder, Titel, Bildunterschriften und Datumsangaben können auch im Modus sanitized vertraulich bleiben: vor dem Teilen prüfen. Geheimnisse deckend maskieren; Unschärfe ist nur visuell."
   },
   "helpModesHeader": {
     "message": "Aufnahmemodi"

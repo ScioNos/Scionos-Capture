@@ -6,6 +6,18 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## 1.5.1 — Chrome Web Store update prepared
+
+Version 1.5.0 is already published on the Chrome Web Store listing. Package 1.5.1 is prepared for that listing; submission is waiting for developer-dashboard reauthentication, followed by Google approval. The GitHub release remains at 1.5.0.
+
+### Privacy and robustness
+
+- Source policy in the Document panel: default sanitized removes query and fragment, none omits sources, full retains them; HTTP(S) credentials are always removed. The choice applies to projects and exports; sources removed on save cannot be recovered. Library exports always use sanitized, including older projects.
+- URL paths, titles, captions, dates and pixels may still be sensitive; local opt-in diagnostics, without telemetry. Permissions are unchanged.
+- Exports and projects: one PNG snapshot per image; library thumbnails generated directly and cleanup accounts for printing in progress.
+- PNG/JPEG/WebP imports: reject before decoding above 16 million pixels or 16,384 px per side instead of reducing; total composition limit unchanged at 32 million pixels.
+- Project v1/v2 reading and v2 writing retained; metadata-only rename with one codec validation, preserving PNGs.
+
 ## [1.5.0] - 2026-11-14
 
 ### Added

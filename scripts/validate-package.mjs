@@ -16,6 +16,45 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+export function validateManifestPolicy(manifest) {
+  assert(manifest && typeof manifest === 'object' && !Array.isArray(manifest), 'Manifest must be an object');
+  assert(manifest.manifest_version === 3, 'manifest_version must be 3');
+  assert(Array.isArray(manifest.permissions), 'permissions must be an array');
+  assert(new Set(manifest.permissions).size === manifest.permissions.length, 'Duplicate permissions are not allowed');
+  manifest.permissions.forEach(permission => assert(allowedPermissions.has(permission), `Unexpected permission: ${permission}`));
+
+  for (const field of ['host_permissions', 'optional_host_permissions', 'optional_permissions']) {
+    if (manifest[field] === undefined) continue;
+    assert(Array.isArray(manifest[field]) && manifest[field].length === 0, `Unapproved ${field} must be empty`);
+  }
+  if (manifest.externally_connectable !== undefined) {
+    const external = manifest.externally_connectable;
+    assert(external && typeof external === 'object' && !Array.isArray(external)
+      && Object.keys(external).length === 0, 'Unapproved externally_connectable must be empty');
+  }
+
+  if (manifest.content_security_policy !== undefined) {
+    const policies = manifest.content_security_policy;
+    assert(policies && typeof policies === 'object' && !Array.isArray(policies), 'MV3 content_security_policy must be an object');
+    for (const [scope, policy] of Object.entries(policies)) {
+      assert(['extension_pages', 'sandbox'].includes(scope) && typeof policy === 'string' && policy.trim(), 'Invalid content_security_policy');
+      for (const directive of policy.split(';')) {
+        const [, ...sources] = directive.trim().split(/\s+/u);
+        for (const source of sources) {
+          assert(source.toLowerCase() !== "'unsafe-eval'", 'CSP unsafe-eval is not approved');
+          // Only local source expressions and CSP keywords are approved. Bare
+          // hostnames, remote schemes, wildcard hosts and protocol-relative URLs fail closed.
+          const local = ["'self'", "'none'", "'wasm-unsafe-eval'", "'unsafe-inline'", "'strict-dynamic'", "'report-sample'", "'unsafe-hashes'", 'blob:', 'data:'].includes(source)
+            || /^'(?:sha256|sha384|sha512)-[A-Za-z0-9+/=]+'$/u.test(source)
+            || /^'nonce-[A-Za-z0-9+/_=-]+'$/u.test(source)
+            || /^allow-[a-z-]+$/u.test(source);
+          assert(local, `CSP remote or unapproved source: ${source}`);
+        }
+      }
+    }
+  }
+}
+
 export function pngDimensions(buffer) {
   assert(buffer.length >= 24, 'PNG header is truncated');
   assert(buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])), 'Invalid PNG signature');
@@ -69,7 +108,7 @@ export async function validatePackage() {
   const manifest = await readJson('manifest.json');
   const packageJson = await readJson('package.json');
   const packageLock = await readJson('package-lock.json');
-  assert(manifest.manifest_version === 3, 'manifest_version must be 3');
+  validateManifestPolicy(manifest);
   assertChromeVersion(manifest.version);
   assert(packageJson.version === manifest.version, 'manifest and package versions must match');
   assert(packageLock && typeof packageLock === 'object', 'package-lock.json must contain an object');
@@ -77,7 +116,6 @@ export async function validatePackage() {
   assert(packageLock.packages && packageLock.packages[''], 'package-lock root entry is missing');
   assert(packageLock.packages[''].version === manifest.version, 'package-lock root version must match');
   assert(manifest.default_locale === 'fr', 'default locale must be fr');
-  manifest.permissions.forEach(permission => assert(allowedPermissions.has(permission), `Unexpected permission: ${permission}`));
 
   const localeEntries = await Promise.all(supportedLocales.map(async locale => {
     const messages = await readJson(`_locales/${locale}/messages.json`);

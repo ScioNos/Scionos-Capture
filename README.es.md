@@ -10,11 +10,11 @@
 
 [Français](README.md) · [English](README.en.md) · [Deutsch](README.de.md) · [Español](README.es.md)
 
-[![Versión](https://img.shields.io/badge/version-1.5.0-blue)](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.0) [![Verificación](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml/badge.svg)](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml) [![Licencia MIT](https://img.shields.io/badge/licence-MIT-green)](LICENSE) ![Chrome y Edge](https://img.shields.io/badge/Chrome_%26_Edge-Manifest_V3-4285F4)
+[![Versión](https://img.shields.io/badge/version-1.5.1-blue)](https://github.com/ScioNos/Scionos-Capture) [![Verificación](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml/badge.svg)](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml) [![Licencia MIT](https://img.shields.io/badge/licence-MIT-green)](LICENSE) ![Chrome y Edge](https://img.shields.io/badge/Chrome_%26_Edge-Manifest_V3-4285F4)
 
 **[Descargar la versión 1.5.0](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.0)** · **[Ver la ficha de Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe)** · **[Obtener ayuda](https://github.com/ScioNos/Scionos-Capture/issues)**
 
-<!-- source-version --> La versión 1.5.0 está disponible en GitHub. La actualización de la ficha de Chrome Web Store está en preparación; su versión puede diferir de la del repositorio.
+<!-- source-version --> La versión 1.5.1 está preparada como actualización de la ficha publicada en Chrome Web Store, actualmente en 1.5.0; el envío espera una nueva autenticación en el panel de desarrollador. La publicación queda sujeta a la revisión y aprobación de Google. La descarga de GitHub sigue en 1.5.0.
 
 ![Editor de Scionos Capture 1.5.0: anotación de una imagen y vista previa de una composición horizontal](store-assets/screenshot-real-1-composition-v1.5.0.png)
 
@@ -40,7 +40,7 @@ Prepara una explicación visual, documenta un problema o conserva un fragmento �
 4. Elige **Cargar descomprimida** y selecciona la carpeta extraída que contiene el manifiesto.
 5. Fija Scionos Capture en la barra de herramientas y abre una página web normal.
 
-La [ficha de Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe) permite instalar desde la tienda. Comprueba la versión que ofrece: la publicación en GitHub y la revisión de Google siguen procesos distintos.
+La versión 1.5.0 ya está publicada en esta [ficha de Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe). La actualización 1.5.1 se está enviando a revisión de Google y aparecerá en la ficha cuando se apruebe.
 
 ## Tres formas de trabajar
 
@@ -90,7 +90,8 @@ Elige una duración de **0, 7, 30 o 90 días** y una cuota de **64 a 1.024 MiB**
 - **Procesamiento local.** La extensión no transmite tus capturas, URL ni datos de navegación a ScioNos ni a terceros. No se ejecuta código remoto.
 - **Conservación a tu elección.** Las capturas temporales y los fragmentos se limpian según su ciclo de vida. Los proyectos de la biblioteca siguen la retención elegida; los archivos guardados por separado quedan bajo tu responsabilidad.
 - **Máscaras sólidas para los secretos.** El desenfoque es un efecto visual. Al guardar un proyecto, las máscaras y los recortes se vuelven irreversibles; las anotaciones afectadas se eliminan de forma conservadora. Tras un recorte, las anotaciones anteriores se aplanan para preservar su aspecto y orden.
-- **Revisión antes de compartir.** Los proyectos y las exportaciones pueden contener imágenes, títulos, leyendas, fuentes y fechas.
+- **Control de fuentes.** En el panel Documento, `sanitized` elimina por defecto los parámetros de consulta y fragmentos de las URL; `none` omite las fuentes y `full` las conserva. Las credenciales incluidas en las URL HTTP(S) siempre se eliminan. La elección se aplica a proyectos y exportaciones; una fuente eliminada al guardar no se puede recuperar. La exportación desde la biblioteca siempre usa `sanitized`, incluso para proyectos antiguos.
+- **Revisión antes de compartir.** Las rutas de las URL, imágenes, títulos, leyendas y fechas aún pueden ser sensibles. El diagnóstico es local y de activación voluntaria, sin telemetría.
 
 Consulta la [política de privacidad](PRIVACY.es.md) y el [modelo de seguridad](SECURITY.es.md).
 
@@ -113,7 +114,7 @@ Los fragmentos permanecen en IndexedDB local y se eliminan tras el ensamblado o 
 - Las páginas internas del navegador y las tiendas de extensiones están protegidas contra la inyección.
 - El contenido animado, virtualizado o sin fin puede quedar incompleto. Algunos elementos fijos o `sticky` pueden variar entre las partes.
 - El selector no recorre el interior de los iframes ni los shadow roots cerrados.
-- Las imágenes que superen **16 millones de píxeles** o **16.384 px por lado** pueden reducirse. Las rotaciones, inclinaciones y transformaciones de perspectiva no compatibles se rechazan explícitamente.
+- Las importaciones PNG, JPEG y WebP que superen **16 millones de píxeles** o **16.384 px por lado** se rechazan antes de decodificar, en vez de reducirse. El límite acumulado de composición sigue siendo de **32 millones de píxeles**. Las rotaciones, inclinaciones y transformaciones de perspectiva no compatibles se rechazan explícitamente.
 - El texto de búsqueda de un PDF solo se conserva cuando su visibilidad puede verificarse. Las imágenes importadas y restauradas de un proyecto no aportan una capa de texto fiable; las palabras inciertas se omiten de la capa textual, sin eliminar la imagen.
 - Aplica o cancela los cambios pendientes antes de exportar.
 
@@ -130,9 +131,9 @@ npm run verify
 
 `verify` comprueba sintaxis, lint, HTML, pruebas unitarias, traducciones, paquete y regresiones del navegador y de accesibilidad. `npm run test:native` prueba los cinco modos en Chrome y Edge instalados con capturas reales y perfiles temporales, sin usar perfiles personales. `npm run package` genera el archivo comprimido y su suma de comprobación en `dist/`.
 
-Sincronización de versión: `npm run version:sync -- 1.5.0`; en PowerShell: `npm.cmd run version:sync -- 1.5.0`.
+Sincronización de versión: `npm run version:sync -- 1.5.1 --unreleased`; en PowerShell: `npm.cmd run version:sync -- 1.5.1 --unreleased`.
 
-<!-- local-package --> Archivo local: scionos-capture-v1.5.0.zip · SHA-256: scionos-capture-v1.5.0.zip.sha256.
+<!-- local-package --> Entregables locales previstos tras la validación: scionos-capture-v1.5.1.zip · SHA-256: scionos-capture-v1.5.1.zip.sha256.
 
 [Contribuir](CONTRIBUTING.es.md) · [Cambios](CHANGELOG.es.md) · [Notas de versión](RELEASE_NOTES.md) · [Informar de un problema](https://github.com/ScioNos/Scionos-Capture/issues) · [Informar de una vulnerabilidad](SECURITY.es.md)
 

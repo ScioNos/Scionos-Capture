@@ -14,7 +14,7 @@ function eventHook() {
   return { addListener(value) { listener = value; }, get listener() { return listener; } };
 }
 
-async function createHarness(store = CaptureStore) {
+async function createHarness(store = CaptureStore, { clock, delay } = {}) {
   const messageEvent = eventHook();
   const alarmEvent = eventHook();
   const removedEvent = eventHook();
@@ -64,7 +64,8 @@ async function createHarness(store = CaptureStore) {
     }
   };
   const context = vm.createContext({
-    chrome, CaptureStore: store, ScionosCaptureUtils, Blob, URL, Uint8Array, fetch: globalThis.fetch,
+    chrome, CaptureStore: store, ScionosCaptureUtils: delay ? { ...ScionosCaptureUtils, delay } : ScionosCaptureUtils,
+    Date: clock ? { now: clock } : Date, Blob, URL, Uint8Array, fetch: globalThis.fetch,
     atob: globalThis.atob, console: { ...console, error() {} }, setTimeout: globalThis.setTimeout,
     clearTimeout: globalThis.clearTimeout, crypto: { randomUUID: crypto.randomUUID }
   });
@@ -83,6 +84,44 @@ function send(listener, message, sender) {
     if (keepAlive !== true) reject(new Error('Message was not accepted'));
   });
 }
+
+test('visible capture queue preserves 550ms start cadence after concurrent requests and quota failures', async () => {
+  let now = 10000;
+  const waits = [], starts = [];
+  const h = await createHarness(CaptureStore, { clock: () => now, delay: async ms => { waits.push(ms); now += ms; } });
+  h.chrome.tabs.captureVisibleTab = async () => {
+    starts.push(now);
+    now += 120; // Capture latency counts toward the interval between starts.
+    if (starts.length === 2) throw new Error('capture quota rate limit');
+    return 'data:image/png;base64,fixture';
+  };
+  const sender = { id: 'test-extension', tab: { id: 7, windowId: 3 }, url: 'https://example.com' };
+  const responses = await Promise.all(Array.from({ length: 3 }, () =>
+    send(h.messageEvent.listener, { action: 'CAPTURE_VISIBLE_TAB' }, sender)));
+  assert.deepEqual(starts, [10000, 10550, 11100]);
+  assert.deepEqual(waits, [430, 430]);
+  assert.equal(responses[0].success, true);
+  assert.equal(responses[1].success, false);
+  assert.equal(responses[1].errorCode, 'RATE_LIMITED');
+  assert.equal(responses[2].success, true, 'a failed capture must release the queue');
+  now += 1000;
+  assert.equal((await send(h.messageEvent.listener, { action: 'CAPTURE_VISIBLE_TAB' }, sender)).success, true);
+  assert.equal(starts.at(-1), 12220);
+  assert.equal(waits.length, 2, 'no extra delay after an idle interval');
+});
+
+test('visible capture queue rechecks the active tab after waiting', async () => {
+  let now = 10000, activeId = 7, captures = 0;
+  const h = await createHarness(CaptureStore, { clock: () => now, delay: async ms => { now += ms; activeId = 8; } });
+  h.chrome.tabs.query = async () => [{ id: activeId, windowId: 3 }];
+  h.chrome.tabs.captureVisibleTab = async () => { captures++; return 'fixture'; };
+  const sender = { id: 'test-extension', tab: { id: 7, windowId: 3 }, url: 'https://example.com' };
+  assert.equal((await send(h.messageEvent.listener, { action: 'CAPTURE_VISIBLE_TAB' }, sender)).success, true);
+  const response = await send(h.messageEvent.listener, { action: 'CAPTURE_VISIBLE_TAB' }, sender);
+  assert.equal(response.success, false);
+  assert.equal(response.errorCode, 'TAB_CHANGED');
+  assert.equal(captures, 1);
+});
 
 test('library retention reconciles at wake-up and reschedules without deleting future projects', async () => {
   const now = Date.now();

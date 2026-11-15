@@ -3,108 +3,138 @@
   function createContentDom({ Utils, text }) {
     const SCROLLABLE_OVERFLOW_VALUES = new Set(['auto', 'overlay', 'scroll']);
 
+    // Explicit local opt-in; retain counts and timings only, never page values.
+    function recordDiagnostic(stage, elements, blocks, durationMs) {
+      const diagnostics = globalScope.__scionosDiagnostics;
+      if (!Array.isArray(diagnostics)) return;
+      try {
+        diagnostics.push({ stage, elements, blocks, durationMs });
+        if (diagnostics.length > 500) diagnostics.splice(0, diagnostics.length - 500);
+      } catch { /* Diagnostics must never affect capture. */ }
+    }
+
     // region is in surface CSS coordinates; returned rectangles are relative to it.
     // Export only complete words whose painted visibility can be established.
     function extractDomTextBlocks(region, surface = getDocumentScrollSurface()) {
       const blocks = [];
       blocks.limited = false;
-      if (!region || region.width <= 0 || region.height <= 0) return blocks;
-      const position = surface.getPosition();
-      const viewport = surface.getCaptureRect();
-      const scaleX = viewport.scaleX || 1, scaleY = viewport.scaleY || 1;
-      const originX = viewport.left - position.x * scaleX;
-      const originY = viewport.top - position.y * scaleY;
-      const clip = { left: originX + region.x * scaleX, top: originY + region.y * scaleY,
-        right: originX + (region.x + region.width) * scaleX, bottom: originY + (region.y + region.height) * scaleY };
-      const overlaps = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
-      const deadline = Date.now() + 500;
-      const painted = [];
-      for (const element of document.querySelectorAll('body *')) {
-        if (Date.now() >= deadline) { blocks.limited = true; return blocks; }
-        if (element.closest('[data-scionos-capture]')) continue;
-        const rect = element.getBoundingClientRect();
-        if (overlaps(rect, clip) && isRenderedVisible(element)) painted.push({ element, rect });
-      }
-      const ancestorReliability = new WeakMap();
-      const colorContext = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
-      colorContext.canvas.width = colorContext.canvas.height = 1;
-      const colors = new Map();
-      const opaqueColor = color => {
-        if (!colors.has(color)) {
-          colorContext.clearRect(0, 0, 1, 1);
-          colorContext.fillStyle = 'transparent';
-          colorContext.fillStyle = color;
-          colorContext.fillRect(0, 0, 1, 1);
-          colors.set(color, colorContext.getImageData(0, 0, 1, 1).data[3] === 255);
-        }
-        return colors.get(color);
-      };
-      const root = surface.isDocument ? (document.body || document.documentElement) : surface.element;
-      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      const startedAt = Date.now();
+      let elements = 0;
+      recordDiagnostic('text:start', elements, blocks.length, 0);
       try {
-        textNodes: for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-          if (Date.now() >= deadline) { blocks.limited = true; break; }
-          const parent = node.parentElement;
-          if (!parent || !node.nodeValue.trim() || parent.closest('script, style, noscript, template, [data-scionos-capture]')) continue;
-          if (!isRenderedVisible(parent)) continue;
-          const computed = getComputedStyle(parent);
-          const link = parent.closest('a');
-          for (const match of node.nodeValue.matchAll(/\S+/gu)) {
-            if (Date.now() >= deadline || blocks.length >= 1500) { blocks.limited = true; break textNodes; }
-            const range = document.createRange();
-            range.setStart(node, match.index);
-            range.setEnd(node, match.index + match[0].length);
-            const rects = Array.from(range.getClientRects());
-            const rect = range.getBoundingClientRect();
-            if (!rect.width || !rect.height || !overlaps(rect, clip)) continue;
-            let reliable = opaqueColor(computed.color) && opaqueColor(computed.webkitTextFillColor || computed.color)
-              && computed.textTransform === 'none' && rects.length === 1 && rect.left >= clip.left && rect.right <= clip.right
-              && rect.top >= clip.top && rect.bottom <= clip.bottom
-              && rect.left >= viewport.left && rect.right <= Math.min(window.innerWidth, viewport.left + viewport.width)
-              && rect.top >= viewport.top && rect.bottom <= Math.min(window.innerHeight, viewport.top + viewport.height);
-            // Geometric overlaps are rejected even for pointer-events:none or a layer behind
-            // the text. This deliberately prefers an image-only word to a privacy leak.
-            if (reliable) reliable = !painted.some(item => item.element !== parent
-              && !item.element.contains(parent) && overlaps(item.rect, rect));
-            if (reliable) {
-              for (let ancestor = parent; ancestor && reliable; ancestor = ancestor.parentElement) {
-                if (!ancestorReliability.has(ancestor)) {
-                  const style = getComputedStyle(ancestor);
-                  let safe = parseFloat(style.opacity || '1') === 1 && style.filter === 'none'
-                    && style.clipPath === 'none' && style.clip === 'auto'
-                    && (!style.maskImage || style.maskImage === 'none')
-                    && (!style.webkitMaskImage || style.webkitMaskImage === 'none')
-                    && (!style.webkitTextSecurity || style.webkitTextSecurity === 'none');
-                  for (const pseudo of ['::before', '::after']) {
-                    const content = getComputedStyle(ancestor, pseudo).content;
-                    if (content && content !== 'none' && content !== 'normal') safe = false;
-                  }
-                  ancestorReliability.set(ancestor, safe);
-                }
-                reliable = ancestorReliability.get(ancestor);
-              }
-            }
-            if (reliable) {
-              // Hit testing also catches clipping by nested overflow containers.
-              for (const x of [rect.left + 0.5, (rect.left + rect.right) / 2, rect.right - 0.5]) {
-                for (const y of [rect.top + 0.5, (rect.top + rect.bottom) / 2, rect.bottom - 0.5]) {
-                  const hit = document.elementFromPoint(x, y);
-                  if (hit !== parent) reliable = false;
-                }
-              }
-            }
-            if (!reliable || blocks.length >= 1500) { blocks.limited = true; continue; }
-            blocks.push({ text: match[0], x: (rect.left - clip.left) / scaleX, y: (rect.top - clip.top) / scaleY,
-              width: rect.width / scaleX, height: rect.height / scaleY, fontSize: parseFloat(computed.fontSize) || 14,
-              fontFamily: computed.fontFamily || 'sans-serif', isLink: Boolean(link && link.href),
-              url: link && link.href ? link.href : null });
-          }
+        if (!region || region.width <= 0 || region.height <= 0) return blocks;
+        // These caches belong to this extraction only: scroll, fixed/sticky position,
+        // style changes and visibility must be reconsidered for every tile.
+        const styles = new WeakMap();
+        const visibility = new WeakMap();
+        const styleFor = element => {
+          if (!styles.has(element)) styles.set(element, getComputedStyle(element));
+          return styles.get(element);
+        };
+        const visible = element => {
+          if (!visibility.has(element)) visibility.set(element, isRenderedVisible(element, styleFor));
+          return visibility.get(element);
+        };
+        const position = surface.getPosition();
+        const viewport = surface.getCaptureRect();
+        const scaleX = viewport.scaleX || 1, scaleY = viewport.scaleY || 1;
+        const originX = viewport.left - position.x * scaleX;
+        const originY = viewport.top - position.y * scaleY;
+        const clip = { left: originX + region.x * scaleX, top: originY + region.y * scaleY,
+          right: originX + (region.x + region.width) * scaleX, bottom: originY + (region.y + region.height) * scaleY };
+        const overlaps = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+        const deadline = Date.now() + 500;
+        const painted = [];
+        for (const element of document.querySelectorAll('body *')) {
+          elements += 1;
+          if (Date.now() >= deadline) { blocks.limited = true; return blocks; }
+          if (element.closest('[data-scionos-capture]')) continue;
+          const rect = element.getBoundingClientRect();
+          if (overlaps(rect, clip) && visible(element)) painted.push({ element, rect });
         }
-      } catch (error) { blocks.limited = true; console.warn('DOM text extraction failed:', error); }
-      return blocks;
+        const ancestorReliability = new WeakMap();
+        const colorContext = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
+        colorContext.canvas.width = colorContext.canvas.height = 1;
+        const colors = new Map();
+        const opaqueColor = color => {
+          if (!colors.has(color)) {
+            colorContext.clearRect(0, 0, 1, 1);
+            colorContext.fillStyle = 'transparent';
+            colorContext.fillStyle = color;
+            colorContext.fillRect(0, 0, 1, 1);
+            colors.set(color, colorContext.getImageData(0, 0, 1, 1).data[3] === 255);
+          }
+          return colors.get(color);
+        };
+        const root = surface.isDocument ? (document.body || document.documentElement) : surface.element;
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        try {
+          textNodes: for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+            if (Date.now() >= deadline) { blocks.limited = true; break; }
+            const parent = node.parentElement;
+            if (!parent || !node.nodeValue.trim() || parent.closest('script, style, noscript, template, [data-scionos-capture]')) continue;
+            if (!visible(parent)) continue;
+            const computed = styleFor(parent);
+            const link = parent.closest('a');
+            for (const match of node.nodeValue.matchAll(/\S+/gu)) {
+              if (Date.now() >= deadline || blocks.length >= 1500) { blocks.limited = true; break textNodes; }
+              const range = document.createRange();
+              range.setStart(node, match.index);
+              range.setEnd(node, match.index + match[0].length);
+              const rects = Array.from(range.getClientRects());
+              const rect = range.getBoundingClientRect();
+              if (!rect.width || !rect.height || !overlaps(rect, clip)) continue;
+              let reliable = opaqueColor(computed.color) && opaqueColor(computed.webkitTextFillColor || computed.color)
+                && computed.textTransform === 'none' && rects.length === 1 && rect.left >= clip.left && rect.right <= clip.right
+                && rect.top >= clip.top && rect.bottom <= clip.bottom
+                && rect.left >= viewport.left && rect.right <= Math.min(window.innerWidth, viewport.left + viewport.width)
+                && rect.top >= viewport.top && rect.bottom <= Math.min(window.innerHeight, viewport.top + viewport.height);
+              // Geometric overlaps are rejected even for pointer-events:none or a layer behind
+              // the text. This deliberately prefers an image-only word to a privacy leak.
+              if (reliable) reliable = !painted.some(item => item.element !== parent
+                && !item.element.contains(parent) && overlaps(item.rect, rect));
+              if (reliable) {
+                for (let ancestor = parent; ancestor && reliable; ancestor = ancestor.parentElement) {
+                  if (!ancestorReliability.has(ancestor)) {
+                    const style = styleFor(ancestor);
+                    let safe = parseFloat(style.opacity || '1') === 1 && style.filter === 'none'
+                      && style.clipPath === 'none' && style.clip === 'auto'
+                      && (!style.maskImage || style.maskImage === 'none')
+                      && (!style.webkitMaskImage || style.webkitMaskImage === 'none')
+                      && (!style.webkitTextSecurity || style.webkitTextSecurity === 'none');
+                    for (const pseudo of ['::before', '::after']) {
+                      const content = getComputedStyle(ancestor, pseudo).content;
+                      if (content && content !== 'none' && content !== 'normal') safe = false;
+                    }
+                    ancestorReliability.set(ancestor, safe);
+                  }
+                  reliable = ancestorReliability.get(ancestor);
+                }
+              }
+              if (reliable) {
+                // Hit testing also catches clipping by nested overflow containers.
+                for (const x of [rect.left + 0.5, (rect.left + rect.right) / 2, rect.right - 0.5]) {
+                  for (const y of [rect.top + 0.5, (rect.top + rect.bottom) / 2, rect.bottom - 0.5]) {
+                    const hit = document.elementFromPoint(x, y);
+                    if (hit !== parent) reliable = false;
+                  }
+                }
+              }
+              if (!reliable || blocks.length >= 1500) { blocks.limited = true; continue; }
+              blocks.push({ text: match[0], x: (rect.left - clip.left) / scaleX, y: (rect.top - clip.top) / scaleY,
+                width: rect.width / scaleX, height: rect.height / scaleY, fontSize: parseFloat(computed.fontSize) || 14,
+                fontFamily: computed.fontFamily || 'sans-serif', isLink: Boolean(link && link.href),
+                url: link && link.href ? link.href : null });
+            }
+          }
+        } catch (error) { blocks.limited = true; console.warn('DOM text extraction failed:', error); }
+        return blocks;
+      } finally {
+        recordDiagnostic('text:end', elements, blocks.length, Math.max(0, Date.now() - startedAt));
+      }
     }
 
-    function isRenderedVisible(element) {
+    function isRenderedVisible(element, styleFor = element => window.getComputedStyle(element)) {
       try {
         if (element && typeof element.checkVisibility === 'function') {
           return element.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true });
@@ -112,7 +142,7 @@
       } catch {
         // Fall through to the computed-style check below.
       }
-      const computed = window.getComputedStyle(element);
+      const computed = styleFor(element);
       return computed.visibility !== 'hidden'
         && computed.display !== 'none'
         && parseFloat(computed.opacity || '1') > 0.05;
@@ -412,64 +442,72 @@
       const seen = new WeakMap();
       return {
         prepare(tileIndex = 0, totalTiles = 1, writtenRect = null, isLastRow = tileIndex === totalTiles - 1) {
-          hidden = [];
-          bottomPatches = [];
-          const capture = surface.isDocument
-            ? { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight }
-            : surface.getCaptureRect();
-          const bounds = writtenRect || { left: capture.left, top: capture.top,
-            right: capture.left + capture.width, bottom: capture.top + capture.height };
-          const visible = [];
-          const position = surface.getPosition();
-          for (const element of document.querySelectorAll('body *')) {
-            if (!element.isConnected || element.closest('[data-scionos-capture]')
-                || (!surface.isDocument && (element === surface.element || element.contains(surface.element)))) continue;
-            const rect = element.getBoundingClientRect();
-            if (!rect.width || !rect.height || rect.right <= capture.left || rect.left >= capture.left + capture.width
-                || rect.bottom <= capture.top || rect.top >= capture.top + capture.height) continue;
-            const styles = getComputedStyle(element);
-            if (styles.visibility === 'hidden' || styles.display === 'none') continue;
-            // Some portals (including X's cookie banner) use a zero-sized
-            // fixed wrapper with a visible absolutely positioned child.
-            let fixed = styles.position === 'fixed';
-            if (!fixed && styles.position === 'absolute') {
-              for (let ancestor = element.parentElement; ancestor && ancestor !== document.body; ancestor = ancestor.parentElement) {
-                const ancestorStyle = getComputedStyle(ancestor);
-                if (ancestorStyle.position === 'fixed') {
-                  const ancestorRect = ancestor.getBoundingClientRect();
-                  fixed = !ancestorRect.width || !ancestorRect.height;
-                  break;
+          const startedAt = Date.now();
+          let elements = 0;
+          recordDiagnostic('anchored:start', elements, 0, 0);
+          try {
+            hidden = [];
+            bottomPatches = [];
+            const capture = surface.isDocument
+              ? { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight }
+              : surface.getCaptureRect();
+            const bounds = writtenRect || { left: capture.left, top: capture.top,
+              right: capture.left + capture.width, bottom: capture.top + capture.height };
+            const visible = [];
+            const position = surface.getPosition();
+            for (const element of document.querySelectorAll('body *')) {
+              elements += 1;
+              if (!element.isConnected || element.closest('[data-scionos-capture]')
+                  || (!surface.isDocument && (element === surface.element || element.contains(surface.element)))) continue;
+              const rect = element.getBoundingClientRect();
+              if (!rect.width || !rect.height || rect.right <= capture.left || rect.left >= capture.left + capture.width
+                  || rect.bottom <= capture.top || rect.top >= capture.top + capture.height) continue;
+              const styles = getComputedStyle(element);
+              if (styles.visibility === 'hidden' || styles.display === 'none') continue;
+              // Some portals (including X's cookie banner) use a zero-sized
+              // fixed wrapper with a visible absolutely positioned child.
+              let fixed = styles.position === 'fixed';
+              if (!fixed && styles.position === 'absolute') {
+                for (let ancestor = element.parentElement; ancestor && ancestor !== document.body; ancestor = ancestor.parentElement) {
+                  const ancestorStyle = getComputedStyle(ancestor);
+                  if (ancestorStyle.position === 'fixed') {
+                    const ancestorRect = ancestor.getBoundingClientRect();
+                    fixed = !ancestorRect.width || !ancestorRect.height;
+                    break;
+                  }
+                  if (ancestorStyle.transform && ancestorStyle.transform !== 'none') break;
                 }
-                if (ancestorStyle.transform && ancestorStyle.transform !== 'none') break;
+              }
+              const sticky = styles.position === 'sticky';
+              const top = parseFloat(styles.top), bottom = parseFloat(styles.bottom);
+              const left = parseFloat(styles.left), right = parseFloat(styles.right);
+              const verticalPin = sticky && (Math.abs(rect.top - capture.top - top) <= 4
+                || Math.abs(rect.bottom - capture.top - capture.height + bottom) <= 4);
+              const horizontalPin = sticky && (Math.abs(rect.left - capture.left - left) <= 4
+                || Math.abs(rect.right - capture.left - capture.width + right) <= 4);
+              const external = !surface.isDocument && styles.position === 'absolute' && !surface.element.contains(element);
+              const bottomFixed = fixed && rect.top > capture.top + capture.height / 2;
+              const firstPosition = seen.get(element);
+              // A vertical sticky header still needs all columns of its first row.
+              // A horizontal sticky sidebar still needs all rows of its first column.
+              const repeated = firstPosition && (fixed || external
+                || (verticalPin && Math.abs(position.y - firstPosition.y) > 2)
+                || (horizontalPin && Math.abs(position.x - firstPosition.x) > 2));
+              const shouldHide = bottomFixed ? !isLastRow : repeated;
+              if (shouldHide) {
+                hidden.push(ScionosContentUtils.snapshotInlineStyle(element, 'visibility'));
+                element.style.setProperty('visibility', 'hidden', 'important');
+              } else if (bottomFixed) {
+                bottomPatches.push({ left: Math.max(rect.left, capture.left), top: Math.max(rect.top, capture.top),
+                  right: Math.min(rect.right, capture.left + capture.width), bottom: Math.min(rect.bottom, capture.top + capture.height) });
+              } else if (rect.right > bounds.left && rect.left < bounds.right && rect.bottom > bounds.top && rect.top < bounds.bottom) {
+                visible.push(element);
               }
             }
-            const sticky = styles.position === 'sticky';
-            const top = parseFloat(styles.top), bottom = parseFloat(styles.bottom);
-            const left = parseFloat(styles.left), right = parseFloat(styles.right);
-            const verticalPin = sticky && (Math.abs(rect.top - capture.top - top) <= 4
-              || Math.abs(rect.bottom - capture.top - capture.height + bottom) <= 4);
-            const horizontalPin = sticky && (Math.abs(rect.left - capture.left - left) <= 4
-              || Math.abs(rect.right - capture.left - capture.width + right) <= 4);
-            const external = !surface.isDocument && styles.position === 'absolute' && !surface.element.contains(element);
-            const bottomFixed = fixed && rect.top > capture.top + capture.height / 2;
-            const firstPosition = seen.get(element);
-            // A vertical sticky header still needs all columns of its first row.
-            // A horizontal sticky sidebar still needs all rows of its first column.
-            const repeated = firstPosition && (fixed || external
-              || (verticalPin && Math.abs(position.y - firstPosition.y) > 2)
-              || (horizontalPin && Math.abs(position.x - firstPosition.x) > 2));
-            const shouldHide = bottomFixed ? !isLastRow : repeated;
-            if (shouldHide) {
-              hidden.push(ScionosContentUtils.snapshotInlineStyle(element, 'visibility'));
-              element.style.setProperty('visibility', 'hidden', 'important');
-            } else if (bottomFixed) {
-              bottomPatches.push({ left: Math.max(rect.left, capture.left), top: Math.max(rect.top, capture.top),
-                right: Math.min(rect.right, capture.left + capture.width), bottom: Math.min(rect.bottom, capture.top + capture.height) });
-            } else if (rect.right > bounds.left && rect.left < bounds.right && rect.bottom > bounds.top && rect.top < bounds.bottom) {
-              visible.push(element);
-            }
+            visible.forEach(element => { if (!seen.has(element)) seen.set(element, position); });
+          } finally {
+            recordDiagnostic('anchored:end', elements, 0, Math.max(0, Date.now() - startedAt));
           }
-          visible.forEach(element => { if (!seen.has(element)) seen.set(element, position); });
         },
         getBottomPatches() { return bottomPatches; },
         restore() {

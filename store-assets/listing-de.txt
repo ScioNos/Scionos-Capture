@@ -1,74 +1,22 @@
-Scionos Capture — Webseiten unter Wahrung deiner Privatsphäre aufnehmen, kommentieren und exportieren.
+Mit Scionos Capture kannst du eine Webseite aufnehmen, annotieren und auf deinem Gerät zu einem Dokument verarbeiten. Es ist kein Konto nötig; Aufnahmen werden nicht an einen Server gesendet.
 
-Scionos Capture ist eine Erweiterung für Chrome und Microsoft Edge mit vollständig lokaler Verarbeitung. Nimm eine Seite, einen Ausschnitt oder eine Unterhaltung auf, füge Anmerkungen hinzu und exportiere das Ergebnis, ohne deine Aufnahmen an einen Server zu senden.
+Eine Seite aufnehmen
+Wähle den sichtbaren Bereich, eine Auswahl, einen Scrollbereich, die ganze Seite oder ein Element. Passe die Grenzen vor der Bestätigung an. Mit einer abbrechbaren Verzögerung kannst du ein Menü oder einen vorübergehenden Seitenzustand vorbereiten.
 
-Entwickelt und herausgegeben von eyelo SA (Schweiz) unter der Marke ScioNos.
+Bilder zusammenstellen und bearbeiten
+Mehrere importierte oder eingefügte Bilder lassen sich mit Titeln und Bildunterschriften kombinieren und umordnen. Update 1.5.1 verbessert die Quellenfreigabe, lehnt zu große Bilddateien vor dem Dekodieren ab und korrigiert Bildverarbeitung und Druck. Der Editor bietet Zeichnen, Text, Pfeile, Hervorhebungen, Formen, Zuschnitt und Maskierung. Unterstützte Annotationen bleiben in gespeicherten Projekten bearbeitbar.
 
-🆕 NEU IN VERSION 1.5.0
-• Ein Dokument aus mehreren lokalen Bildern oder Bildern aus der Zwischenablage zusammenstellen.
-• Als PNG, JPEG, WebP, HTML, Markdown samt Bildern in einer ZIP-Datei, PDF oder Druck mit neuen Darstellungsoptionen exportieren.
-• Bearbeitbare Annotationen und portable .scionos-v2-Projekte nutzen, kompatibel mit v1-Projekten.
-• Projekte ausdrücklich in einer lokalen Bibliothek mit Suche, einstellbarem Kontingent und Aufbewahrungsdauer speichern.
+Arbeit aufbewahren
+Speichere ein portables Projekt zur späteren Bearbeitung oder lege es in der lokalen Bibliothek ab. Dort kannst du Projekte suchen, umbenennen, duplizieren und löschen. Speicherkontingent und Aufbewahrungsdauer sind einstellbar; eine Aufbewahrung ohne Ablauf ist möglich.
 
-🎯 AUFNAHME UND AUSWAHL
-• Modus Element aufnehmen: einen Block mit der Maus hervorheben, bei Bedarf sein über- oder untergeordnetes Element wählen und die Aufnahme vorbereiten. Den angezeigten Teil oder den gesamten Inhalt eines tatsächlich scrollbaren Containers aufnehmen.
-• Auswahl vor der Bestätigung anpassen: acht Griffe, Verschieben, X/Y/Breite/Höhe und Tastatursteuerung. Pfeiltasten verschieben die Auswahl oder einen Griff um 1 CSS-Pixel; Umschalt erhöht den Schritt auf 10 Pixel. Escape bricht ab.
-• Sofortige Aufnahme oder eine Verzögerung von 3, 5 oder 10 Sekunden mit abbrechbarem Countdown und lokal gespeicherter Einstellung. Bei Auswahlen und Elementen beginnt die Verzögerung nach Bestätigung, bei sichtbarem Bereich und ganzer Seite beim Start.
-• Begrenzte Auswahlen tolerieren nun wachsende dynamische Feeds, etwa auf X.com. Cookie-Banner in fixierten Containern mit Höhe null, die sich in zusammengesetzten Abschnitten wiederholen konnten, wurden korrigiert.
+Ergebnisse weitergeben
+Speichere ein Bild oder Dokument, kopiere das Ergebnis oder nutze die Druckfunktion. Die Darstellung lässt sich über Ränder, Ausrichtung und Seiteneinteilung anpassen. Prüfe Inhalt und Metadaten vor dem Teilen.
 
----
+Datenschutz und Grenzen
+Wählen Sie unter Dokument eine Quellenrichtlinie: sanitized (Standard) entfernt URL-Abfragen und Fragmente; none entfernt Quellen und Links; full behält URLs ohne eingebettete Zugangsdaten bei. Dies gilt für gespeicherte Projekte und Exporte; Bibliotheksexporte verwenden immer sanitized. Beim Speichern entfernte Quellen sind nicht wiederherstellbar. Pfade, Bilder, Titel und Bildunterschriften können weiterhin sensibel sein. Pixel mit deckenden Masken schützen; Unschärfe ist nur visuell. Masken und Zuschnitte werden beim Speichern dauerhaft angewendet. Bilddateien über 16 Millionen Pixel oder 16.384 Pixel pro Seite werden vor dem Dekodieren abgelehnt; ein Dokument bleibt auf insgesamt 32 Millionen Pixel begrenzt.
 
-🚀 5 AUFNAHMEMODI
-• Ganze Seite: Seitenabschnitte vertikal und horizontal zusammensetzen, einschließlich unterstützter interner Scrollcontainer.
-• Sichtbarer Bereich: nur den im Fenster angezeigten Inhalt aufnehmen.
-• Ausgewählter Bereich: einen Bereich durch Ziehen markieren, an den Rändern automatisch scrollen lassen, anschließend anpassen und bestätigen.
-• Scrollbereich: eine Unterhaltung oder einen vertikalen Bereich über mehrere Bildschirme hinweg erfassen. Zwei Punkte festlegen oder X/Y/Breite/Höhe eingeben; mit „Bis nach unten“ den Bereich erweitern. Dieser Modus behält die gewählte sichtbare Breite bei und setzt nicht horizontal zusammen.
-• Element aufnehmen: einen Seitenblock visuell auswählen, zwischen über- und untergeordneten Elementen wechseln und seine Grenzen im Anpassungsbereich bestätigen.
+Oberfläche und Hilfe stehen auf Französisch, Englisch, Spanisch und Deutsch bereit. Benutzer verwalten Aufbewahrung und Löschung separat gespeicherter Dateien.
 
-🧩 KOMPOSITION MEHRERER BILDER
-Lokale Bilddateien importieren oder Bilder aus der Zwischenablage einfügen. Bilder hinzufügen, entfernen und umordnen; vertikale oder horizontale Anordnung, Abstand und Hintergrund wählen. Das Dokument mit Titeln, Bildunterschriften und nummerierten Schritten ergänzen.
-
-📚 LOKALE BIBLIOTHEK
-Projekte ausdrücklich speichern, um sie nach dem Schließen des Editors zu behalten. Über Vorschaubilder und Suche wiederfinden, umbenennen, duplizieren oder löschen. Eine Aufbewahrungsdauer von 0, 7, 30 oder 90 Tagen wählen: 0 Tage bedeutet keine automatische Ablaufzeit. Das lokale Kontingent ist von 64 bis 1.024 MiB einstellbar, mit 256 MiB als Standard.
-
-🎨 INTEGRIERTER ANNOTATIONSEDITOR
-Direkt im lokalen Editor arbeiten: Freihandzeichnung, halbtransparenter Textmarker (H), Pfeile (A), Rechtecke und Ellipsen als Umriss oder gefüllt (S), Text (T) und nummerierte Schrittmarkierungen (P).
-Informationen mit einer deckenden Fläche abdecken oder optisch weichzeichnen. Geheimnisse mit einer deckenden Maske schützen: Weichzeichnung bietet keinen zuverlässigen Datenschutz.
-Das Bild zuschneiden, Änderungen mit Strg+Z/Strg+Y rückgängig machen oder wiederholen und den Zoom von 20 bis 300 % einstellen.
-Annotationen sind einzeln bearbeitbar. Ein portables .scionos-v2-Projekt speichern und wieder öffnen; v1-Projekte bleiben kompatibel, ihre Annotationen bleiben zusammengeführt. Beim Speichern werden deckende Masken und Zuschnitte unumkehrbar angewendet; betroffene Annotationen werden konservativ entfernt. Nach einem Zuschnitt werden beim Speichern alle vorherigen Annotationen zusammengeführt, um ihre Darstellung und Reihenfolge zu bewahren.
-
-📄 EXPORTE
-• Aufnahme oder Komposition als PNG, JPEG oder WebP herunterladen; die Qualität für die entsprechenden Formate einstellen.
-• Das Dokument als Markdown samt Bildern in einer ZIP-Datei exportieren.
-• Über die Druckfunktion des Browsers drucken oder als PDF mit Seitenaufteilung speichern. Durchsuchbarer Text und anklickbare Links bleiben erhalten, wenn ihre Sichtbarkeit überprüft werden kann.
-• Maskierte oder angeschnittene Wörter sowie Wörter mit unklarer Sichtbarkeit werden aus der PDF-Textebene ausgeschlossen; das aufgenommene Bild bleibt erhalten.
-• Das Bild in die Zwischenablage kopieren und in eine E-Mail, ein Supportticket oder ein Dokument einfügen.
-Ränder, Ausrichtung, Skalierung und Kopf-/Fußzeilen mit Titel, Quelle, Datum und Seitennummerierung einstellen, innerhalb der Größenlimits.
-Importierte Dateien und aus einem Projekt wiederhergestellte Bilder bieten keine verlässliche Textebene: eine originalgetreue Textsuche in ihren PDFs wird nicht zugesichert.
-Ausstehende Änderungen vor dem Export übernehmen oder verwerfen.
-
-🌐 EIGENSTÄNDIGER INTERAKTIVER HTML-BERICHT
-Eine eigenständige HTML-Datei erstellen, die das Aufnahmebild und einen Betrachter enthält: Zoom, Verschieben, Kopieren, Drucken und PNG-Download.
-Der Bericht umfasst Titel, Quellenlink, Datum, Uhrzeit und Abmessungen. Er lässt sich offline in einem Browser öffnen, ohne Hosting oder externen Dienst. Er bewahrt das aufgenommene Seitenbild, keine interaktive Kopie der ursprünglichen Website.
-
-🖥️ KOMFORT UND PRODUKTIVITÄT
-Dunkle Oberfläche und für HiDPI-Displays geeignete Aufnahmen, einschließlich Windows-Skalierung mit 125 % und 150 %.
-Die vorgeschlagene Tastenkombination Alt+Umschalt+C öffnet die Erweiterung, sofern der Browser sie zuweist. Sie lässt sich auf der Tastenkombinationsseite des Browsers einstellen; das Popup zeigt die tatsächlich zugewiesene Kombination.
-Im Editor: V für den Zeiger, D zum Zeichnen, H zum Hervorheben, A für Pfeile, S für Formen, T für Text, P für Schritte, M zum Maskieren und C zum Zuschneiden. Den Zoom mit 0, + und − steuern.
-Nicht in der Bibliothek gespeicherte Aufnahmen und Übertragungsfragmente werden vorübergehend in IndexedDB auf deinem Gerät gespeichert. Eine Aufnahme bleibt erhalten, solange ihr Editor geöffnet ist, auch nach erneutem Laden. Sie wird beim Schließen des letzten zugehörigen Editors gelöscht. Verwaiste Aufnahmen können nach fünfzehn Minuten bereinigt werden; abgebrochene Übertragungen laufen nach fünfzehn Minuten ohne Aktivität ab. Ein pausierter Browser kann die Bereinigung bis zum Aufwachen verschieben.
-
-🔒 PRIVATSPHÄRE UND DATEN
-Die Verarbeitung erfolgt vollständig lokal. Kein Verarbeitungsserver, kein Versand von Aufnahmen, keine Telemetrie und keine Werbung. Kein Konto erforderlich. Pixel, sichtbarer Text und Metadaten bleiben auf deinem Gerät; Sprache und Aufnahmeverzögerung werden lokal gespeichert.
-Die .scionos-Projekte und Exporte werden auf deinen Wunsch lokal gespeichert. Sie können Bilder, Kompositionstexte, Titel, Bildunterschriften, Quellen und Datumsangaben enthalten: vor dem Teilen prüfen. Du verwaltest die Aufbewahrung und Löschung dieser Dateien.
-Interne Browserseiten und manche geschützten Seiten können nicht aufgenommen werden. Die Elementauswahl durchsucht keine iframe-Inhalte; animierte oder virtualisierte Inhalte und endlose Feeds können Einschränkungen aufweisen. Sehr große Bilder können automatisch verkleinert werden.
-
-💻 OPEN SOURCE UND SUPPORT
-Quellcode ansehen, beitragen oder ein Problem melden:
-https://github.com/ScioNos/Scionos-Capture
+Entwickelt von eyelo SA, Schweiz, unter der Marke ScioNos.
 Support: https://github.com/ScioNos/Scionos-Capture/issues
 Datenschutz: https://github.com/ScioNos/Scionos-Capture/blob/main/PRIVACY.md
-Kontakt: info@eyelo.ch
-Herausgeber: eyelo SA, Schweiz — Marke ScioNos.
-
-🌍 INTERNATIONAL
-Oberfläche und Hilfe sind auf Französisch, Englisch, Spanisch und Deutsch verfügbar. Die Sprache folgt automatisch dem Browser und lässt sich im Sprachmenü der dunklen Oberfläche manuell ändern.

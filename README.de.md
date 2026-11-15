@@ -10,11 +10,11 @@
 
 [Français](README.md) · [English](README.en.md) · [Deutsch](README.de.md) · [Español](README.es.md)
 
-[![Version](https://img.shields.io/badge/version-1.5.0-blue)](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.0) [![Prüfungen](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml/badge.svg)](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml) [![MIT-Lizenz](https://img.shields.io/badge/licence-MIT-green)](LICENSE) ![Chrome und Edge](https://img.shields.io/badge/Chrome_%26_Edge-Manifest_V3-4285F4)
+[![Version](https://img.shields.io/badge/version-1.5.1-blue)](https://github.com/ScioNos/Scionos-Capture) [![Prüfungen](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml/badge.svg)](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml) [![MIT-Lizenz](https://img.shields.io/badge/licence-MIT-green)](LICENSE) ![Chrome und Edge](https://img.shields.io/badge/Chrome_%26_Edge-Manifest_V3-4285F4)
 
 **[Version 1.5.0 herunterladen](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.0)** · **[Chrome-Web-Store-Eintrag ansehen](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe)** · **[Hilfe erhalten](https://github.com/ScioNos/Scionos-Capture/issues)**
 
-<!-- source-version --> Version 1.5.0 ist auf GitHub verfügbar. Die Aktualisierung des Chrome-Web-Store-Eintrags wird vorbereitet; seine Version kann vom Repository abweichen.
+<!-- source-version --> Version 1.5.0 ist bereits im Chrome Web Store veröffentlicht. Das lokal validierte Update 1.5.1 wartet vor dem Upload und der Einreichung auf eine erneute Anmeldung im Entwickler-Dashboard. Die GitHub-Version bleibt bei 1.5.0; nach Einreichung hängt die Store-Veröffentlichung von der Genehmigung durch Google ab. Der GitHub-Download bleibt bei Version 1.5.0.
 
 ![Scionos-Capture-Editor 1.5.0: Bildannotation und Vorschau einer horizontalen Komposition](store-assets/screenshot-real-1-composition-v1.5.0.png)
 
@@ -40,7 +40,7 @@ Erstellen Sie eine visuelle Erklärung, dokumentieren Sie ein Problem oder bewah
 4. Wählen Sie **Entpackte Erweiterung laden** und den entpackten Ordner mit dem Manifest aus.
 5. Heften Sie Scionos Capture an die Symbolleiste an und öffnen Sie eine normale Webseite.
 
-Über den [Chrome-Web-Store-Eintrag](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe) können Sie die Erweiterung aus dem Store installieren. Prüfen Sie die dort angebotene Version: GitHub-Veröffentlichung und Google-Prüfung erfolgen unabhängig voneinander.
+Version 1.5.0 ist bereits in diesem [Chrome-Web-Store-Eintrag](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe) veröffentlicht. Die Aktualisierung 1.5.1 wird derzeit zur Prüfung bei Google eingereicht und erscheint nach der Genehmigung im Eintrag.
 
 ## Drei Arbeitsabläufe
 
@@ -90,7 +90,8 @@ Wählen Sie eine Aufbewahrungsdauer von **0, 7, 30 oder 90 Tagen** und ein Konti
 - **Lokale Verarbeitung.** Die Erweiterung überträgt keine Aufnahmen, URLs oder Browserdaten an ScioNos oder Dritte. Es wird kein Code aus entfernten Quellen ausgeführt.
 - **Selbst gewählte Aufbewahrung.** Temporäre Aufnahmen und Fragmente werden gemäß ihrem Lebenszyklus bereinigt. Bibliotheksprojekte folgen der gewählten Aufbewahrungsdauer; separat gespeicherte Dateien liegen in Ihrer Verantwortung.
 - **Deckende Masken für Geheimnisse.** Unschärfe ist ein visueller Effekt. Beim Speichern eines Projekts werden Masken und Zuschnitte unumkehrbar angewendet; betroffene Annotationen werden vorsorglich entfernt. Nach einem Zuschnitt werden vorherige Annotationen ins Bild eingebettet, um Darstellung und Reihenfolge zu erhalten.
-- **Vor dem Teilen prüfen.** Projekte und Exporte können Bilder, Titel, Bildunterschriften, Quellen und Datumsangaben enthalten.
+- **Quellen kontrollieren.** Im Bereich Dokument entfernt `sanitized` standardmäßig URL-Abfrageparameter und Fragmente; `none` lässt Quellen weg und `full` behält sie bei. In HTTP(S)-URLs eingebettete Zugangsdaten werden immer entfernt. Die Wahl gilt für Projekte und Exporte; beim Speichern entfernte Quellen lassen sich nicht wiederherstellen. Bibliotheksexporte verwenden immer `sanitized`, auch für ältere Projekte.
+- **Vor dem Teilen prüfen.** URL-Pfade, Bilder, Titel, Bildunterschriften und Datumsangaben können weiterhin vertraulich sein. Die Diagnose ist lokal und wird ausdrücklich aktiviert, ohne Telemetrie.
 
 Lesen Sie die [Datenschutzerklärung](PRIVACY.de.md) und das [Sicherheitsmodell](SECURITY.de.md).
 
@@ -113,7 +114,7 @@ Fragmente bleiben in der lokalen IndexedDB und werden nach dem Zusammensetzen od
 - Interne Browserseiten und Erweiterungs-Stores sind gegen das Injizieren von Code geschützt.
 - Animierte, virtualisierte oder endlose Inhalte können unvollständig bleiben. Manche festen oder `sticky`-Elemente können zwischen den Abschnitten variieren.
 - Die Auswahl durchsucht weder iframe-Inhalte noch geschlossene Shadow Roots.
-- Bilder über **16 Millionen Pixel** oder **16.384 px pro Seite** können verkleinert werden. Nicht unterstützte Drehungen, Scherungen und perspektivische Transformationen werden ausdrücklich abgelehnt.
+- PNG-, JPEG- und WebP-Importe über **16 Millionen Pixel** oder **16.384 px pro Seite** werden vor dem Dekodieren abgelehnt statt verkleinert. Das Gesamtlimit der Komposition bleibt bei **32 Millionen Pixel**. Nicht unterstützte Drehungen, Scherungen und perspektivische Transformationen werden ausdrücklich abgelehnt.
 - Durchsuchbarer PDF-Text bleibt nur erhalten, wenn seine Sichtbarkeit überprüfbar ist. Importierte und aus einem Projekt wiederhergestellte Bilder liefern keine zuverlässige Textebene; unsichere Wörter werden aus der Textebene ausgelassen, das Bild bleibt erhalten.
 - Übernehmen oder verwerfen Sie ausstehende Änderungen vor einem Export.
 
@@ -130,9 +131,9 @@ npm run verify
 
 `verify` prüft Syntax, Lint, HTML, Unit-Tests, Übersetzungen, Paket und Browser-/Barrierefreiheitsregressionen. `npm run test:native` testet die fünf Modi in installiertem Chrome und Edge mit echten Aufnahmen und temporären Profilen, ohne persönliche Profile zu nutzen. `npm run package` erzeugt das Archiv und seine Prüfsumme in `dist/`.
 
-Versionsabgleich: `npm run version:sync -- 1.5.0`; in PowerShell: `npm.cmd run version:sync -- 1.5.0`.
+Versionsabgleich: `npm run version:sync -- 1.5.1 --unreleased`; in PowerShell: `npm.cmd run version:sync -- 1.5.1 --unreleased`.
 
-<!-- local-package --> Lokales Archiv: scionos-capture-v1.5.0.zip · SHA-256: scionos-capture-v1.5.0.zip.sha256.
+<!-- local-package --> Geplante lokale Dateien nach der Validierung: scionos-capture-v1.5.1.zip · SHA-256: scionos-capture-v1.5.1.zip.sha256.
 
 [Beitragen](CONTRIBUTING.de.md) · [Änderungen](CHANGELOG.de.md) · [Versionshinweise](RELEASE_NOTES.md) · [Problem melden](https://github.com/ScioNos/Scionos-Capture/issues) · [Sicherheitslücke melden](SECURITY.de.md)
 

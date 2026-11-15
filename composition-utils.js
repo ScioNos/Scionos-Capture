@@ -112,6 +112,10 @@
     const contentHeight = vertical ? output.reduce((sum, item) => sum + item.height, 0) + Math.max(0, output.length - 1) * s.gap : Math.max(0, ...output.map(item => item.height));
     return { width: contentWidth + 2 * s.padding, height: contentHeight + titleHeight + 2 * s.padding, items: output, titleHeight, titleLines, background: s.background, settings: s };
   }
+  function sourcePolicy(value = 'sanitized') {
+    if (!['sanitized', 'none', 'full'].includes(value)) fail('Invalid source policy');
+    return value;
+  }
   function normalizeExportSettings(value = {}) {
     object(value, 'export settings');
     const format = value.format === undefined ? 'A4' : value.format;
@@ -131,7 +135,7 @@
       const enabled = boolean(v.enabled, true, name);
       return { enabled, heightMm: enabled ? number(v.heightMm, 8, 0, 50, `${name} height`) : 0, ...Object.fromEntries(['title','source','date','pagination'].map(key => [key, boolean(v[key], key === 'pagination', `${name} ${key}`)])) };
     };
-    return { format, orientation, marginsMm, scale, header: band(value.header, 'header'), footer: band(value.footer, 'footer') };
+    return { format, orientation, marginsMm, scale, header: band(value.header, 'header'), footer: band(value.footer, 'footer'), sourcePolicy: sourcePolicy(value.sourcePolicy) };
   }
   // scale:'fit' fits the width and paginates vertically; percentages use CSS 96dpi.
   // Numeric percentages may tile in both axes. Source rectangles share exact edges.
@@ -326,14 +330,22 @@
     } finally { await reader.cancel().catch(() => {}); }
     return { bytes: new Uint8Array(await new Blob(chunks).arrayBuffer()), width, height };
   }
+  function sourceUrl(value, policy = 'full') {
+    const url = text(value, 8192, 'url');
+    if (!url) return '';
+    let parsed;
+    try { parsed = new URL(url); } catch { fail('Invalid source URL'); }
+    if (!['http:', 'https:'].includes(parsed.protocol)) fail('Invalid source URL');
+    parsed.username = ''; parsed.password = '';
+    if (policy === 'none') return '';
+    if (policy === 'sanitized') { parsed.search = ''; parsed.hash = ''; }
+    return parsed.href;
+  }
   function metadata(item) {
     object(item, 'project item');
     const id = text(item.id, 128, 'id');
     if (!id) fail('Missing item id');
-    let url = text(item.url, 8192, 'url');
-    if (url) {
-      try { const parsed = new URL(url); if (!['http:', 'https:'].includes(parsed.protocol)) fail('Invalid source URL'); parsed.username = ''; parsed.password = ''; url = parsed.href; } catch { fail('Invalid source URL'); }
-    }
+    const url = sourceUrl(item.url);
     const timestamp = item.timestamp === undefined ? null : item.timestamp;
     if (timestamp !== null && !(typeof timestamp === 'number' && Number.isFinite(timestamp) && timestamp >= 0 && timestamp <= 8640000000000000) && !(typeof timestamp === 'string' && timestamp.length <= 64 && Number.isFinite(Date.parse(timestamp)))) fail('Invalid timestamp');
     return { id, title: text(item.title, 1000), caption: text(item.caption), url, timestamp };
@@ -412,7 +424,7 @@
     const settings = normalizeSettings(document.settings);
     const exportSettings = normalizeExportSettings(document.exportSettings);
     const title = text(document.title, 1000, 'project title');
-    const entries = [], items = [], ids = new Set();
+    const items = [], ids = new Set();
     const annotationBudget = { annotations: 0, points: 0 };
     let total = 0;
     for (const item of document.items) {
@@ -428,16 +440,25 @@
       const png = await cleanPng(new Uint8Array(await item.blob.arrayBuffer()));
       if ((item.width !== undefined && item.width !== png.width) || (item.height !== undefined && item.height !== png.height)) fail('PNG/item dimensions mismatch');
       const annotations = normalizeAnnotations(item.annotations, png.width, png.height, annotationBudget);
-      const path = `images/${String(i + 1).padStart(3, '0')}.png`;
-      entries.push({ name: path, data: png.bytes });
-      items.push({ ...meta, path, width: png.width, height: png.height, annotations });
+      items.push({ ...meta, width: png.width, height: png.height, bytes: png.bytes, annotations });
     }
-    const manifest = { schemaVersion: 2, title, settings, exportSettings, items };
+    return serializeProject({ title, settings, exportSettings, items });
+  }
+  // Only private normalization paths produce this model: every PNG has already
+  // been validated and cleaned once. Never accept caller-supplied validation flags.
+  function serializeProject(document) {
+    const entries = [], items = document.items.map((item, i) => {
+      const { bytes, ...meta } = item;
+      const path = `images/${String(i + 1).padStart(3, '0')}.png`;
+      entries.push({ name: path, data: bytes });
+      return { ...meta, url: sourceUrl(meta.url, document.exportSettings.sourcePolicy), path };
+    });
+    const manifest = { schemaVersion: 2, title: document.title, settings: document.settings, exportSettings: document.exportSettings, items };
     const manifestBytes = encoder.encode(JSON.stringify(manifest));
     if (manifestBytes.length > LIMITS.manifestBytes) fail('Manifest size limit exceeded');
     return new Blob([encodeZip([{ name: 'manifest.json', data: manifestBytes }, ...entries])], { type: 'application/x-scionos-project' });
   }
-  async function decodeProject(blob) {
+  async function readProject(blob) {
     if (!(blob instanceof Blob) || blob.size > LIMITS.zipBytes) fail('Invalid project blob');
     const entries = decodeZip(new Uint8Array(await blob.arrayBuffer()));
     const files = new Map(entries.map(entry => [entry.name, entry.data]));
@@ -465,10 +486,26 @@
       const png = await cleanPng(bytes);
       if (item.width !== png.width || item.height !== png.height) fail('PNG/manifest dimensions mismatch');
       const annotations = manifest.schemaVersion === 1 ? [] : normalizeAnnotations(item.annotations, png.width, png.height, annotationBudget);
-      items.push({ ...meta, width: png.width, height: png.height, blob: new Blob([png.bytes], { type: 'image/png' }), annotations });
+      items.push({ ...meta, width: png.width, height: png.height, bytes: png.bytes, annotations });
     }
-    // Return a fresh allowlisted model. No text layer, history, originals, or unknown fields.
     return { title, settings, exportSettings, items };
   }
-  return Object.freeze({ LIMITS, crc32, cleanPng, estimateTextLines, computeLayout, buildPagePlan, encodeZip, decodeZip, encodeProject, decodeProject });
+  async function decodeProject(blob) {
+    const document = await readProject(blob);
+    // Return a fresh allowlisted model. No text layer, history, originals, or unknown fields.
+    return { ...document, items: document.items.map(({ bytes, ...item }) => ({ ...item, blob: new Blob([bytes], { type: 'image/png' }) })) };
+  }
+  async function rewriteProjectMetadata(blob, changes) {
+    object(changes, 'metadata changes');
+    if (Reflect.ownKeys(changes).some(key => key !== 'title' && key !== 'sourcePolicy')) fail('Unsupported metadata change');
+    const hasTitle = Object.hasOwn(changes, 'title');
+    const title = hasTitle ? text(changes.title, 1000, 'project title') : undefined;
+    const hasPolicy = Object.hasOwn(changes, 'sourcePolicy');
+    const policy = hasPolicy ? sourcePolicy(changes.sourcePolicy) : undefined;
+    const document = await readProject(blob);
+    if (hasTitle) { document.title = title; document.settings.title = title; }
+    if (hasPolicy) document.exportSettings.sourcePolicy = policy;
+    return serializeProject(document);
+  }
+  return Object.freeze({ LIMITS, crc32, cleanPng, estimateTextLines, computeLayout, buildPagePlan, encodeZip, decodeZip, encodeProject, decodeProject, rewriteProjectMetadata });
 });

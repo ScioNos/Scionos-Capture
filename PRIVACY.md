@@ -2,7 +2,7 @@
 
 [Français](PRIVACY.md) · [English](PRIVACY.en.md) · [Español](PRIVACY.es.md) · [Deutsch](PRIVACY.de.md)
 
-Dernière mise à jour : 14 novembre 2026 — version 1.5.0.
+Dernière mise à jour : 14 novembre 2026 — version 1.5.1.
 
 **Éditeur responsable :** eyelo SA (IDE : CHE-108.174.302), Vaud, Suisse — Marque **ScioNos** ([scionos.ch](https://scionos.ch)) — Contact : info@eyelo.ch
 
@@ -23,6 +23,14 @@ Pour toute question de confidentialité : info@eyelo.ch. Pour une vulnérabilit�
 La couche recherchable du PDF conserve uniquement les mots complets dont la visibilité est vérifiable. Les mots incertains sont omis de cette couche ; l’image capturée est conservée. Les anciens calques aux coordonnées non vérifiables sont également omis. Le masquage solide reste nécessaire pour protéger les pixels confidentiels ; le flou est seulement visuel.
 
 Appliquez ou annulez les modifications en attente avant tout export. Le flou reste un effet visuel ; utilisez un masque solide pour les secrets.
+
+## Confidentialité de la mise à jour 1.5.1 — soumission Store en attente
+
+Dans le panneau Document, la politique de sources s’applique aux projets sauvegardés et aux exports : sanitized (par défaut) retire paramètres de requête et fragments des URL, none omet les sources et full les conserve. Les identifiants intégrés aux URL HTTP(S) sont toujours retirés, même en mode full. Les sources retirées à la sauvegarde ne sont plus récupérables ; changer de mode ensuite ne les restaure pas. L’export depuis la bibliothèque applique toujours sanitized, y compris aux projets enregistrés avant cette version.
+
+Ce filtrage ne rend pas le document anonyme : le chemin de l’URL, les pixels, titres, légendes et dates peuvent encore contenir des informations sensibles. Vérifiez-les avant tout partage. Les copies déjà exportées restent sous votre contrôle et ne sont pas modifiées par un changement de politique.
+
+Le diagnostic est local et doit être activé explicitement ; il n’ajoute aucune télémétrie ni transmission automatique. Les permissions restent inchangées. La lecture des projets v1/v2 et l’écriture v2 sont conservées ; les protections irréversibles des masques et rognages restent applicables.
 
 ## Confidentialité de la version 1.5.0
 

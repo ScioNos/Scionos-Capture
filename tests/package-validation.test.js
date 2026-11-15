@@ -9,6 +9,41 @@ test('manifest, locale catalogs, icons and referenced files are valid', async ()
   assert.ok(result.files > 10);
 });
 
+test('manifest policy allows only the current permission set and local CSP', async () => {
+  const { validateManifestPolicy } = await import('../scripts/validate-package.mjs');
+  const manifest = require('../manifest.json');
+  assert.doesNotThrow(() => validateManifestPolicy(manifest));
+  assert.doesNotThrow(() => validateManifestPolicy({ ...manifest,
+    host_permissions: [], optional_host_permissions: [], optional_permissions: [], externally_connectable: {},
+    content_security_policy: { extension_pages: "script-src 'self'; object-src 'self'; connect-src 'none'" }
+  }));
+  for (const permissions of [undefined, 'activeTab', ['activeTab', 'tabs'], ['https://example.com/*'], ['activeTab', 'activeTab']]) {
+    assert.throws(() => validateManifestPolicy({ ...manifest, permissions }), /permissions|permission/);
+  }
+  for (const field of ['host_permissions', 'optional_host_permissions', 'optional_permissions']) {
+    for (const value of [['https://example.com/*'], ['<all_urls>'], ['tabs'], '']) {
+      assert.throws(() => validateManifestPolicy({ ...manifest, [field]: value }), new RegExp(field));
+    }
+  }
+  for (const value of [{ matches: ['https://example.com/*'] }, { ids: ['*'] }, { accepts_tls_channel_id: true }, []]) {
+    assert.throws(() => validateManifestPolicy({ ...manifest, externally_connectable: value }), /externally_connectable/);
+  }
+});
+
+test('manifest policy rejects remote CSP and unsafe evaluation across scopes', async () => {
+  const { validateManifestPolicy } = await import('../scripts/validate-package.mjs');
+  const manifest = require('../manifest.json');
+  for (const scope of ['extension_pages', 'sandbox']) {
+    for (const source of ['https://cdn.example.com', 'http://example.com', 'https:', 'wss://example.com',
+      '//cdn.example.com', '*.example.com', 'example.com', '*', "'unsafe-eval'", "'UNSAFE-EVAL'"]) {
+      assert.throws(() => validateManifestPolicy({ ...manifest,
+        content_security_policy: { [scope]: "script-src 'self' " + source }
+      }), /CSP/);
+    }
+  }
+  assert.throws(() => validateManifestPolicy({ ...manifest, content_security_policy: "script-src 'self'" }), /MV3/);
+});
+
 test('PNG dimensions require a complete PNG signature and IHDR header', async () => {
   const { pngDimensions } = await import('../scripts/validate-package.mjs');
   const header = Buffer.alloc(24);

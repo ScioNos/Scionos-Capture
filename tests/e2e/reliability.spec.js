@@ -336,14 +336,26 @@ async function applyRectangle(page, tool, rect) {
   await page.locator('#geometry-apply').click();
 }
 async function printText(page) {
-  await page.evaluate(() => { globalThis.print = () => {}; document.getElementById('print-area').innerHTML = ''; });
-  await page.locator('#btn-pdf').click();
-  await expect(page.locator('#export-dialog')).toBeVisible();
-  await page.locator('#export-confirm').click();
-  await expect(page.locator('#export-dialog')).not.toBeVisible();
-  await expect(page.locator('#print-area img').first()).toHaveAttribute('src', /^blob:/);
-  await page.evaluate(async () => { await Promise.all([...document.querySelectorAll('#print-area img')].map(image => image.decode())); });
-  return printedPdfText(page);
+  await page.evaluate(() => {
+    globalThis.__scionosDiagnostics = [];
+    globalThis.__printCalls = 0;
+    globalThis.print = () => { globalThis.__printCalls++; };
+  });
+  try {
+    await page.locator('#btn-pdf').click();
+    await expect(page.locator('#export-dialog')).toBeVisible();
+    await page.locator('#export-confirm').click();
+    await expect(page.locator('#export-dialog')).not.toBeVisible();
+    await expect.poll(() => page.evaluate(() => globalThis.__printCalls)).toBe(1);
+    await expect(page.locator('#print-area img').first()).toHaveAttribute('src', /^blob:/);
+    await page.evaluate(async () => { await Promise.all([...document.querySelectorAll('#print-area img')].map(image => image.decode())); });
+    return await printedPdfText(page);
+  } catch (error) {
+    await test.info().attach('export-phases', { body: JSON.stringify(await page.evaluate(() => globalThis.__scionosDiagnostics).catch(() => [])), contentType: 'application/json' });
+    throw error;
+  } finally {
+    await page.evaluate(() => globalThis.dispatchEvent(new globalThis.Event('afterprint'))).catch(() => {});
+  }
 }
 async function printedPdfText(page) {
   const pdf = await page.pdf({ preferCSSPageSize: true, printBackground: true });

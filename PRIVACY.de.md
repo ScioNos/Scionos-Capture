@@ -2,7 +2,7 @@
 
 [Français](PRIVACY.md) · [English](PRIVACY.en.md) · [Español](PRIVACY.es.md) · [Deutsch](PRIVACY.de.md)
 
-Zuletzt aktualisiert: 14. November 2026 — Version 1.5.0.
+Zuletzt aktualisiert: 14. November 2026 — Version 1.5.1.
 
 **Verantwortlicher Herausgeber:** eyelo SA (UID: CHE-108.174.302), Waadt (Vaud), Schweiz — Marke **ScioNos** ([scionos.ch](https://scionos.ch)) — Kontakt: info@eyelo.ch
 
@@ -19,6 +19,14 @@ Sprache und Aufnahmeverzögerung (`captureDelaySeconds`, 0, 3, 5 oder 10 Sekunde
 Die durchsuchbare PDF-Ebene enthält nur vollständige Wörter mit überprüfbarer Sichtbarkeit. Unsichere Wörter werden aus dieser Ebene ausgelassen; das aufgenommene Bild bleibt erhalten. Ältere Ebenen mit ungeprüften Koordinaten werden ebenfalls ausgelassen. Vertrauliche Pixel müssen deckend maskiert werden; Unschärfe ist nur ein visueller Effekt.
 
 Ausstehende Änderungen vor jedem Export übernehmen oder verwerfen. Unschärfe bleibt ein visueller Effekt; Geheimnisse deckend maskieren.
+
+## Datenschutzumfang der Version 1.5.1 — Store-Einreichung ausstehend
+
+Im Bereich Dokument gilt die Quellenrichtlinie für gespeicherte Projekte und Exporte: sanitized (Standard) entfernt URL-Abfrageparameter und Fragmente, none lässt Quellen weg und full behält sie bei. In HTTP(S)-URLs eingebettete Zugangsdaten werden immer entfernt, auch im Modus full. Beim Speichern entfernte Quellen sind nicht wiederherstellbar; ein späterer Moduswechsel stellt sie nicht wieder her. Bibliotheksexporte verwenden immer sanitized, auch für vor dieser Version gespeicherte Projekte.
+
+Diese Filterung anonymisiert das Dokument nicht: URL-Pfade, Pixel, Titel, Bildunterschriften und Datumsangaben können weiterhin vertrauliche Informationen enthalten. Vor dem Teilen prüfen. Bereits exportierte Kopien bleiben unter Ihrer Kontrolle und werden durch eine Richtlinienänderung nicht angepasst.
+
+Die Diagnose ist lokal und muss ausdrücklich aktiviert werden; sie fügt weder Telemetrie noch automatische Übertragung hinzu. Berechtigungen unverändert. Projekte v1/v2 bleiben lesbar, geschrieben wird v2; der unumkehrbare Schutz durch Masken und Zuschnitte gilt weiterhin.
 
 ## Datenschutzumfang der Version 1.5.0
 

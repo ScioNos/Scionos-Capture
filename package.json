@@ -1,6 +1,6 @@
 {
   "name": "scionos-capture",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "private": true,
   "license": "MIT",
   "description": "Extension Manifest V3 de capture d’écran locale pour Chrome et Edge.",
@@ -13,6 +13,7 @@
     "test": "node scripts/test.mjs",
     "test:e2e": "playwright test",
     "test:native": "node scripts/native-capture-smoke.mjs",
+    "test:performance": "node scripts/performance-smoke.mjs",
     "package": "node scripts/package.mjs",
     "verify:core": "npm run check && npm run lint && npm test && npm run validate && npm run package",
     "verify": "npm run verify:core && npm run test:e2e"

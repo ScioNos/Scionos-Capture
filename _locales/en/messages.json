@@ -3,7 +3,7 @@
     "message": "Scionos Capture"
   },
   "appDesc": {
-    "message": "Capture, annotate and compose images. Local projects and library; export PNG, JPEG, WebP, HTML, Markdown and PDF."
+    "message": "Capture and annotate web pages, compose documents and keep your projects in a local library."
   },
   "languagePicker": {
     "message": "Choose language"
@@ -400,13 +400,13 @@
   "popupHelpShort": { "message": "Help" },
   "helpCompositionHeader": { "message": "Compose multiple captures" },
   "helpImportHeader": { "message": "Import images" },
-  "helpImportText": { "message": "Choose Compose / Open images in the extension popup to open the editor without capturing a page. Open local images or paste an image from the clipboard. Images are processed locally." },
+  "helpImportText": { "message": "Choose Compose / Open images in the extension popup, then open local PNG, JPEG or WebP images or paste an image. Above 16 million pixels or 16,384 px per side, imports are rejected before decoding, without resizing. The total limit remains 32 million pixels. Processing is local." },
   "helpComposeHeader": { "message": "Arrange the composition" },
   "helpComposeText": { "message": "Add or remove images, change their order, and arrange them vertically or horizontally. Adjust the background and spacing, then add a title, captions, or numbered steps." },
   "helpExportHeader": { "message": "Export the document" },
-  "helpExportText": { "message": "Export the composition as PNG, JPEG, or WebP, an HTML report, a PDF, or Markdown with its images. JPEG and WebP offer adjustable quality. PDF options let you adjust the page layout. Image dimension limits are checked before export." },
+  "helpExportText": { "message": "Export as PNG, JPEG, WebP, HTML, PDF or Markdown with images. JPEG and WebP offer adjustable quality; PDF options control layout. In the Document panel, choose sanitized (default: no URL query or fragment), none (no sources) or full (retain sources) for projects and exports. HTTP(S) credentials are always removed. Library exports always use sanitized, including older projects." },
   "helpSaveHeader": { "message": "Keep your work" },
-  "helpSaveText": { "message": "Save and reopen a .scionos file to resume your composition. Schema 2 retains editable annotations; schema 1 projects remain compatible, but their earlier annotations are already flattened. Undo/Redo history resets on reopening. Unverified source text is not restored for PDF search. The version shown is the version actually loaded." },
+  "helpSaveText": { "message": "Save a .scionos v2 file; v1 and v2 projects remain readable, with flattened v1 annotations. Sources removed on save cannot be restored by changing modes later. Undo/Redo history resets and unverified text is not restored for PDF search. The version shown is the version actually loaded." },
   "helpTitle": {
     "message": "Help — Scionos Capture"
   },
@@ -417,7 +417,7 @@
     "message": "100% Local Privacy"
   },
   "helpPrivacyText": {
-    "message": "Scionos Capture runs entirely in your browser. No screenshot, metadata, or text is transmitted to an external server. Zero accounts, zero tracking, zero network dependencies."
+    "message": "Scionos Capture processes data locally, without an account or telemetry. Local diagnostics require explicit activation. URL paths, images, titles, captions and dates may remain sensitive even in sanitized mode: review them before sharing. Use solid masks for secrets; blur is visual only."
   },
   "helpModesHeader": {
     "message": "Capture Modes"

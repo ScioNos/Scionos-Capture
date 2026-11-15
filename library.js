@@ -108,10 +108,7 @@
           void run(async () => {
             const current = await CaptureStore.getLibraryProject(record.id);
             if (!current || current.revision !== record.revision) throw new Error('Project changed or no longer exists.');
-            const project = await globalThis.ScionosCompositionUtils.decodeProject(current.blob);
-            project.title = newTitle;
-            project.settings.title = newTitle;
-            const blob = await globalThis.ScionosCompositionUtils.encodeProject(project);
+            const blob = await globalThis.ScionosCompositionUtils.rewriteProjectMetadata(current.blob, { title: newTitle });
             await CaptureStore.saveLibraryProject({ id: current.id, title: newTitle, source: current.source, thumbnail: current.thumbnail, blob }, { expectedRevision: current.revision });
           }, 'renamed');
         }),
@@ -119,13 +116,10 @@
           const current = await CaptureStore.getLibraryProject(record.id);
           if (!current || current.revision !== record.revision) throw new Error('Project changed or no longer exists.');
           const newTitle = (record.title || text('untitled')) + text('duplicateSuffix');
-          const project = await globalThis.ScionosCompositionUtils.decodeProject(current.blob);
-          project.title = newTitle;
-          project.settings.title = newTitle;
-          const blob = await globalThis.ScionosCompositionUtils.encodeProject(project);
+          const blob = await globalThis.ScionosCompositionUtils.rewriteProjectMetadata(current.blob, { title: newTitle });
           await CaptureStore.saveLibraryProject({ id: crypto.randomUUID(), title: newTitle, source: current.source, thumbnail: current.thumbnail, blob }, { expectedRevision: null });
         }, 'duplicated'); }),
-        cardButton('export', () => { void run(async () => { const project = await CaptureStore.getLibraryProject(record.id); if (!project || project.revision !== record.revision) throw new Error('Project changed or no longer exists.'); download(project.blob, project.title); }); }),
+        cardButton('export', () => { void run(async () => { const project = await CaptureStore.getLibraryProject(record.id); if (!project || project.revision !== record.revision) throw new Error('Project changed or no longer exists.'); download(await globalThis.ScionosCompositionUtils.rewriteProjectMetadata(project.blob, { sourcePolicy: 'sanitized' }), project.title); }); }),
         cardButton('remove', () => { if (window.confirm(text('deleteConfirm'))) void run(() => CaptureStore.deleteLibraryProject(record.id, record.revision), 'removed'); }, true)
       );
       body.append(title, meta, actions); li.append(image, body); list.append(li);

@@ -141,8 +141,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     de: { projectNotice: 'Das Projekt speichert Pixel und Zusammenstellung. Anmerkungen werden eingebrannt; ihr Verlauf bleibt nach erneutem Öffnen nicht erhalten.', reduceBefore: 'Die Zusammenstellung überschreitet die Bildgrenzen. Sie wird von {from} auf {to} Pixel verkleinert. Fortfahren?', compositionUndo: 'Zusammenstellung rückgängig', compositionRedo: 'Zusammenstellung wiederholen' }
   };
   const historyLabels = { fr: 'L’ajout et la suppression ne sont pas annulables et réinitialisent l’historique de composition.', en: 'Adding and removing images cannot be undone and resets composition history.', es: 'Añadir y eliminar imágenes no se puede deshacer y reinicia el historial de composición.', de: 'Hinzufügen und Entfernen sind nicht rückgängig zu machen und setzen den Zusammenstellungsverlauf zurück.' };
+  const sharingLabels = {
+    fr: { sourcePolicy: 'Sources et liens enregistrés', sourceSanitized: 'Liens sans paramètres ni fragments', sourceNone: 'Exclure les sources et liens', sourceFull: 'URL complètes', sourceHelp: 'S’applique aux projets et exports. Les chemins, titres, légendes et dates peuvent rester sensibles. Les informations retirées d’un projet enregistré ne sont pas récupérables.', imageDimensions: 'Image invalide ou trop grande : maximum 16 millions de pixels et 16 384 pixels par côté. Réduisez-la avant import.' },
+    en: { sourcePolicy: 'Saved sources and links', sourceSanitized: 'Links without query parameters or fragments', sourceNone: 'Exclude sources and links', sourceFull: 'Full URLs', sourceHelp: 'Applies to projects and exports. Paths, titles, captions and dates can still be sensitive. Information removed from a saved project cannot be recovered.', imageDimensions: 'Invalid or oversized image: maximum 16 million pixels and 16,384 pixels per side. Resize it before importing.' },
+    es: { sourcePolicy: 'Fuentes y enlaces guardados', sourceSanitized: 'Enlaces sin parámetros ni fragmentos', sourceNone: 'Excluir fuentes y enlaces', sourceFull: 'URL completas', sourceHelp: 'Se aplica a proyectos y exportaciones. Rutas, títulos, leyendas y fechas pueden ser sensibles. La información eliminada de un proyecto guardado no se recupera.', imageDimensions: 'Imagen no válida o demasiado grande: máximo 16 millones de píxeles y 16.384 por lado. Redúcela antes de importarla.' },
+    de: { sourcePolicy: 'Gespeicherte Quellen und Links', sourceSanitized: 'Links ohne Abfrageparameter und Fragmente', sourceNone: 'Quellen und Links ausschließen', sourceFull: 'Vollständige URLs', sourceHelp: 'Gilt für Projekte und Exporte. Pfade, Titel, Beschriftungen und Daten können weiterhin sensibel sein. Aus einem gespeicherten Projekt entfernte Angaben sind nicht wiederherstellbar.', imageDimensions: 'Ungültiges oder zu großes Bild: höchstens 16 Millionen Pixel und 16.384 Pixel pro Seite. Vor dem Import verkleinern.' }
+  };
   const memoryLabels = { fr: 'La composition dépasse la limite mémoire de 32 millions de pixels. Réduisez les images ou retirez-en.', en: 'The composition exceeds the 32-million-pixel memory limit. Reduce or remove images.', es: 'La composición supera el límite de memoria de 32 millones de píxeles. Reduce o elimina imágenes.', de: 'Die Zusammenstellung überschreitet die Speichergrenze von 32 Millionen Pixeln. Bilder verkleinern oder entfernen.' };
-  const compositionText = key => key === 'historyNotice' ? (historyLabels[ScionosI18n.language] || historyLabels.en) : key === 'memoryLimit' ? (memoryLabels[ScionosI18n.language] || memoryLabels.en) : (projectLabels[ScionosI18n.language] || projectLabels.en)[key] || (extraLabels[ScionosI18n.language] || extraLabels.en)[key] || (copyLabels[ScionosI18n.language] || copyLabels.en)[key] || key;
+  const compositionText = key => key === 'historyNotice' ? (historyLabels[ScionosI18n.language] || historyLabels.en) : key === 'memoryLimit' ? (memoryLabels[ScionosI18n.language] || memoryLabels.en) : (sharingLabels[ScionosI18n.language] || sharingLabels.en)[key] || (projectLabels[ScionosI18n.language] || projectLabels.en)[key] || (extraLabels[ScionosI18n.language] || extraLabels.en)[key] || (copyLabels[ScionosI18n.language] || copyLabels.en)[key] || key;
 
   function markDocumentDirty() {
     documentDirty = true;
@@ -311,7 +317,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       for (const file of files) {
         let bitmap;
         try {
+          const header = ScionosCaptureUtils.readImageDimensions(new Uint8Array(await file.arrayBuffer()), file.type);
+          if (!header || header.width > 16384 || header.height > 16384 || header.width * header.height > 16000000) throw new Error(compositionText('imageDimensions'));
+          const reservedPixels = [...compositionItems, ...additions].reduce((sum, item) => sum + item.committedSurface.width * item.committedSurface.height, 0);
+          if (reservedPixels + header.width * header.height > 32000000) throw new Error(compositionText('memoryLimit'));
           bitmap = await createImageBitmap(file);
+          // Browser decoders can ignore EXIF for some formats. Both raw and
+          // oriented dimensions have the same bounded pixel count.
+          const matchesRaw = bitmap.width === header.width && bitmap.height === header.height;
+          const matchesOriented = bitmap.width === header.orientedWidth && bitmap.height === header.orientedHeight;
+          if ((!matchesRaw && !matchesOriented) || bitmap.width > 16384 || bitmap.height > 16384 || bitmap.width * bitmap.height > 16000000) throw new Error(compositionText('imageDimensions'));
           const dimensions = ScionosCaptureUtils.computeOutputDimensions(bitmap.width, bitmap.height, 1);
           const usedPixels = [...compositionItems, ...additions].reduce((sum, item) => sum + item.committedSurface.width * item.committedSurface.height, 0);
           if (usedPixels + dimensions.width * dimensions.height > 32000000) throw new Error(compositionText('memoryLimit'));
@@ -361,31 +376,73 @@ document.addEventListener('DOMContentLoaded', async () => {
     return { surface, annotations };
   }
 
-  function canvasPngBlob(surface) {
-    return new Promise((resolve, reject) => surface.toBlob(blob => blob && blob.type === 'image/png' ? resolve(blob) : reject(new Error('PNG encoding failed.')), 'image/png'));
+  function traceExport(stage, details = {}) {
+    const events = globalThis.__scionosDiagnostics;
+    if (!Array.isArray(events)) return;
+    if (events.length >= 500) events.shift();
+    events.push({ stage, at: Date.now(), ...details });
   }
 
-  // Freeze every pixel surface and its filtered metadata synchronously. Start all
-  // encoders before the first await so later edits cannot mix document revisions.
-  async function snapshotComposition() {
+  function canvasPngBlob(surface) {
+    traceExport('encode-start', { width: surface.width, height: surface.height });
+    return new Promise((resolve, reject) => surface.toBlob(blob => {
+      traceExport('encode-end', { bytes: blob?.size || 0 });
+      if (blob && blob.type === 'image/png') resolve(blob);
+      else reject(new Error('PNG encoding failed.'));
+    }, 'image/png'));
+  }
+
+  // Freeze every item at click time before any encoder can yield to later edits.
+  // Export and project snapshots need different pixels; encode only the needed form.
+  function freezeComposition(mode) {
     if (!allowDocumentAction() || !compositionItems.length) return null;
     persistActiveItem();
-    const revision = documentRevision;
-    const title = compositionSettings.title;
-    const settings = { ...compositionSettings };
-    const exportSettings = readPdfSettings();
-    const pending = compositionItems.map(item => {
-      const safe = secureProjectSurface(item);
-      const projectBlob = canvasPngBlob(safe.surface);
-      const source = item.committedSurface;
-      const surface = createSurface(source.width, source.height);
-      surface.getContext('2d').drawImage(source, 0, 0);
-      const metadata = { id: item.id, width: surface.width, height: surface.height, title: item.title, caption: item.caption, url: ScionosCaptureUtils.sanitizeUrl(item.captureRecord.url || '') || '', timestamp: item.captureRecord.timestamp || Date.now(), textBlocks: item.activeTextBlocks.map(block => ({ ...block })) };
-      const encoded = canvasPngBlob(surface);
-      return Promise.all([encoded, projectBlob]).then(([blob, safeBlob]) => ({ ...metadata, blob, safeBlob, annotations: safe.annotations }));
-    });
-    const items = await Promise.all(pending);
-    return { items, settings, title, exportSettings, revision };
+    traceExport('freeze-start', { mode, items: compositionItems.length });
+    const frozen = { items: [], settings: { ...compositionSettings }, title: compositionSettings.title,
+      exportSettings: readPdfSettings(), revision: documentRevision, thumbnailSurface: null };
+    try {
+      for (const item of compositionItems) {
+        let surface, annotations = [];
+        if (mode === 'export') {
+          const source = item.committedSurface;
+          surface = createSurface(source.width, source.height);
+          surface.getContext('2d').drawImage(source, 0, 0);
+        } else ({ surface, annotations } = secureProjectSurface(item));
+        frozen.items.push({ id: item.id, surface, annotations, width: surface.width, height: surface.height,
+          title: item.title, caption: item.caption, url: ScionosCaptureUtils.sanitizeSourceUrl(item.captureRecord.url || '', frozen.exportSettings.sourcePolicy),
+          timestamp: item.captureRecord.timestamp || Date.now(), textBlocks: mode === 'export' ? item.activeTextBlocks.map(block => ({ ...block,
+            url: ScionosCaptureUtils.sanitizeSourceUrl(block.url || '', frozen.exportSettings.sourcePolicy) })) : [] });
+      }
+      if (mode === 'library') {
+        const source = compositionItems[0].committedSurface;
+        const scale = Math.min(1, 220 / Math.max(source.width, source.height));
+        frozen.thumbnailSurface = createSurface(Math.max(1, Math.round(source.width * scale)), Math.max(1, Math.round(source.height * scale)));
+        frozen.thumbnailSurface.getContext('2d').drawImage(source, 0, 0, frozen.thumbnailSurface.width, frozen.thumbnailSurface.height);
+      }
+      traceExport('freeze-end', { mode });
+      return frozen;
+    } catch (error) { releaseFrozenSurfaces(frozen); throw error; }
+  }
+
+  function releaseFrozenSurfaces(frozen) {
+    for (const item of frozen.items) if (item.surface) { item.surface.width = item.surface.height = 1; item.surface = null; }
+    if (frozen.thumbnailSurface) { frozen.thumbnailSurface.width = frozen.thumbnailSurface.height = 1; frozen.thumbnailSurface = null; }
+  }
+
+  async function snapshotComposition(mode = 'export') {
+    const frozen = freezeComposition(mode);
+    if (!frozen) return null;
+    try {
+      const items = [];
+      for (const { surface, ...metadata } of frozen.items) {
+        const blob = await canvasPngBlob(surface);
+        items.push({ ...metadata, blob });
+        surface.width = surface.height = 1;
+      }
+      const thumbnail = frozen.thumbnailSurface ? await canvasPngBlob(frozen.thumbnailSurface) : null;
+      traceExport('snapshot-ready', { mode });
+      return { items, thumbnail, settings: frozen.settings, title: frozen.title, exportSettings: frozen.exportSettings, revision: frozen.revision };
+    } finally { releaseFrozenSurfaces(frozen); }
   }
 
   function downloadBlob(blob, extension, title = compositionSettings.title) {
@@ -398,9 +455,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function saveProject() {
     try {
-      const snapshot = await snapshotComposition();
+      const snapshot = await snapshotComposition('project');
       if (!snapshot) return;
-      const blob = await globalThis.ScionosCompositionUtils.encodeProject({ title: snapshot.title, settings: snapshot.settings, exportSettings: snapshot.exportSettings, items: snapshot.items.map(item => ({ id: item.id, blob: item.safeBlob, annotations: item.annotations, title: item.title, caption: item.caption, url: item.url, timestamp: item.timestamp })) });
+      const blob = await globalThis.ScionosCompositionUtils.encodeProject({ title: snapshot.title, settings: snapshot.settings, exportSettings: snapshot.exportSettings, items: snapshot.items.map(item => ({ id: item.id, blob: item.blob, annotations: item.annotations, title: item.title, caption: item.caption, url: item.url, timestamp: item.timestamp })) });
       downloadBlob(blob, 'scionos', snapshot.title);
       if (documentRevision === snapshot.revision) documentDirty = false;
       showToast(compositionText('saved'));
@@ -411,7 +468,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const session = librarySession;
     // Snapshot now, before joining the queue: later edits must not change a click's
     // contents. Attach rejection handling immediately even while a save is pending.
-    const pendingSnapshot = snapshotComposition().then(snapshot => ({ snapshot }), error => ({ error }));
+    const pendingSnapshot = snapshotComposition('library').then(snapshot => ({ snapshot }), error => ({ error }));
     session.saves = session.saves.then(() => saveLibrarySnapshot(session, pendingSnapshot));
   }
 
@@ -423,12 +480,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Only preceding saves from this same document may advance this revision.
       const id = session.id || crypto.randomUUID();
       const expectedRevision = session.revision;
-      const blob = await globalThis.ScionosCompositionUtils.encodeProject({ title: snapshot.title, settings: snapshot.settings, exportSettings: snapshot.exportSettings, items: snapshot.items.map(item => ({ id: item.id, blob: item.safeBlob, annotations: item.annotations, title: item.title, caption: item.caption, url: item.url, timestamp: item.timestamp })) });
-      const image = await createImageBitmap(snapshot.items[0].blob);
-      const thumbnailCanvas = createSurface(Math.max(1, Math.round(image.width * Math.min(1, 220 / Math.max(image.width, image.height)))), Math.max(1, Math.round(image.height * Math.min(1, 220 / Math.max(image.width, image.height)))));
-      thumbnailCanvas.getContext('2d').drawImage(image, 0, 0, thumbnailCanvas.width, thumbnailCanvas.height);
-      image.close();
-      const thumbnail = await canvasPngBlob(thumbnailCanvas);
+      const blob = await globalThis.ScionosCompositionUtils.encodeProject({ title: snapshot.title, settings: snapshot.settings, exportSettings: snapshot.exportSettings, items: snapshot.items.map(item => ({ id: item.id, blob: item.blob, annotations: item.annotations, title: item.title, caption: item.caption, url: item.url, timestamp: item.timestamp })) });
+      const thumbnail = snapshot.thumbnail;
       const metadata = await CaptureStore.saveLibraryProject({ id, title: snapshot.title || 'Scionos Capture', source: snapshot.items[0]?.url || '', thumbnail, blob }, { expectedRevision });
       session.id = id; session.revision = metadata.revision;
       chrome.runtime.sendMessage({ action: 'LIBRARY_PROJECTS_CHANGED' }).catch(() => {});
@@ -483,10 +536,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function readPdfSettings() {
     const band = name => ({ enabled: byId(`pdf-${name}`).checked, title: byId(`pdf-${name}-title`).checked, source: byId(`pdf-${name}-source`).checked, date: byId(`pdf-${name}-date`).checked, pagination: byId(`pdf-${name}-pagination`).checked });
-    return { format: byId('pdf-paper').value, orientation: byId('pdf-orientation').value, marginsMm: Math.max(5, Math.min(30, Number(byId('pdf-margin').value) || 12)), scale: byId('pdf-fit').checked ? 'fit' : Math.max(25, Math.min(100, Number(byId('pdf-scale').value) || 100)), header: band('header'), footer: band('footer') };
+    return { sourcePolicy: ScionosCaptureUtils.normalizeSourcePolicy(byId('source-policy').value), format: byId('pdf-paper').value, orientation: byId('pdf-orientation').value, marginsMm: Math.max(5, Math.min(30, Number(byId('pdf-margin').value) || 12)), scale: byId('pdf-fit').checked ? 'fit' : Math.max(25, Math.min(100, Number(byId('pdf-scale').value) || 100)), header: band('header'), footer: band('footer') };
   }
 
   function restorePdfSettings(settings) {
+    byId('source-policy').value = ScionosCaptureUtils.normalizeSourcePolicy(settings.sourcePolicy);
     if (['A4', 'Letter'].includes(settings.format)) byId('pdf-paper').value = settings.format;
     if (['portrait', 'landscape'].includes(settings.orientation)) byId('pdf-orientation').value = settings.orientation;
     const margin = typeof settings.marginsMm === 'number' ? settings.marginsMm : settings.marginsMm?.top;
@@ -520,10 +574,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function runCompositionExport(format) {
     const button = byId('export-confirm');
     button.disabled = true;
+    byId('export-status').textContent = compositionText('loading');
+    traceExport('export-start', { format });
     try {
       const snapshot = await snapshotComposition();
       if (!snapshot) return;
-      byId('export-status').textContent = compositionText('loading');
       const exporter = globalThis.ScionosCompositionExport;
       if (['png', 'jpeg', 'webp'].includes(format)) {
         const layout = globalThis.ScionosCompositionUtils.computeLayout(snapshot.items, snapshot.settings);
@@ -542,6 +597,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       byId('export-status').textContent = compositionText('done');
       byId('export-dialog').close();
+      traceExport('dialog-close', { format });
     } catch (error) { byId('export-status').textContent = compositionText('failure') + error.message; showToast(compositionText('failure') + error.message, true); }
     finally { button.disabled = false; }
   }
@@ -1450,6 +1506,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       showToast(getI18nText('copied'));
     } catch (error) { showToast(compositionText('failure') + error.message, true); }
   });
+  byId('source-policy').addEventListener('change', markDocumentDirty);
   byId('export-format').addEventListener('change', updateExportFields);
   byId('export-confirm').addEventListener('click', () => { void runCompositionExport(byId('export-format').value); });
   byId('export-cancel').addEventListener('click', () => byId('export-dialog').close());

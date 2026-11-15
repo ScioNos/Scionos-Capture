@@ -1,74 +1,22 @@
-Scionos Capture — Capture, annotate and export web pages with privacy in mind.
+Scionos Capture lets you capture a web page, annotate it and prepare a document on your device. No account is required and screenshots are not sent to a server.
 
-Scionos Capture is an extension for Chrome and Microsoft Edge with 100% local processing. Capture a page, an excerpt or a conversation, add annotations and export the result without sending your screenshots to a server.
+Capture a page
+Choose the visible area, a selection, a scrolling region, the whole page or an element. Adjust the bounds before confirming. A cancellable delay lets you prepare a menu or a temporary page state.
 
-Developed and published by eyelo SA (Switzerland), under the ScioNos brand.
+Compose and annotate
+Combine and reorder multiple imported or pasted images, with titles and captions. Update 1.5.1 refines source sharing, rejects oversized image files before decoding, and fixes image processing and printing. The editor provides drawing, text, arrows, highlighting, shapes, cropping and masking. Supported annotations remain editable in saved projects.
 
-🆕 WHAT’S NEW IN VERSION 1.5.0
-• Compose a document from multiple local images or images pasted from the clipboard.
-• Export as PNG, JPEG, WebP, HTML, Markdown with images in a ZIP, PDF or print, with new presentation settings.
-• Work with editable annotations and portable .scionos v2 projects, compatible with v1 projects.
-• Explicitly save projects to a local library with search, an adjustable quota and retention period.
+Keep your work
+Save a portable project to resume later, or store it in the local library. Search, rename, duplicate and delete projects there. The storage quota and retention period are adjustable, including a no-expiration option.
 
-🎯 CAPTURE AND SELECTION
-• Element capture mode: hover over a block, choose its parent or child, then prepare its capture. Capture the displayed portion or the entire content of a genuinely scrollable container.
-• Adjust your selection before confirming: eight resize handles, movement, X/Y/width/height fields and keyboard controls. Arrow keys move the selection or a handle by 1 CSS pixel; Shift increases the step to 10 pixels. Escape cancels.
-• Capture immediately or after 3, 5 or 10 seconds, with a cancellable countdown and a locally remembered preference. For selections and elements, the delay starts after confirmation; for visible-area and full-page captures, it starts at launch.
-• Bounded selections now tolerate a dynamic feed growing in height, including on X.com. Fixed cookie banners inside zero-height fixed wrappers that could repeat across stitched portions.
+Share a result
+Save an image or document, copy the result or use printing. Presentation settings provide margins, orientation and pagination. Review content and metadata before sharing.
 
----
+Privacy and limitations
+Choose a source policy in Document settings: sanitized (default) removes URL queries and fragments; none removes sources and links; full keeps URLs without embedded credentials. This applies to saved projects and exports; library exports always use sanitized. Sources removed on save cannot be recovered. Paths, images, titles and captions may still be sensitive. Use solid masks to protect pixels; blur is only visual. Masks and crops become permanent when saved. Image files above 16 million pixels or 16,384 pixels per side are rejected before decoding; a document remains limited to 32 million pixels total.
 
-🚀 5 CAPTURE MODES
-• Full page: stitch page portions vertically and horizontally, including supported internal scrolling containers.
-• Visible area: capture only what is displayed in the window.
-• Selected area: draw a region by dragging, with automatic scrolling at the edges, then adjust and confirm it.
-• Scrolling area: keep a conversation or a vertical region spanning several screens. Define two points or enter X/Y/width/height coordinates; use “To the bottom” to extend the region. This mode preserves the chosen visible width and does not stitch horizontally.
-• Element capture: visually choose a page block, navigate between parent and child, and confirm its bounds in the adjustment panel.
+The interface and help are available in French, English, Spanish and German. Users manage the retention and deletion of separately saved files.
 
-🧩 MULTI-IMAGE COMPOSITION
-Import local image files or paste images from the clipboard. Add, remove and reorder images, then choose a vertical or horizontal layout, spacing and background. Complete your document with titles, captions and numbered steps.
-
-📚 LOCAL LIBRARY
-Explicitly save projects to keep them after the editor closes. Find them using thumbnails and search; rename, duplicate or delete them. Choose a retention period of 0, 7, 30 or 90 days: 0 days means no automatic expiration. Adjust the local quota from 64 to 1,024 MiB, with a default of 256 MiB.
-
-🎨 BUILT-IN ANNOTATION EDITOR
-Work directly in the local editor: freehand drawing, a translucent highlighter (H), arrows (A), outlined or filled rectangles and ellipses (S), text (T) and numbered step markers (P).
-Cover information with an opaque solid mask or apply visual blur. Use solid masking to protect secrets: blur is not reliable data protection.
-Crop the image, undo or redo changes with Ctrl+Z/Ctrl+Y, and adjust zoom from 20 to 300%.
-Annotations are individually editable. Save and reopen a portable .scionos v2 project; v1 projects remain compatible, with their annotations flattened. On saving, solid masks and crops are applied irreversibly, and affected annotations are conservatively removed. After a crop, all preceding annotations are flattened on saving to preserve their appearance and order.
-
-📄 EXPORTS
-• Download your screenshot or composition as PNG, JPEG or WebP; adjust quality for the applicable formats.
-• Export your document as Markdown with its images in a ZIP.
-• Use your browser’s print function to print or save a paginated PDF. A searchable text layer and clickable links are retained where their visibility can be verified.
-• Masked or cropped words, and words whose visibility cannot be established, are excluded from the PDF text layer; the captured image is retained.
-• Copy the image to the clipboard to paste it into an email, a support ticket or a document.
-Adjust margins, orientation, scale and headers/footers with title, source, date and pagination, subject to size limits.
-Imported files and images restored from a project do not provide a reliable text layer: faithful text search is not promised in their PDFs.
-Apply or cancel pending edits before exporting.
-
-🌐 SELF-CONTAINED INTERACTIVE HTML REPORT
-Create a standalone HTML file embedding your screenshot image and its viewer: zoom, pan, copy, print and PNG download.
-The report includes the title, source link, date, time and dimensions. It opens offline in a browser without hosting or an external service. It preserves the captured page image, not an interactive copy of the original website.
-
-🖥️ COMFORT AND PRODUCTIVITY
-Enjoy a dark interface and captures suited to HiDPI displays, including Windows scaling at 125% and 150%.
-The suggested Alt+Shift+C shortcut opens the extension if assigned by your browser. Configure it on the browser’s shortcuts page; the popup shows the combination actually assigned.
-In the editor: V for the cursor, D to draw, H to highlight, A for arrows, S for shapes, T for text, P for steps, M to mask and C to crop. Use 0, + and − for zoom.
-Screenshots not saved to the library and transfer fragments are temporarily stored in IndexedDB on your device. A screenshot is kept while its editor remains open, including after a reload. It is deleted when the last associated editor closes. Orphaned screenshots become eligible for cleanup after fifteen minutes; abandoned transfers expire after fifteen minutes of inactivity. A suspended browser may defer cleanup until it wakes.
-
-🔒 PRIVACY AND DATA
-All screenshot processing takes place locally. No processing server, screenshot uploads, telemetry or advertising. No account is required. Screenshot pixels, visible text and metadata remain on your device; your chosen language and capture delay are remembered locally.
-The .scionos projects and exports are saved locally at your request. They may contain images, composition text, titles, captions, sources and dates: review them before sharing. You manage retention and deletion of these files.
-Internal browser pages and some protected pages cannot be captured. The element picker does not traverse iframe contents; animated or virtualized content and infinite feeds may have limitations. Very large images may be reduced automatically.
-
-💻 OPEN SOURCE AND SUPPORT
-Explore the source code, contribute or report a problem:
-https://github.com/ScioNos/Scionos-Capture
+Developed by eyelo SA, Switzerland, under the ScioNos brand.
 Support: https://github.com/ScioNos/Scionos-Capture/issues
 Privacy: https://github.com/ScioNos/Scionos-Capture/blob/main/PRIVACY.md
-Contact: info@eyelo.ch
-Publisher: eyelo SA, Switzerland — ScioNos brand.
-
-🌍 INTERNATIONAL
-The interface and help are available in French, English, Spanish and German. The language follows your browser automatically and can be changed manually from the language menu in the dark interface.

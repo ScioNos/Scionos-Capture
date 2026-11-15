@@ -2,7 +2,7 @@
 
 [Français](PRIVACY.md) · [English](PRIVACY.en.md) · [Español](PRIVACY.es.md) · [Deutsch](PRIVACY.de.md)
 
-Last updated: November 14, 2026 — version 1.5.0.
+Last updated: November 14, 2026 — version 1.5.1.
 
 **Publisher:** eyelo SA (UID: CHE-108.174.302), Vaud, Switzerland — Brand **ScioNos** ([scionos.ch](https://scionos.ch)) — Contact: info@eyelo.ch
 
@@ -21,6 +21,14 @@ For privacy inquiries: info@eyelo.ch. For vulnerabilities, use [SECURITY.en.md](
 The searchable PDF layer retains only complete words whose visibility can be verified. Uncertain words are omitted from that layer while the captured image is preserved. Legacy layers with unverified coordinates are also omitted. Use solid censorship to protect confidential pixels; blur is only a visual effect.
 
 Apply or cancel pending edits before any export. Blur remains a visual effect; use a solid mask for secrets.
+
+## Privacy scope of version 1.5.1 — Store submission pending
+
+In the Document panel, source policy applies to saved projects and exports: sanitized (default) removes URL query parameters and fragments, none omits sources and full retains them. Credentials embedded in HTTP(S) URLs are always removed, including in full mode. Sources removed on save cannot be recovered; switching modes later does not restore them. Library exports always apply sanitized, including to projects saved before this version.
+
+This filtering does not make the document anonymous: URL paths, pixels, titles, captions and dates may still contain sensitive information. Review them before sharing. Previously exported copies remain under your control and are not changed by a policy adjustment.
+
+Diagnostics are local and require explicit activation; they add no telemetry or automatic transmission. Permissions are unchanged. Project v1/v2 reading and v2 writing are retained; irreversible mask and crop protections still apply.
 
 ## Privacy scope of version 1.5.0
 

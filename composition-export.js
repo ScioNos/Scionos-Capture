@@ -16,23 +16,21 @@
     if (!utils || !capture || typeof utils.computeLayout !== 'function' || typeof capture.computeOutputDimensions !== 'function') throw new Error('Composition export utilities are unavailable.');
     return { utils, capture };
   }
-  function safeUrl(value) {
-    try {
-      const url = new URL(String(value || ''));
-      if (!['http:', 'https:'].includes(url.protocol)) return '';
-      url.username = '';
-      url.password = '';
-      return url.href;
-    } catch { return ''; }
+  function trace(stage, details = {}) {
+    const events = root.__scionosDiagnostics;
+    if (!Array.isArray(events)) return;
+    if (events.length >= 500) events.shift();
+    events.push({ stage, at: Date.now(), ...details });
   }
+  function safeUrl(value, policy) { return dependencies().capture.sanitizeSourceUrl(value, policy); }
   function finite(value) { return typeof value === 'number' && Number.isFinite(value); }
-  function verifiedBlocks(value, width, height) {
+  function verifiedBlocks(value, width, height, policy) {
     const limits = dependencies().utils.LIMITS;
     if (!Array.isArray(value) || value.length > limits.textBlocksPerItem) return [];
     const blocks = value.filter(block => block && typeof block.text === 'string' && block.text.length && block.text.length <= limits.textBlockText &&
       [block.x, block.y, block.width, block.height].every(finite) && block.x >= 0 && block.y >= 0 && block.width > 0 && block.height > 0 &&
       block.x + block.width <= width && block.y + block.height <= height).map(block => ({ text: block.text, x: block.x, y: block.y, width: block.width, height: block.height,
-      fontSize: finite(block.fontSize) && block.fontSize > 0 ? block.fontSize : 12, url: safeUrl(block.url) }));
+      fontSize: finite(block.fontSize) && block.fontSize > 0 ? block.fontSize : 12, url: safeUrl(block.url, policy) }));
     const bytes = blocks.reduce((total, block) => total + block.text.length * 2 + (block.url || '').length * 2 + 64, 0);
     return bytes <= limits.textBlocksBytes ? blocks : [];
   }
@@ -42,13 +40,15 @@
     const maxPixels = utils.LIMITS && utils.LIMITS.imagePixels || 16000000;
     if (!snapshot || !Array.isArray(snapshot.items) || !snapshot.items.length || snapshot.items.length > 30) throw new Error('A composition requires between 1 and 30 images.');
     // Copy geometry/metadata before the first await. Do not retain caller-owned mutable arrays.
+    trace('prepare-start', { items: snapshot.items.length });
+    const policy = dependencies().capture.normalizeSourcePolicy(snapshot.exportSettings?.sourcePolicy);
     const settings = { ...(snapshot.settings || {}) };
     if (settings.title === undefined) settings.title = typeof snapshot.title === 'string' ? snapshot.title : '';
     const items = snapshot.items.map(item => {
       if (!item || !(item.blob instanceof Blob) || !Number.isSafeInteger(item.width) || !Number.isSafeInteger(item.height) || item.width < 1 || item.height < 1 ||
           item.width > maxDimension || item.height > maxDimension || item.width * item.height > maxPixels) throw new Error('Invalid composition image (maximum 16384 px per side and 16 million pixels).');
-      return { id: item.id, blob: item.blob, width: item.width, height: item.height, title: item.title || '', caption: item.caption || '', url: safeUrl(item.url), timestamp: item.timestamp,
-        textBlocks: verifiedBlocks(item.textBlocks, item.width, item.height), annotations: Array.isArray(item.annotations) ? item.annotations.filter(annotation => annotation && annotation.kind === 'text' && typeof annotation.text === 'string' && Number.isFinite(annotation.x) && Number.isFinite(annotation.y) && Number.isFinite(annotation.fontSize) && annotation.fontSize > 0).map(annotation => ({ ...annotation })) : [] };
+      return { id: item.id, blob: item.blob, width: item.width, height: item.height, title: item.title || '', caption: item.caption || '', url: safeUrl(item.url, policy), timestamp: item.timestamp,
+        textBlocks: verifiedBlocks(item.textBlocks, item.width, item.height, policy), annotations: Array.isArray(item.annotations) ? item.annotations.filter(annotation => annotation && annotation.kind === 'text' && typeof annotation.text === 'string' && Number.isFinite(annotation.x) && Number.isFinite(annotation.y) && Number.isFinite(annotation.fontSize) && annotation.fontSize > 0).map(annotation => ({ ...annotation })) : [] };
     });
     const layout = utils.computeLayout(items, settings);
     if (!finite(layout.width) || !finite(layout.height) || layout.width < 1 || layout.height < 1) throw new Error('Invalid composition dimensions.');
@@ -63,6 +63,7 @@
       const cleaned = await utils.cleanPng(new Uint8Array(await item.blob.arrayBuffer()));
       if (cleaned.width !== item.width || cleaned.height !== item.height) throw new Error('PNG dimensions do not match the composition snapshot.');
     }
+    trace('prepare-end');
     return result;
   }
   function canvasBlob(canvas, type = 'image/png', quality = 0.9) {
@@ -307,6 +308,7 @@
     const blocks = compositionBlocks(prepared);
     const plan = avoidTextCuts(dependencies().utils.buildPagePlan(prepared.layout.width, prepared.layout.height, pdfSettings({ ...prepared.exportSettings, ...options })), blocks);
     if (!plan.pages.length || plan.pages.length > MAX_PAGES) throw new Error('PDF page limit exceeded (200 pages).');
+    trace('print-prepared', { pages: plan.pages.length });
     const previous = printJobs.get(printArea);
     if (previous) previous();
     const urls = [];
@@ -314,13 +316,18 @@
     const printWindow = owner.defaultView || window;
     const oldHidden = printArea.hidden;
     const oldMarker = printArea.getAttribute('data-composition-print');
-    let timer;
+    let timer, closed = false;
     const cleanup = () => {
+      if (closed) return;
+      closed = true;
+      trace('print-cleanup');
       urls.splice(0).forEach(url => URL.revokeObjectURL(url));
       printWindow.removeEventListener('afterprint', cleanup);
+      printWindow.removeEventListener('pagehide', cleanup);
       if (timer) clearTimeout(timer);
       if (printJobs.get(printArea) === cleanup) {
         printJobs.delete(printArea);
+        if (printRequests.get(printArea) === request) printRequests.delete(printArea);
         printArea.replaceChildren();
         printArea.hidden = oldHidden;
         if (oldMarker === null) printArea.removeAttribute('data-composition-print');
@@ -349,14 +356,21 @@
       printArea.replaceChildren(style, ...holder.childNodes);
       printArea.hidden = false;
       printArea.setAttribute('data-composition-print', '');
+      trace('print-images-start');
       await Promise.all(Array.from(printArea.querySelectorAll('img')).map(waitForImage));
+      trace('print-images-end');
       assertCurrent();
+      trace('print-fonts-start');
       if (owner.fonts && owner.fonts.ready) await owner.fonts.ready;
+      trace('print-fonts-end');
       assertCurrent();
       printWindow.addEventListener('afterprint', cleanup, { once: true });
+      printWindow.addEventListener('pagehide', cleanup, { once: true });
       // Fallback for browser implementations that never deliver afterprint (also on cancellation).
       timer = setTimeout(cleanup, 300000);
+      trace('print-call');
       printWindow.print();
+      trace('print-return');
     } catch (error) { cleanup(); throw error; }
   }
   const api = Object.freeze({ image, html, markdown, print, render });

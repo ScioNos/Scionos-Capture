@@ -6,7 +6,7 @@ const vm = require('node:vm');
 const { TextEncoder, TextDecoder } = require('node:util');
 const { DecompressionStream } = require('node:stream/web');
 const U = require('../composition-utils.js');
-const { computeLayout, buildPagePlan, encodeZip, decodeZip, encodeProject, decodeProject, crc32 } = U;
+const { computeLayout, buildPagePlan, encodeZip, decodeZip, encodeProject, decodeProject, rewriteProjectMetadata, crc32 } = U;
 const enc = new TextEncoder();
 function chunk(type, data) {
   const b = new Uint8Array(data.length + 12), v = new DataView(b.buffer);
@@ -23,6 +23,10 @@ function png({ width = 2, height = 2, text = '', raw, compressed } = {}) {
 }
 function project(blob = png()) {
   return { title: 'Tutoriel', items: [{ id: 'capture-1', blob, title: 'Étape', caption: 'Légende', url: 'https://example.com/page', timestamp: 1700000000000 }], settings: { numbered: true }, exportSettings: { format: 'Letter', header: true } };
+}
+async function archiveContents(blob) {
+  const entries = decodeZip(new Uint8Array(await blob.arrayBuffer()));
+  return { entries, manifest: JSON.parse(new TextDecoder().decode(entries.find(entry => entry.name === 'manifest.json').data)) };
 }
 async function rewriteProject(blob, modify) {
   const entries = decodeZip(new Uint8Array(await blob.arrayBuffer()));
@@ -301,6 +305,161 @@ test('annotation and point budgets bound work on save and import', async () => {
   await assert.rejects(encodeProject(many), /document limit/);
   const points = project(); points.items[0].annotations = [{...op,points:Array(10001).fill({x:0,y:0})}];
   await assert.rejects(encodeProject(points), /points/);
+});
+test('source policy enum is normalized on page plans, save and import without a schema change', async () => {
+  assert.equal(buildPagePlan(10, 10).settings.sourcePolicy, 'sanitized');
+  for (const policy of ['sanitized', 'none', 'full']) {
+    assert.equal(buildPagePlan(10, 10, {sourcePolicy:policy}).settings.sourcePolicy, policy);
+    const doc = project(); doc.exportSettings.sourcePolicy = policy;
+    const archive = await encodeProject(doc);
+    const { manifest } = await archiveContents(archive);
+    assert.equal(manifest.schemaVersion, 2);
+    assert.equal(manifest.exportSettings.sourcePolicy, policy);
+    assert.equal((await decodeProject(archive)).exportSettings.sourcePolicy, policy);
+  }
+  const archive = await encodeProject(project());
+  for (const value of [null, '', 'SANITIZED', 'other', false, 0, {}, []]) {
+    assert.throws(() => buildPagePlan(10, 10, {sourcePolicy:value}), /source policy/);
+    const doc = project(); doc.exportSettings.sourcePolicy = value;
+    await assert.rejects(encodeProject(doc), /source policy/);
+    await assert.rejects(decodeProject(await rewriteProject(archive, m => { m.exportSettings.sourcePolicy = value; })), /source policy/);
+  }
+  for (const modify of [m => { delete m.exportSettings; }, m => { delete m.exportSettings.sourcePolicy; }]) {
+    assert.equal((await decodeProject(await rewriteProject(archive, modify))).exportSettings.sourcePolicy, 'sanitized');
+  }
+});
+test('source policies normalize HTTP(S), remove credentials and never mutate the input model', async () => {
+  const source = 'HTTPS://alice:p%40ss@EXAMPLE.COM:443/a/../b?q=secret&x=1#private';
+  const expected = {sanitized:'https://example.com/b', none:'', full:'https://example.com/b?q=secret&x=1#private'};
+  for (const [policy, url] of Object.entries(expected)) {
+    const doc = project(); doc.items[0].url = source; doc.exportSettings.sourcePolicy = policy;
+    const before = JSON.stringify(doc);
+    Object.freeze(doc.items[0]); Object.freeze(doc.items); Object.freeze(doc.settings); Object.freeze(doc.exportSettings); Object.freeze(doc);
+    const archive = await encodeProject(doc);
+    assert.equal((await archiveContents(archive)).manifest.items[0].url, url);
+    assert.equal((await decodeProject(archive)).items[0].url, url);
+    assert.equal(JSON.stringify(doc), before);
+  }
+  const defaultDoc = project(); defaultDoc.items[0].url = source;
+  assert.equal((await archiveContents(await encodeProject(defaultDoc))).manifest.items[0].url, expected.sanitized);
+  for (const policy of ['sanitized', 'none', 'full']) {
+    for (const url of ['javascript:alert(1)', 'data:text/plain,secret', 'file:///secret', 'relative', 'https://']) {
+      const doc = project(); doc.items[0].url = url; doc.exportSettings.sourcePolicy = policy;
+      await assert.rejects(encodeProject(doc), /URL/);
+    }
+    const doc = project(); doc.items[0].url = 'http://name:password@EXAMPLE.COM:80'; doc.exportSettings.sourcePolicy = policy;
+    assert.equal((await archiveContents(await encodeProject(doc))).manifest.items[0].url, policy === 'none' ? '' : 'http://example.com/');
+  }
+});
+test('decode retains complete normalized source URLs in memory regardless of archive policy', async () => {
+  const archive = await encodeProject(project());
+  for (const policy of [undefined, 'sanitized', 'none', 'full']) {
+    const imported = await rewriteProject(archive, m => {
+      m.items[0].url = 'HTTPS://user:password@EXAMPLE.COM:443/a/../page?token=secret#part';
+      if (policy === undefined) delete m.exportSettings; else m.exportSettings.sourcePolicy = policy;
+    });
+    const decoded = await decodeProject(imported);
+    assert.equal(decoded.items[0].url, 'https://example.com/page?token=secret#part');
+    assert.equal(decoded.exportSettings.sourcePolicy, policy === undefined ? 'sanitized' : policy);
+    const exported = await archiveContents(await encodeProject(decoded));
+    assert.equal(exported.manifest.items[0].url, policy === 'full' ? decoded.items[0].url : policy === 'none' ? '' : 'https://example.com/page');
+  }
+});
+test('metadata rewrite updates both title locations, preserves annotations and exact rendering PNG bytes', async () => {
+  const doc = project(png({text:'Comment\0discarded metadata'}));
+  doc.settings.title = 'Visible old title'; doc.exportSettings.sourcePolicy = 'full';
+  doc.items[0].url = 'https://user:password@example.com/page?secret=1#section';
+  doc.items[0].annotations = [{kind:'arrow',color:'#123456',width:2,start:{x:-1,y:0},end:{x:3,y:2}}];
+  const archive = await encodeProject(doc);
+  const before = new Uint8Array(await archive.arrayBuffer());
+  const original = await archiveContents(archive);
+  const changes = Object.freeze({title:'Nouveau titre', sourcePolicy:'sanitized'});
+  const rewritten = await rewriteProjectMetadata(archive, changes);
+  const { manifest, entries } = await archiveContents(rewritten);
+  assert.equal(manifest.schemaVersion, 2);
+  assert.equal(manifest.title, changes.title); assert.equal(manifest.settings.title, changes.title);
+  assert.equal(manifest.items[0].url, 'https://example.com/page');
+  assert.equal(manifest.exportSettings.sourcePolicy, 'sanitized');
+  assert.deepEqual(manifest.items[0].annotations, doc.items[0].annotations);
+  assert.deepEqual(entries.find(e => e.name === manifest.items[0].path).data, original.entries[1].data);
+  assert.deepEqual(new Uint8Array(await archive.arrayBuffer()), before);
+  assert.equal(doc.settings.title, 'Visible old title');
+  assert.deepEqual((await decodeProject(rewritten)).items[0].annotations, doc.items[0].annotations);
+  const erased = await archiveContents(await rewriteProjectMetadata(archive, {title:'', sourcePolicy:'none'}));
+  assert.equal(erased.manifest.title, ''); assert.equal(erased.manifest.settings.title, ''); assert.equal(erased.manifest.items[0].url, '');
+});
+test('metadata rewrite preserves an omitted policy but explicit undefined sanitizes even full library archives', async () => {
+  const doc = project(); doc.exportSettings.sourcePolicy = 'full'; doc.items[0].url += '?token=secret#fragment';
+  const full = await encodeProject(doc);
+  const old = await rewriteProject(full, m => { delete m.exportSettings; });
+  for (const archive of [full, old]) {
+    for (const changes of [{sourcePolicy:undefined}, {sourcePolicy:'sanitized'}]) {
+      const { manifest } = await archiveContents(await rewriteProjectMetadata(archive, changes));
+      assert.equal(manifest.exportSettings.sourcePolicy, 'sanitized');
+      assert.equal(manifest.items[0].url, 'https://example.com/page');
+      assert.equal(manifest.title, doc.title); assert.equal(manifest.settings.title, '');
+    }
+    for (const changes of [{}, {title:'Renamed'}]) {
+      const { manifest } = await archiveContents(await rewriteProjectMetadata(archive, changes));
+      assert.equal(manifest.exportSettings.sourcePolicy, archive === full ? 'full' : 'sanitized');
+      assert.equal(manifest.items[0].url, archive === full ? doc.items[0].url : 'https://example.com/page');
+      assert.equal(manifest.title, changes.title || doc.title);
+      assert.equal(manifest.settings.title, changes.title || '');
+    }
+    assert.equal((await archiveContents(await rewriteProjectMetadata(archive, {sourcePolicy:'full'}))).manifest.items[0].url, doc.items[0].url);
+  }
+});
+test('metadata rewrite validates strict changes allowlist and exports no validation bypass API', async () => {
+  const archive = await encodeProject(project());
+  for (const changes of [undefined, null, [], 'title', {items:[]}, {settings:{}}, {exportSettings:{}}, {schemaVersion:1}, {trusted:true}, {skipValidation:true}, {title:5}, {title:'x'.repeat(1001)}, {title:'bad\0title'}, {sourcePolicy:null}, {sourcePolicy:'unknown'}, {[Symbol('hidden')]:true}]) {
+    await assert.rejects(rewriteProjectMetadata(archive, changes));
+  }
+  const nonEnumerable = {}; Object.defineProperty(nonEnumerable, 'skipValidation', {value:true});
+  await assert.rejects(rewriteProjectMetadata(archive, nonEnumerable), /Unsupported metadata change/);
+  assert.equal(U.serializeProject, undefined); assert.equal(U.readProject, undefined); assert.equal(U.sourcePolicy, undefined);
+});
+test('metadata rewrite migrates schema 1 to 2 and normalizes archive image locations', async () => {
+  const archive = await rewriteProject(await encodeProject(project()), (m, entries) => {
+    m.schemaVersion = 1; m.items[0].annotations = [{kind:'unsupported'}]; m.items[0].path = 'images/custom.png'; entries[1].name = m.items[0].path;
+    m.items[0].textBlocks = [{text:'discard'}]; delete m.exportSettings;
+  });
+  const { manifest, entries } = await archiveContents(await rewriteProjectMetadata(archive, {title:'Migrated'}));
+  assert.equal(manifest.schemaVersion, 2); assert.equal(manifest.title, 'Migrated'); assert.equal(manifest.settings.title, 'Migrated');
+  assert.equal(manifest.items[0].path, 'images/001.png'); assert.equal(entries[1].name, 'images/001.png');
+  assert.deepEqual(manifest.items[0].annotations, []); assert.equal(manifest.items[0].textBlocks, undefined);
+  assert.equal(manifest.exportSettings.sourcePolicy, 'sanitized');
+});
+test('metadata rewrite rejects corrupt ZIP, manifests, PNGs, annotations and unsupported source URLs', async () => {
+  const archive = await encodeProject(project());
+  const corrupted = new Uint8Array(await archive.arrayBuffer()); corrupted[50] ^= 1;
+  await assert.rejects(rewriteProjectMetadata(new Blob([corrupted]), {title:'x'}), /CRC/);
+  const invalidArchives = [
+    m => { m.schemaVersion = 3; }, m => { m.items[0].width = 3; },
+    m => { m.items[0].url = 'javascript:alert(1)'; }, m => { m.exportSettings.sourcePolicy = 'unknown'; },
+    m => { m.items[0].annotations = [{kind:'crop'}]; },
+    (_m, e) => { e[1].data = new Uint8Array(e[1].data); e[1].data[20] ^= 1; }
+  ];
+  for (const modify of invalidArchives) await assert.rejects(rewriteProjectMetadata(await rewriteProject(archive, modify), {sourcePolicy:'none'}));
+  const badCompressed = new Uint8Array(await png({compressed:Uint8Array.of(1,2,3)}).arrayBuffer());
+  const badStream = await rewriteProject(archive, (_m, e) => { e[1].data = badCompressed; });
+  await assert.rejects(rewriteProjectMetadata(badStream, {title:'x'}));
+  await assert.rejects(rewriteProjectMetadata(new Blob([encodeZip([{name:'manifest.json',data:enc.encode('{broken')}])]), {}), /manifest/);
+});
+test('metadata rewrite inflates each PNG exactly once through a standalone VM codec', async () => {
+  const doc = project(); doc.items.push({...doc.items[0], id:'capture-2'});
+  doc.exportSettings.sourcePolicy = 'full'; doc.items[0].url += '?secret=1#part';
+  const archive = await encodeProject(doc);
+  let inflations = 0;
+  const context = {TextEncoder, TextDecoder, Uint32Array, Uint8Array, Blob, URL, DecompressionStream:class extends DecompressionStream {
+    constructor(format) { super(format); inflations++; }
+  }};
+  vm.runInNewContext(fs.readFileSync(require.resolve('../composition-utils.js'), 'utf8'), context);
+  const rewritten = await context.ScionosCompositionUtils.rewriteProjectMetadata(archive, {title:'Once', sourcePolicy:undefined});
+  assert.equal(inflations, doc.items.length);
+  const original = await archiveContents(archive), updated = await archiveContents(rewritten);
+  assert.equal(updated.manifest.title, 'Once'); assert.equal(updated.manifest.settings.title, 'Once');
+  assert.equal(updated.manifest.items[0].url, 'https://example.com/page');
+  for (let i = 1; i < original.entries.length; i++) assert.deepEqual(updated.entries[i].data, original.entries[i].data);
 });
 test('project validates image count, blob sizes, IDs, metadata and credentials', async () => {
   await assert.rejects(encodeProject({items:[]}), /1–30/);

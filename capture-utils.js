@@ -179,19 +179,263 @@
       .replace(/'/g, '&#39;');
   }
 
-  function sanitizeUrl(url) {
-    if (!url || typeof url !== 'string') return '';
+  function normalizeSourcePolicy(value) {
+    if (value === undefined) return 'sanitized';
+    if (value === 'sanitized' || value === 'none' || value === 'full') return value;
+    throw new TypeError('Invalid source policy.');
+  }
+
+  function sanitizeHttpUrl(url, policy) {
+    if (policy === 'none' || !url || typeof url !== 'string') return '';
     try {
       const parsed = new URL(url);
       if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
         parsed.username = '';
         parsed.password = '';
+        if (policy === 'sanitized') {
+          parsed.search = '';
+          parsed.hash = '';
+        }
         return parsed.href;
       }
     } catch {
-      // Ignore invalid URL
+      // Ignore invalid URL.
     }
     return '';
+  }
+
+  function sanitizeSourceUrl(url, policy = 'sanitized') {
+    return sanitizeHttpUrl(url, normalizeSourcePolicy(policy));
+  }
+
+  // Historical links retain their query and fragment by default.
+  function sanitizeUrl(url) {
+    return sanitizeHttpUrl(url, 'full');
+  }
+
+  // Header inspection only: this does not validate or decode compressed pixels.
+  // Encoded dimensions are kept separately from the browser's oriented bitmap.
+  // Work is bounded even for adversarial marker/chunk/IFD sequences.
+  function readImageDimensions(bytes, mimeType) {
+    let data;
+    if (bytes instanceof ArrayBuffer) data = new Uint8Array(bytes);
+    else if (ArrayBuffer.isView(bytes)) data = new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    else return null;
+    if (typeof mimeType !== 'string') return null;
+    const mime = mimeType.trim().toLowerCase();
+    const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
+    const has = (offset, length, end = data.length) => Number.isInteger(offset) && offset >= 0 && length >= 0 && offset <= end - length;
+    const textAt = (offset, text) => has(offset, text.length) && [...text].every((char, index) => data[offset + index] === char.charCodeAt(0));
+    const u16 = (offset, little = false) => view.getUint16(offset, little);
+    const u32 = (offset, little = false) => view.getUint32(offset, little);
+    const u24 = offset => data[offset] + data[offset + 1] * 256 + data[offset + 2] * 65536;
+    const result = (width, height, format, orientation = 1) => {
+      if (!Number.isInteger(width) || !Number.isInteger(height) || width <= 0 || height <= 0) return null;
+      return { width, height, orientation, orientedWidth: orientation >= 5 ? height : width,
+        orientedHeight: orientation >= 5 ? width : height, format };
+    };
+    // Only IFD0 orientation affects the main image. Never follow thumbnail IFDs
+    // or arbitrary pointers; orientation SHORT/count=1 is stored inline.
+    const exifOrientation = (start, end) => {
+      if (!has(start, 8, end)) return null;
+      const little = textAt(start, 'II');
+      if (!little && !textAt(start, 'MM')) return null;
+      if (u16(start + 2, little) !== 42) return null;
+      const relative = u32(start + 4, little);
+      if (relative < 8 || !has(start + relative, 2, end)) return null;
+      const ifd = start + relative;
+      const count = u16(ifd, little);
+      if (!has(ifd + 2, count * 12 + 4, end)) return null;
+      let orientation = 1;
+      let found = false;
+      for (let index = 0; index < count; index += 1) {
+        const entry = ifd + 2 + index * 12;
+        if (u16(entry, little) !== 0x0112) continue;
+        if (found || u16(entry + 2, little) !== 3 || u32(entry + 4, little) !== 1) return null;
+        orientation = u16(entry + 8, little);
+        if (orientation < 1 || orientation > 8) return null;
+        found = true;
+      }
+      return orientation;
+    };
+
+    if (mime === 'image/png') {
+      if (!has(0, 33) || !textAt(0, '\x89PNG\r\n\x1a\n') || u32(8) !== 13 || !textAt(12, 'IHDR')) return null;
+      const width = u32(16);
+      const height = u32(20);
+      const depths = { 0: [1, 2, 4, 8, 16], 2: [8, 16], 3: [1, 2, 4, 8], 4: [8, 16], 6: [8, 16] };
+      if (width > 0x7fffffff || height > 0x7fffffff || !depths[data[25]]?.includes(data[24])
+          || data[26] !== 0 || data[27] !== 0 || data[28] > 1) return null;
+      const validCrc = (start, end) => {
+        let crc = 0xffffffff;
+        for (let index = start; index < end; index += 1) {
+          crc ^= data[index];
+          for (let bit = 0; bit < 8; bit += 1) crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0);
+        }
+        return ((crc ^ 0xffffffff) >>> 0) === u32(end);
+      };
+      if (!validCrc(12, 29)) return null;
+      let offset = 33;
+      let orientation = 1;
+      let hasExif = false;
+      let hasImageData = false;
+      // Skip compressed IDAT bytes by length. Chromium applies eXIf orientation
+      // only before the first IDAT. Still validate later chunk bounds.
+      while (offset < data.length) {
+        if (!has(offset, 12)) return null;
+        const length = u32(offset);
+        const start = offset + 8;
+        if (length > 0x7fffffff || !has(start, length + 4)) return null;
+        for (let index = offset + 4; index < start; index += 1) {
+          if (!(data[index] >= 65 && data[index] <= 90) && !(data[index] >= 97 && data[index] <= 122)) return null;
+        }
+        if (textAt(offset + 4, 'IHDR')) return null;
+        if (textAt(offset + 4, 'IDAT')) hasImageData = true;
+        if (textAt(offset + 4, 'eXIf') && !hasImageData) {
+          if (hasExif || !validCrc(offset + 4, start + length)) return null;
+          const parsed = exifOrientation(start, start + length);
+          if (parsed === null) return null;
+          orientation = parsed;
+          hasExif = true;
+        }
+        offset = start + length + 4;
+        if (textAt(start - 4, 'IEND')) {
+          if (length !== 0 || offset !== data.length) return null;
+          break;
+        }
+      }
+      return result(width, height, 'png', orientation);
+    }
+
+    if (mime === 'image/jpeg') {
+      if (!has(0, 4) || data[0] !== 0xff || data[1] !== 0xd8) return null;
+      let offset = 2;
+      let dimensions = null;
+      let orientation = 1;
+      let hasOrientation = false;
+      while (offset < data.length) {
+        if (!has(offset, 2) || data[offset++] !== 0xff) return null;
+        while (offset < data.length && data[offset] === 0xff) offset += 1;
+        if (!has(offset, 1)) return null;
+        const marker = data[offset++];
+        if (marker === 0xd9) return dimensions && result(dimensions.width, dimensions.height, 'jpeg', orientation);
+        if (marker === 0x00 || marker === 0xd8 || (marker >= 0xd0 && marker <= 0xd7)) return null;
+        if (marker === 0x01) continue; // TEM has no length field.
+        if (!has(offset, 2)) return null;
+        const length = u16(offset);
+        if (length < 2 || !has(offset, length)) return null;
+        const start = offset + 2;
+        const end = offset + length;
+        if (marker === 0xe1 && textAt(start, 'Exif\0\0')) {
+          const parsed = exifOrientation(start + 6, end);
+          if (parsed === null || (hasOrientation && orientation !== parsed)) return null;
+          orientation = parsed;
+          hasOrientation = true;
+        }
+        const sof = marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker);
+        if (sof) {
+          if (length < 11) return null;
+          const components = data[start + 5];
+          const width = u16(start + 3);
+          const height = u16(start + 1);
+          if (!components || length !== 8 + 3 * components || !width || !height || !data[start]) return null;
+          if (dimensions && (dimensions.width !== width || dimensions.height !== height)) return null;
+          dimensions = { width, height };
+        }
+        if (marker === 0xda) {
+          if (!dimensions || length < 8 || !data[start] || length !== 6 + 2 * data[start]) return null;
+          return result(dimensions.width, dimensions.height, 'jpeg', orientation);
+        }
+        offset = end;
+      }
+      return null;
+    }
+
+    if (mime === 'image/webp') {
+      if (!has(0, 20) || !textAt(0, 'RIFF') || !textAt(8, 'WEBP') || u32(4, true) !== data.length - 8) return null;
+      let offset = 12;
+      let dimensions = null;
+      let imageDimensions = null;
+      let orientation = 1;
+      let extended = false;
+      let animated = false;
+      let animationHeader = false;
+      let animationFrames = 0;
+      const readWebpFrame = (typeOffset, start, length) => {
+        if (textAt(typeOffset, 'VP8 ')) {
+          if (length < 10 || (data[start] & 1) || !textAt(start + 3, '\x9d\x01\x2a')) return null;
+          const tag = u24(start);
+          if (((tag >>> 1) & 7) > 3 || !(tag & 0x10) || (tag >>> 5) > length - 10) return null;
+          return result(u16(start + 6, true) & 0x3fff, u16(start + 8, true) & 0x3fff, 'webp');
+        }
+        if (textAt(typeOffset, 'VP8L')) {
+          if (length < 5 || data[start] !== 0x2f || (data[start + 4] & 0xe0)) return null;
+          return result(1 + (u16(start + 1, true) & 0x3fff),
+            1 + ((data[start + 2] >>> 6) | (data[start + 3] << 2) | ((data[start + 4] & 0x0f) << 10)), 'webp');
+        }
+        return null;
+      };
+      while (offset < data.length) {
+        if (!has(offset, 8)) return null;
+        const length = u32(offset + 4, true);
+        const start = offset + 8;
+        if (!has(start, length + (length & 1))) return null;
+        if ((length & 1) && data[start + length] !== 0) return null;
+        let frame = null;
+        if (textAt(offset, 'VP8X')) {
+          if (offset !== 12 || length !== 10 || (data[start] & 0xc1) || data[start + 1] || data[start + 2] || data[start + 3]) return null;
+          animated = Boolean(data[start] & 0x02);
+          extended = true;
+          dimensions = result(u24(start + 4) + 1, u24(start + 7) + 1, 'webp');
+        } else if (textAt(offset, 'VP8 ') || textAt(offset, 'VP8L')) {
+          if (animated) return null;
+          frame = readWebpFrame(offset, start, length);
+        } else if (textAt(offset, 'ANIM')) {
+          if (!animated || animationHeader || animationFrames || length !== 6) return null;
+          animationHeader = true;
+        } else if (textAt(offset, 'ANMF')) {
+          if (!animated || !animationHeader || length < 24 || (data[start + 15] & 0xfc)) return null;
+          const x = u24(start) * 2;
+          const y = u24(start + 3) * 2;
+          const width = u24(start + 6) + 1;
+          const height = u24(start + 9) + 1;
+          if (x + width > dimensions.width || y + height > dimensions.height) return null;
+          let child = start + 16;
+          let frameImage = null;
+          const end = start + length;
+          while (child < end) {
+            if (!has(child, 8, end)) return null;
+            const childLength = u32(child + 4, true);
+            const childStart = child + 8;
+            if (!has(childStart, childLength + (childLength & 1), end)
+                || ((childLength & 1) && data[childStart + childLength] !== 0)) return null;
+            if (textAt(child, 'VP8 ') || textAt(child, 'VP8L')) {
+              if (frameImage) return null;
+              frameImage = readWebpFrame(child, childStart, childLength);
+              if (!frameImage) return null;
+            }
+            child = childStart + childLength + (childLength & 1);
+          }
+          if (!frameImage || frameImage.width !== width || frameImage.height !== height) return null;
+          animationFrames += 1;
+        } else if (textAt(offset, 'EXIF')) {
+          const parsed = exifOrientation(start + (textAt(start, 'Exif\0\0') ? 6 : 0), start + length);
+          if (parsed === null) return null;
+          orientation = parsed;
+        }
+        if (textAt(offset, 'VP8 ') || textAt(offset, 'VP8L')) {
+          if (!frame || imageDimensions) return null;
+          imageDimensions = frame;
+        }
+        offset = start + length + (length & 1);
+      }
+      if (offset !== data.length) return null;
+      if (animated) return animationFrames ? result(dimensions.width, dimensions.height, 'webp', orientation) : null;
+      if (!imageDimensions) return null;
+      if (extended && (dimensions.width !== imageDimensions.width || dimensions.height !== imageDimensions.height)) return null;
+      return result(imageDimensions.width, imageDimensions.height, 'webp', orientation);
+    }
+    return null;
   }
 
   function sanitizeFilename(title, fallback = 'Scionos_Capture', maxLength = 45) {
@@ -788,6 +1032,9 @@
     isRestrictedUrl,
     escapeHtml,
     sanitizeUrl,
+    normalizeSourcePolicy,
+    sanitizeSourceUrl,
+    readImageDimensions,
     sanitizeFilename,
     buildLocalTimestamp,
     buildTextLayerSpans,

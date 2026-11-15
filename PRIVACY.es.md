@@ -2,7 +2,7 @@
 
 [Français](PRIVACY.md) · [English](PRIVACY.en.md) · [Español](PRIVACY.es.md) · [Deutsch](PRIVACY.de.md)
 
-Última actualización: 14 de noviembre de 2026 — versión 1.5.0.
+Última actualización: 14 de noviembre de 2026 — versión 1.5.1.
 
 **Editorial responsable:** eyelo SA (IDE: CHE-108.174.302), Vaud, Suiza — Marca **ScioNos** ([scionos.ch](https://scionos.ch)) — Contacto: info@eyelo.ch
 
@@ -19,6 +19,14 @@ El idioma y el retardo de captura (`captureDelaySeconds`, 0, 3, 5 o 10 segundos)
 La capa de búsqueda del PDF conserva solo palabras completas cuya visibilidad puede verificarse. Las palabras inciertas se omiten de esa capa y se conserva la imagen capturada. También se omiten las capas antiguas con coordenadas no verificadas. Usa censura sólida para proteger píxeles confidenciales; el desenfoque es solo visual.
 
 Aplica o cancela los cambios pendientes antes de exportar. El desenfoque es un efecto visual; usa una máscara sólida para secretos.
+
+## Alcance de privacidad de la versión 1.5.1 — envío a la tienda pendiente
+
+En el panel Documento, la política de fuentes se aplica a proyectos guardados y exportaciones: sanitized (por defecto) elimina parámetros de consulta y fragmentos de URL, none omite las fuentes y full las conserva. Las credenciales incluidas en las URL HTTP(S) siempre se eliminan, incluso en modo full. Las fuentes eliminadas al guardar no se recuperan; cambiar de modo después no las restaura. La exportación desde la biblioteca siempre aplica sanitized, incluso a proyectos guardados antes de esta versión.
+
+Este filtrado no hace anónimo el documento: rutas de URL, píxeles, títulos, leyendas y fechas aún pueden contener información sensible. Revísalos antes de compartir. Las copias ya exportadas siguen bajo tu control y no cambian al ajustar la política.
+
+El diagnóstico es local y requiere activación explícita; no añade telemetría ni transmisión automática. Los permisos no cambian. Se mantiene la lectura de proyectos v1/v2 y la escritura v2; siguen aplicándose las protecciones irreversibles de máscaras y recortes.
 
 ## Alcance de privacidad de la versión 1.5.0
 
