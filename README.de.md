@@ -12,7 +12,7 @@
 
 [![Version](https://img.shields.io/badge/version-1.5.1-blue)](https://github.com/ScioNos/Scionos-Capture) [![Prüfungen](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml/badge.svg)](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml) [![MIT-Lizenz](https://img.shields.io/badge/licence-MIT-green)](LICENSE) ![Chrome und Edge](https://img.shields.io/badge/Chrome_%26_Edge-Manifest_V3-4285F4)
 
-**[Version 1.5.0 herunterladen](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.0)** · **[Chrome-Web-Store-Eintrag ansehen](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe)** · **[Hilfe erhalten](https://github.com/ScioNos/Scionos-Capture/issues)**
+**[Version 1.5.1 herunterladen](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.1)** · **[Chrome-Web-Store-Eintrag ansehen](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe)** · **[Hilfe erhalten](https://github.com/ScioNos/Scionos-Capture/issues)**
 
 <!-- source-version --> Version 1.5.1 wurde als Aktualisierung des im Chrome Web Store veröffentlichten Eintrags (derzeit 1.5.0) zur Prüfung eingereicht; der aktuelle Status lautet „Prüfung ausstehend“. Die öffentliche Verfügbarkeit hängt von der Genehmigung durch Google ab. Der GitHub-Download bleibt bei Version 1.5.0.
 
@@ -32,15 +32,15 @@ Erstellen Sie eine visuelle Erklärung, dokumentieren Sie ein Problem oder bewah
 
 ## In wenigen Minuten installieren
 
-### Von GitHub — Version 1.5.0
+### Von GitHub herunterladen — Version 1.5.1
 
-1. Laden Sie `scionos-capture-v1.5.0.zip` aus dem [Release v1.5.0](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.0) herunter.
+1. Laden Sie `scionos-capture-v1.5.1.zip` aus dem [Release v1.5.1](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.1) herunter.
 2. Prüfen Sie die Prüfsumme mit der mitgelieferten `.sha256`-Datei und entpacken Sie das Archiv.
 3. Öffnen Sie `chrome://extensions` oder `edge://extensions` und aktivieren Sie den **Entwicklermodus**.
 4. Wählen Sie **Entpackte Erweiterung laden** und den entpackten Ordner mit dem Manifest aus.
 5. Heften Sie Scionos Capture an die Symbolleiste an und öffnen Sie eine normale Webseite.
 
-Version 1.5.0 ist bereits in diesem [Chrome-Web-Store-Eintrag](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe) veröffentlicht. Die Aktualisierung 1.5.1 wird derzeit zur Prüfung bei Google eingereicht und erscheint nach der Genehmigung im Eintrag.
+Version 1.5.0 ist bereits in diesem [Chrome-Web-Store-Eintrag](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe) veröffentlicht. Die Aktualisierung 1.5.1 wurde eingereicht und wartet auf die Google-Prüfung; nach der Genehmigung erscheint sie im Eintrag.
 
 ## Drei Arbeitsabläufe
 

@@ -12,7 +12,7 @@
 
 [![Versión](https://img.shields.io/badge/version-1.5.1-blue)](https://github.com/ScioNos/Scionos-Capture) [![Verificación](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml/badge.svg)](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml) [![Licencia MIT](https://img.shields.io/badge/licence-MIT-green)](LICENSE) ![Chrome y Edge](https://img.shields.io/badge/Chrome_%26_Edge-Manifest_V3-4285F4)
 
-**[Descargar la versión 1.5.0](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.0)** · **[Ver la ficha de Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe)** · **[Obtener ayuda](https://github.com/ScioNos/Scionos-Capture/issues)**
+**[Descargar la versión 1.5.1](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.1)** · **[Ver la ficha de Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe)** · **[Obtener ayuda](https://github.com/ScioNos/Scionos-Capture/issues)**
 
 <!-- source-version --> La versión 1.5.1 se ha enviado a revisión como actualización de la ficha publicada en Chrome Web Store, actualmente en 1.5.0; su estado es pendiente de revisión. La disponibilidad pública depende de la aprobación de Google. La descarga de GitHub sigue en 1.5.0.
 
@@ -32,15 +32,15 @@ Prepara una explicación visual, documenta un problema o conserva un fragmento �
 
 ## Instalar en pocos minutos
 
-### Desde GitHub — versión 1.5.0
+### Descargar desde GitHub — versión 1.5.1
 
-1. Descarga `scionos-capture-v1.5.0.zip` de la [versión v1.5.0](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.0).
+1. Descarga `scionos-capture-v1.5.1.zip` de la [versión v1.5.1](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.1).
 2. Verifica su suma de comprobación con el archivo `.sha256` incluido y extrae el archivo comprimido.
 3. Abre `chrome://extensions` o `edge://extensions` y activa el **Modo de desarrollador**.
 4. Elige **Cargar descomprimida** y selecciona la carpeta extraída que contiene el manifiesto.
 5. Fija Scionos Capture en la barra de herramientas y abre una página web normal.
 
-La versión 1.5.0 ya está publicada en esta [ficha de Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe). La actualización 1.5.1 se está enviando a revisión de Google y aparecerá en la ficha cuando se apruebe.
+La versión 1.5.0 ya está publicada en esta [ficha de Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe). La actualización 1.5.1 se ha enviado y está pendiente de revisión de Google; aparecerá en la ficha tras su aprobación.
 
 ## Tres formas de trabajar
 

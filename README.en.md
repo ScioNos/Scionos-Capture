@@ -12,7 +12,7 @@
 
 [![Version](https://img.shields.io/badge/version-1.5.1-blue)](https://github.com/ScioNos/Scionos-Capture) [![Checks](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml/badge.svg)](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml) [![MIT License](https://img.shields.io/badge/licence-MIT-green)](LICENSE) ![Chrome and Edge](https://img.shields.io/badge/Chrome_%26_Edge-Manifest_V3-4285F4)
 
-**[Download version 1.5.0](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.0)** · **[View the Chrome Web Store listing](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe)** · **[Get help](https://github.com/ScioNos/Scionos-Capture/issues)**
+**[Download version 1.5.1](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.1)** · **[View the Chrome Web Store listing](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe)** · **[Get help](https://github.com/ScioNos/Scionos-Capture/issues)**
 
 <!-- source-version --> Version 1.5.1 has been submitted for review as an update to the published Chrome Web Store listing, currently at 1.5.0; its current status is pending review. Public availability depends on Google approval. The GitHub download remains at 1.5.0.
 
@@ -32,15 +32,15 @@ Create a visual explanation, document a problem or save a useful excerpt. Sciono
 
 ## Install in minutes
 
-### From GitHub — version 1.5.0
+### Download from GitHub — version 1.5.1
 
-1. Download `scionos-capture-v1.5.0.zip` from the [v1.5.0 release](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.0).
+1. Download `scionos-capture-v1.5.1.zip` from the [v1.5.1 release](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.1).
 2. Verify its checksum using the supplied `.sha256` file, then extract the archive.
 3. Open `chrome://extensions` or `edge://extensions` and enable **Developer mode**.
 4. Choose **Load unpacked** and select the extracted folder containing the manifest.
 5. Pin Scionos Capture to the toolbar and open a regular web page.
 
-Version 1.5.0 is already published on this [Chrome Web Store listing](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe). The 1.5.1 update is being submitted for Google review; it will appear there after approval.
+Version 1.5.0 is already published on this [Chrome Web Store listing](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe). The 1.5.1 update has been submitted and is pending Google review; it will appear there after approval.
 
 ## Three ways to work
 
