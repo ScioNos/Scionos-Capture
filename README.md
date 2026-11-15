@@ -133,7 +133,7 @@ npm run verify
 
 Synchronisation de version : `npm run version:sync -- 1.5.1 --unreleased` ; sous PowerShell : `npm.cmd run version:sync -- 1.5.1 --unreleased`.
 
-<!-- local-package --> Livrables locaux prévus après validation : scionos-capture-v1.5.1.zip · SHA-256 : scionos-capture-v1.5.1.zip.sha256.
+<!-- local-package --> Release GitHub publiée : `scionos-capture-v1.5.1.zip` · SHA-256 : `cd9a63914d4d407862494ef50d35b706e11653d704b0f09173796d794f442564`. La 1.5.1 reste en attente d’examen sur le Chrome Web Store.
 
 [Contribuer](CONTRIBUTING.md) · [Changements](CHANGELOG.md) · [Notes de version](RELEASE_NOTES.md) · [Signaler un problème](https://github.com/ScioNos/Scionos-Capture/issues) · [Signaler une vulnérabilité](SECURITY.md)
 
