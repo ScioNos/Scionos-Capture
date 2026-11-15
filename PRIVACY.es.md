@@ -20,7 +20,7 @@ La capa de búsqueda del PDF conserva solo palabras completas cuya visibilidad p
 
 Aplica o cancela los cambios pendientes antes de exportar. El desenfoque es un efecto visual; usa una máscara sólida para secretos.
 
-## Alcance de privacidad de la versión 1.5.1 — envío a la tienda pendiente
+## Alcance de privacidad de la versión 1.5.1 — enviada, pendiente de revisión de Google
 
 En el panel Documento, la política de fuentes se aplica a proyectos guardados y exportaciones: sanitized (por defecto) elimina parámetros de consulta y fragmentos de URL, none omite las fuentes y full las conserva. Las credenciales incluidas en las URL HTTP(S) siempre se eliminan, incluso en modo full. Las fuentes eliminadas al guardar no se recuperan; cambiar de modo después no las restaura. La exportación desde la biblioteca siempre aplica sanitized, incluso a proyectos guardados antes de esta versión.
 

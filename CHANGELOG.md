@@ -8,7 +8,7 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 
 ## 1.5.1 — mise à jour préparée pour le Chrome Web Store
 
-La version 1.5.0 est déjà publiée sur la fiche Chrome Web Store. Le paquet 1.5.1 est préparé pour cette fiche ; sa soumission attend une reconnexion au tableau développeur, puis l’approbation Google. La release GitHub reste en 1.5.0.
+La version 1.5.0 est déjà publiée sur la fiche Chrome Web Store. Le paquet 1.5.1 est soumis à l’examen Google ; son statut actuel est « En attente d’examen ». Sa publication publique dépend de l’approbation Google. La release GitHub reste en 1.5.0.
 
 ### Confidentialité et robustesse
 

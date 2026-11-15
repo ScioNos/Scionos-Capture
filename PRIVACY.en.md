@@ -22,7 +22,7 @@ The searchable PDF layer retains only complete words whose visibility can be ver
 
 Apply or cancel pending edits before any export. Blur remains a visual effect; use a solid mask for secrets.
 
-## Privacy scope of version 1.5.1 — Store submission pending
+## Privacy scope of version 1.5.1 — submitted, pending Google review
 
 In the Document panel, source policy applies to saved projects and exports: sanitized (default) removes URL query parameters and fragments, none omits sources and full retains them. Credentials embedded in HTTP(S) URLs are always removed, including in full mode. Sources removed on save cannot be recovered; switching modes later does not restore them. Library exports always apply sanitized, including to projects saved before this version.
 

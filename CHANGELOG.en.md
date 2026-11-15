@@ -8,7 +8,7 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## 1.5.1 — Chrome Web Store update prepared
 
-Version 1.5.0 is already published on the Chrome Web Store listing. Package 1.5.1 is prepared for that listing; submission is waiting for developer-dashboard reauthentication, followed by Google approval. The GitHub release remains at 1.5.0.
+Version 1.5.0 is already published on the Chrome Web Store listing. Package 1.5.1 has been submitted for Google review and is currently pending review. Public availability depends on Google approval. The GitHub release remains at 1.5.0.
 
 ### Privacy and robustness
 

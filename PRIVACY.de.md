@@ -20,7 +20,7 @@ Die durchsuchbare PDF-Ebene enthält nur vollständige Wörter mit überprüfbar
 
 Ausstehende Änderungen vor jedem Export übernehmen oder verwerfen. Unschärfe bleibt ein visueller Effekt; Geheimnisse deckend maskieren.
 
-## Datenschutzumfang der Version 1.5.1 — Store-Einreichung ausstehend
+## Datenschutzumfang der Version 1.5.1 — eingereicht, Google-Prüfung ausstehend
 
 Im Bereich Dokument gilt die Quellenrichtlinie für gespeicherte Projekte und Exporte: sanitized (Standard) entfernt URL-Abfrageparameter und Fragmente, none lässt Quellen weg und full behält sie bei. In HTTP(S)-URLs eingebettete Zugangsdaten werden immer entfernt, auch im Modus full. Beim Speichern entfernte Quellen sind nicht wiederherstellbar; ein späterer Moduswechsel stellt sie nicht wieder her. Bibliotheksexporte verwenden immer sanitized, auch für vor dieser Version gespeicherte Projekte.
 

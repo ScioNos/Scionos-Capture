@@ -14,7 +14,7 @@
 
 **[Version 1.5.0 herunterladen](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.0)** · **[Chrome-Web-Store-Eintrag ansehen](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe)** · **[Hilfe erhalten](https://github.com/ScioNos/Scionos-Capture/issues)**
 
-<!-- source-version --> Version 1.5.0 ist bereits im Chrome Web Store veröffentlicht. Das lokal validierte Update 1.5.1 wartet vor dem Upload und der Einreichung auf eine erneute Anmeldung im Entwickler-Dashboard. Die GitHub-Version bleibt bei 1.5.0; nach Einreichung hängt die Store-Veröffentlichung von der Genehmigung durch Google ab. Der GitHub-Download bleibt bei Version 1.5.0.
+<!-- source-version --> Version 1.5.1 wurde als Aktualisierung des im Chrome Web Store veröffentlichten Eintrags (derzeit 1.5.0) zur Prüfung eingereicht; der aktuelle Status lautet „Prüfung ausstehend“. Die öffentliche Verfügbarkeit hängt von der Genehmigung durch Google ab. Der GitHub-Download bleibt bei Version 1.5.0.
 
 ![Scionos-Capture-Editor 1.5.0: Bildannotation und Vorschau einer horizontalen Komposition](store-assets/screenshot-real-1-composition-v1.5.0.png)
 

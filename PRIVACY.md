@@ -24,7 +24,7 @@ La couche recherchable du PDF conserve uniquement les mots complets dont la visi
 
 Appliquez ou annulez les modifications en attente avant tout export. Le flou reste un effet visuel ; utilisez un masque solide pour les secrets.
 
-## Confidentialité de la mise à jour 1.5.1 — soumission Store en attente
+## Confidentialité de la mise à jour 1.5.1 — soumise, en attente d’examen Google
 
 Dans le panneau Document, la politique de sources s’applique aux projets sauvegardés et aux exports : sanitized (par défaut) retire paramètres de requête et fragments des URL, none omet les sources et full les conserve. Les identifiants intégrés aux URL HTTP(S) sont toujours retirés, même en mode full. Les sources retirées à la sauvegarde ne sont plus récupérables ; changer de mode ensuite ne les restaure pas. L’export depuis la bibliothèque applique toujours sanitized, y compris aux projets enregistrés avant cette version.
 

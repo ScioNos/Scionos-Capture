@@ -6,7 +6,7 @@
 
 ## 1.5.1 — actualización preparada para Chrome Web Store
 
-La versión 1.5.0 ya está publicada en la ficha de Chrome Web Store. El paquete 1.5.1 está preparado para esa ficha; el envío espera una nueva autenticación en el panel de desarrollador y, después, la aprobación de Google. La versión de GitHub sigue en 1.5.0.
+La versión 1.5.0 ya está publicada en la ficha de Chrome Web Store. El paquete 1.5.1 se ha enviado a revisión de Google y está pendiente de revisión. La disponibilidad pública depende de la aprobación de Google. La versión de GitHub sigue en 1.5.0.
 
 ### Privacidad y robustez
 
