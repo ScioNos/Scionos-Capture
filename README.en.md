@@ -18,6 +18,8 @@
 
 ## Version 1.5.2 — fixes and reliability
 
+**Notice:** the corrected v1.5.2 release keeps the same version number and includes ESLint 10.15.0, `@eslint/js` 10.0.1 and html-validate 11.21.1; the Node.js range is already set to `^22.22.0 || >=24.8.0`.
+
 - Editor drags: track the active `pointerId` and handle gesture interruptions.
 - Internal editor thumbnails and composition preview: reconstruct them when reopening a project to include annotations.
 - The “Export project” button: keep the unsaved-changes state; the message says the download was requested without guaranteeing that the browser saved the file.
@@ -132,7 +134,7 @@ Chunks stay in local IndexedDB and are deleted after assembly or fifteen minutes
 
 The interface and help are available in **French, English, German and Spanish**. The project uses Manifest V3 and has no external JavaScript runtime dependencies.
 
-Prerequisite: **Node.js 22.13.0 or later**, with **Node.js 24 recommended** for development and test tools.
+Prerequisite: **Node.js `^22.22.0 || >=24.8.0`**, with **Node.js 24.8+ recommended** for development and test tools.
 
 ```bash
 npm ci
@@ -143,7 +145,7 @@ npm run verify
 
 Version sync for GitHub publication: `npm run version:sync -- 1.5.2`; in PowerShell: `npm.cmd run version:sync -- 1.5.2`. This command also changes package version files; run it only as part of their coordinated update.
 
-<!-- local-package --> Validated local archive: `scionos-capture-v1.5.2.zip`, 35 files. SHA-256: `4cd9154b5b98b4e413c23683f3ecbfe3bfc2b0a633ae0b4407b19934d5938bc7`.
+<!-- local-package --> Validated local archive: `scionos-capture-v1.5.2.zip`, 35 files. SHA-256: `d20d607afc0bdb4e8d942a04b770803ffa0215d311b657436c5388c023dd5d98`.
 
 [Contribute](CONTRIBUTING.en.md) · [Changelog](CHANGELOG.en.md) · [Release notes](RELEASE_NOTES.md) · [Report an issue](https://github.com/ScioNos/Scionos-Capture/issues) · [Report a vulnerability](SECURITY.en.md)
 

@@ -10,8 +10,8 @@
 - Rapports HTML : application de la politique de sources dans tous les chemins du générateur, avec retrait systématique des identifiants HTTP(S).
 - Impression/PDF : limites cumulées de 32 millions de pixels et 128 Mio de blobs, avec un maximum de 200 pages.
 - Paquet : retrait de l’ancien module `editor-export.js`, soit 35 fichiers de distribution.
-- Outils de test : @axe-core/playwright 4.14.0, @playwright/test 1.65.1, fake-indexeddb 6.2.8 et PDF.js 6.5.438 ; Node.js 22.13.0 minimum, Node.js 24 recommandé.
-- Accessibilité : le nom annoncé du sélecteur de langue contient son code visible. Les migrations majeures ESLint et HTML-Validate sont documentées dans [la revue des dépendances](DEPENDENCY_REVIEW_1.5.2.md).
+- Outils de test : @axe-core/playwright 4.14.0, @playwright/test 1.65.1, fake-indexeddb 6.2.8 et PDF.js 6.5.438. Dépendances de lint et validation majeures mises à jour : @eslint/js 10.0.1, eslint 10.15.0 et html-validate 11.21.1. Prérequis Node.js : ^22.22.0 ou >=24.8.0 ; matrice CI configurée pour 22.22.0 et 24.8.0, sans exécution GitHub attestée pour cette migration.
+- Accessibilité : le nom annoncé du sélecteur de langue contient son code visible. La migration majeure ESLint et HTML-Validate est détaillée dans [la revue de migration](MAJOR_DEPENDENCY_MIGRATION.md).
 
 Validation locale réussie : 133 tests unitaires, 126 tests navigateur, cinq modes natifs dans Chrome et Edge, performances générales et dix scénarios PDF. Archive de 35 fichiers. Les résultats et l’empreinte du paquet sont consignés dans [la revue des dépendances et validations](DEPENDENCY_REVIEW_1.5.2.md).
 
@@ -25,8 +25,8 @@ Validation locale réussie : 133 tests unitaires, 126 tests navigateur, cinq mod
 - HTML reports: apply source policy throughout the generator, always removing HTTP(S) credentials.
 - Print/PDF: cumulative limits of 32 million pixels and 128 MiB of blobs, with a maximum of 200 pages.
 - Package: removed the legacy `editor-export.js` module, leaving 35 distribution files.
-- Test tools: @axe-core/playwright 4.14.0, @playwright/test 1.65.1, fake-indexeddb 6.2.8 and PDF.js 6.5.438; Node.js 22.13.0 minimum, Node.js 24 recommended.
-- Accessibility: the language selector’s accessible name contains its visible code. ESLint and HTML-Validate major migrations are documented in the [dependency review](DEPENDENCY_REVIEW_1.5.2.md).
+- Test tools: @axe-core/playwright 4.14.0, @playwright/test 1.65.1, fake-indexeddb 6.2.8 and PDF.js 6.5.438. Major lint and validation tools upgraded: @eslint/js 10.0.1, eslint 10.15.0 and html-validate 11.21.1. Node.js requirement: ^22.22.0 or >=24.8.0; CI matrix configured for 22.22.0 and 24.8.0, with no GitHub run attested for this migration.
+- Accessibility: the language selector’s accessible name contains its visible code. The ESLint and HTML-Validate major migration is detailed in the [migration review](MAJOR_DEPENDENCY_MIGRATION.md).
 
 Local validation passed: 133 unit tests, 126 browser tests, five native modes in Chrome and Edge, general performance runs and ten PDF scenarios. The archive contains 35 files. Results and the package checksum are recorded in the [dependency and validation review](DEPENDENCY_REVIEW_1.5.2.md).
 
@@ -40,8 +40,8 @@ Local validation passed: 133 unit tests, 126 browser tests, five native modes in
 - Informes HTML: aplicación de la política de fuentes en todo el generador, eliminando siempre las credenciales HTTP(S).
 - Impresión/PDF: límites acumulados de 32 millones de píxeles y 128 MiB de blobs, con un máximo de 200 páginas.
 - Paquete: retirada del módulo antiguo `editor-export.js`, con 35 archivos de distribución.
-- Herramientas de prueba: @axe-core/playwright 4.14.0, @playwright/test 1.65.1, fake-indexeddb 6.2.8 y PDF.js 6.5.438; Node.js 22.13.0 mínimo, Node.js 24 recomendado.
-- Accesibilidad: el nombre accesible del selector de idioma incluye su código visible. Las migraciones mayores de ESLint y HTML-Validate se documentan en la [revisión de dependencias](DEPENDENCY_REVIEW_1.5.2.md).
+- Herramientas de prueba: @axe-core/playwright 4.14.0, @playwright/test 1.65.1, fake-indexeddb 6.2.8 y PDF.js 6.5.438. Herramientas principales de lint y validación actualizadas: @eslint/js 10.0.1, eslint 10.15.0 y html-validate 11.21.1. Node.js requerido: ^22.22.0 o >=24.8.0; matriz CI configurada para 22.22.0 y 24.8.0, sin ejecución en GitHub acreditada para esta migración.
+- Accesibilidad: el nombre accesible del selector de idioma incluye su código visible. La migración mayor de ESLint y HTML-Validate se detalla en la [revisión de migración](MAJOR_DEPENDENCY_MIGRATION.md).
 
 Validación local superada: 133 pruebas unitarias, 126 pruebas de navegador, cinco modos nativos en Chrome y Edge, rendimiento general y diez escenarios PDF. Archivo de 35 elementos. Los resultados y la suma del paquete constan en la [revisión de dependencias y validaciones](DEPENDENCY_REVIEW_1.5.2.md).
 
@@ -55,8 +55,8 @@ Validación local superada: 133 pruebas unitarias, 126 pruebas de navegador, cin
 - HTML-Berichte: Quellenrichtlinie im gesamten Generator anwenden und HTTP(S)-Zugangsdaten immer entfernen.
 - Drucken/PDF: kumulierte Grenzen von 32 Millionen Pixeln und 128 MiB Blobs, höchstens 200 Seiten.
 - Paket: altes Modul `editor-export.js` entfernt; damit 35 Distributionsdateien.
-- Testwerkzeuge: @axe-core/playwright 4.14.0, @playwright/test 1.65.1, fake-indexeddb 6.2.8 und PDF.js 6.5.438; mindestens Node.js 22.13.0, Node.js 24 empfohlen.
-- Barrierefreiheit: Der zugängliche Name der Sprachauswahl enthält den sichtbaren Sprachcode. Hauptversionen von ESLint und HTML-Validate sind in der [Abhängigkeitsprüfung](DEPENDENCY_REVIEW_1.5.2.md) dokumentiert.
+- Testwerkzeuge: @axe-core/playwright 4.14.0, @playwright/test 1.65.1, fake-indexeddb 6.2.8 und PDF.js 6.5.438. Lint- und Validierungswerkzeuge aktualisiert: @eslint/js 10.0.1, eslint 10.15.0 und html-validate 11.21.1. Node.js-Anforderung: ^22.22.0 oder >=24.8.0; CI-Matrix für 22.22.0 und 24.8.0 konfiguriert, ein GitHub-Lauf für diese Migration ist nicht belegt.
+- Barrierefreiheit: Der zugängliche Name der Sprachauswahl enthält den sichtbaren Sprachcode. Die Hauptversionsmigration von ESLint und HTML-Validate ist in der [Migrationsprüfung](MAJOR_DEPENDENCY_MIGRATION.md) dokumentiert.
 
 Lokale Prüfung bestanden: 133 Unit-Tests, 126 Browsertests, fünf native Modi in Chrome und Edge, allgemeine Leistungsmessungen und zehn PDF-Szenarien. Archiv mit 35 Dateien. Ergebnisse und Prüfsumme stehen in der [Abhängigkeits- und Validierungsprüfung](DEPENDENCY_REVIEW_1.5.2.md).
 

@@ -64,7 +64,7 @@ Aucun identifiant ni compte applicatif n’est nécessaire.
 
 ## Préparation et publication
 
-Archive locale validée : `scionos-capture-v1.5.2.zip`, 35 fichiers. SHA-256 : `4cd9154b5b98b4e413c23683f3ecbfe3bfc2b0a633ae0b4407b19934d5938bc7`.
+Archive locale validée : `scionos-capture-v1.5.2.zip`, 35 fichiers. SHA-256 : `d20d607afc0bdb4e8d942a04b770803ffa0215d311b657436c5388c023dd5d98`.
 
 Validation 1.5.2 : `npm run verify:release` a réussi — 133 tests unitaires, 126 tests navigateur, cinq modes chacun dans Chrome 157.0.8103.79 et Edge 157.0.4341.60, trois répétitions de performance et dix scénarios PDF. Résultats et environnement : [revue des dépendances et validation](DEPENDENCY_REVIEW_1.5.2.md).
 

@@ -5,14 +5,14 @@
 No adjuntes capturas con datos personales, credenciales o secretos.
 
 1. Crea una rama `fix/...`, `feat/...` o `docs/...`.
-2. Usa Node.js 24 y ejecuta `npm ci`.
+2. Usa Node.js 24.8+ y ejecuta `npm ci`.
 3. Mantén cero dependencias de ejecución y justifica las de desarrollo.
 4. Ejecuta `npm run verify` antes de la pull request.
 5. Prueba manualmente Chrome y Edge.
 
 Comprueba los cinco modos, incluidos los dos puntos, el desplazamiento, los fragmentos parciales y los campos geométricos del área desplazable. Cubre también páginas altas y anchas, DPR, cambio de pestaña, Deshacer/Rehacer, recorte, máscara, copia, PNG/PDF, zoom, teclado y cuatro idiomas. Añade cada nueva cadena a todos los `_locales/*/messages.json` y mantén los permisos mínimos, documentados y validados.
 
-Las dependencias de desarrollo y pruebas requieren Node.js 22.13.0 o posterior; se recomienda Node.js 24. PDF.js 6.5.438 se usa solo en las pruebas de extracción PDF. La CI verifica Node.js 22.13.0 y 24.
+Las dependencias de desarrollo y pruebas requieren Node.js `^22.22.0 || >=24.8.0`; se recomienda Node.js 24.8+. PDF.js 6.5.438 se usa solo en las pruebas de extracción PDF. La CI verifica Node.js 22.22.0 y 24.8.0.
 
 Sincronización de versión para la publicación GitHub: `npm run version:sync -- 1.5.2`; en PowerShell: `npm.cmd run version:sync -- 1.5.2`. Este comando también modifica los archivos de versión del paquete; ejecútalo solo dentro de su actualización coordinada.
 

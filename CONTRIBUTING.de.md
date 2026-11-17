@@ -5,14 +5,14 @@
 Keine Screenshots mit persönlichen Daten, Zugangsdaten oder Geheimnissen anhängen.
 
 1. Branch `fix/...`, `feat/...` oder `docs/...` erstellen.
-2. Node.js 24 verwenden und `npm ci` ausführen.
+2. Node.js 24.8+ verwenden und `npm ci` ausführen.
 3. Keine Laufzeitabhängigkeiten hinzufügen; Entwicklungsabhängigkeiten begründen.
 4. Vor dem Pull Request `npm run verify` ausführen.
 5. Chrome und Edge manuell testen.
 
 Alle fünf Modi prüfen, besonders die zwei Punkte, das Scrollen, Teilabschnitte und Geometriefelder des Scrollbereichs. Auch hohe/breite Seiten, DPR, Tabwechsel, Rückgängig/Wiederholen, Zuschnitt, Abdeckung, Kopieren, PNG/PDF, Zoom, Tastatur und vier Sprachen abdecken. Neue Texte in alle `_locales/*/messages.json` aufnehmen. Manifest-Berechtigungen minimal, dokumentiert und validiert halten.
 
-Entwicklungs- und Testabhängigkeiten benötigen Node.js ab 22.13.0; Node.js 24 wird empfohlen. PDF.js 6.5.438 wird nur für PDF-Textextraktionstests verwendet. Die CI prüft Node.js 22.13.0 und 24.
+Entwicklungs- und Testabhängigkeiten benötigen Node.js `^22.22.0 || >=24.8.0`; Node.js 24.8+ wird empfohlen. PDF.js 6.5.438 wird nur für PDF-Textextraktionstests verwendet. Die CI prüft Node.js 22.22.0 und 24.8.0.
 
 Versionsabgleich für die GitHub-Veröffentlichung: `npm run version:sync -- 1.5.2`; in PowerShell: `npm.cmd run version:sync -- 1.5.2`. Dieser Befehl ändert auch Paketversionsdateien; nur im Rahmen ihrer abgestimmten Aktualisierung ausführen.
 

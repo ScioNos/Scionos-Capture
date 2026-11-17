@@ -1,4 +1,6 @@
-# Dépendances — préparation de Scionos Capture 1.5.2
+# Dépendances — publication initiale de Scionos Capture 1.5.2
+
+> Historique de la publication initiale. La correction ultérieure de la même version intègre les migrations majeures décrites dans [le rapport de migration](MAJOR_DEPENDENCY_MIGRATION.md). Les versions, commit, contrôles CI et empreinte ci-dessous concernent l’archive initiale.
 
 ## Périmètre
 
@@ -73,8 +75,8 @@ Rapports locaux générés dans `dist/performance-smoke.json` et `dist/verify-1.
 
 La [release GitHub v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2) est publiée le 17 novembre 2026 à 14:41:13 UTC (15:41:13 Europe/Zurich). L’API GitHub confirme `draft: false`, `prerelease: false` et la désigne comme dernière release.
 
-Le tag v1.5.2 pointe vers `2511407bd22624337889164e5c1593ceeed99de0`. Les deux workflows de ce commit ont réussi : [Verify extension](https://github.com/ScioNos/Scionos-Capture/actions/runs/44104646466), incluant les contrôles principaux sur Node.js 22.13.0 et 24, les tests navigateur Linux et les régressions Windows ; [Verify release package](https://github.com/ScioNos/Scionos-Capture/actions/runs/44104649783), incluant les régressions Windows et `npm run verify` sur Linux.
+Lors de la publication initiale, le tag v1.5.2 pointait vers `2511407bd22624337889164e5c1593ceeed99de0`. Les deux workflows de ce commit ont réussi : [Verify extension](https://github.com/ScioNos/Scionos-Capture/actions/runs/44104646466), incluant les contrôles principaux sur Node.js 22.13.0 et 24, les tests navigateur Linux et les régressions Windows ; [Verify release package](https://github.com/ScioNos/Scionos-Capture/actions/runs/44104649783), incluant les régressions Windows et `npm run verify` sur Linux.
 
-Le ZIP de 165 693 octets et son fichier SHA-256 sont joints à la release. Le téléchargement depuis GitHub a été vérifié ; son empreinte correspond à l’archive locale validée. Les 35 fichiers de cette archive correspondent exactement aux sources du tag. La documentation de publication peut évoluer ensuite sur main sans modifier le tag ni les fichiers distribués.
+Le ZIP initial de 165 693 octets et son fichier SHA-256 avaient été joints à la release. Son téléchargement avait été vérifié ; les 35 fichiers correspondaient aux sources du tag initial. La correction de la release remplace cette archive et actualise le tag ; consulter le rapport de migration pour l’état corrigé.
 
 Aucune soumission de cette version au Chrome Web Store n’a été effectuée. Son statut reste distinct de la release GitHub.

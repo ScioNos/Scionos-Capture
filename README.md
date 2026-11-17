@@ -18,6 +18,8 @@
 
 ## Version 1.5.2 — corrections et fiabilisation
 
+**Avis :** la release v1.5.2 corrigée conserve le même numéro de version et inclut ESLint 10.15.0, `@eslint/js` 10.0.1 et html-validate 11.21.1 ; la plage Node.js est déjà réglée sur `^22.22.0 || >=24.8.0`.
+
 - Glissers dans l’éditeur : suivi du `pointerId` actif et gestion des interruptions du geste.
 - Miniatures internes de l’éditeur et aperçu de composition : reconstruction à la réouverture du projet pour inclure les annotations.
 - Bouton « Exporter projet » : l’état « modifications non enregistrées » reste actif ; le message indique que le téléchargement a été demandé, sans garantir son enregistrement par le navigateur.
@@ -132,7 +134,7 @@ Les fragments restent dans IndexedDB local et sont supprimés après assemblage 
 
 L’interface et l’aide existent en **français, anglais, allemand et espagnol**. Le projet utilise Manifest V3 et n’a aucune dépendance JavaScript d’exécution externe.
 
-Prérequis : **Node.js 22.13.0 minimum**, avec **Node.js 24 recommandé** pour les outils de développement et de test.
+Prérequis : **Node.js `^22.22.0 || >=24.8.0`**, avec **Node.js 24.8+ recommandé** pour les outils de développement et de test.
 
 ```bash
 npm ci
@@ -143,7 +145,7 @@ npm run verify
 
 Synchronisation de version pour la publication GitHub : `npm run version:sync -- 1.5.2` ; sous PowerShell : `npm.cmd run version:sync -- 1.5.2`. Cette commande modifie aussi les fichiers de version du paquet ; ne l’exécutez que dans le cadre de leur mise à jour coordonnée.
 
-<!-- local-package --> Archive locale validée : `scionos-capture-v1.5.2.zip`, 35 fichiers. SHA-256 : `4cd9154b5b98b4e413c23683f3ecbfe3bfc2b0a633ae0b4407b19934d5938bc7`.
+<!-- local-package --> Archive locale validée : `scionos-capture-v1.5.2.zip`, 35 fichiers. SHA-256 : `d20d607afc0bdb4e8d942a04b770803ffa0215d311b657436c5388c023dd5d98`.
 
 [Contribuer](CONTRIBUTING.md) · [Changements](CHANGELOG.md) · [Notes de version](RELEASE_NOTES.md) · [Signaler un problème](https://github.com/ScioNos/Scionos-Capture/issues) · [Signaler une vulnérabilité](SECURITY.md)
 

@@ -5,14 +5,14 @@
 Never attach screenshots containing personal data, credentials, or secrets.
 
 1. Create a `fix/...`, `feat/...`, or `docs/...` branch.
-2. Use Node.js 24 and run `npm ci`.
+2. Use Node.js 24.8+ and run `npm ci`.
 3. Keep runtime dependencies at zero and justify development dependencies.
 4. Run `npm run verify` before opening a pull request.
 5. Reload and manually test the extension in Chrome and Edge.
 
 Test all five capture modes, including the scrolling area's two points, scrolling, partial slices, and geometry fields. Also cover tall and wide pages, DPR, tab switching, Undo/Redo, crop, mask, copy, PNG/PDF, zoom, keyboard access, and all four languages. Add every new string to all `_locales/*/messages.json` files. Keep manifest permissions minimal, documented, and validated.
 
-Development and test dependencies require Node.js 22.13.0 or later; Node.js 24 is recommended. PDF.js 6.5.438 is used only for PDF extraction tests. CI checks Node.js 22.13.0 and 24.
+Development and test dependencies require Node.js `^22.22.0 || >=24.8.0`; Node.js 24.8+ is recommended. PDF.js 6.5.438 is used only for PDF extraction tests. CI checks Node.js 22.22.0 and 24.8.0.
 
 Version sync for GitHub publication: `npm run version:sync -- 1.5.2`; in PowerShell: `npm.cmd run version:sync -- 1.5.2`. This command also changes package version files; run it only as part of their coordinated update.
 

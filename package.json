@@ -21,16 +21,16 @@
     "verify:release": "npm run verify && npm run test:native && npm run test:performance && npm run test:performance:pdf"
   },
   "engines": {
-    "node": ">=22.13.0"
+    "node": "^22.22.0 || >=24.8.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
-    "@eslint/js": "^9.39.5",
+    "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.65.1",
     "archiver": "^8.0.0",
-    "eslint": "^9.39.5",
+    "eslint": "^10.15.0",
     "fake-indexeddb": "^6.2.8",
-    "html-validate": "^9.7.1",
+    "html-validate": "^11.21.1",
     "pdfjs-dist": "6.5.438"
   },
   "overrides": {

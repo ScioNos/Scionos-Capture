@@ -16,7 +16,7 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - HTML reports: apply source policy throughout the generator, always removing HTTP(S) credentials.
 - Print/PDF: cumulative limits of 32 million pixels and 128 MiB of blobs, with a maximum of 200 pages.
 - Package: legacy `editor-export.js` module removed, leaving 35 distribution files.
-- Updated test tools: axe-core/Playwright 4.14.0, Playwright Test 1.65.1, fake-indexeddb 6.2.8 and PDF.js 6.5.438. Node.js 22.13.0 minimum; Node.js 24 recommended. ESLint and HTML-Validate major migrations are reviewed separately.
+- Updated test tools: axe-core/Playwright 4.14.0, Playwright Test 1.65.1, fake-indexeddb 6.2.8 and PDF.js 6.5.438. ESLint and HTML-Validate migrated to @eslint/js 10.0.1, eslint 10.15.0 and html-validate 11.21.1. Node.js requirement: ^22.22.0 or >=24.8.0; the CI matrix targets Node.js 22.22.0 and 24.8.0, with no GitHub run attested for this migration. Details: [major dependency migration](MAJOR_DEPENDENCY_MIGRATION.md).
 - Accessibility: the language selector’s accessible name includes its visible code, checked in all four languages.
 
 Version 1.5.2 validation: `npm run verify:release` passed — 133 unit tests, 126 browser tests, five modes each in Chrome 157.0.8103.79 and Edge 157.0.4341.60, three performance repetitions and ten PDF scenarios. Results and environment: [dependency review and validation](DEPENDENCY_REVIEW_1.5.2.md).

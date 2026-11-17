@@ -14,7 +14,7 @@
 - HTML-Berichte: Quellenrichtlinie im gesamten Generator anwenden und HTTP(S)-Zugangsdaten immer entfernen.
 - Drucken/PDF: kumulierte Grenzen von 32 Millionen Pixeln und 128 MiB Blobs, höchstens 200 Seiten.
 - Paket: altes Modul `editor-export.js` entfernt; damit 35 Distributionsdateien.
-- Aktualisierte Testwerkzeuge: axe-core/Playwright 4.14.0, Playwright Test 1.65.1, fake-indexeddb 6.2.8 und PDF.js 6.5.438. Mindestens Node.js 22.13.0; Node.js 24 empfohlen. Hauptversionen von ESLint und HTML-Validate werden separat geprüft.
+- Aktualisierte Testwerkzeuge: axe-core/Playwright 4.14.0, Playwright Test 1.65.1, fake-indexeddb 6.2.8 und PDF.js 6.5.438. ESLint und HTML-Validate auf @eslint/js 10.0.1, eslint 10.15.0 und html-validate 11.21.1 aktualisiert. Node.js-Anforderung: ^22.22.0 oder >=24.8.0; die CI-Matrix zielt auf Node.js 22.22.0 und 24.8.0, ein GitHub-Lauf für diese Migration ist nicht belegt. Details: [Migration der Hauptversionen](MAJOR_DEPENDENCY_MIGRATION.md).
 - Barrierefreiheit: Der zugängliche Name der Sprachauswahl enthält den sichtbaren Sprachcode, geprüft in allen vier Sprachen.
 
 Validierung 1.5.2: `npm run verify:release` erfolgreich — 133 Unit-Tests, 126 Browsertests, je fünf Modi in Chrome 157.0.8103.79 und Edge 157.0.4341.60, drei Leistungswiederholungen und zehn PDF-Szenarien. Ergebnisse und Umgebung: [Abhängigkeitsprüfung und Validierung](DEPENDENCY_REVIEW_1.5.2.md).

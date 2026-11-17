@@ -18,6 +18,8 @@
 
 ## Versión 1.5.2 — correcciones y fiabilidad
 
+**Aviso:** la versión v1.5.2 corregida mantiene el mismo número de versión e incluye ESLint 10.15.0, `@eslint/js` 10.0.1 y html-validate 11.21.1; el rango de Node.js ya está configurado como `^22.22.0 || >=24.8.0`.
+
 - Arrastres en el editor: seguimiento del `pointerId` activo y gestión de interrupciones del gesto.
 - Miniaturas internas del editor y vista previa de composición: reconstrucción al reabrir el proyecto para incluir las anotaciones.
 - Botón «Exportar proyecto»: se mantiene el estado de cambios sin guardar; el mensaje indica que se ha solicitado la descarga sin garantizar que el navegador haya guardado el archivo.
@@ -132,7 +134,7 @@ Los fragmentos permanecen en IndexedDB local y se eliminan tras el ensamblado o 
 
 La interfaz y la ayuda están disponibles en **francés, inglés, alemán y español**. El proyecto utiliza Manifest V3 y no tiene dependencias externas de JavaScript en tiempo de ejecución.
 
-Requisito: **Node.js 22.13.0 o posterior**, con **Node.js 24 recomendado** para las herramientas de desarrollo y pruebas.
+Requisito: **Node.js `^22.22.0 || >=24.8.0`**, con **Node.js 24.8+ recomendado** para las herramientas de desarrollo y pruebas.
 
 ```bash
 npm ci
@@ -143,7 +145,7 @@ npm run verify
 
 Sincronización de versión para la publicación GitHub: `npm run version:sync -- 1.5.2`; en PowerShell: `npm.cmd run version:sync -- 1.5.2`. Este comando también modifica los archivos de versión del paquete; ejecútalo solo dentro de su actualización coordinada.
 
-<!-- local-package --> Archivo local validado: `scionos-capture-v1.5.2.zip`, 35 archivos. SHA-256: `4cd9154b5b98b4e413c23683f3ecbfe3bfc2b0a633ae0b4407b19934d5938bc7`.
+<!-- local-package --> Archivo local validado: `scionos-capture-v1.5.2.zip`, 35 archivos. SHA-256: `d20d607afc0bdb4e8d942a04b770803ffa0215d311b657436c5388c023dd5d98`.
 
 [Contribuir](CONTRIBUTING.es.md) · [Cambios](CHANGELOG.es.md) · [Notas de versión](RELEASE_NOTES.md) · [Informar de un problema](https://github.com/ScioNos/Scionos-Capture/issues) · [Informar de una vulnerabilidad](SECURITY.es.md)
 

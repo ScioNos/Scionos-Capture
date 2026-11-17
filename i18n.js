@@ -40,7 +40,7 @@
     const requestVersion = ++localeRequestVersion;
     const nextMode = LANGUAGE_MODES.includes(mode) ? mode : 'auto';
     let nextLanguage = nextMode === 'auto' ? browserLanguage() : nextMode;
-    let nextMessages = {};
+    let nextMessages;
     try {
       nextMessages = await loadLocale(nextLanguage);
     } catch (error) {

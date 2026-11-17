@@ -18,6 +18,8 @@
 
 ## Version 1.5.2 — Korrekturen und Zuverlässigkeit
 
+**Hinweis:** Das korrigierte Release v1.5.2 behält dieselbe Versionsnummer und enthält ESLint 10.15.0, `@eslint/js` 10.0.1 und html-validate 11.21.1; der Node.js-Bereich ist bereits auf `^22.22.0 || >=24.8.0` eingestellt.
+
 - Ziehen im Editor: aktiven `pointerId` verfolgen und Unterbrechungen der Geste behandeln.
 - Interne Editor-Miniaturen und Kompositionsvorschau: beim erneuten Öffnen des Projekts einschließlich Annotationen rekonstruieren.
 - Schaltfläche „Projekt exportieren“: Status ungespeicherter Änderungen beibehalten; die Meldung bestätigt die Download-Anforderung, ohne das Speichern durch den Browser zu garantieren.
@@ -132,7 +134,7 @@ Fragmente bleiben in der lokalen IndexedDB und werden nach dem Zusammensetzen od
 
 Oberfläche und Hilfe sind auf **Französisch, Englisch, Deutsch und Spanisch** verfügbar. Das Projekt nutzt Manifest V3 und hat keine externen JavaScript-Laufzeitabhängigkeiten.
 
-Voraussetzung: **Node.js ab 22.13.0**, für Entwicklungs- und Testwerkzeuge wird **Node.js 24 empfohlen**.
+Voraussetzung: **Node.js `^22.22.0 || >=24.8.0`**, für Entwicklungs- und Testwerkzeuge wird **Node.js 24.8+ empfohlen**.
 
 ```bash
 npm ci
@@ -143,7 +145,7 @@ npm run verify
 
 Versionsabgleich für die GitHub-Veröffentlichung: `npm run version:sync -- 1.5.2`; in PowerShell: `npm.cmd run version:sync -- 1.5.2`. Dieser Befehl ändert auch Paketversionsdateien; nur im Rahmen ihrer abgestimmten Aktualisierung ausführen.
 
-<!-- local-package --> Validiertes lokales Archiv: `scionos-capture-v1.5.2.zip`, 35 Dateien. SHA-256: `4cd9154b5b98b4e413c23683f3ecbfe3bfc2b0a633ae0b4407b19934d5938bc7`.
+<!-- local-package --> Validiertes lokales Archiv: `scionos-capture-v1.5.2.zip`, 35 Dateien. SHA-256: `d20d607afc0bdb4e8d942a04b770803ffa0215d311b657436c5388c023dd5d98`.
 
 [Beitragen](CONTRIBUTING.de.md) · [Änderungen](CHANGELOG.de.md) · [Versionshinweise](RELEASE_NOTES.md) · [Problem melden](https://github.com/ScioNos/Scionos-Capture/issues) · [Sicherheitslücke melden](SECURITY.de.md)
 

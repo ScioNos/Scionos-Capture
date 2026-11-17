@@ -5,7 +5,7 @@
 Merci de contribuer. Ne joignez jamais de capture contenant des données personnelles, identifiants ou secrets.
 
 1. Créez une branche `fix/...`, `feat/...` ou `docs/...`.
-2. Installez Node.js 24 et exécutez `npm ci`.
+2. Installez Node.js 24.8+ et exécutez `npm ci`.
 3. Gardez les dépendances d’exécution à zéro et justifiez toute dépendance de développement.
 4. Exécutez `npm run verify` avant la pull request.
 5. Rechargez l’extension et testez manuellement Chrome et Edge.
@@ -14,7 +14,7 @@ Vérifiez les cinq modes de capture, notamment les deux points, le défilement, 
 
 Toute nouvelle chaîne doit être ajoutée aux quatre fichiers `_locales/*/messages.json`. Toute permission de manifeste doit être minimale, expliquée dans le README et couverte par la validation du paquet.
 
-Node.js 22.13.0 minimum est requis par les dépendances de développement et de test ; Node.js 24 est recommandé. PDF.js 6.5.438 sert uniquement aux tests d’extraction PDF. La CI vérifie Node.js 22.13.0 et 24.
+Les dépendances de développement et de test requièrent Node.js `^22.22.0 || >=24.8.0` ; Node.js 24.8+ est recommandé. PDF.js 6.5.438 sert uniquement aux tests d’extraction PDF. La CI vérifie Node.js 22.22.0 et 24.8.0.
 
 Synchronisation de version pour la publication GitHub : `npm run version:sync -- 1.5.2` ; sous PowerShell : `npm.cmd run version:sync -- 1.5.2`. Cette commande modifie aussi les fichiers de version du paquet ; ne l’exécutez que dans le cadre de leur mise à jour coordonnée.
 
