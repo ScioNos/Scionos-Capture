@@ -1,6 +1,6 @@
 # Migration des outils ESLint et HTML-Validate
 
-Cette migration intervient après la publication GitHub de la version 1.5.2. À la demande de l’utilisateur, elle est intégrée à une correction de cette même release, sans changer le numéro 1.5.2. Le tag et les fichiers joints seront actualisés après validation du paquet corrigé.
+Cette migration intervient après la publication GitHub de la version 1.5.2. À la demande de l’utilisateur, elle est intégrée à une correction de cette même release, sans changer le numéro 1.5.2. Le tag et les fichiers joints ont été actualisés après validation du paquet corrigé.
 
 ## Versions
 
@@ -32,6 +32,6 @@ Sources officielles : [npm-check-updates](https://github.com/raineorshine/npm-ch
 
 La correction complète a aussi passé `npm run verify:release` sous Node 26.13.1 : 133 tests unitaires, 126 tests navigateur, cinq modes natifs dans Chrome 157.0.8103.79 et Edge 157.0.4341.60, trois répétitions de performances générales et dix scénarios PDF. L’archive corrigée contient 35 fichiers ; SHA-256 : `d20d607afc0bdb4e8d942a04b770803ffa0215d311b657436c5388c023dd5d98`.
 
-La matrice CI cible Node 22.22.0 et 24.8.0 ; les résultats distants seront constatés après le push du commit corrigé.
+Les deux workflows du commit corrigé `81d97a63fad16f1982f52e26ddce583b787de8a1` ont réussi : [Verify extension](https://github.com/ScioNos/Scionos-Capture/actions/runs/44119918920), incluant Node 22.22.0 et 24.8.0, Chromium Linux et les régressions Windows ; [Verify release package](https://github.com/ScioNos/Scionos-Capture/actions/runs/44119924708), incluant les régressions Windows et la validation complète Linux.
 
-La correction conserve le numéro 1.5.2 dans le paquet et le manifeste. Le ZIP corrigé garde le nom `scionos-capture-v1.5.2.zip` ; son empreinte sera remplacée avec l’archive dans la release existante. La correction du tag v1.5.2 est explicite ; les clones qui possèdent déjà l’ancien tag devront le récupérer à nouveau pour voir le nouveau commit.
+La correction conserve le numéro 1.5.2 dans le paquet et le manifeste. Le ZIP corrigé garde le nom `scionos-capture-v1.5.2.zip` ; l’archive et son empreinte ont été remplacées dans la [release existante](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). Le téléchargement public vérifié correspond à l’archive corrigée de 165 695 octets et à l’empreinte ci-dessus. Le tag v1.5.2 pointe désormais vers `81d97a63fad16f1982f52e26ddce583b787de8a1` ; les clones qui possèdent déjà l’ancien tag devront le récupérer à nouveau pour voir le nouveau commit. Aucune soumission au Chrome Web Store n’a été effectuée.
