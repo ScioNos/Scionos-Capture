@@ -10,11 +10,21 @@
 
 [Français](README.md) · [English](README.en.md) · [Deutsch](README.de.md) · [Español](README.es.md)
 
-[![Version](https://img.shields.io/badge/version-1.5.1-blue)](https://github.com/ScioNos/Scionos-Capture) [![Checks](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml/badge.svg)](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml) [![MIT License](https://img.shields.io/badge/licence-MIT-green)](LICENSE) ![Chrome and Edge](https://img.shields.io/badge/Chrome_%26_Edge-Manifest_V3-4285F4)
+[![Version](https://img.shields.io/badge/version-1.5.2-blue)](https://github.com/ScioNos/Scionos-Capture) [![Checks](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml/badge.svg)](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml) [![MIT License](https://img.shields.io/badge/licence-MIT-green)](LICENSE) ![Chrome and Edge](https://img.shields.io/badge/Chrome_%26_Edge-Manifest_V3-4285F4)
 
-**[Download version 1.5.1](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.1)** · **[View the Chrome Web Store listing](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe)** · **[Get help](https://github.com/ScioNos/Scionos-Capture/issues)**
+**[Download version 1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2)** · **[View the Chrome Web Store listing](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe)** · **[Get help](https://github.com/ScioNos/Scionos-Capture/issues)**
 
-<!-- source-version --> Version 1.5.1 has been submitted for review as an update to the published Chrome Web Store listing, currently at 1.5.0; its current status is pending review. Public availability depends on Google approval. The GitHub download remains at 1.5.0.
+<!-- source-version --> **1.5.2 — GitHub release prepared.** Planned GitHub publication: [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). Current Chrome Web Store status is unconfirmed; no 1.5.2 Store submission is performed here.
+
+## Version 1.5.2 — fixes and reliability
+
+- Editor drags: track the active `pointerId` and handle gesture interruptions.
+- Internal editor thumbnails and composition preview: reconstruct them when reopening a project to include annotations.
+- The “Export project” button: keep the unsaved-changes state; the message says the download was requested without guaranteeing that the browser saved the file.
+- HTML reports: apply source policy throughout the generator, always removing HTTP(S) credentials.
+- Print/PDF: cumulative limits of 32 million pixels and 128 MiB of blobs, with a maximum of 200 pages.
+- Package: legacy `editor-export.js` module removed, leaving 35 distribution files.
+
 
 ![Scionos Capture 1.5.0 editor: image annotation and a horizontal composition preview](store-assets/screenshot-real-1-composition-v1.5.0.png)
 
@@ -32,15 +42,15 @@ Create a visual explanation, document a problem or save a useful excerpt. Sciono
 
 ## Install in minutes
 
-### Download from GitHub — version 1.5.1
+### Download from GitHub — version 1.5.2
 
-1. Download `scionos-capture-v1.5.1.zip` from the [v1.5.1 release](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.1).
+1. Download `scionos-capture-v1.5.2.zip` from the [v1.5.2 release](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2).
 2. Verify its checksum using the supplied `.sha256` file, then extract the archive.
 3. Open `chrome://extensions` or `edge://extensions` and enable **Developer mode**.
 4. Choose **Load unpacked** and select the extracted folder containing the manifest.
 5. Pin Scionos Capture to the toolbar and open a regular web page.
 
-Version 1.5.0 is already published on this [Chrome Web Store listing](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe). The 1.5.1 update has been submitted and is pending Google review; it will appear there after approval.
+An existing [Chrome Web Store listing](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe) is available. Its distributed version and review status must be confirmed in the dashboard; no 1.5.2 Store submission is performed here.
 
 ## Three ways to work
 
@@ -122,7 +132,7 @@ Chunks stay in local IndexedDB and are deleted after assembly or fifteen minutes
 
 The interface and help are available in **French, English, German and Spanish**. The project uses Manifest V3 and has no external JavaScript runtime dependencies.
 
-Recommended prerequisite: **Node.js 24**. Core checks remain compatible with Node.js 20.
+Prerequisite: **Node.js 22.13.0 or later**, with **Node.js 24 recommended** for development and test tools.
 
 ```bash
 npm ci
@@ -131,12 +141,14 @@ npm run verify
 
 `verify` checks syntax, lint, HTML, unit tests, translations, packaging and browser/accessibility regressions. `npm run test:native` tests all five modes in installed Chrome and Edge with real captures and disposable profiles, without using personal profiles. `npm run package` generates the archive and its checksum in `dist/`.
 
-Version sync: `npm run version:sync -- 1.5.1 --unreleased`; in PowerShell: `npm.cmd run version:sync -- 1.5.1 --unreleased`.
+Version sync for GitHub publication: `npm run version:sync -- 1.5.2`; in PowerShell: `npm.cmd run version:sync -- 1.5.2`. This command also changes package version files; run it only as part of their coordinated update.
 
-<!-- local-package --> GitHub release published: `scionos-capture-v1.5.1.zip` · SHA-256: `cd9a63914d4d407862494ef50d35b706e11653d704b0f09173796d794f442564`. Version 1.5.1 remains pending review on the Chrome Web Store.
+<!-- local-package --> Validated local archive: `scionos-capture-v1.5.2.zip`, 35 files. SHA-256: `4cd9154b5b98b4e413c23683f3ecbfe3bfc2b0a633ae0b4407b19934d5938bc7`.
 
 [Contribute](CONTRIBUTING.en.md) · [Changelog](CHANGELOG.en.md) · [Release notes](RELEASE_NOTES.md) · [Report an issue](https://github.com/ScioNos/Scionos-Capture/issues) · [Report a vulnerability](SECURITY.en.md)
 
 ---
 
 Developed by **eyelo SA, Switzerland**, under the **ScioNos** brand. [Website](https://scionos.ch) · [Contact](mailto:info@eyelo.ch) · [MIT License](LICENSE)
+
+Version 1.5.2 validation: `npm run verify:release` passed — 133 unit tests, 126 browser tests, five modes each in Chrome 157.0.8103.79 and Edge 157.0.4341.60, three performance repetitions and ten PDF scenarios. Results and environment: [dependency review and validation](DEPENDENCY_REVIEW_1.5.2.md).

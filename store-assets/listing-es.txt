@@ -1,10 +1,12 @@
+Borrador de ficha para la candidata 1.5.2 — en preparación, no publicada. La 1.5.1 está publicada en GitHub; el estado actual de Chrome Web Store no está confirmado.
+
 Scionos Capture permite capturar una página web, anotarla y preparar un documento en tu dispositivo. No necesita cuenta ni envía las capturas a un servidor.
 
 Capturar una página
 Elige el área visible, una selección, una región desplazable, la página completa o un elemento. Ajusta los límites antes de confirmar. Un retardo cancelable permite preparar un menú o un estado temporal de la página.
 
 Componer y anotar
-Combina y reordena varias imágenes importadas o pegadas, con títulos y leyendas. La actualización 1.5.1 mejora el control de las fuentes compartidas, rechaza archivos de imagen demasiado grandes antes de decodificarlos y corrige el procesamiento y la impresión. El editor ofrece dibujo, texto, flechas, resaltado, formas, recorte y enmascarado. Las anotaciones compatibles siguen siendo editables en los proyectos guardados.
+Combina y reordena varias imágenes importadas o pegadas, con títulos y leyendas. La candidata 1.5.2 prepara correcciones de arrastres interrumpidos, miniaturas internas del editor y vista previa, y exportaciones. Exportar un proyecto portátil mantiene el indicador de cambios sin guardar; el mensaje «descarga solicitada» no garantiza la escritura del archivo. El editor ofrece dibujo, texto, flechas, resaltado, formas, recorte y enmascarado. Las anotaciones compatibles siguen siendo editables en los proyectos guardados.
 
 Conservar el trabajo
 Guarda un proyecto portátil para retomarlo después o consérvalo en la biblioteca local. Allí puedes buscar, renombrar, duplicar y eliminar proyectos. La cuota de almacenamiento y el periodo de conservación son ajustables, con opción sin caducidad.
@@ -14,6 +16,8 @@ Guarda una imagen o documento, copia el resultado o utiliza la impresión. Los a
 
 Privacidad y límites
 En Documento, elige una política de fuentes: sanitized (por defecto) elimina parámetros y fragmentos de URL; none elimina fuentes y enlaces; full conserva las URL sin credenciales integradas. Se aplica a proyectos guardados y exportaciones; la biblioteca siempre exporta con sanitized. Las fuentes eliminadas al guardar no se recuperan. Las rutas, imágenes, títulos y leyendas pueden seguir siendo sensibles. Para proteger los píxeles, usa máscaras sólidas: el desenfoque es solo visual. Las máscaras y los recortes son definitivos al guardar. Los archivos de imagen de más de 16 millones de píxeles o 16.384 por lado se rechazan antes de decodificar; cada documento sigue limitado a 32 millones de píxeles.
+
+Para la candidata 1.5.2, impresión/PDF se limita a 32 millones de píxeles acumulados, 128 MiB de blobs acumulados y 200 páginas.
 
 Interfaz y ayuda disponibles en francés, inglés, español y alemán. El usuario gestiona la conservación y eliminación de archivos guardados por separado.
 

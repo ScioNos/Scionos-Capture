@@ -238,6 +238,74 @@ for (const placement of ['before IDAT', 'after IDAT']) {
   });
 }
 
+test('PDF print refuses cumulative raster pixels before allocating page canvases', async () => {
+  const page = await context.newPage();
+  try {
+    await page.goto(extensionOrigin + '/editor.html');
+    const result = await page.evaluate(async () => {
+      const canvas = document.createElement('canvas'); canvas.width = 100; canvas.height = 80;
+      canvas.getContext('2d').fillRect(0, 0, 100, 80);
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+      const utils = globalThis.ScionosCompositionUtils;
+      globalThis.ScionosCompositionUtils = { ...utils, computeLayout: (...args) => ({ ...utils.computeLayout(...args), width: 8200, height: 4000 }) };
+      const area = document.getElementById('print-area'); let canvases = 0;
+      const originalCreate = document.createElement.bind(document);
+      document.createElement = function (tag, ...args) { if (tag === 'canvas') canvases++; return originalCreate(tag, ...args); };
+      try {
+        await globalThis.ScionosCompositionExport.print({ title: 'Raster budget', settings: {}, items: [{ id: 'large', width: 100, height: 80, blob, title: '' }] }, { marginsMm: 5, scale: 100 }, area);
+        return { rejected: false, canvases };
+      } catch (error) { return { rejected: /pixel budget/.test(error.message), message: error.message, canvases }; }
+      finally { document.createElement = originalCreate; globalThis.ScionosCompositionUtils = utils; canvas.width = canvas.height = 1; }
+    });
+    expect(result.rejected).toBe(true);
+    expect(result.canvases).toBe(0);
+  } finally { await page.close(); }
+});
+
+test('PDF print revokes earlier pages when cumulative encoded bytes exceed budget', async () => {
+  const page = await context.newPage();
+  try {
+    await page.goto(extensionOrigin + '/editor.html');
+    const result = await page.evaluate(async () => {
+      const surface = document.createElement('canvas'); surface.width = 100; surface.height = 80;
+      const context = surface.getContext('2d'); context.fillStyle = '#346'; context.fillRect(0, 0, surface.width, surface.height);
+      const blob = await new Promise(resolve => surface.toBlob(resolve, 'image/png'));
+      const utils = globalThis.ScionosCompositionUtils;
+      // Two narrow pages exercise the real page plan without allocating a large raster.
+      globalThis.ScionosCompositionUtils = { ...utils, computeLayout: (...args) => ({ ...utils.computeLayout(...args), width: 100, height: 1600 }) };
+      const area = document.getElementById('print-area'); const created = [], revoked = [], surfaces = [];
+      const originalCreate = URL.createObjectURL, originalRevoke = URL.revokeObjectURL, originalBlob = globalThis.HTMLCanvasElement.prototype.toBlob;
+      URL.createObjectURL = value => { const url = originalCreate.call(URL, value); created.push(url); return url; };
+      URL.revokeObjectURL = value => { revoked.push(value); return originalRevoke.call(URL, value); };
+      let calls = 0;
+      globalThis.HTMLCanvasElement.prototype.toBlob = function(callback) {
+        surfaces.push(this);
+        // Keep real Blob/URL semantics; only the reported encoded size is simulated.
+        const encoded = new Blob([Uint8Array.of(1)], { type: 'image/png' });
+        Object.defineProperty(encoded, 'size', { value: 64 * 1024 * 1024 + (++calls === 2 ? 1 : 0) });
+        globalThis.queueMicrotask(() => callback(encoded));
+      };
+      try {
+        let message = '';
+        try { await globalThis.ScionosCompositionExport.print({ title: 'Byte budget', settings: {}, items: [{ id: 'tall', width: 100, height: 80, blob, title: '' }] }, { marginsMm: 5, scale: 100 }, area); }
+        catch (error) { message = error.message; }
+        return { message, created, revoked, calls, surfaces: surfaces.map(canvas => [canvas.width, canvas.height]), children: area.childNodes.length, marker: area.hasAttribute('data-composition-print') };
+      } finally {
+        globalThis.HTMLCanvasElement.prototype.toBlob = originalBlob;
+        created.forEach(url => originalRevoke.call(URL, url));
+        URL.createObjectURL = originalCreate; URL.revokeObjectURL = originalRevoke; globalThis.ScionosCompositionUtils = utils; surface.width = surface.height = 1;
+      }
+    });
+    expect(result.message).toMatch(/byte budget/);
+    expect(result.calls).toBe(2);
+    expect(result.created).toHaveLength(1);
+    expect(result.revoked).toEqual(result.created);
+    expect(result.surfaces).toEqual([[1, 1], [1, 1]]);
+    expect(result.children).toBe(0);
+    expect(result.marker).toBe(false);
+  } finally { await page.close(); }
+});
+
 test('print replacement and repeated cleanup revoke each owned URL exactly once', async () => {
   const page=await context.newPage();
   try {

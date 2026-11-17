@@ -2,7 +2,7 @@
 
 [Français](PRIVACY.md) · [English](PRIVACY.en.md) · [Español](PRIVACY.es.md) · [Deutsch](PRIVACY.de.md)
 
-Zuletzt aktualisiert: 14. November 2026 — Version 1.5.1.
+Zuletzt aktualisiert: 17. November 2026 — Dokumentation der Version 1.5.2.
 
 **Verantwortlicher Herausgeber:** eyelo SA (UID: CHE-108.174.302), Waadt (Vaud), Schweiz — Marke **ScioNos** ([scionos.ch](https://scionos.ch)) — Kontakt: info@eyelo.ch
 
@@ -20,7 +20,13 @@ Die durchsuchbare PDF-Ebene enthält nur vollständige Wörter mit überprüfbar
 
 Ausstehende Änderungen vor jedem Export übernehmen oder verwerfen. Unschärfe bleibt ein visueller Effekt; Geheimnisse deckend maskieren.
 
-## Datenschutzumfang der Version 1.5.1 — eingereicht, Google-Prüfung ausstehend
+## Datenschutz der Version 1.5.2
+
+**1.5.2 — GitHub-Release vorbereitet.** Geplante GitHub-Veröffentlichung: [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). Der aktuelle Chrome-Web-Store-Status ist unbestätigt; hier erfolgt keine Store-Einreichung von 1.5.2.
+
+Die Korrekturen wenden die Quellenrichtlinie auch im gesamten HTML-Generator an. `sanitized` entfernt Abfrage und Fragment, `none` lässt Quellen weg und `full` behält URLs; HTTP(S)-Zugangsdaten werden immer entfernt. Interne Editor-Miniaturen und Kompositionsvorschau werden aus dem erneut geöffneten Projekt einschließlich Annotationen rekonstruiert. Ein portabler Export entfernt den Hinweis auf ungespeicherte Änderungen nicht; „Download angefordert“ bestätigt keine Datei auf dem Datenträger. Berechtigungen und lokale Verarbeitung bleiben unverändert.
+
+## Datenschutz der Version 1.5.1 — auf GitHub veröffentlicht; Store-Status unbestätigt
 
 Im Bereich Dokument gilt die Quellenrichtlinie für gespeicherte Projekte und Exporte: sanitized (Standard) entfernt URL-Abfrageparameter und Fragmente, none lässt Quellen weg und full behält sie bei. In HTTP(S)-URLs eingebettete Zugangsdaten werden immer entfernt, auch im Modus full. Beim Speichern entfernte Quellen sind nicht wiederherstellbar; ein späterer Moduswechsel stellt sie nicht wieder her. Bibliotheksexporte verwenden immer sanitized, auch für vor dieser Version gespeicherte Projekte.
 

@@ -96,7 +96,13 @@ export async function validateMarkdownDocuments(projectRoot = root) {
       const destination = relative ? path.resolve(path.dirname(file), decodeURIComponent(relative)) : file;
       const stat = await fs.stat(destination).catch(() => null);
       assert(stat, `Missing Markdown link in ${path.relative(projectRoot, file)}: ${target}`);
-      if (fragment && anchors.has(destination)) assert(anchors.get(destination).has(decodeURIComponent(fragment)),
+      const lineAnchor = fragment && /^L([1-9]\d*)(?:-L([1-9]\d*))?$/u.exec(fragment);
+      if (lineAnchor && stat.isFile()) {
+        const destinationContent = contents.get(destination) ?? await fs.readFile(destination, 'utf8');
+        const lineCount = destinationContent.split('\n').length;
+        assert(Number(lineAnchor[1]) <= lineCount && (!lineAnchor[2] || Number(lineAnchor[2]) >= Number(lineAnchor[1]) && Number(lineAnchor[2]) <= lineCount),
+          `Invalid line anchor in ${path.relative(projectRoot, file)}: ${target}`);
+      } else if (fragment && anchors.has(destination)) assert(anchors.get(destination).has(decodeURIComponent(fragment)),
         `Missing Markdown anchor in ${path.relative(projectRoot, file)}: ${target}`);
       links += 1;
     }
@@ -133,7 +139,7 @@ export async function validatePackage() {
     manifest.action.default_popup,
     ...Object.values(manifest.icons),
     manifest.action.default_icon,
-    'editor.html', 'help.html', 'capture-utils.js', 'capture-content-utils.js', 'capture-store.js', 'content-dom.js', 'content-transfer.js', 'content-capture.js', 'content.js', 'editor-operations.js', 'editor-export.js', 'composition-utils.js', 'composition-export.js', 'annotation-model.js', 'editor.js', 'library.html', 'library.js', 'help.js', 'i18n.js', 'popup.js'
+    'editor.html', 'help.html', 'capture-utils.js', 'capture-content-utils.js', 'capture-store.js', 'content-dom.js', 'content-transfer.js', 'content-capture.js', 'content.js', 'editor-operations.js', 'composition-utils.js', 'composition-export.js', 'annotation-model.js', 'editor.js', 'library.html', 'library.js', 'help.js', 'i18n.js', 'popup.js'
   ];
   await Promise.all(referencedFiles.map(async relativePath => {
     const stat = await fs.stat(path.join(root, relativePath));
@@ -164,6 +170,13 @@ export async function validatePackage() {
     assert(readme.includes(`scionos-capture-v${manifest.version}.zip`), `README local archive version is stale: ${relativePath}`);
     const sourceMarker = readme.match(/<!-- source-version -->([^\n]+)/u);
     if (sourceMarker) assert(sourceMarker[1].includes(manifest.version), `README preparation version is stale: ${relativePath}`);
+  }
+  // Current documentation must describe this candidate; historical release files
+  // deliberately retain the versions they document.
+  for (const relativePath of [...documentFiles.filter(file => !file.startsWith('PULL_REQUEST_TEMPLATE')), 'STORE_LISTING.md',
+    ...supportedLocales.map(locale => `store-assets/listing-${locale}.txt`)]) {
+    const content = await fs.readFile(path.join(root, relativePath), 'utf8');
+    assert(content.includes(manifest.version), `Current documentation version is stale: ${relativePath}`);
   }
   const releaseNotes = await fs.readFile(path.join(root, 'RELEASE_NOTES.md'), 'utf8');
   assert(releaseNotes.includes(`# Scionos Capture ${manifest.version}`), 'Release notes version is stale');

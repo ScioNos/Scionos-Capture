@@ -144,9 +144,9 @@
       flag.src = `images/flags/${currentLang}.svg`;
       flag.alt = '';
       code.textContent = currentLang.toUpperCase();
-      button.setAttribute('aria-label', getI18nText('languageCurrent', {
+      button.setAttribute('aria-label', `${code.textContent} — ${getI18nText('languageCurrent', {
         language: getI18nText(`language${currentLang.toUpperCase()}`)
-      }));
+      })}`);
       menu.setAttribute('aria-label', getI18nText('languagePicker'));
       options.forEach(option => {
         const selected = option.dataset.languageMode === currentMode;

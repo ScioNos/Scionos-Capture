@@ -6,9 +6,24 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
-## 1.5.1 — Chrome Web Store update prepared
+## [1.5.2] — 2026-11-17
 
-Version 1.5.0 is already published on the Chrome Web Store listing. Package 1.5.1 has been submitted for Google review and is currently pending review. Public availability depends on Google approval. The GitHub release remains at 1.5.0.
+**1.5.2 — GitHub release prepared.** Planned GitHub publication: [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). Current Chrome Web Store status is unconfirmed; no 1.5.2 Store submission is performed here.
+
+- Editor drags: track the active `pointerId` and handle gesture interruptions.
+- Internal editor thumbnails and composition preview: reconstruct them when reopening a project to include annotations.
+- The “Export project” button: keep the unsaved-changes state; the message says the download was requested without guaranteeing that the browser saved the file.
+- HTML reports: apply source policy throughout the generator, always removing HTTP(S) credentials.
+- Print/PDF: cumulative limits of 32 million pixels and 128 MiB of blobs, with a maximum of 200 pages.
+- Package: legacy `editor-export.js` module removed, leaving 35 distribution files.
+- Updated test tools: axe-core/Playwright 4.14.0, Playwright Test 1.65.1, fake-indexeddb 6.2.8 and PDF.js 6.5.438. Node.js 22.13.0 minimum; Node.js 24 recommended. ESLint and HTML-Validate major migrations are reviewed separately.
+- Accessibility: the language selector’s accessible name includes its visible code, checked in all four languages.
+
+Version 1.5.2 validation: `npm run verify:release` passed — 133 unit tests, 126 browser tests, five modes each in Chrome 157.0.8103.79 and Edge 157.0.4341.60, three performance repetitions and ten PDF scenarios. Results and environment: [dependency review and validation](DEPENDENCY_REVIEW_1.5.2.md).
+
+## [1.5.1] — published on GitHub
+
+Version 1.5.1 is published on GitHub. The current Chrome Web Store status and distributed version are unconfirmed; check them in the dashboard.
 
 ### Privacy and robustness
 
@@ -191,7 +206,7 @@ Version 1.5.0 is already published on the Chrome Web Store listing. Package 1.5.
 - Canvas-clipping zoom, non-responsive toolbar, incomplete translations, hard-coded shortcut, contrast, and accessible names.
 - Locale descriptions above 132 characters, editor reload data loss, and inaccurate retention wording.
 
-[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.5.2...HEAD
 [1.3.3]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.0...v1.3.1
@@ -203,3 +218,7 @@ Version 1.5.0 is already published on the Chrome Web Store listing. Package 1.5.
 
 [1.5.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.3...v1.4.0
+
+[1.5.1]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.1
+
+[1.5.2]: https://github.com/ScioNos/Scionos-Capture/compare/v1.5.1...v1.5.2

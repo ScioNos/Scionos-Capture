@@ -6,9 +6,24 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 
 ## [Unreleased]
 
-## 1.5.1 — mise à jour préparée pour le Chrome Web Store
+## [1.5.2] — 2026-11-17
 
-La version 1.5.0 est déjà publiée sur la fiche Chrome Web Store. Le paquet 1.5.1 est soumis à l’examen Google ; son statut actuel est « En attente d’examen ». Sa publication publique dépend de l’approbation Google. La release GitHub reste en 1.5.0.
+**1.5.2 — release GitHub préparée.** Publication GitHub prévue : [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). Le statut actuel du Chrome Web Store n’est pas confirmé ; aucune soumission de la 1.5.2 n’est effectuée ici.
+
+- Glissers dans l’éditeur : suivi du `pointerId` actif et gestion des interruptions du geste.
+- Miniatures internes de l’éditeur et aperçu de composition : reconstruction à la réouverture du projet pour inclure les annotations.
+- Bouton « Exporter projet » : l’état « modifications non enregistrées » reste actif ; le message indique que le téléchargement a été demandé, sans garantir son enregistrement par le navigateur.
+- Rapports HTML : application de la politique de sources dans tous les chemins du générateur, avec retrait systématique des identifiants HTTP(S).
+- Impression/PDF : limites cumulées de 32 millions de pixels et 128 Mio de blobs, avec un maximum de 200 pages.
+- Paquet : ancien module `editor-export.js` retiré, soit 35 fichiers de distribution.
+- Outils de test mis à jour : axe-core/Playwright 4.14.0, Playwright Test 1.65.1, fake-indexeddb 6.2.8 et PDF.js 6.5.438. Node.js 22.13.0 minimum ; Node.js 24 recommandé. Les migrations majeures ESLint et HTML-Validate sont étudiées séparément.
+- Accessibilité : le nom annoncé du sélecteur de langue inclut son code visible, avec vérification dans les quatre langues.
+
+Validation 1.5.2 : `npm run verify:release` a réussi — 133 tests unitaires, 126 tests navigateur, cinq modes chacun dans Chrome 157.0.8103.79 et Edge 157.0.4341.60, trois répétitions de performance et dix scénarios PDF. Résultats et environnement : [revue des dépendances et validation](DEPENDENCY_REVIEW_1.5.2.md).
+
+## [1.5.1] — publiée sur GitHub
+
+La version 1.5.1 est publiée sur GitHub. Le statut actuel et la version distribuée sur le Chrome Web Store ne sont pas confirmés ; ils doivent être vérifiés dans le tableau de bord.
 
 ### Confidentialité et robustesse
 
@@ -196,7 +211,7 @@ La version 1.5.0 est déjà publiée sur la fiche Chrome Web Store. Le paquet 1.
 - Descriptions localisées dépassant la limite de 132 caractères.
 - Conservation temporaire plus longue que celle annoncée et perte au rechargement de l’éditeur.
 
-[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/ScioNos/Scionos-Capture/compare/v1.5.2...HEAD
 [1.3.3]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.0...v1.3.1
@@ -208,3 +223,7 @@ La version 1.5.0 est déjà publiée sur la fiche Chrome Web Store. Le paquet 1.
 
 [1.5.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.3...v1.4.0
+
+[1.5.1]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.1
+
+[1.5.2]: https://github.com/ScioNos/Scionos-Capture/compare/v1.5.1...v1.5.2

@@ -50,6 +50,18 @@ async function canvasPixel(page, x, y) {
     [...canvas.getContext('2d').getImageData(point.x, point.y, 1, 1).data], { x, y });
 }
 
+async function redPixelCount(page, selector) {
+  return page.locator(selector).evaluate(async image => {
+    await image.decode();
+    const canvas = document.createElement('canvas'); canvas.width = image.naturalWidth; canvas.height = image.naturalHeight;
+    const context = canvas.getContext('2d'); context.drawImage(image, 0, 0);
+    const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+    let count = 0;
+    for (let index = 0; index < pixels.length; index += 4) if (pixels[index] > 150 && pixels[index + 1] < 120 && pixels[index + 2] < 120) count++;
+    return count;
+  });
+}
+
 async function solidMask(page, bounds = { x: 30, y: 30, width: 520, height: 50 }) {
   await page.locator('#tool-censor').click();
   await page.locator('#censor-type').selectOption('color');
@@ -121,6 +133,66 @@ async function projectManifest(page, file) {
   }, [...file.buffer]);
 }
 
+async function annotatedProjectFixture(page, { count = 1, text = 'AUDIT_ANNOTATION' } = {}) {
+  const bytes = await page.evaluate(async ({ count, text }) => {
+    const items = [];
+    for (let index = 0; index < count; index++) {
+      const canvas = document.createElement('canvas'); canvas.width = 240; canvas.height = 120;
+      const context = canvas.getContext('2d'); context.fillStyle = '#ffffff'; context.fillRect(0, 0, 240, 120);
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+      items.push({ id: `audit-${index}`, blob, title: `Image ${index + 1}`, annotations: [{ kind: 'text', x: 30, y: 35, text: `${text}_${index}`, color: '#ff0000', bgColor: 'transparent', fontSize: 20 }] });
+    }
+    const project = await globalThis.ScionosCompositionUtils.encodeProject({ title: 'Audit project', settings: { title: 'Audit project' }, items });
+    return [...new Uint8Array(await project.arrayBuffer())];
+  }, { count, text });
+  return { name: 'audit.scionos', mimeType: 'application/x-scionos-project', buffer: Buffer.from(bytes) };
+}
+
+async function annotationPointerEvents(page, events) {
+  return page.locator('#main-canvas').evaluate((canvas, events) => {
+    // Synthetic pointer events cannot acquire a native browser capture. Model its
+    // ownership explicitly so pointer identity and release remain observable.
+    if (!globalThis.__annotationPointerCapture) {
+      const captured = new Set();
+      const released = [];
+      globalThis.__annotationPointerCapture = { captured, released };
+      canvas.setPointerCapture = pointerId => captured.add(pointerId);
+      canvas.hasPointerCapture = pointerId => captured.has(pointerId);
+      canvas.releasePointerCapture = pointerId => { captured.delete(pointerId); released.push(pointerId); };
+    }
+    const rect = canvas.getBoundingClientRect();
+    for (const { type, pointerId = 41, x = 70, y = 70, buttons = 1 } of events) {
+      if (type === 'lostpointercapture' || type === 'pointercancel') globalThis.__annotationPointerCapture.captured.delete(pointerId);
+      canvas.dispatchEvent(new globalThis.PointerEvent(type, { bubbles: true, pointerId, pointerType: 'touch', button: 0, buttons,
+        clientX: rect.left + x * rect.width / canvas.width, clientY: rect.top + y * rect.height / canvas.height }));
+    }
+    return { captured: [...globalThis.__annotationPointerCapture.captured], released: [...globalThis.__annotationPointerCapture.released] };
+  }, events);
+}
+
+async function redBounds(page) {
+  return page.locator('#main-canvas').evaluate(canvas => {
+    const data = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+    let minX = canvas.width, minY = canvas.height, maxX = -1, maxY = -1, count = 0;
+    for (let index = 0; index < data.length; index += 4) {
+      if (data[index] > 150 && data[index + 1] < 120 && data[index + 2] < 120) {
+        const x = index / 4 % canvas.width, y = Math.floor(index / 4 / canvas.width);
+        minX = Math.min(minX, x); minY = Math.min(minY, y); maxX = Math.max(maxX, x); maxY = Math.max(maxY, y); count++;
+      }
+    }
+    return { minX, minY, maxX, maxY, count };
+  });
+}
+
+async function expectDirtyReplacement(page, original) {
+  const waiting = page.waitForEvent('dialog');
+  await page.locator('#project-file').setInputFiles(original);
+  const dialog = await waiting;
+  expect(dialog.type()).toBe('confirm');
+  await dialog.dismiss();
+  await expect(page.locator('#composition-items li')).toHaveCount(2);
+}
+
 async function legacyProjectFixture(page) {
   const bytes = await page.evaluate(async () => {
     const canvas = document.createElement('canvas'); canvas.width = 100; canvas.height = 80;
@@ -177,6 +249,37 @@ test('v2 project keeps editable annotations and burns masks into the saved image
   } finally { await reopened.close(); await page.close(); }
 });
 
+test('reopened multi-image project thumbnails include editable annotations', async () => {
+  const page = await context.newPage();
+  const reopened = await context.newPage();
+  try {
+    await page.goto(extensionOrigin + '/editor.html');
+    await page.locator('#project-file').setInputFiles(await annotatedProjectFixture(page, { count: 2, text: 'THUMBNAIL' }));
+    await expect(page.locator('#composition-items li')).toHaveCount(2);
+    await solidMask(page, { x: 10, y: 90, width: 80, height: 20 });
+    const project = await downloadProject(page);
+    await reopened.goto(extensionOrigin + '/editor.html');
+    await reopened.locator('#project-file').setInputFiles(project);
+    await expect(reopened.locator('#composition-items li img')).toHaveCount(2);
+    const mainPixels = await reopened.locator('#main-canvas').evaluate(canvas => {
+      const data = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data; let count = 0;
+      for (let index = 0; index < data.length; index += 4) if (data[index] > 150 && data[index + 1] < 120 && data[index + 2] < 120) count++;
+      return count;
+    });
+    expect(mainPixels).toBeGreaterThan(50);
+    expect(await redPixelCount(reopened, '#composition-items li:first-child img')).toBeGreaterThan(0);
+    expect(await redPixelCount(reopened, '#composition-items li:nth-child(2) img')).toBeGreaterThan(0);
+    expect(await redPixelCount(reopened, '#composition-preview figure:first-of-type img')).toBeGreaterThan(0);
+    const thumbnailMask = await reopened.locator('#composition-items li:first-child img').evaluate(async image => {
+      await image.decode();
+      const canvas = document.createElement('canvas'); canvas.width = image.naturalWidth; canvas.height = image.naturalHeight;
+      const context = canvas.getContext('2d'); context.drawImage(image, 0, 0);
+      return [...context.getImageData(Math.floor(40 / 240 * canvas.width), Math.floor(100 / 120 * canvas.height), 1, 1).data];
+    });
+    expect(thumbnailMask).toEqual([0, 0, 0, 255]);
+  } finally { await reopened.close(); await page.close(); }
+});
+
 test('moving an annotation near a canvas edge survives save and reopen', async () => {
   const page = await context.newPage();
   const reopened = await context.newPage();
@@ -202,6 +305,91 @@ test('moving an annotation near a canvas edge survives save and reopen', async (
     await selectAnnotation(reopened, annotation.x + 10, annotation.y + 10);
     await expect(reopened.locator('#annotation-text')).toHaveValue('EDGE');
   } finally { await reopened.close(); await page.close(); }
+});
+
+for (const interruption of ['pointercancel', 'lostpointercapture']) test(`interrupted annotation drag is finalized on ${interruption}`, async () => {
+  const page = await context.newPage();
+  try {
+    await page.goto(extensionOrigin + '/editor.html');
+    const original = await annotatedProjectFixture(page, { count: 2, text: 'INTERRUPTED' });
+    await page.locator('#project-file').setInputFiles(original);
+    await expect(page.locator('#main-canvas')).toHaveAttribute('width', '240');
+    await page.locator('#tool-select').click();
+    const before = await redBounds(page);
+    await annotationPointerEvents(page, [{ type: 'pointerdown', x: 40, y: 40 }]);
+    await annotationPointerEvents(page, [{ type: 'pointermove', pointerId: 99, x: 100, y: 95 }, { type: interruption, pointerId: 99, buttons: 0 }]);
+    expect(await redBounds(page)).toEqual(before);
+    expect(await annotationPointerEvents(page, [{ type: 'pointermove', x: 70, y: 70 }])).toEqual({ captured: [41], released: [] });
+    const movedPixels = await redBounds(page);
+    expect(movedPixels.minX).toBeGreaterThan(before.minX + 20);
+    expect(movedPixels.minY).toBeGreaterThan(before.minY + 20);
+    const capture = await annotationPointerEvents(page, [{ type: interruption, buttons: 0 }, { type: 'pointermove', x: 110, y: 110, buttons: 0 }]);
+    expect(capture.captured).toEqual([]);
+    expect(await redBounds(page)).toEqual(movedPixels);
+    // Observe dirty state immediately: exporting would itself finalize a stale drag.
+    await expectDirtyReplacement(page, original);
+    expect(await redBounds(page)).toEqual(movedPixels);
+    const manifest = await projectManifest(page, await downloadProject(page));
+    expect(manifest.items[0].annotations[0]).toMatchObject({ text: 'INTERRUPTED_0', x: 60, y: 65 });
+    expect(manifest.items[1].annotations[0]).toMatchObject({ text: 'INTERRUPTED_1', x: 30, y: 35 });
+  } finally { await page.close(); }
+});
+
+for (const action of ['image', 'tool', 'undo']) test(`active annotation drag is finalized before ${action} change`, async () => {
+  const page = await context.newPage();
+  try {
+    await page.goto(extensionOrigin + '/editor.html');
+    const original = await annotatedProjectFixture(page, { count: 2, text: 'CHANGE' });
+    await page.locator('#project-file').setInputFiles(original);
+    await expect(page.locator('#main-canvas')).toHaveAttribute('width', '240');
+    await page.locator('#tool-select').click();
+    const before = await redBounds(page);
+    await annotationPointerEvents(page, [{ type: 'pointerdown', x: 40, y: 40 }, { type: 'pointermove', x: 70, y: 70 }]);
+    const moved = await redBounds(page);
+    if (action === 'image') {
+      // The first document action finishes the gesture and asks the user to retry.
+      await page.locator('#composition-items li button').nth(1).click();
+      expect(await redBounds(page)).toEqual(moved);
+      await page.locator('#composition-items li button').nth(1).click();
+      await expect(page.locator('#composition-items li button').nth(1)).toHaveAttribute('aria-pressed', 'true');
+      const secondImage = await redBounds(page);
+      expect(secondImage.minX).toBe(before.minX);
+      expect(secondImage.minY).toBe(before.minY);
+      await expect(page.locator('#annotation-controls')).not.toBeVisible();
+      await annotationPointerEvents(page, [{ type: 'pointermove', x: 110, y: 110 }, { type: 'pointerup', buttons: 0 }]);
+      expect(await redBounds(page)).toEqual(secondImage);
+      await page.locator('#composition-items li button').nth(0).click();
+      expect(await redBounds(page)).toEqual(moved);
+    } else {
+      await page.locator(action === 'tool' ? '#tool-arrow' : '#btn-undo').click();
+      await annotationPointerEvents(page, [{ type: 'pointermove', x: 110, y: 110 }, { type: 'pointerup', buttons: 0 }]);
+      expect(await redBounds(page)).toEqual(action === 'undo' ? before : moved);
+    }
+    expect(await annotationPointerEvents(page, [])).toEqual({ captured: [], released: [41] });
+    await expectDirtyReplacement(page, original);
+    const manifest = await projectManifest(page, await downloadProject(page));
+    expect(manifest.items[0].annotations[0]).toMatchObject(action === 'undo' ? { x: 30, y: 35 } : { x: 60, y: 65 });
+    expect(manifest.items[1].annotations[0]).toMatchObject({ x: 30, y: 35 });
+  } finally { await page.close(); }
+});
+
+test('portable project download request does not mark editor saved', async () => {
+  const page = await context.newPage();
+  try {
+    await page.goto(extensionOrigin + '/editor.html');
+    const original = await annotatedProjectFixture(page, { text: 'SAVED_STATUS' });
+    await page.locator('#project-file').setInputFiles(original);
+    await expect(page.locator('#main-canvas')).toHaveAttribute('width', '240');
+    await page.locator('#composition-title').fill('Changed locally');
+    await page.evaluate(() => { globalThis.HTMLAnchorElement.prototype.click = function () { globalThis.__downloadClickRequested = true; }; });
+    await page.locator('#btn-save-project').click();
+    await page.waitForFunction(() => globalThis.__downloadClickRequested);
+    const dialogPromise = page.waitForEvent('dialog');
+    await page.locator('#project-file').setInputFiles(original);
+    const dialog = await dialogPromise;
+    await dialog.dismiss();
+    await expect(page.locator('#composition-title')).toHaveValue('Changed locally');
+  } finally { await page.close(); }
 });
 
 test('v1 flattened project opens safely and saves as a v2 project', async () => {

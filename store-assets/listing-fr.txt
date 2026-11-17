@@ -1,10 +1,12 @@
+Brouillon de fiche pour la candidate 1.5.2 — en préparation, non publiée. La 1.5.1 est publiée sur GitHub ; le statut actuel du Chrome Web Store n’est pas confirmé.
+
 Scionos Capture permet de capturer une page web, de l’annoter et de préparer un document sur votre appareil. Aucun compte n’est nécessaire et les captures ne sont pas envoyées à un serveur.
 
 Capturer une page
 Choisissez la zone visible, une sélection, une zone défilante, la page entière ou un élément. Ajustez les limites avant de confirmer. Un délai annulable permet de préparer un menu ou un état temporaire de la page.
 
 Composer et annoter
-La composition permet de réunir et réordonner plusieurs images importées ou collées, avec titres et légendes. La mise à jour 1.5.1 affine le partage des sources, refuse les fichiers image trop grands avant leur décodage et corrige le traitement et l’impression. L’éditeur propose dessin, texte, flèches, surlignage, formes, recadrage et masquage. Les annotations prises en charge restent modifiables dans les projets enregistrés.
+La composition permet de réunir et réordonner plusieurs images importées ou collées, avec titres et légendes. La candidate 1.5.2 prépare des corrections des glissers interrompus, des miniatures internes de l’éditeur et de l’aperçu, et des exports. L’export d’un projet portable conserve l’indication de modifications non enregistrées ; un message « téléchargement demandé » ne garantit pas l’écriture du fichier. L’éditeur propose dessin, texte, flèches, surlignage, formes, recadrage et masquage. Les annotations prises en charge restent modifiables dans les projets enregistrés.
 
 Conserver son travail
 Enregistrez un projet portable pour le reprendre plus tard, ou conservez-le dans la bibliothèque locale. Vous pouvez y rechercher, renommer, dupliquer et supprimer les projets. Le quota de stockage et la durée de conservation sont réglables ; le choix sans expiration est disponible.
@@ -14,6 +16,8 @@ Enregistrez une image ou un document, copiez le résultat ou utilisez l’impres
 
 Confidentialité et limites
 Pour partager, choisissez dans Document : sanitized (par défaut) retire paramètres et fragments d’URL ; none retire sources et liens ; full conserve les URL, sans identifiants intégrés. Ce choix s’applique aux projets enregistrés et aux exports ; la bibliothèque exporte toujours en sanitized. Les sources retirées à l’enregistrement ne sont pas récupérables. Chemins, images, titres et légendes peuvent encore être sensibles. Pour protéger les pixels, utilisez un masque solide : le flou est seulement visuel. À l’enregistrement, masques et recadrages deviennent définitifs. Les fichiers image de plus de 16 millions de pixels ou 16 384 pixels par côté sont refusés avant décodage ; le cumul du document reste limité à 32 millions de pixels.
+
+Pour la candidate 1.5.2, l’impression/PDF est limitée à 32 millions de pixels cumulés, 128 Mio de blobs cumulés et 200 pages.
 
 L’interface et l’aide sont disponibles en français, anglais, espagnol et allemand. Les fichiers enregistrés séparément restent à conserver ou supprimer par l’utilisateur.
 

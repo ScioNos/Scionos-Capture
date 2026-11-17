@@ -12,6 +12,7 @@ test.beforeAll(async () => {
   origin = 'chrome-extension://' + new URL(worker.url()).host;
   const page = await context.newPage();
   await page.goto(origin + '/library.html');
+  await expect(page.locator('#language-button')).toHaveAttribute('aria-label', /.+/);
   await page.locator('#language-button').click();
   await page.locator('[data-language-mode="fr"]').click();
   await expect(page.locator('h1')).toHaveText('Bibliothèque');

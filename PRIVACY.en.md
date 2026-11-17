@@ -2,7 +2,7 @@
 
 [Français](PRIVACY.md) · [English](PRIVACY.en.md) · [Español](PRIVACY.es.md) · [Deutsch](PRIVACY.de.md)
 
-Last updated: November 14, 2026 — version 1.5.1.
+Last updated: November 17, 2026 — version 1.5.2 documentation.
 
 **Publisher:** eyelo SA (UID: CHE-108.174.302), Vaud, Switzerland — Brand **ScioNos** ([scionos.ch](https://scionos.ch)) — Contact: info@eyelo.ch
 
@@ -22,7 +22,13 @@ The searchable PDF layer retains only complete words whose visibility can be ver
 
 Apply or cancel pending edits before any export. Blur remains a visual effect; use a solid mask for secrets.
 
-## Privacy scope of version 1.5.1 — submitted, pending Google review
+## Privacy scope of version 1.5.2
+
+**1.5.2 — GitHub release prepared.** Planned GitHub publication: [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). Current Chrome Web Store status is unconfirmed; no 1.5.2 Store submission is performed here.
+
+The fixes also apply source policy throughout the HTML generator. `sanitized` removes query and fragment, `none` omits sources, and `full` retains URLs; HTTP(S) credentials are always removed. Internal editor thumbnails and the composition preview are reconstructed from the reopened project, including annotations. Portable export does not clear the unsaved-changes indicator; “download requested” does not confirm that the file was written to disk. Permissions and local processing remain unchanged.
+
+## Privacy scope of version 1.5.1 — published on GitHub; Store status unconfirmed
 
 In the Document panel, source policy applies to saved projects and exports: sanitized (default) removes URL query parameters and fragments, none omits sources and full retains them. Credentials embedded in HTTP(S) URLs are always removed, including in full mode. Sources removed on save cannot be recovered; switching modes later does not restore them. Library exports always apply sanitized, including to projects saved before this version.
 

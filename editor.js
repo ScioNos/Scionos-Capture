@@ -128,10 +128,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const byId = id => document.getElementById(id);
   const compositionSettings = { direction: 'vertical', gap: 0, padding: 0, background: '#ffffff', title: '', numbered: false };
   const copyLabels = {
-    fr: { document: 'Document', import: 'Importer des images', open: 'Ouvrir un projet', save: 'Enregistrer le projet', documentTitle: 'Titre du document', images: 'Images', up: 'Monter', down: 'Descendre', remove: 'Supprimer', itemTitle: 'Titre de l’image', caption: 'Légende', layout: 'Composition', direction: 'Disposition', vertical: 'Verticale', horizontal: 'Horizontale', gap: 'Espacement (px)', padding: 'Marge (px)', background: 'Fond', numbered: 'Numéroter les images', preview: 'Aperçu de la composition', export: 'Exporter', format: 'Format', quality: 'Qualité (%)', pdfSettings: 'Présentation PDF', paper: 'Papier', orientation: 'Orientation', portrait: 'Portrait', landscape: 'Paysage', pdfMargin: 'Marges (mm)', scale: 'Échelle (%)', header: 'En-tête : titre, source et date', footer: 'Pied de page : pagination', cancel: 'Annuler', empty: 'Importez des images PNG, JPEG ou WebP, collez une image, ou ouvrez un projet .scionos pour commencer.', pending: 'Validez ou annulez la modification en cours avant de continuer.', limit: 'Maximum 30 images, 48 Mio par image et 128 Mio au total.', replace: 'Remplacer le document ? Les modifications non enregistrées seront perdues.', saved: 'Projet enregistré.', failure: 'Impossible de terminer : ', image: 'Image', loading: 'Traitement en cours…', unsupported: 'Choisissez uniquement des images PNG, JPEG ou WebP.', reduced: 'Image exportée à taille réduite pour respecter les limites du navigateur.', done: 'Export terminé.' },
-    en: { document: 'Document', import: 'Import images', open: 'Open project', save: 'Save project', documentTitle: 'Document title', images: 'Images', up: 'Move up', down: 'Move down', remove: 'Remove', itemTitle: 'Image title', caption: 'Caption', layout: 'Composition', direction: 'Layout', vertical: 'Vertical', horizontal: 'Horizontal', gap: 'Spacing (px)', padding: 'Margin (px)', background: 'Background', numbered: 'Number images', preview: 'Composition preview', export: 'Export', format: 'Format', quality: 'Quality (%)', pdfSettings: 'PDF layout', paper: 'Paper', orientation: 'Orientation', portrait: 'Portrait', landscape: 'Landscape', pdfMargin: 'Margins (mm)', scale: 'Scale (%)', header: 'Header: title, source and date', footer: 'Footer: page numbers', cancel: 'Cancel', empty: 'Import PNG, JPEG or WebP images, paste an image, or open a .scionos project to begin.', pending: 'Apply or cancel the pending edit before continuing.', limit: 'Maximum 30 images, 48 MiB per image and 128 MiB total.', replace: 'Replace this document? Unsaved changes will be lost.', saved: 'Project saved.', failure: 'Unable to complete: ', image: 'Image', loading: 'Processing…', unsupported: 'Choose PNG, JPEG or WebP images only.', reduced: 'The exported image was reduced to respect browser limits.', done: 'Export complete.' },
-    es: { document: 'Documento', import: 'Importar imágenes', open: 'Abrir proyecto', save: 'Guardar proyecto', documentTitle: 'Título del documento', images: 'Imágenes', up: 'Subir', down: 'Bajar', remove: 'Eliminar', itemTitle: 'Título de la imagen', caption: 'Leyenda', layout: 'Composición', direction: 'Disposición', vertical: 'Vertical', horizontal: 'Horizontal', gap: 'Espaciado (px)', padding: 'Margen (px)', background: 'Fondo', numbered: 'Numerar imágenes', preview: 'Vista previa', export: 'Exportar', format: 'Formato', quality: 'Calidad (%)', pdfSettings: 'Presentación PDF', paper: 'Papel', orientation: 'Orientación', portrait: 'Vertical', landscape: 'Horizontal', pdfMargin: 'Márgenes (mm)', scale: 'Escala (%)', header: 'Encabezado: título, fuente y fecha', footer: 'Pie: número de página', cancel: 'Cancelar', empty: 'Importa imágenes PNG, JPEG o WebP, pega una imagen o abre un proyecto .scionos.', pending: 'Aplica o cancela la edición antes de continuar.', limit: 'Máximo 30 imágenes, 48 MiB por imagen y 128 MiB en total.', replace: '¿Reemplazar el documento? Se perderán los cambios sin guardar.', saved: 'Proyecto guardado.', failure: 'No se pudo completar: ', image: 'Imagen', loading: 'Procesando…', unsupported: 'Elige imágenes PNG, JPEG o WebP.', reduced: 'La imagen exportada se redujo para respetar los límites del navegador.', done: 'Exportación completada.' },
-    de: { document: 'Dokument', import: 'Bilder importieren', open: 'Projekt öffnen', save: 'Projekt speichern', documentTitle: 'Dokumenttitel', images: 'Bilder', up: 'Nach oben', down: 'Nach unten', remove: 'Entfernen', itemTitle: 'Bildtitel', caption: 'Bildunterschrift', layout: 'Zusammenstellung', direction: 'Anordnung', vertical: 'Vertikal', horizontal: 'Horizontal', gap: 'Abstand (px)', padding: 'Rand (px)', background: 'Hintergrund', numbered: 'Bilder nummerieren', preview: 'Vorschau', export: 'Exportieren', format: 'Format', quality: 'Qualität (%)', pdfSettings: 'PDF-Layout', paper: 'Papier', orientation: 'Ausrichtung', portrait: 'Hochformat', landscape: 'Querformat', pdfMargin: 'Ränder (mm)', scale: 'Maßstab (%)', header: 'Kopfzeile: Titel, Quelle und Datum', footer: 'Fußzeile: Seitenzahlen', cancel: 'Abbrechen', empty: 'PNG-, JPEG- oder WebP-Bilder importieren, ein Bild einfügen oder ein .scionos-Projekt öffnen.', pending: 'Die laufende Änderung zuerst anwenden oder abbrechen.', limit: 'Höchstens 30 Bilder, 48 MiB pro Bild und 128 MiB insgesamt.', replace: 'Dokument ersetzen? Nicht gespeicherte Änderungen gehen verloren.', saved: 'Projekt gespeichert.', failure: 'Vorgang fehlgeschlagen: ', image: 'Bild', loading: 'Verarbeitung…', unsupported: 'Nur PNG-, JPEG- oder WebP-Bilder auswählen.', reduced: 'Das exportierte Bild wurde wegen der Browsergrenzen verkleinert.', done: 'Export abgeschlossen.' }
+    fr: { document: 'Document', import: 'Importer des images', open: 'Ouvrir un projet', save: 'Exporter le projet', documentTitle: 'Titre du document', images: 'Images', up: 'Monter', down: 'Descendre', remove: 'Supprimer', itemTitle: 'Titre de l’image', caption: 'Légende', layout: 'Composition', direction: 'Disposition', vertical: 'Verticale', horizontal: 'Horizontale', gap: 'Espacement (px)', padding: 'Marge (px)', background: 'Fond', numbered: 'Numéroter les images', preview: 'Aperçu de la composition', export: 'Exporter', format: 'Format', quality: 'Qualité (%)', pdfSettings: 'Présentation PDF', paper: 'Papier', orientation: 'Orientation', portrait: 'Portrait', landscape: 'Paysage', pdfMargin: 'Marges (mm)', scale: 'Échelle (%)', header: 'En-tête : titre, source et date', footer: 'Pied de page : pagination', cancel: 'Annuler', empty: 'Importez des images PNG, JPEG ou WebP, collez une image, ou ouvrez un projet .scionos pour commencer.', pending: 'Validez ou annulez la modification en cours avant de continuer.', limit: 'Maximum 30 images, 48 Mio par image et 128 Mio au total.', replace: 'Remplacer le document ? Les modifications non enregistrées seront perdues.', saved: 'Projet enregistré dans la bibliothèque.', projectExportRequested: 'Téléchargement du projet demandé ; vérifiez que le fichier a bien été conservé.', failure: 'Impossible de terminer : ', image: 'Image', loading: 'Traitement en cours…', unsupported: 'Choisissez uniquement des images PNG, JPEG ou WebP.', reduced: 'Image exportée à taille réduite pour respecter les limites du navigateur.', done: 'Export terminé.' },
+    en: { document: 'Document', import: 'Import images', open: 'Open project', save: 'Export project', documentTitle: 'Document title', images: 'Images', up: 'Move up', down: 'Move down', remove: 'Remove', itemTitle: 'Image title', caption: 'Caption', layout: 'Composition', direction: 'Layout', vertical: 'Vertical', horizontal: 'Horizontal', gap: 'Spacing (px)', padding: 'Margin (px)', background: 'Background', numbered: 'Number images', preview: 'Composition preview', export: 'Export', format: 'Format', quality: 'Quality (%)', pdfSettings: 'PDF layout', paper: 'Paper', orientation: 'Orientation', portrait: 'Portrait', landscape: 'Landscape', pdfMargin: 'Margins (mm)', scale: 'Scale (%)', header: 'Header: title, source and date', footer: 'Footer: page numbers', cancel: 'Cancel', empty: 'Import PNG, JPEG or WebP images, paste an image, or open a .scionos project to begin.', pending: 'Apply or cancel the pending edit before continuing.', limit: 'Maximum 30 images, 48 MiB per image and 128 MiB total.', replace: 'Replace this document? Unsaved changes will be lost.', saved: 'Project saved to the library.', projectExportRequested: 'Project download requested; check that the file was saved.', failure: 'Unable to complete: ', image: 'Image', loading: 'Processing…', unsupported: 'Choose PNG, JPEG or WebP images only.', reduced: 'The exported image was reduced to respect browser limits.', done: 'Export complete.' },
+    es: { document: 'Documento', import: 'Importar imágenes', open: 'Abrir proyecto', save: 'Exportar proyecto', documentTitle: 'Título del documento', images: 'Imágenes', up: 'Subir', down: 'Bajar', remove: 'Eliminar', itemTitle: 'Título de la imagen', caption: 'Leyenda', layout: 'Composición', direction: 'Disposición', vertical: 'Vertical', horizontal: 'Horizontal', gap: 'Espaciado (px)', padding: 'Margen (px)', background: 'Fondo', numbered: 'Numerar imágenes', preview: 'Vista previa', export: 'Exportar', format: 'Formato', quality: 'Calidad (%)', pdfSettings: 'Presentación PDF', paper: 'Papel', orientation: 'Orientación', portrait: 'Vertical', landscape: 'Horizontal', pdfMargin: 'Márgenes (mm)', scale: 'Escala (%)', header: 'Encabezado: título, fuente y fecha', footer: 'Pie: número de página', cancel: 'Cancelar', empty: 'Importa imágenes PNG, JPEG o WebP, pega una imagen o abre un proyecto .scionos.', pending: 'Aplica o cancela la edición antes de continuar.', limit: 'Máximo 30 imágenes, 48 MiB por imagen y 128 MiB en total.', replace: '¿Reemplazar el documento? Se perderán los cambios sin guardar.', saved: 'Proyecto guardado en la biblioteca.', projectExportRequested: 'Descarga del proyecto solicitada; comprueba que el archivo se haya guardado.', failure: 'No se pudo completar: ', image: 'Imagen', loading: 'Procesando…', unsupported: 'Elige imágenes PNG, JPEG o WebP.', reduced: 'La imagen exportada se redujo para respetar los límites del navegador.', done: 'Exportación completada.' },
+    de: { document: 'Dokument', import: 'Bilder importieren', open: 'Projekt öffnen', save: 'Projekt exportieren', documentTitle: 'Dokumenttitel', images: 'Bilder', up: 'Nach oben', down: 'Nach unten', remove: 'Entfernen', itemTitle: 'Bildtitel', caption: 'Bildunterschrift', layout: 'Zusammenstellung', direction: 'Anordnung', vertical: 'Vertikal', horizontal: 'Horizontal', gap: 'Abstand (px)', padding: 'Rand (px)', background: 'Hintergrund', numbered: 'Bilder nummerieren', preview: 'Vorschau', export: 'Exportieren', format: 'Format', quality: 'Qualität (%)', pdfSettings: 'PDF-Layout', paper: 'Papier', orientation: 'Ausrichtung', portrait: 'Hochformat', landscape: 'Querformat', pdfMargin: 'Ränder (mm)', scale: 'Maßstab (%)', header: 'Kopfzeile: Titel, Quelle und Datum', footer: 'Fußzeile: Seitenzahlen', cancel: 'Abbrechen', empty: 'PNG-, JPEG- oder WebP-Bilder importieren, ein Bild einfügen oder ein .scionos-Projekt öffnen.', pending: 'Die laufende Änderung zuerst anwenden oder abbrechen.', limit: 'Höchstens 30 Bilder, 48 MiB pro Bild und 128 MiB insgesamt.', replace: 'Dokument ersetzen? Nicht gespeicherte Änderungen gehen verloren.', saved: 'Projekt in der Bibliothek gespeichert.', projectExportRequested: 'Projektdownload angefordert; bitte prüfen, ob die Datei gespeichert wurde.', failure: 'Vorgang fehlgeschlagen: ', image: 'Bild', loading: 'Verarbeitung…', unsupported: 'Nur PNG-, JPEG- oder WebP-Bilder auswählen.', reduced: 'Das exportierte Bild wurde wegen der Browsergrenzen verkleinert.', done: 'Export abgeschlossen.' }
   };
   const extraLabels = { fr: { fit: 'Ajuster à la largeur', source: 'Source', date: 'Date', pagination: 'Pagination' }, en: { fit: 'Fit to width', source: 'Source', date: 'Date', pagination: 'Page numbers' }, es: { fit: 'Ajustar al ancho', source: 'Fuente', date: 'Fecha', pagination: 'Paginación' }, de: { fit: 'An Breite anpassen', source: 'Quelle', date: 'Datum', pagination: 'Seitennummern' } };
   const projectLabels = {
@@ -159,7 +159,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function hasPendingEdit() { return Boolean(draftOperation || pendingTextPoint); }
 
+  function finishAnnotationDrag(pointerId, { release = true } = {}) {
+    const drag = annotationDrag;
+    if (!drag || pointerId !== drag.pointerId) return false;
+    annotationDrag = null;
+    if (release && canvas.hasPointerCapture(pointerId)) canvas.releasePointerCapture(pointerId);
+    return true;
+  }
+
   function allowDocumentAction() {
+    if (annotationDrag) { finishAnnotationDrag(annotationDrag.pointerId); showToast(compositionText('pending'), true); return false; }
     if (hasPendingEdit()) { showToast(compositionText('pending'), true); return false; }
     if (compositionBusy || historyConsolidation) { showToast(compositionText('loading')); return false; }
     return true;
@@ -169,19 +178,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const item = compositionItems.find(entry => entry.id === activeItemId);
     if (!item) return;
     Object.assign(item, { baseImage, operations, redoOperations, annotationUndo, annotationRedo, activeTextBlocks, committedSurface, captureRecord, currentStepNumber, historyRevision });
-    const surface = committedSurface;
-    if (surface) {
-      const thumb = document.createElement('canvas');
-      const scale = Math.min(1, 220 / Math.max(surface.width, surface.height));
-      thumb.width = Math.max(1, Math.round(surface.width * scale));
-      thumb.height = Math.max(1, Math.round(surface.height * scale));
-      thumb.getContext('2d').drawImage(surface, 0, 0, thumb.width, thumb.height);
-      item.thumbnail = thumb.toDataURL('image/png');
-    }
+    updateItemThumbnail(item);
   }
 
   function selectCompositionItem(id) {
     if (id !== activeItemId && !allowDocumentAction()) return false;
+    if (id !== activeItemId && annotationDrag) finishAnnotationDrag(annotationDrag.pointerId);
     persistActiveItem();
     const item = compositionItems.find(entry => entry.id === id);
     activeItemId = item?.id || null;
@@ -299,6 +301,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     thumbnail.height = Math.max(1, Math.round(bitmap.height * thumbnailScale));
     thumbnail.getContext('2d').drawImage(bitmap, 0, 0, thumbnail.width, thumbnail.height);
     return { id: metadata.id || crypto.randomUUID(), title: metadata.title || '', caption: metadata.caption || '', thumbnail: thumbnail.toDataURL('image/png'), inputBytes: metadata.inputBytes || record.blob?.size || 0, baseImage: bitmap, operations: [], redoOperations: [], annotationUndo: [], annotationRedo: [], activeTextBlocks: record.textCoordinateSpace === 'bitmap' ? [...(record.textBlocks || [])] : [], committedSurface: surface, captureRecord: record, currentStepNumber: 1, historyRevision: 0 };
+  }
+
+  function updateItemThumbnail(item) {
+    const surface = item.committedSurface;
+    if (!surface) { item.thumbnail = ''; return; }
+    const scale = Math.min(1, 220 / Math.max(surface.width, surface.height));
+    const thumbnail = document.createElement('canvas');
+    thumbnail.width = Math.max(1, Math.round(surface.width * scale));
+    thumbnail.height = Math.max(1, Math.round(surface.height * scale));
+    thumbnail.getContext('2d').drawImage(surface, 0, 0, thumbnail.width, thumbnail.height);
+    item.thumbnail = thumbnail.toDataURL('image/png');
   }
 
   async function importImages(files) {
@@ -459,8 +472,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!snapshot) return;
       const blob = await globalThis.ScionosCompositionUtils.encodeProject({ title: snapshot.title, settings: snapshot.settings, exportSettings: snapshot.exportSettings, items: snapshot.items.map(item => ({ id: item.id, blob: item.blob, annotations: item.annotations, title: item.title, caption: item.caption, url: item.url, timestamp: item.timestamp })) });
       downloadBlob(blob, 'scionos', snapshot.title);
-      if (documentRevision === snapshot.revision) documentDirty = false;
-      showToast(compositionText('saved'));
+      showToast(compositionText('projectExportRequested'));
     } catch (error) { showToast(compositionText('failure') + error.message, true); }
   }
 
@@ -509,6 +521,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         rendered.getContext('2d').drawImage(bitmap, 0, 0);
         for (const annotation of entry.operations) rendered = applyOperation(rendered, annotation);
         entry.committedSurface = rendered;
+        updateItemThumbnail(entry);
         prepared.push(entry);
       }
       if (hasPendingEdit() || historyConsolidation) throw new Error(compositionText('pending'));
@@ -950,6 +963,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function cancelDraft() {
+    if (annotationDrag) finishAnnotationDrag(annotationDrag.pointerId);
     draftOperation = null;
     const pointerId = activePointerId;
     activePointerId = null;
@@ -1126,7 +1140,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   canvas.addEventListener('pointerdown', event => {
-    if (!baseImage || event.button !== 0) return;
+    if (!baseImage || event.button !== 0 || annotationDrag || activePointerId !== null) return;
     const point = getCanvasCoords(event);
     if (currentTool === 'select') {
       const model = globalThis.ScionosAnnotationModel;
@@ -1136,7 +1150,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!handle) selectedAnnotation = model.hitTest(choices, point, { context, tolerance: 5 / currentZoom });
       const selected = choices[selectedAnnotation];
       if (selected) {
-        annotationDrag = { index: selectedAnnotation, original: globalThis.structuredClone(selected), point, handle, moved: false };
+        annotationDrag = { pointerId: event.pointerId, itemId: activeItemId, index: selectedAnnotation, original: globalThis.structuredClone(selected), point, handle, moved: false };
         canvas.setPointerCapture(event.pointerId);
       }
       renderCanvas();
@@ -1183,12 +1197,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   canvas.addEventListener('pointermove', event => {
     if (annotationDrag && currentTool === 'select') {
+      if (event.pointerId !== annotationDrag.pointerId || annotationDrag.itemId !== activeItemId) return;
       const point = getCanvasCoords(event);
       const deltaX = point.x - annotationDrag.point.x, deltaY = point.y - annotationDrag.point.y;
       const model = globalThis.ScionosAnnotationModel;
       const next = annotationDrag.handle ? model.resize(annotationDrag.original, annotationDrag.handle, point, { context }) : model.move(annotationDrag.original, deltaX, deltaY);
       if (!annotationDrag.moved && Math.hypot(deltaX, deltaY) > 0.5) { recordAnnotationHistory(); annotationDrag.moved = true; }
-      if (annotationDrag.moved) { operations[annotationDrag.index] = next; historyRevision += 1; rebuildCommittedSurface(); }
+      if (annotationDrag.moved) { operations[annotationDrag.index] = next; historyRevision += 1; rebuildCommittedSurface(); markDocumentDirty(); }
       return;
     }
     if (!draftOperation || event.pointerId !== activePointerId) return;
@@ -1204,9 +1219,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   canvas.addEventListener('pointerup', async event => {
     if (annotationDrag && currentTool === 'select') {
-      if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
-      if (annotationDrag.moved) markDocumentDirty();
-      annotationDrag = null;
+      finishAnnotationDrag(event.pointerId);
       return;
     }
     if (!draftOperation || event.pointerId !== activePointerId) return;
@@ -1221,9 +1234,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   canvas.addEventListener('pointercancel', event => {
     if (event.pointerId === activePointerId) cancelDraft();
+    else finishAnnotationDrag(event.pointerId, { release: false });
   });
   canvas.addEventListener('lostpointercapture', event => {
     if (event.pointerId === activePointerId) cancelDraft();
+    else finishAnnotationDrag(event.pointerId, { release: false });
   });
 
   canvas.addEventListener('keydown', event => {

@@ -1,10 +1,12 @@
+Draft listing for candidate 1.5.2 — in preparation, unpublished. Version 1.5.1 is published on GitHub; current Chrome Web Store status is unconfirmed.
+
 Scionos Capture lets you capture a web page, annotate it and prepare a document on your device. No account is required and screenshots are not sent to a server.
 
 Capture a page
 Choose the visible area, a selection, a scrolling region, the whole page or an element. Adjust the bounds before confirming. A cancellable delay lets you prepare a menu or a temporary page state.
 
 Compose and annotate
-Combine and reorder multiple imported or pasted images, with titles and captions. Update 1.5.1 refines source sharing, rejects oversized image files before decoding, and fixes image processing and printing. The editor provides drawing, text, arrows, highlighting, shapes, cropping and masking. Supported annotations remain editable in saved projects.
+Combine and reorder multiple imported or pasted images, with titles and captions. Candidate 1.5.2 prepares fixes for interrupted drags, internal editor thumbnails and preview, and exports. Exporting a portable project preserves the unsaved-changes indicator; a “download requested” message does not guarantee that the file was written. The editor provides drawing, text, arrows, highlighting, shapes, cropping and masking. Supported annotations remain editable in saved projects.
 
 Keep your work
 Save a portable project to resume later, or store it in the local library. Search, rename, duplicate and delete projects there. The storage quota and retention period are adjustable, including a no-expiration option.
@@ -14,6 +16,8 @@ Save an image or document, copy the result or use printing. Presentation setting
 
 Privacy and limitations
 Choose a source policy in Document settings: sanitized (default) removes URL queries and fragments; none removes sources and links; full keeps URLs without embedded credentials. This applies to saved projects and exports; library exports always use sanitized. Sources removed on save cannot be recovered. Paths, images, titles and captions may still be sensitive. Use solid masks to protect pixels; blur is only visual. Masks and crops become permanent when saved. Image files above 16 million pixels or 16,384 pixels per side are rejected before decoding; a document remains limited to 32 million pixels total.
+
+For candidate 1.5.2, print/PDF is limited to 32 million cumulative pixels, 128 MiB of cumulative blobs and 200 pages.
 
 The interface and help are available in French, English, Spanish and German. Users manage the retention and deletion of separately saved files.
 

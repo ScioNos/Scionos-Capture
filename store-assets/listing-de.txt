@@ -1,10 +1,12 @@
+Eintragsentwurf für Kandidat 1.5.2 — in Vorbereitung, unveröffentlicht. Version 1.5.1 ist auf GitHub veröffentlicht; der aktuelle Chrome-Web-Store-Status ist unbestätigt.
+
 Mit Scionos Capture kannst du eine Webseite aufnehmen, annotieren und auf deinem Gerät zu einem Dokument verarbeiten. Es ist kein Konto nötig; Aufnahmen werden nicht an einen Server gesendet.
 
 Eine Seite aufnehmen
 Wähle den sichtbaren Bereich, eine Auswahl, einen Scrollbereich, die ganze Seite oder ein Element. Passe die Grenzen vor der Bestätigung an. Mit einer abbrechbaren Verzögerung kannst du ein Menü oder einen vorübergehenden Seitenzustand vorbereiten.
 
 Bilder zusammenstellen und bearbeiten
-Mehrere importierte oder eingefügte Bilder lassen sich mit Titeln und Bildunterschriften kombinieren und umordnen. Update 1.5.1 verbessert die Quellenfreigabe, lehnt zu große Bilddateien vor dem Dekodieren ab und korrigiert Bildverarbeitung und Druck. Der Editor bietet Zeichnen, Text, Pfeile, Hervorhebungen, Formen, Zuschnitt und Maskierung. Unterstützte Annotationen bleiben in gespeicherten Projekten bearbeitbar.
+Mehrere importierte oder eingefügte Bilder lassen sich mit Titeln und Bildunterschriften kombinieren und umordnen. Kandidat 1.5.2 bereitet Korrekturen für unterbrochenes Ziehen, interne Editor-Miniaturen und Vorschau sowie Exporte vor. Der Export eines portablen Projekts behält den Hinweis auf ungespeicherte Änderungen; „Download angefordert“ garantiert keine gespeicherte Datei. Der Editor bietet Zeichnen, Text, Pfeile, Hervorhebungen, Formen, Zuschnitt und Maskierung. Unterstützte Annotationen bleiben in gespeicherten Projekten bearbeitbar.
 
 Arbeit aufbewahren
 Speichere ein portables Projekt zur späteren Bearbeitung oder lege es in der lokalen Bibliothek ab. Dort kannst du Projekte suchen, umbenennen, duplizieren und löschen. Speicherkontingent und Aufbewahrungsdauer sind einstellbar; eine Aufbewahrung ohne Ablauf ist möglich.
@@ -14,6 +16,8 @@ Speichere ein Bild oder Dokument, kopiere das Ergebnis oder nutze die Druckfunkt
 
 Datenschutz und Grenzen
 Wählen Sie unter Dokument eine Quellenrichtlinie: sanitized (Standard) entfernt URL-Abfragen und Fragmente; none entfernt Quellen und Links; full behält URLs ohne eingebettete Zugangsdaten bei. Dies gilt für gespeicherte Projekte und Exporte; Bibliotheksexporte verwenden immer sanitized. Beim Speichern entfernte Quellen sind nicht wiederherstellbar. Pfade, Bilder, Titel und Bildunterschriften können weiterhin sensibel sein. Pixel mit deckenden Masken schützen; Unschärfe ist nur visuell. Masken und Zuschnitte werden beim Speichern dauerhaft angewendet. Bilddateien über 16 Millionen Pixel oder 16.384 Pixel pro Seite werden vor dem Dekodieren abgelehnt; ein Dokument bleibt auf insgesamt 32 Millionen Pixel begrenzt.
+
+Für Kandidat 1.5.2 ist Drucken/PDF auf 32 Millionen kumulierte Pixel, 128 MiB kumulierte Blobs und 200 Seiten begrenzt.
 
 Oberfläche und Hilfe stehen auf Französisch, Englisch, Spanisch und Deutsch bereit. Benutzer verwalten Aufbewahrung und Löschung separat gespeicherter Dateien.
 

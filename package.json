@@ -1,35 +1,37 @@
 {
   "name": "scionos-capture",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "private": true,
   "license": "MIT",
   "description": "Extension Manifest V3 de capture d’écran locale pour Chrome et Edge.",
   "scripts": {
     "clean": "node scripts/clean.mjs",
     "version:sync": "node scripts/update-readme-version.mjs",
-    "check": "node --check background.js && node --check capture-utils.js && node --check capture-content-utils.js && node --check capture-store.js && node --check content-dom.js && node --check content-transfer.js && node --check content-selection.js && node --check content-capture.js && node --check content.js && node --check editor-operations.js && node --check editor-export.js && node --check composition-utils.js && node --check composition-export.js && node --check annotation-model.js && node --check editor.js && node --check library.js && node --check help.js && node --check i18n.js && node --check popup.js",
+    "check": "node --check background.js && node --check capture-utils.js && node --check capture-content-utils.js && node --check capture-store.js && node --check content-dom.js && node --check content-transfer.js && node --check content-selection.js && node --check content-capture.js && node --check content.js && node --check editor-operations.js && node --check composition-utils.js && node --check composition-export.js && node --check annotation-model.js && node --check editor.js && node --check library.js && node --check help.js && node --check i18n.js && node --check popup.js",
     "lint": "eslint . && html-validate popup.html editor.html library.html help.html",
     "validate": "node scripts/validate-package.mjs",
     "test": "node scripts/test.mjs",
     "test:e2e": "playwright test",
     "test:native": "node scripts/native-capture-smoke.mjs",
     "test:performance": "node scripts/performance-smoke.mjs",
+    "test:performance:pdf": "node scripts/pdf-performance-smoke.mjs",
     "package": "node scripts/package.mjs",
     "verify:core": "npm run check && npm run lint && npm test && npm run validate && npm run package",
-    "verify": "npm run verify:core && npm run test:e2e"
+    "verify": "npm run verify:core && npm run test:e2e",
+    "verify:release": "npm run verify && npm run test:native && npm run test:performance && npm run test:performance:pdf"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.13.0"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.12.1",
+    "@axe-core/playwright": "^4.14.0",
     "@eslint/js": "^9.39.5",
-    "@playwright/test": "^1.62.1",
+    "@playwright/test": "^1.65.1",
     "archiver": "^8.0.0",
     "eslint": "^9.39.5",
-    "fake-indexeddb": "^6.2.5",
+    "fake-indexeddb": "^6.2.8",
     "html-validate": "^9.7.1",
-    "pdfjs-dist": "6.3.289"
+    "pdfjs-dist": "6.5.438"
   },
   "overrides": {
     "glob": "14.0.2",

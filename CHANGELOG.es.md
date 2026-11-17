@@ -4,9 +4,24 @@
 
 ## [Sin publicar]
 
-## 1.5.1 — actualización preparada para Chrome Web Store
+## [1.5.2] — 2026-11-17
 
-La versión 1.5.0 ya está publicada en la ficha de Chrome Web Store. El paquete 1.5.1 se ha enviado a revisión de Google y está pendiente de revisión. La disponibilidad pública depende de la aprobación de Google. La versión de GitHub sigue en 1.5.0.
+**1.5.2 — versión GitHub preparada.** Publicación GitHub prevista: [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). El estado actual de Chrome Web Store no está confirmado; aquí no se realiza ningún envío de la 1.5.2 a la tienda.
+
+- Arrastres en el editor: seguimiento del `pointerId` activo y gestión de interrupciones del gesto.
+- Miniaturas internas del editor y vista previa de composición: reconstrucción al reabrir el proyecto para incluir las anotaciones.
+- Botón «Exportar proyecto»: se mantiene el estado de cambios sin guardar; el mensaje indica que se ha solicitado la descarga sin garantizar que el navegador haya guardado el archivo.
+- Informes HTML: aplicación de la política de fuentes en todo el generador, eliminando siempre las credenciales HTTP(S).
+- Impresión/PDF: límites acumulados de 32 millones de píxeles y 128 MiB de blobs, con un máximo de 200 páginas.
+- Paquete: módulo antiguo `editor-export.js` retirado, con 35 archivos de distribución.
+- Herramientas de prueba actualizadas: axe-core/Playwright 4.14.0, Playwright Test 1.65.1, fake-indexeddb 6.2.8 y PDF.js 6.5.438. Node.js 22.13.0 mínimo; Node.js 24 recomendado. Las migraciones mayores de ESLint y HTML-Validate se estudian por separado.
+- Accesibilidad: el nombre accesible del selector de idioma incluye su código visible, comprobado en los cuatro idiomas.
+
+Validación 1.5.2: `npm run verify:release` completado con éxito — 133 pruebas unitarias, 126 pruebas de navegador, cinco modos en Chrome 157.0.8103.79 y en Edge 157.0.4341.60, tres repeticiones de rendimiento y diez escenarios PDF. Resultados y entorno: [revisión de dependencias y validación](DEPENDENCY_REVIEW_1.5.2.md).
+
+## [1.5.1] — publicada en GitHub
+
+La versión 1.5.1 está publicada en GitHub. El estado actual de Chrome Web Store y su versión distribuida no están confirmados; deben comprobarse en el panel.
 
 ### Privacidad y robustez
 
@@ -182,7 +197,7 @@ La versión 1.5.0 ya está publicada en la ficha de Chrome Web Store. El paquete
 - Soporte completo en 4 idiomas: francés, inglés, español y alemán.
 - Accesibilidad total (WCAG, alto contraste, navegación por teclado, lectores de pantalla).
 
-[Sin publicar]: https://github.com/ScioNos/Scionos-Capture/compare/v1.5.0...HEAD
+[Sin publicar]: https://github.com/ScioNos/Scionos-Capture/compare/v1.5.2...HEAD
 [1.3.3]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.0...v1.3.1
@@ -194,3 +209,7 @@ La versión 1.5.0 ya está publicada en la ficha de Chrome Web Store. El paquete
 
 [1.5.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/ScioNos/Scionos-Capture/compare/v1.3.3...v1.4.0
+
+[1.5.1]: https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.1
+
+[1.5.2]: https://github.com/ScioNos/Scionos-Capture/compare/v1.5.1...v1.5.2

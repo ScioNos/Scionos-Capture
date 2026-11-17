@@ -2,7 +2,7 @@
 
 [Français](PRIVACY.md) · [English](PRIVACY.en.md) · [Español](PRIVACY.es.md) · [Deutsch](PRIVACY.de.md)
 
-Última actualización: 14 de noviembre de 2026 — versión 1.5.1.
+Última actualización: 17 de noviembre de 2026 — documentación de la versión 1.5.2.
 
 **Editorial responsable:** eyelo SA (IDE: CHE-108.174.302), Vaud, Suiza — Marca **ScioNos** ([scionos.ch](https://scionos.ch)) — Contacto: info@eyelo.ch
 
@@ -20,7 +20,13 @@ La capa de búsqueda del PDF conserva solo palabras completas cuya visibilidad p
 
 Aplica o cancela los cambios pendientes antes de exportar. El desenfoque es un efecto visual; usa una máscara sólida para secretos.
 
-## Alcance de privacidad de la versión 1.5.1 — enviada, pendiente de revisión de Google
+## Privacidad de la versión 1.5.2
+
+**1.5.2 — versión GitHub preparada.** Publicación GitHub prevista: [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). El estado actual de Chrome Web Store no está confirmado; aquí no se realiza ningún envío de la 1.5.2 a la tienda.
+
+Las correcciones aplican también la política de fuentes en todo el generador HTML. `sanitized` elimina consulta y fragmento, `none` omite las fuentes y `full` conserva las URL; las credenciales HTTP(S) siempre se eliminan. Las miniaturas internas del editor y la vista previa de composición se reconstruyen desde el proyecto reabierto, incluidas las anotaciones. Exportar un proyecto portátil no elimina el indicador de cambios sin guardar; «descarga solicitada» no confirma la escritura del archivo en disco. Los permisos y el procesamiento local no cambian.
+
+## Privacidad de la versión 1.5.1 — publicada en GitHub; estado de la tienda no confirmado
 
 En el panel Documento, la política de fuentes se aplica a proyectos guardados y exportaciones: sanitized (por defecto) elimina parámetros de consulta y fragmentos de URL, none omite las fuentes y full las conserva. Las credenciales incluidas en las URL HTTP(S) siempre se eliminan, incluso en modo full. Las fuentes eliminadas al guardar no se recuperan; cambiar de modo después no las restaura. La exportación desde la biblioteca siempre aplica sanitized, incluso a proyectos guardados antes de esta versión.
 

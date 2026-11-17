@@ -496,7 +496,8 @@
   function buildHtmlReport(options = {}) {
     const title = options.title || 'Scionos Capture';
     const rawUrl = options.url || '';
-    const safeUrl = sanitizeUrl(rawUrl);
+    const sourcePolicy = normalizeSourcePolicy(options.sourcePolicy);
+    const displayUrl = sanitizeSourceUrl(rawUrl, sourcePolicy);
     const timestamp = options.timestamp ? new Date(options.timestamp).toLocaleString(options.lang || 'fr') : new Date().toLocaleString();
     const width = Number(options.width) || 0;
     const height = Number(options.height) || 0;
@@ -517,8 +518,7 @@
     const txtAppName = texts.appName || 'Scionos Capture';
 
     const escapedTitle = escapeHtml(title);
-    const escapedRawUrl = escapeHtml(rawUrl);
-    const escapedSafeUrl = escapeHtml(safeUrl);
+    const escapedDisplayUrl = escapeHtml(displayUrl);
     const escapedTimestamp = escapeHtml(timestamp);
     const escapedLang = escapeHtml(lang);
 
@@ -764,7 +764,7 @@
       <div class="meta-group">
         <div class="title" title="${escapedTitle}">${escapedTitle}</div>
         <div class="meta-details">
-          ${safeUrl ? `<span class="meta-item"><strong>${escapeHtml(txtSource)}:</strong> <a class="meta-link" href="${escapedSafeUrl}" target="_blank" rel="noopener noreferrer" title="${escapedRawUrl}">${escapedRawUrl}</a></span>` : (rawUrl ? `<span class="meta-item"><strong>${escapeHtml(txtSource)}:</strong> <span class="meta-link" title="${escapedRawUrl}">${escapedRawUrl}</span></span>` : '')}
+          ${displayUrl ? `<span class="meta-item"><strong>${escapeHtml(txtSource)}:</strong> <a class="meta-link" href="${escapedDisplayUrl}" target="_blank" rel="noopener noreferrer" title="${escapedDisplayUrl}">${escapedDisplayUrl}</a></span>` : ''}
           <span class="meta-item"><strong>${escapeHtml(txtDate)}:</strong> ${escapedTimestamp}</span>
           ${width && height ? `<span class="badge" title="${escapeHtml(txtDimensions)}">${width} × ${height} px</span>` : ''}
         </div>

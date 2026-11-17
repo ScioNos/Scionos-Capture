@@ -431,6 +431,20 @@ test('sanitizes URLs safely to prevent javascript: or malicious protocol injecti
   assert.equal(sanitizeUrl(''), '');
 });
 
+test('HTML report applies source policy consistently to link text and title', () => {
+  const url = 'https://alice:secret@example.com/private?token=PRIVATE_TOKEN#PRIVATE_FRAGMENT';
+  for (const [policy, expected, excluded] of [
+    ['sanitized', 'https://example.com/private', ['alice', 'secret', 'PRIVATE_TOKEN', 'PRIVATE_FRAGMENT']],
+    ['full', 'https://example.com/private?token=PRIVATE_TOKEN#PRIVATE_FRAGMENT', ['alice', 'secret']],
+    ['none', '', ['alice', 'secret', 'PRIVATE_TOKEN', 'PRIVATE_FRAGMENT']]
+  ]) {
+    const html = buildHtmlReport({ url, sourcePolicy: policy, width: 1, height: 1, dataUrl: 'data:image/png;base64,AA==' });
+    if (expected) assert.ok(html.includes(expected));
+    else assert.ok(!html.includes('class="meta-link"'));
+    for (const value of excluded) assert.ok(!html.includes(value), `${policy} report exposed ${value}`);
+  }
+});
+
 test('builds a standalone HTML report with embedded image and safe metadata', () => {
   const html = buildHtmlReport({
     title: 'Test <Page> & More',
@@ -454,6 +468,7 @@ test('builds a standalone HTML report with embedded image and safe metadata', ()
   assert.ok(html.includes('<html lang="fr">'));
   assert.ok(html.includes('Test &lt;Page&gt; &amp; More'));
   assert.ok(html.includes('https://example.com/path'));
+  assert.ok(!html.includes('javascript:'));
   assert.ok(html.includes('1920 × 1080 px'));
   assert.ok(html.includes('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='));
   assert.ok(html.includes('id="btn-zoom-in"'));

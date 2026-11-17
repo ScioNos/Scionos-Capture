@@ -5,6 +5,8 @@
   const IMAGE_LIMIT = 48 * 1024 * 1024;
   const TOTAL_LIMIT = 128 * 1024 * 1024;
   const MAX_PAGES = 200;
+  const MAX_PRINT_PIXELS = 32000000;
+  const MAX_PRINT_IMAGE_BYTES = 128 * 1024 * 1024;
   const FONT = 'monospace';
   const printJobs = new WeakMap();
   const printRequests = new WeakMap();
@@ -308,7 +310,12 @@
     const blocks = compositionBlocks(prepared);
     const plan = avoidTextCuts(dependencies().utils.buildPagePlan(prepared.layout.width, prepared.layout.height, pdfSettings({ ...prepared.exportSettings, ...options })), blocks);
     if (!plan.pages.length || plan.pages.length > MAX_PAGES) throw new Error('PDF page limit exceeded (200 pages).');
-    trace('print-prepared', { pages: plan.pages.length });
+    let printPixels = 0, printImageBytes = 0;
+    for (const page of plan.pages) {
+      printPixels += Math.ceil(page.sourceWidth) * Math.ceil(page.sourceHeight);
+      if (printPixels > MAX_PRINT_PIXELS) throw new Error('PDF image pixel budget exceeded (32 million pixels).');
+    }
+    trace('print-prepared', { pages: plan.pages.length, pixels: printPixels });
     const previous = printJobs.get(printArea);
     if (previous) previous();
     const urls = [];
@@ -342,6 +349,8 @@
         let blob;
         try { assertCurrent(); blob = await canvasBlob(canvas); } finally { canvas.width = 1; canvas.height = 1; }
         assertCurrent();
+        printImageBytes += blob.size;
+        if (printImageBytes > MAX_PRINT_IMAGE_BYTES) throw new Error('PDF image byte budget exceeded (128 MiB).');
         const url = URL.createObjectURL(blob);
         urls.push(url);
         const s = plan.settings;

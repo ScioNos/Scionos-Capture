@@ -70,12 +70,22 @@ export async function updateReadmeVersion(targetVersion, projectRoot = root, { u
     const fullPath = path.join(projectRoot, relPath);
     let content = await fs.readFile(fullPath, 'utf8');
     const originalContent = content;
+    // Only the leading release-note section belongs to the version being prepared.
+    // Older sections retain their published names, URLs and archive references.
+    let releaseHistory = '';
+    if (relPath === 'RELEASE_NOTES.md') {
+      const historyStart = content.search(/\n#\s+Scionos\s+Capture\s+/u);
+      if (historyStart !== -1) {
+        releaseHistory = content.slice(historyStart);
+        content = content.slice(0, historyStart);
+      }
+    }
 
     content = content.replace(
       /https:\/\/img\.shields\.io\/badge\/version-[\d.]+(-[\w.]+)?-blue/g,
       `https://img.shields.io/badge/version-${version}-blue`
     );
-    if (!unreleased || relPath === 'RELEASE_NOTES.md') {
+    if (!unreleased) {
       content = content.replace(
         /https:\/\/github\.com\/ScioNos\/Scionos-Capture\/releases\/tag\/v[\d.]+(-[\w.]+)?/g,
         `https://github.com/ScioNos/Scionos-Capture/releases/tag/v${version}`
@@ -110,12 +120,29 @@ export async function updateReadmeVersion(targetVersion, projectRoot = root, { u
       };
       const [status, archive] = labels[language];
       content = content.replace(/^### PDF — [\d.]+$/gm, '### PDF');
-      content = content.replace(/\n+<!-- source-version -->[^\n]*\n/gu, '\n');
-      if (unreleased) content = content.replace(/(^!\[Version\][^\n]*\n)/m,
-        `$1\n<!-- source-version --> **${version} — ${status}.**\n`);
+      const sourceVersion = `<!-- source-version --> **${version} — ${status}.**`;
+      if (unreleased) {
+        // Replace only our candidate prefix; keep any published-status context on the line.
+        if (/^<!-- source-version -->/m.test(content)) {
+          content = content.replace(/^<!-- source-version -->(?: \*\*[^\n]*?\*\*)?/m, sourceVersion);
+        } else {
+          // The badge may be standalone or one link in a composite badge row.
+          content = content.replace(/(^[^\n]*https:\/\/img\.shields\.io\/badge\/version-[^\n]*(?:\n|$))/m,
+            `$1\n${sourceVersion}\n`);
+        }
+      } else {
+        content = content.replace(/^<!-- source-version -->[^\n]*(?:\n|$)/gm, '');
+      }
       const localPackage = `<!-- local-package --> ${archive} : \`scionos-capture-v${version}.zip\` · SHA-256 : \`scionos-capture-v${version}.zip.sha256\`.`;
-      if (content.includes('<!-- local-package -->')) content = content.replace(/^<!-- local-package -->[^\n]*/gm, localPackage);
-      else if (unreleased) content += `\n${localPackage}\n`;
+      // Candidate markers track the source version; published artifact attestations stay intact.
+      if (!unreleased && content.includes('<!-- local-package -->')) content = content.replace(/^<!-- local-package -->[^\n]*/gm, localPackage);
+      else if (unreleased && !content.includes('<!-- local-package -->')) content += `\n${localPackage}\n`;
+      else if (unreleased) {
+        content = content.replace(/^<!-- local-package -->[^\n]*/gm, line => {
+          const candidate = /^<!-- local-package --> (?:Candidate\b|Unpublished candidate\b|Candidata\b|Unveröffentlichter Kandidat\b|(?:Archive locale|Local archive|Archivo local|Lokales Archiv)\s*:)/iu.test(line);
+          return candidate ? line.replace(/\d+\.\d+\.\d+(?:\.\d+)?/gu, version) : line;
+        });
+      }
     }
 
     if (relPath.startsWith('SECURITY')) {
@@ -133,6 +160,7 @@ export async function updateReadmeVersion(targetVersion, projectRoot = root, { u
       );
     }
 
+    if (relPath === 'RELEASE_NOTES.md' && releaseHistory) content += releaseHistory;
     if (content !== originalContent) updates.set(relPath, content);
   }
 

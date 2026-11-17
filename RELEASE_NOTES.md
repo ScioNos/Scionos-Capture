@@ -1,6 +1,70 @@
+# Scionos Capture 1.5.2
+
+## Français
+
+**1.5.2 — publication GitHub.** Le statut actuel du Chrome Web Store reste distinct et non confirmé ; aucune soumission Store de cette version n’est attestée.
+
+- Glissers dans l’éditeur : suivi du `pointerId` actif et gestion des interruptions du geste.
+- Miniatures internes de l’éditeur et aperçu de composition : reconstruction à la réouverture du projet pour inclure les annotations.
+- Bouton « Exporter projet » : l’état « modifications non enregistrées » reste actif ; le message indique que le téléchargement a été demandé, sans garantir son enregistrement par le navigateur.
+- Rapports HTML : application de la politique de sources dans tous les chemins du générateur, avec retrait systématique des identifiants HTTP(S).
+- Impression/PDF : limites cumulées de 32 millions de pixels et 128 Mio de blobs, avec un maximum de 200 pages.
+- Paquet : retrait de l’ancien module `editor-export.js`, soit 35 fichiers de distribution.
+- Outils de test : @axe-core/playwright 4.14.0, @playwright/test 1.65.1, fake-indexeddb 6.2.8 et PDF.js 6.5.438 ; Node.js 22.13.0 minimum, Node.js 24 recommandé.
+- Accessibilité : le nom annoncé du sélecteur de langue contient son code visible. Les migrations majeures ESLint et HTML-Validate sont documentées dans [la revue des dépendances](DEPENDENCY_REVIEW_1.5.2.md).
+
+Validation locale réussie : 133 tests unitaires, 126 tests navigateur, cinq modes natifs dans Chrome et Edge, performances générales et dix scénarios PDF. Archive de 35 fichiers. Les résultats et l’empreinte du paquet sont consignés dans [la revue des dépendances et validations](DEPENDENCY_REVIEW_1.5.2.md).
+
+## English
+
+**1.5.2 — GitHub release.** Chrome Web Store status remains separate and unconfirmed; no Store submission of this version is attested.
+
+- Editor drags: track the active `pointerId` and handle gesture interruptions.
+- Internal editor thumbnails and composition preview: reconstruct them when reopening a project to include annotations.
+- The “Export project” button: keep the unsaved-changes state; the message says the download was requested without guaranteeing that the browser saved the file.
+- HTML reports: apply source policy throughout the generator, always removing HTTP(S) credentials.
+- Print/PDF: cumulative limits of 32 million pixels and 128 MiB of blobs, with a maximum of 200 pages.
+- Package: removed the legacy `editor-export.js` module, leaving 35 distribution files.
+- Test tools: @axe-core/playwright 4.14.0, @playwright/test 1.65.1, fake-indexeddb 6.2.8 and PDF.js 6.5.438; Node.js 22.13.0 minimum, Node.js 24 recommended.
+- Accessibility: the language selector’s accessible name contains its visible code. ESLint and HTML-Validate major migrations are documented in the [dependency review](DEPENDENCY_REVIEW_1.5.2.md).
+
+Local validation passed: 133 unit tests, 126 browser tests, five native modes in Chrome and Edge, general performance runs and ten PDF scenarios. The archive contains 35 files. Results and the package checksum are recorded in the [dependency and validation review](DEPENDENCY_REVIEW_1.5.2.md).
+
+## Español
+
+**1.5.2 — publicación en GitHub.** El estado de Chrome Web Store sigue siendo independiente y no confirmado; no se acredita un envío de esta versión a la tienda.
+
+- Arrastres en el editor: seguimiento del `pointerId` activo y gestión de interrupciones del gesto.
+- Miniaturas internas del editor y vista previa de composición: reconstrucción al reabrir el proyecto para incluir las anotaciones.
+- Botón «Exportar proyecto»: se mantiene el estado de cambios sin guardar; el mensaje indica que se ha solicitado la descarga sin garantizar que el navegador haya guardado el archivo.
+- Informes HTML: aplicación de la política de fuentes en todo el generador, eliminando siempre las credenciales HTTP(S).
+- Impresión/PDF: límites acumulados de 32 millones de píxeles y 128 MiB de blobs, con un máximo de 200 páginas.
+- Paquete: retirada del módulo antiguo `editor-export.js`, con 35 archivos de distribución.
+- Herramientas de prueba: @axe-core/playwright 4.14.0, @playwright/test 1.65.1, fake-indexeddb 6.2.8 y PDF.js 6.5.438; Node.js 22.13.0 mínimo, Node.js 24 recomendado.
+- Accesibilidad: el nombre accesible del selector de idioma incluye su código visible. Las migraciones mayores de ESLint y HTML-Validate se documentan en la [revisión de dependencias](DEPENDENCY_REVIEW_1.5.2.md).
+
+Validación local superada: 133 pruebas unitarias, 126 pruebas de navegador, cinco modos nativos en Chrome y Edge, rendimiento general y diez escenarios PDF. Archivo de 35 elementos. Los resultados y la suma del paquete constan en la [revisión de dependencias y validaciones](DEPENDENCY_REVIEW_1.5.2.md).
+
+## Deutsch
+
+**1.5.2 — GitHub-Release.** Der Chrome-Web-Store-Status bleibt unabhängig und unbestätigt; eine Store-Einreichung dieser Version wird nicht bestätigt.
+
+- Ziehen im Editor: aktiven `pointerId` verfolgen und Unterbrechungen der Geste behandeln.
+- Interne Editor-Miniaturen und Kompositionsvorschau: beim erneuten Öffnen des Projekts einschließlich Annotationen rekonstruieren.
+- Schaltfläche „Projekt exportieren“: Status ungespeicherter Änderungen beibehalten; die Meldung bestätigt die Download-Anforderung, ohne das Speichern durch den Browser zu garantieren.
+- HTML-Berichte: Quellenrichtlinie im gesamten Generator anwenden und HTTP(S)-Zugangsdaten immer entfernen.
+- Drucken/PDF: kumulierte Grenzen von 32 Millionen Pixeln und 128 MiB Blobs, höchstens 200 Seiten.
+- Paket: altes Modul `editor-export.js` entfernt; damit 35 Distributionsdateien.
+- Testwerkzeuge: @axe-core/playwright 4.14.0, @playwright/test 1.65.1, fake-indexeddb 6.2.8 und PDF.js 6.5.438; mindestens Node.js 22.13.0, Node.js 24 empfohlen.
+- Barrierefreiheit: Der zugängliche Name der Sprachauswahl enthält den sichtbaren Sprachcode. Hauptversionen von ESLint und HTML-Validate sind in der [Abhängigkeitsprüfung](DEPENDENCY_REVIEW_1.5.2.md) dokumentiert.
+
+Lokale Prüfung bestanden: 133 Unit-Tests, 126 Browsertests, fünf native Modi in Chrome und Edge, allgemeine Leistungsmessungen und zehn PDF-Szenarien. Archiv mit 35 Dateien. Ergebnisse und Prüfsumme stehen in der [Abhängigkeits- und Validierungsprüfung](DEPENDENCY_REVIEW_1.5.2.md).
+
+---
+
 # Scionos Capture 1.5.1
 
-**La 1.5.0 est publiée au Chrome Web Store ; la 1.5.1 est soumise et en attente d’examen Google / Version 1.5.0 is published on the Chrome Web Store; 1.5.1 is submitted and pending Google review / La 1.5.0 está publicada en Chrome Web Store; la 1.5.1 está enviada y pendiente de revisión de Google / Version 1.5.0 ist im Chrome Web Store veröffentlicht; 1.5.1 wurde eingereicht und wartet auf die Google-Prüfung.**
+**1.5.1 publiée sur GitHub ; statut Store non confirmé / 1.5.1 published on GitHub; Store status unconfirmed / 1.5.1 publicada en GitHub; estado de la tienda no confirmado / 1.5.1 auf GitHub veröffentlicht; Store-Status unbestätigt.**
 
 ## Français
 
@@ -8,7 +72,7 @@
 - Les chemins d’URL, images, titres, légendes et dates peuvent encore être sensibles. Diagnostic local sur activation explicite, sans télémétrie ; permissions inchangées.
 - Un instantané PNG par image pour les exports et projets ; vignette de bibliothèque générée directement et nettoyage tenant compte d’une impression en cours. Le renommage modifie les métadonnées avec une validation du codec et préserve les PNG.
 - Imports PNG/JPEG/WebP : au-delà de 16 millions de pixels ou de 16 384 px par côté, refus avant décodage au lieu d’une réduction. Le cumul de composition reste à 32 millions de pixels. Lecture des projets v1/v2 et écriture v2 conservées.
-- La version 1.5.0 est publiée sur le [Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe) et sur GitHub. Le package 1.5.1 a été soumis à l’examen Google et son statut est « En attente d’examen ». La version 1.5.1 n’est pas encore publiée publiquement ; cela dépend de l’approbation Google. GitHub reste à la version 1.5.0.
+- La version 1.5.1 est publiée sur GitHub. Le statut actuel et la version distribuée sur le Chrome Web Store ne sont pas confirmés ; ils doivent être vérifiés dans le tableau de bord.
 
 ## English
 
@@ -16,7 +80,7 @@
 - URL paths, images, titles, captions and dates may still be sensitive. Local opt-in diagnostics, without telemetry; permissions unchanged.
 - One PNG snapshot per image for exports and projects; directly generated library thumbnails and cleanup that accounts for printing in progress. Rename changes metadata with one codec validation and preserves PNGs.
 - PNG/JPEG/WebP imports: above 16 million pixels or 16,384 px per side, reject before decoding instead of reducing. The total composition limit remains 32 million pixels. Project v1/v2 reading and v2 writing retained.
-- Version 1.5.0 is published on the [Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe) and GitHub. Package 1.5.1 has been submitted for Google review and is currently pending review. Version 1.5.1 is not publicly available yet; that depends on Google approval. GitHub remains at version 1.5.0.
+- Version 1.5.1 is published on GitHub. The current Chrome Web Store status and distributed version are unconfirmed; check them in the dashboard.
 
 ## Español
 
@@ -24,7 +88,7 @@
 - Las rutas de URL, imágenes, títulos, leyendas y fechas aún pueden ser sensibles. Diagnóstico local de activación voluntaria, sin telemetría; permisos sin cambios.
 - Una instantánea PNG por imagen para exportaciones y proyectos; miniaturas de biblioteca generadas directamente y limpieza que tiene en cuenta una impresión en curso. El cambio de nombre modifica metadatos con una validación del códec y conserva los PNG.
 - Importaciones PNG/JPEG/WebP: por encima de 16 millones de píxeles o 16.384 px por lado, rechazo antes de decodificar, en vez de reducir. El límite acumulado sigue en 32 millones de píxeles. Lectura de proyectos v1/v2 y escritura v2 conservadas.
-- La versión 1.5.0 está publicada en [Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe) y GitHub. El paquete 1.5.1 se ha enviado a revisión de Google y está pendiente de revisión. La versión 1.5.1 aún no está disponible públicamente; depende de la aprobación de Google. GitHub sigue en la versión 1.5.0.
+- La versión 1.5.1 está publicada en GitHub. El estado actual de Chrome Web Store y su versión distribuida no están confirmados; deben comprobarse en el panel.
 
 ## Deutsch
 
@@ -32,7 +96,7 @@
 - URL-Pfade, Bilder, Titel, Bildunterschriften und Datumsangaben können weiterhin vertraulich sein. Lokale, ausdrücklich aktivierte Diagnose ohne Telemetrie; Berechtigungen unverändert.
 - Ein PNG-Abbild pro Bild für Exporte und Projekte; direkt erzeugte Bibliotheksvorschaubilder und Bereinigung unter Berücksichtigung laufender Druckvorgänge. Umbenennen ändert Metadaten mit einer Codec-Validierung und behält PNGs bei.
 - PNG-/JPEG-/WebP-Importe: über 16 Millionen Pixel oder 16.384 px pro Seite vor dem Dekodieren ablehnen statt verkleinern. Gesamtlimit weiterhin 32 Millionen Pixel. Projekte v1/v2 bleiben lesbar, geschrieben wird v2.
-- Version 1.5.0 ist im [Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe) und auf GitHub veröffentlicht. Paket 1.5.1 wurde zur Google-Prüfung eingereicht und wartet derzeit auf Prüfung. Version 1.5.1 ist noch nicht öffentlich verfügbar; dies hängt von der Genehmigung durch Google ab. GitHub bleibt bei Version 1.5.0.
+- Version 1.5.1 ist auf GitHub veröffentlicht. Der aktuelle Chrome-Web-Store-Status und die ausgelieferte Version sind unbestätigt; im Dashboard prüfen.
 
 ---
 

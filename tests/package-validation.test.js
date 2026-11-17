@@ -154,8 +154,21 @@ test('unreleased synchronization preserves published links and history and is id
       'Download: `scionos-capture-v1.3.2.zip`'
     ].join('\n') + '\n';
     for (const file of docs.filter(file => file.startsWith('README'))) {
-      await fs.writeFile(path.join(root, file), publishedReadme, 'utf8');
+      const badgeReadme = file === 'README.md' ? publishedReadme : publishedReadme.replace(
+        '![Version](https://img.shields.io/badge/version-1.3.2-blue)',
+        '[![Version](https://img.shields.io/badge/version-1.3.2-blue)](https://github.com/ScioNos/Scionos-Capture) [![Checks](https://example.com/check.svg)](https://example.com/check)'
+      );
+      await fs.writeFile(path.join(root, file), badgeReadme, 'utf8');
     }
+    const publishedArtifact = '<!-- local-package --> Published: `scionos-capture-v1.3.2.zip` · SHA-256: `published-fixture-checksum`.\n';
+    await fs.appendFile(path.join(root, 'README.en.md'), publishedArtifact);
+    await fs.appendFile(path.join(root, 'README.es.md'), '<!-- source-version --> **1.3.3 — en preparación.** Published GitHub: 1.3.2.\n');
+    const candidateArtifact = '<!-- local-package --> Candidata 1.3.3 no publicada: nombre previsto `scionos-capture-v1.3.3.zip`. Sin suma de comprobación.\n';
+    await fs.appendFile(path.join(root, 'README.es.md'), candidateArtifact);
+    await fs.appendFile(path.join(root, 'README.de.md'), '<!-- local-package --> Unveröffentlichter Kandidat 1.3.3: `scionos-capture-v1.3.3.zip`.\n');
+    const releaseHistory = '\n---\n\n# Scionos Capture 1.3.2\n[Release v1.3.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.3.2)\nArchive: `scionos-capture-v1.3.2.zip`\n';
+    const releaseDraft = '# Scionos Capture 1.3.3\nLatest published: [v1.3.2 release](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.3.2)\n';
+    await fs.writeFile(path.join(root, 'RELEASE_NOTES.md'), releaseDraft + releaseHistory);
     const history = '# Historical audit 1.3.2\nPublished 2026-09-30\n';
     for (const file of ['CHANGELOG.md', 'AUDIT_1.3.2.md']) await fs.writeFile(path.join(root, file), history);
     await updateReadmeVersion('1.3.4', root, { unreleased: true });
@@ -166,10 +179,34 @@ test('unreleased synchronization preserves published links and history and is id
       assert.ok(text.includes('/releases/tag/v1.3.2'));
       assert.ok(text.includes('scionos-capture-v1.3.2.zip'));
       assert.ok(text.includes('<!-- local-package -->'));
-      assert.ok(text.includes('scionos-capture-v1.3.4.zip'));
+      if (file === 'README.en.md') assert.ok(text.includes(publishedArtifact));
+      else assert.ok(text.includes('scionos-capture-v1.3.4.zip'));
+      if (file === 'README.es.md') assert.ok(text.includes('Published GitHub: 1.3.2.'));
+      assert.equal(text.match(/<!-- source-version -->/g).length, 1);
       assert.ok(!text.includes('/releases/tag/v1.3.4'));
     }
+    const draftNotes = await fs.readFile(path.join(root, 'RELEASE_NOTES.md'), 'utf8');
+    assert.equal(draftNotes, (releaseDraft + releaseHistory).replace('# Scionos Capture 1.3.3', '# Scionos Capture 1.3.4'));
     assert.deepEqual((await updateReadmeVersion('1.3.4', root, { unreleased: true })).updatedFiles, []);
+    await updateReadmeVersion('1.3.5', root, { unreleased: true });
+    for (const file of docs.filter(file => file.startsWith('README'))) {
+      const text = await fs.readFile(path.join(root, file), 'utf8');
+      assert.ok(text.includes('/badge/version-1.3.5-blue'));
+      assert.ok(text.includes('<!-- source-version --> **1.3.5'));
+      assert.ok(text.includes('/releases/tag/v1.3.2'));
+      assert.ok(!text.includes('/releases/tag/v1.3.5'));
+      const artifact = text.match(/^<!-- local-package -->[^\n]*/m)[0];
+      if (file === 'README.en.md') assert.equal(artifact + '\n', publishedArtifact);
+      else {
+        assert.ok(artifact.includes('scionos-capture-v1.3.5.zip'));
+        assert.ok(!artifact.includes('1.3.4'));
+      }
+      if (file === 'README.es.md') assert.ok(text.includes(candidateArtifact.replaceAll('1.3.3', '1.3.5')));
+    }
+    assert.deepEqual((await updateReadmeVersion('1.3.5', root, { unreleased: true })).updatedFiles, []);
+    assert.ok((await fs.readFile(path.join(root, 'RELEASE_NOTES.md'), 'utf8')).endsWith(releaseHistory));
+    await updateReadmeVersion('1.3.5', root);
+    assert.ok((await fs.readFile(path.join(root, 'RELEASE_NOTES.md'), 'utf8')).endsWith(releaseHistory.slice(releaseHistory.indexOf('\n# Scionos Capture'))));
     for (const file of ['CHANGELOG.md', 'AUDIT_1.3.2.md']) {
       assert.equal(await fs.readFile(path.join(root, file), 'utf8'), history);
     }
@@ -187,6 +224,11 @@ test('Markdown validation checks relative files and anchors including local igno
     await fs.writeFile(path.join(root, 'ROADMAP.md'), '# Étapes\n');
     await fs.writeFile(path.join(root, 'AUDIT_1.3.2.md'), '# Audit 1.3.2\n');
     assert.deepEqual(await validateMarkdownDocuments(root), { documents: 3, links: 2 });
+    await fs.appendFile(path.join(root, 'README.md'), '[Line](ROADMAP.md#L1)\n[Lines](ROADMAP.md#L1-L2)\n');
+    assert.deepEqual(await validateMarkdownDocuments(root), { documents: 3, links: 4 });
+    await fs.appendFile(path.join(root, 'README.md'), '[Invalid](ROADMAP.md#L999)\n');
+    await assert.rejects(validateMarkdownDocuments(root), /Invalid line anchor/);
+    await fs.writeFile(path.join(root, 'README.md'), '# Documentation\n[Roadmap](ROADMAP.md#étapes)\n[Historical](AUDIT_1.3.2.md)\n');
     await fs.writeFile(path.join(root, 'ROADMAP.md'), '# Other heading\n');
     await assert.rejects(validateMarkdownDocuments(root), /Missing Markdown anchor/);
     await fs.rm(path.join(root, 'ROADMAP.md'));

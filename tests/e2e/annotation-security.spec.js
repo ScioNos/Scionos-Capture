@@ -259,7 +259,7 @@ test('annotation controls remain accessible in four supported interface language
       await expect(page.locator('#annotation-controls')).toBeVisible();
       const accessible = await page.locator('#annotation-controls').evaluate(element => [...element.querySelectorAll('button,input')].map(control => ({ label: control.getAttribute('aria-label'), title: control.title, text: control.textContent })));
       expect(accessible.some(control => control.label || control.title || control.text.trim())).toBe(true);
-      const axe = await new AxeBuilder({ page }).include('#annotation-controls').analyze();
+      const axe = await new AxeBuilder({ page }).include('#annotation-controls').include('#language-button').analyze();
       expect(axe.violations.filter(issue => ['serious', 'critical'].includes(issue.impact))).toEqual([]);
       await page.reload();
     }
