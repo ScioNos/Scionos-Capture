@@ -4,7 +4,7 @@
 
 ## Versions prises en charge
 
-Politique mise à jour le 17 novembre 2026 pour la version 1.5.2 — release GitHub préparée. La ligne prise en charge est `1.5.x`. La publication GitHub [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2) est prévue ; le statut actuel du Chrome Web Store reste non confirmé et aucune soumission de la 1.5.2 n’est effectuée ici.
+Politique mise à jour le 17 novembre 2026 pour la version 1.5.2 — publiée sur GitHub. La ligne prise en charge est `1.5.x`. La version [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2) est publiée sur GitHub ; le statut actuel du Chrome Web Store reste non confirmé et aucune soumission de la 1.5.2 n’est effectuée ici.
 
 ## Signaler une vulnérabilité
 

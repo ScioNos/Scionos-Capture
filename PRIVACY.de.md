@@ -22,7 +22,7 @@ Ausstehende Änderungen vor jedem Export übernehmen oder verwerfen. Unschärfe 
 
 ## Datenschutz der Version 1.5.2
 
-**1.5.2 — GitHub-Release vorbereitet.** Geplante GitHub-Veröffentlichung: [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). Der aktuelle Chrome-Web-Store-Status ist unbestätigt; hier erfolgt keine Store-Einreichung von 1.5.2.
+**1.5.2 — auf GitHub veröffentlicht.** GitHub-Release: [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). Der aktuelle Chrome-Web-Store-Status ist unbestätigt; hier erfolgt keine Store-Einreichung von 1.5.2.
 
 Die Korrekturen wenden die Quellenrichtlinie auch im gesamten HTML-Generator an. `sanitized` entfernt Abfrage und Fragment, `none` lässt Quellen weg und `full` behält URLs; HTTP(S)-Zugangsdaten werden immer entfernt. Interne Editor-Miniaturen und Kompositionsvorschau werden aus dem erneut geöffneten Projekt einschließlich Annotationen rekonstruiert. Ein portabler Export entfernt den Hinweis auf ungespeicherte Änderungen nicht; „Download angefordert“ bestätigt keine Datei auf dem Datenträger. Berechtigungen und lokale Verarbeitung bleiben unverändert.
 

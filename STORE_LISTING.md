@@ -1,6 +1,6 @@
 # Scionos Capture — fiche Chrome Web Store 1.5.2
 
-**1.5.2 — release GitHub préparée.** Publication GitHub prévue : [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). Le statut actuel du Chrome Web Store n’est pas confirmé ; aucune soumission de la 1.5.2 n’est effectuée ici.
+**1.5.2 — publiée sur GitHub.** Release GitHub : [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). Le statut actuel du Chrome Web Store n’est pas confirmé ; aucune soumission de la 1.5.2 n’est effectuée ici.
 
 ## Fiche produit
 
@@ -68,4 +68,4 @@ Archive locale validée : `scionos-capture-v1.5.2.zip`, 35 fichiers. SHA-256 : `
 
 Validation 1.5.2 : `npm run verify:release` a réussi — 133 tests unitaires, 126 tests navigateur, cinq modes chacun dans Chrome 157.0.8103.79 et Edge 157.0.4341.60, trois répétitions de performance et dix scénarios PDF. Résultats et environnement : [revue des dépendances et validation](DEPENDENCY_REVIEW_1.5.2.md).
 
-La publication GitHub [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2) est prévue. La version distribuée et le statut effectif du Store restent à confirmer dans le tableau de bord ; aucune soumission de la 1.5.2 n’est effectuée ici.
+La version [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2) est publiée sur GitHub. La version distribuée et le statut effectif du Store restent à confirmer dans le tableau de bord ; aucune soumission de la 1.5.2 n’est effectuée ici.

@@ -69,4 +69,12 @@ La première exécution a révélé un diagnostic sérieux `label-content-name-m
 
 Rapports locaux générés dans `dist/performance-smoke.json` et `dist/verify-1.5.2/pdf-performance.json`. Ces mesures sont synthétiques et locales ; les captures natives utilisent des profils jetables. Les vérifications Node.js 22.13.0 et 24 sont configurées dans la CI ; elles ne sont pas assimilées à une exécution locale sous ces versions.
 
-La publication GitHub et la soumission au Chrome Web Store doivent être constatées séparément.
+## Publication constatée
+
+La [release GitHub v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2) est publiée le 17 novembre 2026 à 14:41:13 UTC (15:41:13 Europe/Zurich). L’API GitHub confirme `draft: false`, `prerelease: false` et la désigne comme dernière release.
+
+Le tag v1.5.2 pointe vers `2511407bd22624337889164e5c1593ceeed99de0`. Les deux workflows de ce commit ont réussi : [Verify extension](https://github.com/ScioNos/Scionos-Capture/actions/runs/44104646466), incluant les contrôles principaux sur Node.js 22.13.0 et 24, les tests navigateur Linux et les régressions Windows ; [Verify release package](https://github.com/ScioNos/Scionos-Capture/actions/runs/44104649783), incluant les régressions Windows et `npm run verify` sur Linux.
+
+Le ZIP de 165 693 octets et son fichier SHA-256 sont joints à la release. Le téléchargement depuis GitHub a été vérifié ; son empreinte correspond à l’archive locale validée. Les 35 fichiers de cette archive correspondent exactement aux sources du tag. La documentation de publication peut évoluer ensuite sur main sans modifier le tag ni les fichiers distribués.
+
+Aucune soumission de cette version au Chrome Web Store n’a été effectuée. Son statut reste distinct de la release GitHub.

@@ -24,7 +24,7 @@ Apply or cancel pending edits before any export. Blur remains a visual effect; u
 
 ## Privacy scope of version 1.5.2
 
-**1.5.2 — GitHub release prepared.** Planned GitHub publication: [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). Current Chrome Web Store status is unconfirmed; no 1.5.2 Store submission is performed here.
+**1.5.2 — published on GitHub.** GitHub release: [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). Current Chrome Web Store status is unconfirmed; no 1.5.2 Store submission is performed here.
 
 The fixes also apply source policy throughout the HTML generator. `sanitized` removes query and fragment, `none` omits sources, and `full` retains URLs; HTTP(S) credentials are always removed. Internal editor thumbnails and the composition preview are reconstructed from the reopened project, including annotations. Portable export does not clear the unsaved-changes indicator; “download requested” does not confirm that the file was written to disk. Permissions and local processing remain unchanged.
 

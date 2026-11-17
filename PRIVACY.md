@@ -26,7 +26,7 @@ Appliquez ou annulez les modifications en attente avant tout export. Le flou res
 
 ## Confidentialité de la version 1.5.2
 
-**1.5.2 — release GitHub préparée.** Publication GitHub prévue : [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). Le statut actuel du Chrome Web Store n’est pas confirmé ; aucune soumission de la 1.5.2 n’est effectuée ici.
+**1.5.2 — publiée sur GitHub.** Release GitHub : [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). Le statut actuel du Chrome Web Store n’est pas confirmé ; aucune soumission de la 1.5.2 n’est effectuée ici.
 
 Les corrections appliquent aussi la politique de sources à tous les chemins du générateur HTML. `sanitized` retire requête et fragment, `none` omet les sources, `full` conserve les URL ; les identifiants HTTP(S) restent toujours retirés. Les miniatures internes de l’éditeur et l’aperçu de composition sont reconstruits à partir du projet rouvert, annotations comprises. Un export portable ne supprime pas l’indicateur de modifications non enregistrées ; « téléchargement demandé » ne confirme pas l’écriture du fichier sur disque. Les permissions et le traitement local restent inchangés.
 

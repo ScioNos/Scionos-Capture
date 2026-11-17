@@ -22,7 +22,7 @@ Aplica o cancela los cambios pendientes antes de exportar. El desenfoque es un e
 
 ## Privacidad de la versión 1.5.2
 
-**1.5.2 — versión GitHub preparada.** Publicación GitHub prevista: [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). El estado actual de Chrome Web Store no está confirmado; aquí no se realiza ningún envío de la 1.5.2 a la tienda.
+**1.5.2 — publicada en GitHub.** Versión GitHub: [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). El estado actual de Chrome Web Store no está confirmado; aquí no se realiza ningún envío de la 1.5.2 a la tienda.
 
 Las correcciones aplican también la política de fuentes en todo el generador HTML. `sanitized` elimina consulta y fragmento, `none` omite las fuentes y `full` conserva las URL; las credenciales HTTP(S) siempre se eliminan. Las miniaturas internas del editor y la vista previa de composición se reconstruyen desde el proyecto reabierto, incluidas las anotaciones. Exportar un proyecto portátil no elimina el indicador de cambios sin guardar; «descarga solicitada» no confirma la escritura del archivo en disco. Los permisos y el procesamiento local no cambian.
 

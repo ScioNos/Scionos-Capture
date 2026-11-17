@@ -4,7 +4,7 @@
 
 ## Supported versions
 
-Policy updated on November 17, 2026 for version 1.5.2 — GitHub release prepared. The supported line is `1.5.x`. GitHub publication [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2) is planned; current Chrome Web Store status is unconfirmed and no 1.5.2 Store submission is performed here.
+Policy updated on November 17, 2026 for version 1.5.2 — published on GitHub. The supported line is `1.5.x`. Version [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2) is published on GitHub; current Chrome Web Store status is unconfirmed and no 1.5.2 Store submission is performed here.
 
 ## Reporting a vulnerability
 

@@ -2,7 +2,7 @@
 
 [Français](SECURITY.md) · [English](SECURITY.en.md) · [Español](SECURITY.es.md) · [Deutsch](SECURITY.de.md)
 
-Política actualizada el 17 de noviembre de 2026 para la versión 1.5.2 — versión GitHub preparada. La línea compatible es `1.5.x`. La publicación GitHub [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2) está prevista; el estado actual de Chrome Web Store no está confirmado y aquí no se realiza ningún envío de la 1.5.2 a la tienda.
+Política actualizada el 17 de noviembre de 2026 para la versión 1.5.2 — publicada en GitHub. La línea compatible es `1.5.x`. La versión [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2) está publicada en GitHub; el estado actual de Chrome Web Store no está confirmado y aquí no se realiza ningún envío de la 1.5.2 a la tienda.
 
 No abras una issue pública para una vulnerabilidad explotable. Usa el [informe privado de GitHub](https://github.com/ScioNos/Scionos-Capture/security/advisories/new) o contacta con `info@eyelo.ch` e incluye versión, impacto, pasos y una prueba no destructiva cuando sea posible.
 
