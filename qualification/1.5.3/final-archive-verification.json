@@ -1,15 +1,21 @@
 {
-  "verifiedAt": "2026-11-26T12:11:25.653Z",
+  "verifiedAt": "2026-11-26T12:20:00.898Z",
   "version": "1.5.3",
   "file": "D:\\Serveurs\\Projet_ScioNos\\Scionos-Capture\\dist\\scionos-capture-v1.5.3.zip",
   "size": 175572,
-  "sha256": "f17b2c50df2cc6b21254a6a893ddb48a5339ba369ee2d1ca3592fc7dbadb1b34",
+  "sha256": "f863e10d835425c9023cdb716f7f6bdaa5ce191f34982042417312a50a733d81",
   "entries": [
     {
       "name": "LICENSE",
       "size": 1075,
       "crc32": "9f96b56b",
       "sha256": "cacaccd731be75c382a700d0e63a30d90044fc5887ee5c50b4765df168087586"
+    },
+    {
+      "name": "capture-store.js",
+      "size": 22669,
+      "crc32": "4c75a7ab",
+      "sha256": "028f068861ec8a7824ce0673d46d30eb28d3e818302397aad7e1c9ddc6cc201b"
     },
     {
       "name": "manifest.json",
@@ -24,22 +30,16 @@
       "sha256": "909148c5a0310b3d6c054d9a7fc7dff74073e68c8f1900bf9ed91821d93a5136"
     },
     {
-      "name": "capture-store.js",
-      "size": 22669,
-      "crc32": "4c75a7ab",
-      "sha256": "028f068861ec8a7824ce0673d46d30eb28d3e818302397aad7e1c9ddc6cc201b"
+      "name": "capture-content-utils.js",
+      "size": 1725,
+      "crc32": "f3bdeb40",
+      "sha256": "3ea02354df7c964638c96c78dbc52bf1acc0f7c4294c3da5669bef39804da57a"
     },
     {
       "name": "capture-utils.js",
       "size": 45143,
       "crc32": "21d8da55",
       "sha256": "c85f998f2f32bde194dd40b2321fc4424ab7449bb3b81731f093ccfed456a436"
-    },
-    {
-      "name": "capture-content-utils.js",
-      "size": 1725,
-      "crc32": "f3bdeb40",
-      "sha256": "3ea02354df7c964638c96c78dbc52bf1acc0f7c4294c3da5669bef39804da57a"
     },
     {
       "name": "content-dom.js",
@@ -54,18 +54,6 @@
       "sha256": "be2cf94ff5083b794a66a5c2f2952e8cfa8845b34c2a9ac47db5cb754e0f9f5e"
     },
     {
-      "name": "content-selection.js",
-      "size": 12662,
-      "crc32": "8abba645",
-      "sha256": "37eec7a327a3ee9e5aa602dfa692d09d2b8fd7213f1021cd9f5723747e7d1bed"
-    },
-    {
-      "name": "content-capture.js",
-      "size": 47427,
-      "crc32": "9b73cab1",
-      "sha256": "13d17511ab8a9c5245ee6a7ff2ddb504927756332634e6a8efcffbcfeb0d09c8"
-    },
-    {
       "name": "content.js",
       "size": 2026,
       "crc32": "e07d7d53",
@@ -76,6 +64,18 @@
       "size": 37227,
       "crc32": "913ce2a6",
       "sha256": "eb9199441a51fd97b19cddbcb46a1343e667e43a5ab727f5d72f4c0a5da7dab1"
+    },
+    {
+      "name": "content-selection.js",
+      "size": 12662,
+      "crc32": "8abba645",
+      "sha256": "37eec7a327a3ee9e5aa602dfa692d09d2b8fd7213f1021cd9f5723747e7d1bed"
+    },
+    {
+      "name": "content-capture.js",
+      "size": 47427,
+      "crc32": "9b73cab1",
+      "sha256": "13d17511ab8a9c5245ee6a7ff2ddb504927756332634e6a8efcffbcfeb0d09c8"
     },
     {
       "name": "editor-operations.js",
@@ -96,16 +96,16 @@
       "sha256": "de5002cb09a28d651f4e0f5c0d0bcc9c4f901a78957cdc68b75a7c365650ec9c"
     },
     {
-      "name": "annotation-model.js",
-      "size": 11799,
-      "crc32": "4c9c4ea7",
-      "sha256": "85e1d1bea3972eed8eb469b040ea2d0325e841ec5b27ac248c58379c15f63871"
-    },
-    {
       "name": "editor.js",
       "size": 98785,
       "crc32": "d9721891",
       "sha256": "fa82263327146916440fbb0d51e8556b7606d7eb198f733d89f1cda8d2dabe53"
+    },
+    {
+      "name": "annotation-model.js",
+      "size": 11799,
+      "crc32": "4c9c4ea7",
+      "sha256": "85e1d1bea3972eed8eb469b040ea2d0325e841ec5b27ac248c58379c15f63871"
     },
     {
       "name": "library.html",

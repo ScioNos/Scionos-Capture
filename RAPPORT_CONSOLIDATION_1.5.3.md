@@ -156,7 +156,7 @@ Le dernier `npm ci` Windows, `npm ls --all` et `npm audit` réussissent : arbre 
 ZIP définitif local : `dist/scionos-capture-v1.5.3.zip`, **175 572 octets, 35 fichiers**. SHA-256 :
 
 ```text
-f17b2c50df2cc6b21254a6a893ddb48a5339ba369ee2d1ca3592fc7dbadb1b34
+f863e10d835425c9023cdb716f7f6bdaa5ce191f34982042417312a50a733d81
 ```
 
 [Attestation indépendante de l’archive](qualification/1.5.3/final-archive-verification.json) : CRC de chaque entrée, allow-list exacte, aucune entrée supplémentaire ou dupliquée, taille décompressée et contenu octet pour octet identiques aux sources. Le fichier `.sha256` adjacent correspond. Le ZIP n’est pas publié sur GitHub ou dans un Store.

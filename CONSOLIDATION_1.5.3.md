@@ -45,7 +45,7 @@ Mesures finales séquentielles contre le commit exact `03d87f2` : `final-qualifi
 ZIP local vérifié : `dist/scionos-capture-v1.5.3.zip`, **175572 octets,35fichiers**.
 
 ```text
-f17b2c50df2cc6b21254a6a893ddb48a5339ba369ee2d1ca3592fc7dbadb1b34
+f863e10d835425c9023cdb716f7f6bdaa5ce191f34982042417312a50a733d81
 ```
 
 `final-archive-verification.json` atteste CRC,allow-list exacte,absence de doublons et identité décompressée avec les sources. `final-qualification-source-hashes.json` identifie les sources qualifiées.
