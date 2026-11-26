@@ -1,26 +1,27 @@
-Eintragsentwurf für Kandidat 1.5.2 — in Vorbereitung, unveröffentlicht. Version 1.5.1 ist auf GitHub veröffentlicht; der aktuelle Chrome-Web-Store-Status ist unbestätigt.
+Scionos Capture 1.5.3
 
-Mit Scionos Capture kannst du eine Webseite aufnehmen, annotieren und auf deinem Gerät zu einem Dokument verarbeiten. Es ist kein Konto nötig; Aufnahmen werden nicht an einen Server gesendet.
+Lokale Vorbereitung 1.5.3, unveröffentlicht. Keine Änderung am entfernten Store-Eintrag oder an öffentlichen Links für 1.5.2.
 
-Eine Seite aufnehmen
-Wähle den sichtbaren Bereich, eine Auswahl, einen Scrollbereich, die ganze Seite oder ein Element. Passe die Grenzen vor der Bestätigung an. Mit einer abbrechbaren Verzögerung kannst du ein Menü oder einen vorübergehenden Seitenzustand vorbereiten.
+Mit Scionos Capture kannst du Webseiten aufnehmen, Bilder annotieren und Dokumente lokal erstellen. Du benötigst kein Konto. Aufnahmen werden auf deinem Gerät verarbeitet und nicht an einen Verarbeitungsserver gesendet.
 
-Bilder zusammenstellen und bearbeiten
-Mehrere importierte oder eingefügte Bilder lassen sich mit Titeln und Bildunterschriften kombinieren und umordnen. Kandidat 1.5.2 bereitet Korrekturen für unterbrochenes Ziehen, interne Editor-Miniaturen und Vorschau sowie Exporte vor. Der Export eines portablen Projekts behält den Hinweis auf ungespeicherte Änderungen; „Download angefordert“ garantiert keine gespeicherte Datei. Der Editor bietet Zeichnen, Text, Pfeile, Hervorhebungen, Formen, Zuschnitt und Maskierung. Unterstützte Annotationen bleiben in gespeicherten Projekten bearbeitbar.
+FÜNF AUFNAHMEMODI
+Wähle den sichtbaren Bereich, eine Auswahl, einen Scrollbereich, die ganze Seite oder ein Element. Passe die Grenzen vor dem Bestätigen einer Auswahl an. Eine abbrechbare Verzögerung gibt dir Zeit, ein Menü oder einen vorübergehenden Seitenzustand vorzubereiten. Interne Browserseiten und Erweiterungsstores sind geschützt und können nicht aufgenommen werden.
 
-Arbeit aufbewahren
-Speichere ein portables Projekt zur späteren Bearbeitung oder lege es in der lokalen Bibliothek ab. Dort kannst du Projekte suchen, umbenennen, duplizieren und löschen. Speicherkontingent und Aufbewahrungsdauer sind einstellbar; eine Aufbewahrung ohne Ablauf ist möglich.
+ZUSAMMENSTELLEN UND ANNOTIEREN
+Importiere mehrere Bilder oder füge sie aus der Zwischenablage ein, ändere ihre Reihenfolge und ordne sie vertikal oder horizontal an. Ergänze Titel, Bildunterschriften, Text, Pfeile, Formen, Zeichnungen und Hervorhebungen. Schneide Bilder zu und verwende deckende Masken, um vertrauliche Informationen zu schützen.
 
-Ergebnisse weitergeben
-Speichere ein Bild oder Dokument, kopiere das Ergebnis oder nutze die Druckfunktion. Die Darstellung lässt sich über Ränder, Ausrichtung und Seiteneinteilung anpassen. Prüfe Inhalt und Metadaten vor dem Teilen.
+ARBEIT FORTSETZEN
+Speichere ein portables .scionos-Projekt, um es später erneut zu öffnen. Unterstützte Annotationen bleiben bearbeitbar; Masken und Zuschnitte werden beim Speichern dauerhaft angewendet. In der lokalen Bibliothek kannst du Projekte suchen, umbenennen, duplizieren und löschen. Speicherkontingent und Aufbewahrungsdauer sind einstellbar, auch ohne Ablaufdatum.
 
-Datenschutz und Grenzen
-Wählen Sie unter Dokument eine Quellenrichtlinie: sanitized (Standard) entfernt URL-Abfragen und Fragmente; none entfernt Quellen und Links; full behält URLs ohne eingebettete Zugangsdaten bei. Dies gilt für gespeicherte Projekte und Exporte; Bibliotheksexporte verwenden immer sanitized. Beim Speichern entfernte Quellen sind nicht wiederherstellbar. Pfade, Bilder, Titel und Bildunterschriften können weiterhin sensibel sein. Pixel mit deckenden Masken schützen; Unschärfe ist nur visuell. Masken und Zuschnitte werden beim Speichern dauerhaft angewendet. Bilddateien über 16 Millionen Pixel oder 16.384 Pixel pro Seite werden vor dem Dekodieren abgelehnt; ein Dokument bleibt auf insgesamt 32 Millionen Pixel begrenzt.
+EXPORTIEREN UND TEILEN
+Exportiere PNG, JPEG, WebP, HTML oder Markdown/ZIP. Über die Druckfunktion deines Browsers kannst du ein PDF mit Einstellungen für Ränder, Ausrichtung und Seiteneinteilung speichern. Bei der Aufnahme erfasster sichtbarer Text kann PDFs durchsuchbar machen; für importierte Bilder gibt es keine OCR-Texterkennung.
 
-Für Kandidat 1.5.2 ist Drucken/PDF auf 32 Millionen kumulierte Pixel, 128 MiB kumulierte Blobs und 200 Seiten begrenzt.
+DATENSCHUTZ UND GRENZEN
+Wähle eine Quellenrichtlinie: sanitized entfernt URL-Abfragen und Fragmente; none entfernt Quellen und Links; full behält URLs ohne eingebettete Zugangsdaten. Bibliotheksexporte verwenden sanitized. URL-Pfade, Bilder, Titel und Bildunterschriften können weiterhin sensible Informationen enthalten: Prüfe das Ergebnis vor dem Teilen. Unschärfe ist ein visueller Effekt und ersetzt keine deckende Maske.
 
-Oberfläche und Hilfe stehen auf Französisch, Englisch, Spanisch und Deutsch bereit. Benutzer verwalten Aufbewahrung und Löschung separat gespeicherter Dateien.
+Importe sind auf 30 Bilder, 16 Millionen Pixel pro Bild und insgesamt 32 Millionen Pixel begrenzt. Drucken/PDF ist auf 32 Millionen gerenderte Pixel, 128 MiB Seitenbilder und 200 Seiten begrenzt; ein Budget kann vor der maximalen Seitenzahl erreicht werden. Separat exportierte Dateien verwaltest du selbst.
 
+Oberfläche und Hilfe auf Französisch, Englisch, Spanisch und Deutsch.
 Entwickelt von eyelo SA, Schweiz, unter der Marke ScioNos.
 Support: https://github.com/ScioNos/Scionos-Capture/issues
 Datenschutz: https://github.com/ScioNos/Scionos-Capture/blob/main/PRIVACY.md

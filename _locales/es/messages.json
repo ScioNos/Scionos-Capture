@@ -444,7 +444,7 @@
     "message": "Edición y Formatos de exportación"
   },
   "helpEditorText": {
-    "message": "Anote con flechas, texto, números de paso o formas. Oculte datos sensibles con máscara sólida (el desenfoque es puramente visual). Exporte en PNG, PDF indexable con enlaces o informe HTML interactivo."
+    "message": "Anota con flechas, texto, pasos numerados o formas. Oculta los datos sensibles con máscaras sólidas (el desenfoque es solo visual). Exporta en PNG, PDF o HTML autónomo. El texto original de la página se omite del PDF. Los títulos y leyendas añadidos pueden seguir siendo buscables; PDF solo imagen desactiva todas las capas de texto y sus enlaces asociados."
   },
   "helpShortcutsHeader": {
     "message": "Atajos de teclado"
@@ -492,7 +492,22 @@
     "message": "Cerrar ayuda"
   },
   "textLayerLimitedNotice": {
-    "message": "La capa de búsqueda del PDF se limita al texto cuya visibilidad puede verificarse. Se conserva la imagen capturada."
+    "message": "El texto original de la página se omite del PDF porque no se puede acreditar su correspondencia con los píxeles capturados. Se conserva la imagen. Los títulos y leyendas añadidos pueden seguir siendo buscables, salvo en el modo PDF solo imagen."
+  },
+  "captureDurationLimitError": {
+    "message": "La captura ha superado el límite de 180 segundos. Selecciona un área más pequeña y vuelve a intentarlo."
+  },
+  "capturePortionLimitError": {
+    "message": "La captura requiere más de 256 porciones. Selecciona un área más pequeña y vuelve a intentarlo."
+  },
+  "captureCancelledError": {
+    "message": "Captura cancelada."
+  },
+  "pdfResourceLimitError": {
+    "message": "El PDF supera los límites de recursos. Reduce la composición, las imágenes o el texto y vuelve a intentarlo."
+  },
+  "projectResourceLimitError": {
+    "message": "El proyecto supera los límites de recursos: manifiesto JSON de 1 MiB o archivo ZIP de 128 MiB. Reduce texto, trazos o imágenes y vuelve a intentarlo."
   },
   "exportPendingDraft": {
     "message": "Aplica o cancela la modificación pendiente antes de exportar."

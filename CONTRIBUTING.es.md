@@ -1,5 +1,7 @@
 # Contribuir a Scionos Capture
 
+Preparación local 1.5.3, sin publicar. Sin cambios en la ficha remota de la tienda ni en los enlaces públicos 1.5.2.
+
 [Français](CONTRIBUTING.md) · [English](CONTRIBUTING.en.md) · [Español](CONTRIBUTING.es.md) · [Deutsch](CONTRIBUTING.de.md)
 
 No adjuntes capturas con datos personales, credenciales o secretos.

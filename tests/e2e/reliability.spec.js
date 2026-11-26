@@ -271,12 +271,24 @@ test('delayed visible capture waits before acquisition and rejects unsupported d
 test('inner-surface text is collected in surface coordinates and covered text is omitted', async () => {
   const page = await context.newPage();
   await prepareFullPageHarness(page, '<style>html,body{margin:0;height:600px;overflow:hidden}.app{position:absolute;left:100px;top:80px;width:300px;height:300px;overflow:auto}.content{height:1200px;position:relative}p{position:absolute;margin:0;left:10px}.cover{position:absolute;top:110px;left:10px;width:200px;height:30px;background:white;z-index:5;pointer-events:none}</style><div class="app" data-scroll-surface><div class="content"><p style="top:10px">FIRST_PUBLIC</p><p style="top:110px">OCCLUDED_SECRET</p><div class="cover"></div><p style="top:1010px">LAST_PUBLIC</p></div></div>');
-  await startFullPageCapture(page); await readOpenedCapture(page);
+  const extracted = await page.evaluate(() => {
+    const dom = globalThis.ScionosContentDom.create({ Utils: globalThis.ScionosCaptureUtils, text: key => key });
+    const surface = dom.findScrollSurface(); const metrics = surface.getMetrics();
+    const region = { x: 0, y: 0, width: metrics.fullWidth, height: metrics.fullHeight };
+    const first = dom.extractDomTextBlocks(region, surface);
+    surface.scrollTo(0, 900);
+    const last = dom.extractDomTextBlocks(region, surface);
+    surface.scrollTo(0, 0);
+    return { blocks: [...first, ...last], limited: first.limited || last.limited };
+  });
+  expect(extracted.limited).toBe(true);
+  expect(extracted.blocks.map(block => block.text)).toEqual(['FIRST_PUBLIC', 'LAST_PUBLIC']);
+  expect(extracted.blocks[0].x).toBeCloseTo(10); expect(extracted.blocks[1].y).toBeGreaterThan(1000);
+  await startFullPageCapture(page); expect(await readOpenedCapture(page)).toMatchObject({width:300,height:1200});
   const capture = await page.evaluate(() => globalThis.__openedCapture);
   expect(capture.textCoordinateSpace).toBe('bitmap');
   expect(capture.textLayerLimited).toBe(true);
-  expect(capture.textBlocks.map(block => block.text)).toEqual(['FIRST_PUBLIC', 'LAST_PUBLIC']);
-  expect(capture.textBlocks[0].x).toBeCloseTo(10); expect(capture.textBlocks[1].y).toBeGreaterThan(1000);
+  expect(capture.textBlocks).toEqual([]);
   await page.close();
 });
 
@@ -289,7 +301,14 @@ for (const dpr of [1, 1.25, 1.5, 2]) {
       await useRealPixels(page);
       await startCapture(page, 'START_VISIBLE_CAPTURE'); await readOpenedCapture(page);
       const visible = await page.evaluate(() => globalThis.__openedCapture);
-      expect(visible.textBlocks[0].x).toBeCloseTo(150 * dpr);
+      expect(visible.textBlocks).toEqual([]); expect(visible.textLayerLimited).toBe(true);
+      const transferred=await page.evaluate(async()=>{
+        const utils=globalThis.ScionosCaptureUtils,text=key=>key;
+        const blocks=globalThis.ScionosContentDom.create({Utils:utils,text}).extractDomTextBlocks({x:0,y:0,width:globalThis.innerWidth,height:globalThis.innerHeight});
+        return (await globalThis.ScionosContentTransfer.create({Utils:utils,text}).prepareDataUrlForEditor(globalThis.__lastBitmap,blocks)).textBlocks;
+      });
+      expect(transferred.map(block=>block.text)).toEqual(['PUBLIC_DPR']);
+      expect(transferred[0].x).toBeCloseTo(150 * dpr);
       expect(await page.evaluate(async () => {
         const pixels = async src => {
           const image = new globalThis.Image(); image.src = src; await image.decode();
@@ -304,7 +323,10 @@ for (const dpr of [1, 1.25, 1.5, 2]) {
       await page.mouse.move(100, 100); await page.mouse.down(); await page.mouse.move(400, 300); await page.mouse.up(); await confirmSelection(page);
       expect(await readOpenedCapture(page)).toMatchObject({ width: Math.round(300 * dpr), height: Math.round(200 * dpr) });
       const selected = await page.evaluate(() => globalThis.__openedCapture);
-      expect(selected.textBlocks[0].x).toBeCloseTo(50 * dpr);
+      expect(selected.textBlocks).toEqual([]); expect(selected.textLayerLimited).toBe(true);
+      const selectedGeometry=await page.evaluate(()=>globalThis.ScionosContentDom.create({Utils:globalThis.ScionosCaptureUtils,text:key=>key}).extractDomTextBlocks({x:100,y:100,width:300,height:200}));
+      expect(selectedGeometry.map(block=>block.text)).toEqual(['PUBLIC_DPR']);
+      expect(selectedGeometry[0].x * dpr).toBeCloseTo(50 * dpr);
     } finally { await scaled.close(); }
   });
 }
@@ -368,6 +390,54 @@ async function printedPdfText(page) {
     return text;
   } finally { await task.destroy(); }
 }
+test('standalone painted snapshots preserve redaction, crop geometry and PDF text contracts', async () => {
+  const page = await context.newPage();
+  try {
+    await page.goto(editorUrl);
+    const states = await page.evaluate(async () => {
+      const U = globalThis.ScionosCaptureUtils;
+      const original = document.createElement('canvas'); original.width = 640; original.height = 300;
+      const ctx = original.getContext('2d'); ctx.fillStyle = 'white'; ctx.fillRect(0, 0, 640, 300);
+      ctx.font = '18px Arial'; ctx.fillStyle = 'black';
+      const blocks = [
+        { text: 'FIXTURE_SECRET', x: 30, y: 40, width: 200, height: 24, fontSize: 18 },
+        { text: 'FIXTURE_PUBLIC', x: 320, y: 140, width: 220, height: 24, fontSize: 18 },
+        { text: 'FIXTURE_PARTIAL', x: 520, y: 220, width: 110, height: 24, fontSize: 18 }
+      ];
+      for (const block of blocks) ctx.fillText(block.text, block.x, block.y + 18);
+      const originalBlob = await new Promise(resolve => original.toBlob(resolve));
+      const mask = { x: 20, y: 30, width: 230, height: 50 };
+      ctx.fillRect(mask.x, mask.y, mask.width, mask.height);
+      const filtered = U.filterTextBlocksOnCensor(blocks, mask);
+      const crop = { x: 300, y: 100, width: 280, height: 160 };
+      const cropped = document.createElement('canvas'); cropped.width = crop.width; cropped.height = crop.height;
+      cropped.getContext('2d').drawImage(original, crop.x, crop.y, crop.width, crop.height, 0, 0, crop.width, crop.height);
+      const croppedBlocks = U.shiftAndCropTextBlocks(filtered, crop);
+      globalThis.__paintedPdfFixtures = [
+        { blob: originalBlob, width: 640, height: 300, textBlocks: blocks },
+        { blob: await new Promise(resolve => cropped.toBlob(resolve)), width: crop.width, height: crop.height, textBlocks: croppedBlocks }
+      ];
+      original.width = original.height = cropped.width = cropped.height = 1;
+      return { filtered: filtered.map(b => b.text), cropped: croppedBlocks };
+    });
+    expect(states.filtered).toEqual(['FIXTURE_PUBLIC', 'FIXTURE_PARTIAL']);
+    expect(states.cropped).toHaveLength(1);
+    expect(states.cropped[0]).toMatchObject({ text: 'FIXTURE_PUBLIC', x: 20, y: 40, width: 220, height: 24 });
+    for (const index of [0, 1]) {
+      await page.evaluate(async index => {
+        globalThis.print = () => {};
+        await globalThis.ScionosCompositionExport.print({ settings: { gap: 0, padding: 0 },
+          items: [{ id: 'painted-contract', ...globalThis.__paintedPdfFixtures[index] }] }, {}, document.getElementById('print-area'));
+      }, index);
+      const text = await printedPdfText(page);
+      expect(text).toContain('FIXTURE_PUBLIC');
+      if (index === 0) { expect(text).toContain('FIXTURE_SECRET'); expect(text).toContain('FIXTURE_PARTIAL'); }
+      else { expect(text).not.toContain('FIXTURE_SECRET'); expect(text).not.toContain('FIXTURE_PARTIAL'); }
+      await page.evaluate(() => globalThis.dispatchEvent(new globalThis.Event('afterprint')));
+    }
+  } finally { await page.close(); }
+});
+
 async function drawFilledRectangle(page, rect) {
   await page.locator('#tool-shape').click();
   await page.locator('#shape-type').selectOption('rect');
@@ -451,7 +521,7 @@ for (const dpr of [1, 1.25, 1.5, 2]) {
     await applyRectangle(page, 'crop', { x: 80 * dpr, y: 80 * dpr, width: 400 * dpr, height: 150 * dpr });
     expect(await page.locator('#main-canvas').evaluate((canvas, dpr) => [...canvas.getContext('2d').getImageData(Math.round(50 * dpr), Math.round(30 * dpr), 1, 1).data], dpr)).toEqual([0, 0, 0, 255]);
     const text = await printText(page);
-    expect(text).toContain('PUBLIC_KEEP'); expect(text).not.toContain('SECRET_MASK');
+    expect(text).not.toContain('PUBLIC_KEEP'); expect(text).not.toContain('SECRET_MASK');
     await page.close();
   });
 }
@@ -467,7 +537,7 @@ test('generated PDF excludes outside and partially cropped words through repeate
   await page.locator('#btn-undo').click(); await page.locator('#btn-redo').click();
   await applyRectangle(page, 'crop', { x: 20, y: 80, width: 180, height: 100 });
   const text = await printText(page);
-  expect(text).toContain('PUBLIC_KEEP'); expect(text).not.toContain('OUTSIDE_SECRET'); expect(text).not.toContain('PARTIAL_SECRET');
+  expect(text).not.toContain('PUBLIC_KEEP'); expect(text).not.toContain('OUTSIDE_SECRET'); expect(text).not.toContain('PARTIAL_SECRET');
   await page.close();
 });
 
@@ -515,14 +585,16 @@ test('covered and transparent DOM secrets are absent from the generated PDF', as
   await prepareFullPageHarness(page, '<style>html,body{margin:0;background:white}p{position:absolute;left:50px;margin:0}.cover{position:absolute;left:50px;top:100px;width:250px;height:30px;background:white;pointer-events:none}</style><p style="top:40px">PUBLIC_VISIBLE</p><p style="top:100px">SECRET_OCCLUDED</p><div class="cover"></div><p style="top:180px;color:transparent">SECRET_TRANSPARENT</p>');
   await useRealPixels(page); await startCapture(page, 'START_VISIBLE_CAPTURE'); await readOpenedCapture(page);
   const capture = await page.evaluate(() => globalThis.__openedCapture);
-  expect(capture.textBlocks.map(b => b.text)).toEqual(['PUBLIC_VISIBLE']);
-  await seedEditor(page, { width: 800, height: 600, textBlocks: capture.textBlocks, textLayerLimited: capture.textLayerLimited });
+  const extracted=await page.evaluate(()=>globalThis.ScionosContentDom.create({Utils:globalThis.ScionosCaptureUtils,text:key=>key}).extractDomTextBlocks({x:0,y:0,width:800,height:600}));
+  expect(extracted.map(b => b.text)).toEqual(['PUBLIC_VISIBLE']);
+  expect(capture.textBlocks).toEqual([]); expect(capture.textLayerLimited).toBe(true);
+  await seedEditor(page, { width: 800, height: 600, textBlocks: extracted, textLayerLimited: capture.textLayerLimited });
   const text = await printText(page);
-  expect(text).toContain('PUBLIC_VISIBLE'); expect(text).not.toContain('SECRET_OCCLUDED'); expect(text).not.toContain('SECRET_TRANSPARENT');
+  expect(text).not.toContain('PUBLIC_VISIBLE'); expect(text).not.toContain('SECRET_OCCLUDED'); expect(text).not.toContain('SECRET_TRANSPARENT');
   await page.close();
 });
 
-test('filled opaque shapes remove covered text from searchable PDFs across undo and redo', async () => {
+test('filled opaque shapes retain raster undo and redo while inherited PDF text stays omitted', async () => {
   const page = await context.newPage();
   await page.setViewportSize({ width: 1400, height: 900 });
   const secret = 'SECRET_SHAPE_PDF_7319';
@@ -537,17 +609,19 @@ test('filled opaque shapes remove covered text from searchable PDFs across undo 
   expect(coveredPixel).toEqual([0, 0, 0]);
   const maskedText = await printText(page);
   expect(maskedText).not.toContain(secret);
-  expect(maskedText).toContain(visible);
+  expect(maskedText).not.toContain(visible);
 
   await page.locator('#btn-undo').click();
+  expect(await page.locator('#main-canvas').evaluate(canvas => [...canvas.getContext('2d').getImageData(100, 80, 1, 1).data])).toEqual([255, 255, 255, 255]);
   const undoneText = await printText(page);
-  expect(undoneText).toContain(secret);
-  expect(undoneText).toContain(visible);
+  expect(undoneText).not.toContain(secret);
+  expect(undoneText).not.toContain(visible);
 
   await page.locator('#btn-redo').click();
+  expect(await page.locator('#main-canvas').evaluate(canvas => [...canvas.getContext('2d').getImageData(100, 80, 1, 1).data])).toEqual([0, 0, 0, 255]);
   const redoneText = await printText(page);
   expect(redoneText).not.toContain(secret);
-  expect(redoneText).toContain(visible);
+  expect(redoneText).not.toContain(visible);
   await page.close();
 });
 
@@ -651,7 +725,7 @@ test('PDF text remains censored with more than 100 editable annotations', async 
   }
   await expect(page.locator('#btn-undo')).toBeEnabled();
   const text = await printText(page);
-  expect(text).toContain('PUBLIC_KEEP'); expect(text).not.toContain('SECRET_FLATTEN');
+  expect(text).not.toContain('PUBLIC_KEEP'); expect(text).not.toContain('SECRET_FLATTEN');
   await page.close();
 });
 
@@ -689,7 +763,7 @@ test('undo during asynchronous PDF encoding cannot mix masked pixels with origin
     return [...context.getImageData(130, 120, 1, 1).data];
   })).toEqual([0, 0, 0, 255]);
   const text = await printedPdfText(page);
-  expect(text).toContain('PUBLIC_KEEP');
+  expect(text).not.toContain('PUBLIC_KEEP');
   expect(text).not.toContain('SECRET_ASYNC');
   await page.close();
 });
@@ -699,10 +773,12 @@ test('descendant covers cannot leak text into a generated PDF', async () => {
   await prepareFullPageHarness(page, '<style>html,body{margin:0;background:white}p{position:absolute;left:50px;margin:0}.cover{position:absolute;inset:0;background:white}</style><p style="top:40px">PUBLIC_DESCENDANT</p><p style="top:100px">SECRET_CHILD_NONE<span class="cover" style="pointer-events:none"></span></p><p style="top:180px">SECRET_CHILD_AUTO<span class="cover"></span></p>');
   await useRealPixels(page); await startCapture(page, 'START_VISIBLE_CAPTURE'); await readOpenedCapture(page);
   const capture = await page.evaluate(() => globalThis.__openedCapture);
-  expect(capture.textBlocks.map(block => block.text)).toEqual(['PUBLIC_DESCENDANT']);
-  await seedEditor(page, { width:800, height:600, textBlocks:capture.textBlocks });
+  const extracted=await page.evaluate(()=>globalThis.ScionosContentDom.create({Utils:globalThis.ScionosCaptureUtils,text:key=>key}).extractDomTextBlocks({x:0,y:0,width:800,height:600}));
+  expect(extracted.map(block => block.text)).toEqual(['PUBLIC_DESCENDANT']);
+  expect(capture.textBlocks).toEqual([]); expect(capture.textLayerLimited).toBe(true);
+  await seedEditor(page, { width:800, height:600, textBlocks:extracted });
   const text = await printText(page);
-  expect(text).toContain('PUBLIC_DESCENDANT'); expect(text).not.toContain('SECRET_CHILD');
+  expect(text).not.toContain('PUBLIC_DESCENDANT'); expect(text).not.toContain('SECRET_CHILD');
   await page.close();
 });
 
@@ -716,7 +792,7 @@ test('fast freehand masks cover every segment and single clicks across undo and 
   await page.mouse.move(start.x,start.y); await page.mouse.down(); await page.mouse.move(end.x,end.y); await page.mouse.up();
   const pixel = () => canvas.evaluate(c => [...c.getContext('2d').getImageData(180,100,1,1).data]);
   expect(await pixel()).toEqual([0,0,0,255]); expect(await printText(page)).not.toContain('SECRET_FREE_SEGMENT');
-  await page.locator('#btn-undo').click(); expect(await printText(page)).toContain('SECRET_FREE_SEGMENT');
+  await page.locator('#btn-undo').click(); expect(await printText(page)).not.toContain('SECRET_FREE_SEGMENT');
   await page.locator('#btn-redo').click(); expect(await pixel()).toEqual([0,0,0,255]);
   const click=point(30,200); await page.mouse.click(click.x,click.y);
   expect(await canvas.evaluate(c => [...c.getContext('2d').getImageData(30,200,1,1).data])).toEqual([0,0,0,255]);
@@ -872,11 +948,11 @@ test('blurred freehand paths include the segment between distant points',async()
  expect(result.middle[0]).toBeGreaterThan(50);expect(result.middle[0]).toBeLessThan(200);expect(result.outside).toEqual(result.original);await page.close();
 });
 
-test('text extraction stops after the global block cap while pixels still complete',async()=>{
+test('independent text assembly stops after the global block cap while pixels still complete',async()=>{
  const page=await context.newPage();await prepareFullPageHarness(page,'<style>html,body{margin:0;height:2400px}</style>');
  const result=await page.evaluate(async()=>{
   const utils=globalThis.ScionosCaptureUtils;const text=key=>key;const dom=globalThis.ScionosContentDom.create({Utils:utils,text});let calls=0;
-  const capture=globalThis.ScionosContentCapture.create({Utils:utils,text,dom:{...dom,extractDomTextBlocks:()=>{calls++;return Array.from({length:1500},(_,i)=>({text:'word'+i,x:i/10,y:0,width:1,height:1}));}},transfer:globalThis.ScionosContentTransfer.create({Utils:utils,text})});
+  const capture=globalThis.ScionosContentCapture.create({Utils:utils,text,dom:{...dom,createAcquisitionGuard:surface=>{const guard=dom.createAcquisitionGuard(surface);return {...guard,textIsStable:()=>true};},extractDomTextBlocks:()=>{calls++;return Array.from({length:1500},(_,i)=>({text:'word'+i,x:i/10,y:0,width:1,height:1}));}},transfer:globalThis.ScionosContentTransfer.create({Utils:utils,text})});
   await capture.executeFullPageCapture();return {calls,blocks:globalThis.__openedCapture.textBlocks.length,limited:globalThis.__openedCapture.textLayerLimited};
  });
  expect(result).toEqual({calls:1,blocks:1500,limited:true});expect(await readOpenedCapture(page)).toMatchObject({height:2400});await page.close();
@@ -912,7 +988,12 @@ for(const action of ['START_FULL_PAGE_CAPTURE','START_ZONE_CAPTURE','START_SCROL
 test('left scrollbar gutters share the same viewport origin for selection and visible text',async()=>{
  const page=await context.newPage();await prepareFullPageHarness(page,'<style>html{scrollbar-gutter:stable both-edges}html,body{margin:0}body{height:1200px;background:red}.stripe{position:absolute;left:110px;top:0;width:40px;height:1200px;background:blue}p{position:absolute;left:250px;top:400px;margin:0;color:black}</style><div class="stripe"></div><p>GUTTER_PUBLIC</p>');
  await useRealPixels(page);await startCapture(page,'START_VISIBLE_CAPTURE');await readOpenedCapture(page);
- const text=await page.evaluate(()=>({block:globalThis.__openedCapture.textBlocks.find(b=>b.text==='GUTTER_PUBLIC'),left:document.querySelector('p').getBoundingClientRect().left}));
+ const text=await page.evaluate(()=>{
+   const dom=globalThis.ScionosContentDom.create({Utils:globalThis.ScionosCaptureUtils,text:key=>key});
+   const surface=dom.getDocumentScrollSurface();const origin=dom.clientPointToSurface(surface,0,0);
+   return {block:dom.extractDomTextBlocks({...origin,width:globalThis.innerWidth,height:globalThis.innerHeight},surface).find(b=>b.text==='GUTTER_PUBLIC'),left:document.querySelector('p').getBoundingClientRect().left};
+  });
+  expect(await page.evaluate(()=>globalThis.__openedCapture.textBlocks)).toEqual([]);
  expect(text.block.x).toBeCloseTo(text.left);
  await page.evaluate(()=>{globalThis.__openedCapture=null;});await startCapture(page,'START_ZONE_CAPTURE');
  await page.mouse.move(100,100);await page.mouse.down();await page.mouse.move(400,300);await page.mouse.up(); await confirmSelection(page);await readOpenedCapture(page);

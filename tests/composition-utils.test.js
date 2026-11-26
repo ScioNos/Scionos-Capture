@@ -13,11 +13,13 @@ function chunk(type, data) {
   v.setUint32(0, data.length); b.set(enc.encode(type), 4); b.set(data, 8);
   v.setUint32(b.length - 4, crc32(b.subarray(4, b.length - 4))); return b;
 }
-function png({ width = 2, height = 2, text = '', raw, compressed } = {}) {
+function png({ width = 2, height = 2, text = '', raw, compressed, depth = 8, color = 6, palette, transparency } = {}) {
   const ihdr = new Uint8Array(13), v = new DataView(ihdr.buffer);
-  v.setUint32(0, width); v.setUint32(4, height); ihdr[8] = 8; ihdr[9] = 6;
+  v.setUint32(0, width); v.setUint32(4, height); ihdr[8] = depth; ihdr[9] = color;
   const chunks = [new Uint8Array([137,80,78,71,13,10,26,10]), chunk('IHDR', ihdr)];
   if (text) chunks.push(chunk('tEXt', enc.encode(text)));
+  if (palette) chunks.push(chunk('PLTE', palette));
+  if (transparency) chunks.push(chunk('tRNS', transparency));
   chunks.push(chunk('IDAT', compressed || deflateSync(raw || new Uint8Array((width * 4 + 1) * height))), chunk('IEND', new Uint8Array()));
   return new Blob(chunks, { type: 'image/png' });
 }
@@ -176,6 +178,15 @@ test('project rejects non PNG, CRC corruption, malformed compressed data and sca
   await assert.rejects(encodeProject(project(png({raw}))), /filter/);
   await assert.rejects(encodeProject(project(png({width:1000000,height:1000000,compressed:Uint8Array.of(1)}))), /dimensions/);
 });
+test('PNG rejects transparency referencing missing palette entries or out-of-range samples', async () => {
+  const indexed = { width: 1, height: 1, color: 3, palette: Uint8Array.of(0, 0, 0), raw: Uint8Array.of(0, 0) };
+  await assert.rejects(U.cleanPng(new Uint8Array(await png({ ...indexed, transparency: Uint8Array.of(255, 0) }).arrayBuffer())), /transparency/);
+  for (const [color, transparency] of [[0, Uint8Array.of(1, 0)], [2, Uint8Array.of(0, 0, 1, 0, 0, 0)]]) {
+    await assert.rejects(U.cleanPng(new Uint8Array(await png({ width: 1, height: 1, color, transparency, raw: new Uint8Array(color === 0 ? 2 : 4) }).arrayBuffer())), /transparency/);
+  }
+  assert.equal((await U.cleanPng(new Uint8Array(await png({ ...indexed, transparency: Uint8Array.of(0) }).arrayBuffer()))).width, 1);
+});
+
 test('project validates canvas dimension and pixel limits before inflating PNG', async () => {
   for (const dimensions of [{width:16385,height:1}, {width:1,height:16385}, {width:4001,height:4000}]) {
     await assert.rejects(encodeProject(project(png({...dimensions,compressed:Uint8Array.of(1)}))), /dimensions/);

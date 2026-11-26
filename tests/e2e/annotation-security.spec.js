@@ -168,8 +168,8 @@ test('mask plus crop and later annotations keep project-v2 pixels and exports fr
 
     const pdfText = await preparePdf(page);
     expect(pdfText).not.toContain(secret);
-    expect(pdfText).toContain(retainedSecret); // Unmasked source text remains searchable in PDF.
-    expect(pdfText).toContain(publicText);
+    expect(pdfText).not.toContain(retainedSecret); // CaptureStore metadata has no independent pixel attestation.
+    expect(pdfText).not.toContain(publicText);
     expect(pdfText).toContain(explicitCaptionSecret); // Explicit user metadata is intentionally retained.
 
     const markdownZip = await exportMarkdown(page);

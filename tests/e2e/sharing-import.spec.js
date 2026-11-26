@@ -59,10 +59,27 @@ async function exportDocument(page, format) {
   const bytes = await downloadBytes(await pending);
   await expect(page.locator('#export-dialog')).not.toBeVisible(); return bytes;
 }
-async function printedDocument(page) {
-  await page.evaluate(() => { globalThis.print = () => {}; });
-  await page.locator('#btn-pdf').click(); await page.locator('#export-confirm').click();
-  await expect(page.locator('#export-dialog')).not.toBeVisible();
+async function printedFixtureDocument(page, policy) {
+  await page.evaluate(async ({ policy, sourceUrl, linkUrl }) => {
+    const canvas = document.createElement('canvas'); canvas.width = 640; canvas.height = 240;
+    const ctx = canvas.getContext('2d'); ctx.fillStyle = 'white'; ctx.fillRect(0, 0, 640, 240);
+    ctx.fillStyle = 'black'; ctx.font = '18px Arial'; ctx.fillText('SEARCHABLE LINK', 40, 80);
+    const blob = await new Promise(resolve => canvas.toBlob(resolve));
+    globalThis.print = () => {};
+    await globalThis.ScionosCompositionExport.print({ settings: { gap: 0, padding: 0 }, exportSettings: { sourcePolicy: policy },
+      items: [{ id: 'explicit-painted-fixture', blob, width: 640, height: 240, url: sourceUrl,
+        textBlocks: [{ text: 'SEARCHABLE LINK', x: 40, y: 60, width: 240, height: 24, fontSize: 18, url: linkUrl }] }] },
+    { sourcePolicy: policy }, document.getElementById('print-area'));
+    canvas.width = canvas.height = 1;
+  }, { policy, sourceUrl, linkUrl });
+  return printedDocument(page, true);
+}
+async function printedDocument(page, standalone = false) {
+  if (!standalone) {
+    await page.evaluate(() => { globalThis.print = () => {}; });
+    await page.locator('#btn-pdf').click(); await page.locator('#export-confirm').click();
+    await expect(page.locator('#export-dialog')).not.toBeVisible();
+  }
   await expect(page.locator('#print-area img').first()).toHaveAttribute('src', /^blob:/);
   await page.locator('#print-area img').evaluateAll(images => Promise.all(images.map(image => image.decode())));
   const domLinks = await page.locator('#print-area a').evaluateAll(links => links.map(link => link.href));
@@ -123,11 +140,17 @@ for (const policy of ['sanitized', 'none', 'full']) {
       const markdown = archiveEntries(await exportDocument(page, 'markdown')).get('document.md').toString('utf8');
       if (expectedSource) expect(markdown).toContain('[Source](<' + expectedSource + '>)'); else expect(markdown).not.toContain('[Source]');
       const printed = await printedDocument(page);
-      expect(printed.text).toContain('SEARCHABLE LINK');
+      expect(printed.text).not.toContain('SEARCHABLE LINK');
       if (expectedSource) expect(printed.text).toContain(expectedSource); else expect(printed.text).not.toContain(publicSource);
-      expect(printed.domLinks).toEqual(expectedLink ? [expectedLink] : []);
-      expect(printed.links).toEqual(expectedLink ? [expectedLink] : []);
-      const all = JSON.stringify({project,html,markdown,printed});
+      expect(printed.domLinks).toEqual([]);
+      expect(printed.links).toEqual([]);
+      // The public exporter contract is tested separately with explicit painted
+      // fixture pixels. CaptureStore records never provide paint attestation.
+      const standalone = await printedFixtureDocument(page, policy);
+      expect(standalone.text).toContain('SEARCHABLE LINK');
+      expect(standalone.domLinks).toEqual(expectedLink ? [expectedLink] : []);
+      expect(standalone.links).toEqual(expectedLink ? [expectedLink] : []);
+      const all = JSON.stringify({project,html,markdown,printed,standalone});
       for (const secret of ['SOURCE_PASSWORD', 'LINK_PASSWORD', 'https://alice:', 'https://bob:']) expect(all).not.toContain(secret);
       if (policy !== 'full') for (const secret of ['SOURCE_QUERY','SOURCE_FRAGMENT','LINK_QUERY','LINK_FRAGMENT']) expect(all).not.toContain(secret);
     } finally { await page.close(); }

@@ -1,12 +1,16 @@
-# Scionos Capture — fiche Chrome Web Store 1.5.2
+# Scionos Capture — préparation locale de la fiche Chrome Web Store 1.5.3
 
-**1.5.2 — publiée sur GitHub.** Release GitHub : [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). Le statut actuel du Chrome Web Store n’est pas confirmé ; aucune soumission de la 1.5.2 n’est effectuée ici.
+**Préparation locale 1.5.3, non publiée.** Aucune modification de la fiche Store distante ni des liens publics 1.5.2. La validation finale intégrée appartient au parent.
+
+## Historique de la candidate 1.5.2
+
+**Candidate locale 1.5.2 corrigée pour le Store.** La release GitHub existante reste inchangée et ne contient pas ces nouveaux correctifs. Aucune soumission Google effectuée. [Bilan de préparation](STORE_READINESS_1.5.2.md).
 
 ## Fiche produit
 
 **Nom :** Scionos Capture
 
-**Catégorie :** Outils pour les développeurs (catégorie actuellement sélectionnée dans la boutique).
+**Catégorie proposée :** Outils pour les développeurs. La sélection actuelle de la console n’a pas été vérifiée pendant cette préparation.
 
 **Descriptions complètes localisées :**
 
@@ -15,13 +19,19 @@
 - [Español](store-assets/listing-es.txt)
 - [Deutsch](store-assets/listing-de.txt)
 
-Ces brouillons décrivent la version 1.5.2 et conservent les fonctions introduites en 1.5.0 : composition multi-images, annotations éditables, projets portables .scionos v2, bibliothèque locale et exports PNG, JPEG, WebP, HTML, Markdown/ZIP et PDF. Les fonctions de capture existantes, les limites et les précautions de confidentialité restent décrites. Les résumés courts proviennent des messages appDesc inclus dans les quatre catalogues de langue du paquet.
+Ces descriptions produit préparent localement la version 1.5.3 non publiée et conservent les fonctions introduites en 1.5.0 : composition multi-images, annotations éditables, projets portables .scionos v2, bibliothèque locale et exports PNG, JPEG, WebP, HTML, Markdown/ZIP et PDF. Les fonctions de capture existantes, les limites et les précautions de confidentialité restent décrites. Les résumés courts proviennent des messages appDesc inclus dans les quatre catalogues de langue du paquet.
 
-## Captures existantes — interface réelle 1.5.0
+## Captures — interface réelle 1.5.2
 
-Les captures existantes montrent la véritable interface 1.5.0 ; elles ne constituent pas des captures de la version 1.5.2. Leurs noms et liens sont conservés. Les visuels doivent montrer la véritable interface, avec des contenus de démonstration locaux sans données personnelles. Le générateur reproductible est [generate-real-store-assets.mjs](scripts/generate-real-store-assets.mjs). Exécuter `node scripts/generate-real-store-assets.mjs` produit les captures PNG versionnées dans store-assets, au format 1280 × 800 pixels. La composition, la bibliothèque, les réglages d’export, la sélection et la popup présentent les fonctions à vérifier.
+Cinq captures réelles 1.5.2 ont été générées et revues visuellement, en français, au format 1280 × 800 pixels : [composition](store-assets/screenshot-real-1-composition-v1.5.2.png), [bibliothèque](store-assets/screenshot-real-2-bibliotheque-v1.5.2.png), [export](store-assets/screenshot-real-3-export-v1.5.2.png), [sélection](store-assets/screenshot-real-4-selection-v1.5.2.png), [popup](store-assets/screenshot-real-5-popup-v1.5.2.png). Les autres langues peuvent utiliser ces visuels communs ; seules les descriptions sont localisées. Les contenus sont fictifs et locaux. La sélection présente l’interface de production avec transfert simulé, avant acquisition ; aucun pixel de capture simulée n’est montré. La popup est ouverte dans un onglet à sa largeur native.
+
+Le [générateur reproductible](scripts/generate-real-store-assets.mjs) conserve l’interface sans retouche ; les dimensions, empreintes et contrôles sont dans [le manifeste des visuels](store-assets/screenshots-real-v1.5.2.json). Les anciens visuels 1.5.0 sont conservés comme historique. Les [consignes Google sur les images](https://developer.chrome.com/docs/webstore/images?hl=en) permettent cinq captures et recommandent 1280 × 800 pixels.
 
 ## Version 1.5.2 — corrections et fiabilisation
+
+- Sélections : pointeur actif, rejet des pointeurs secondaires et gestion des interruptions.
+- Capture : restauration des éléments masqués après exception de préparation.
+- Bibliothèque : suppression globale atomique et refus des listes périmées.
 
 - Glissers dans l’éditeur : suivi du `pointerId` actif et gestion des interruptions du geste.
 - Miniatures internes de l’éditeur et aperçu de composition : reconstruction à la réouverture du projet pour inclure les annotations.
@@ -59,13 +69,11 @@ Aucun identifiant ni compte applicatif n’est nécessaire.
 3. Depuis la popup, ouvrir une nouvelle composition. Importer deux images locales, les réordonner, choisir une disposition, ajouter titres et légendes, puis essayer PNG, JPEG, WebP, HTML et Markdown/ZIP.
 4. Enregistrer un projet .scionos, fermer l’éditeur et rouvrir le fichier. Les annotations prises en charge restent éditables ; les masques et rognages enregistrés sont définitifs. Les projets v1 restent lisibles avec annotations aplaties.
 5. Enregistrer explicitement dans la bibliothèque, rechercher, renommer, dupliquer, rouvrir et supprimer le projet. Vérifier les durées 0, 7, 30 ou 90 jours et le quota configurable de 64 à 1 024 Mio (256 Mio par défaut). 0 jour signifie sans expiration automatique.
-6. Pour la version 1.5.2, vérifier les interruptions de glisser, les miniatures reconstruites, l’état non enregistré après export portable, les politiques de sources HTML et les budgets PDF (32 millions de pixels, 128 Mio de blobs, 200 pages). Ces régressions sont couvertes par la [validation locale réussie](DEPENDENCY_REVIEW_1.5.2.md) ; ce parcours peut être repris par les examinateurs de la boutique.
+6. Pour la version 1.5.2, vérifier les interruptions de glisser, les miniatures reconstruites, l’état non enregistré après export portable, les politiques de sources HTML et les budgets PDF (32 millions de pixels, 128 Mio de blobs, 200 pages). Ces régressions sont couvertes par la [validation de la candidate](STORE_READINESS_1.5.2.md) ; ce parcours peut être repris par les examinateurs de la boutique.
 7. Vérifier français, anglais, espagnol et allemand depuis le menu de langue. Les images importées ne fournissent pas une couche texte fiable pour la recherche dans le PDF.
 
 ## Préparation et publication
 
-Archive locale validée : `scionos-capture-v1.5.2.zip`, 35 fichiers. SHA-256 : `d20d607afc0bdb4e8d942a04b770803ffa0215d311b657436c5388c023dd5d98`.
+136 tests unitaires et 136 tests navigateur ont réussi. Les cinq modes natifs Chrome/Edge, trois répétitions de performance et dix scénarios PDF ont été exécutés. Le [bilan de préparation](STORE_READINESS_1.5.2.md) décrit les preuves, les limites, le ZIP final et son empreinte.
 
-Validation 1.5.2 : `npm run verify:release` a réussi — 133 tests unitaires, 126 tests navigateur, cinq modes chacun dans Chrome 157.0.8103.79 et Edge 157.0.4341.60, trois répétitions de performance et dix scénarios PDF. Résultats et environnement : [revue des dépendances et validation](DEPENDENCY_REVIEW_1.5.2.md).
-
-La version [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2) est publiée sur GitHub. La version distribuée et le statut effectif du Store restent à confirmer dans le tableau de bord ; aucune soumission de la 1.5.2 n’est effectuée ici.
+La candidate reste locale : aucun téléversement ou envoi à Google, aucun push Git ou remplacement de release GitHub.

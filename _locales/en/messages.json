@@ -444,7 +444,7 @@
     "message": "Editing & Export Formats"
   },
   "helpEditorText": {
-    "message": "Annotate with arrows, text, step badges, or shapes. Conceal sensitive data using solid masking (blur is strictly visual). Export as high-fidelity PNG, searchable PDF with clickable links, or standalone interactive HTML."
+    "message": "Annotate with arrows, text, step badges or shapes. Conceal sensitive data using solid masks (blur is visual only). Export as PNG, PDF or standalone HTML. Source page text is omitted from the PDF. Added titles and captions may remain searchable; Image-only PDF disables all text layers and their associated links."
   },
   "helpShortcutsHeader": {
     "message": "Keyboard Shortcuts"
@@ -492,7 +492,22 @@
     "message": "Close help"
   },
   "textLayerLimitedNotice": {
-    "message": "The searchable PDF layer is limited to text whose visibility can be verified. The captured image is preserved."
+    "message": "Source page text is omitted from the PDF because its correspondence with the captured pixels cannot be established. The image is preserved. Added titles and captions may remain searchable, except in Image-only PDF mode."
+  },
+  "captureDurationLimitError": {
+    "message": "Capture exceeded the 180-second limit. Select a smaller area and try again."
+  },
+  "capturePortionLimitError": {
+    "message": "Capture requires more than 256 portions. Select a smaller area and try again."
+  },
+  "captureCancelledError": {
+    "message": "Capture cancelled."
+  },
+  "pdfResourceLimitError": {
+    "message": "The PDF exceeds resource limits. Reduce the composition, images or text and try again."
+  },
+  "projectResourceLimitError": {
+    "message": "The project exceeds resource limits: a 1 MiB JSON manifest or a 128 MiB ZIP archive. Reduce text, strokes or images and try again."
   },
   "exportPendingDraft": {
     "message": "Apply or cancel the pending edit before exporting."

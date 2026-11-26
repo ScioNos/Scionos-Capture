@@ -66,6 +66,31 @@
           }
           return colors.get(color);
         };
+        const colorBytes = color => {
+          colorContext.clearRect(0, 0, 1, 1); colorContext.fillStyle = color;
+          colorContext.fillRect(0, 0, 1, 1);
+          return Array.from(colorContext.getImageData(0, 0, 1, 1).data);
+        };
+        const backgroundCache = new WeakMap();
+        const distinctFromBackground = (element, foreground) => {
+          if (!backgroundCache.has(element)) {
+            let background = colorBytes('Canvas');
+            for (let ancestor = element; ancestor; ancestor = ancestor.parentElement) {
+              const style = styleFor(ancestor);
+              if (!style.backgroundColor) continue;
+              const color = colorBytes(style.backgroundColor);
+              // A translucent background is composited with every lower paint layer,
+              // not just the nearest opaque ancestor. Rounded/clipped boxes, root
+              // background propagation and color-space rounding make a 1px model
+              // insufficient proof. Omit this word rather than guess its contrast.
+              if (color[3] > 0 && color[3] < 255) { background = null; break; }
+              if (color[3] === 255) { background = color; break; }
+            }
+            backgroundCache.set(element, background);
+          }
+          const front = colorBytes(foreground), back = backgroundCache.get(element);
+          return Boolean(back) && front.slice(0, 3).some((value, index) => Math.abs(value - back[index]) > 1);
+        };
         const root = surface.isDocument ? (document.body || document.documentElement) : surface.element;
         const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
         try {
@@ -85,6 +110,7 @@
               const rect = range.getBoundingClientRect();
               if (!rect.width || !rect.height || !overlaps(rect, clip)) continue;
               let reliable = opaqueColor(computed.color) && opaqueColor(computed.webkitTextFillColor || computed.color)
+                && distinctFromBackground(parent, computed.webkitTextFillColor || computed.color)
                 && computed.textTransform === 'none' && rects.length === 1 && rect.left >= clip.left && rect.right <= clip.right
                 && rect.top >= clip.top && rect.bottom <= clip.bottom
                 && rect.left >= viewport.left && rect.right <= Math.min(window.innerWidth, viewport.left + viewport.width)
@@ -98,6 +124,9 @@
                   if (!ancestorReliability.has(ancestor)) {
                     const style = styleFor(ancestor);
                     let safe = parseFloat(style.opacity || '1') === 1 && style.filter === 'none'
+                      && (!style.backgroundImage || style.backgroundImage === 'none')
+                      && (!style.mixBlendMode || style.mixBlendMode === 'normal')
+                      && (!style.backgroundBlendMode || style.backgroundBlendMode.split(',').every(mode => mode.trim() === 'normal'))
                       && style.clipPath === 'none' && style.clip === 'auto'
                       && (!style.maskImage || style.maskImage === 'none')
                       && (!style.webkitMaskImage || style.webkitMaskImage === 'none')
@@ -540,6 +569,64 @@
       return current;
     }
 
+    // Observe through screenshot decoding and text extraction. Changes that leave
+    // the final DOM identical still invalidate its association with earlier pixels.
+    function createAcquisitionGuard(surface) {
+      const position = surface.getPosition(), geometry = surface.getCaptureRect();
+      const metrics = surface.getMetrics();
+      let dirty = typeof globalThis.MutationObserver !== 'function';
+      const extensionNode = node => Boolean((node?.nodeType === 3 ? node.parentElement : node)?.closest?.('[data-scionos-capture]'));
+      const consume = records => {
+        if (records.some(record => !extensionNode(record.target)
+          && !(record.type === 'childList' && [...record.addedNodes, ...record.removedNodes].length
+            && [...record.addedNodes, ...record.removedNodes].every(extensionNode)))) dirty = true;
+      };
+      const cssFingerprint = () => {
+        try {
+          let bytes = 0, rules = 0;
+          const deadline = Date.now() + 25;
+          const sheets = [...(document.styleSheets || []), ...(document.adoptedStyleSheets || [])];
+          const value = sheets.map(sheet => {
+            const contents = Array.from(sheet.cssRules, rule => {
+              if (Date.now() > deadline || ++rules > 10000 || (bytes += rule.cssText.length) > 1024 * 1024) throw new Error('CSS budget');
+              return rule.cssText;
+            });
+            return [sheet.disabled, sheet.media?.mediaText, contents];
+          });
+          return JSON.stringify(value);
+        } catch { dirty = true; return null; }
+      };
+      const initialCss = cssFingerprint();
+      // captureVisibleTab is asynchronous and has no atomic DOM/render token.
+      // CSSOM/adoptedStyleSheets can change and revert in the page's MAIN world
+      // without an observable mutation in this isolated world. Even equal start
+      // and end states cannot attest what was painted in between. Until independent
+      // pixel/text evidence exists, native captures must omit all DOM-derived text.
+      const pixelTextAssociationVerified = false;
+      const observer = typeof globalThis.MutationObserver === 'function' ? new globalThis.MutationObserver(consume) : null;
+      observer?.observe(document.documentElement, { subtree: true, childList: true, attributes: true, characterData: true });
+      // CSS animations and media can repaint without a DOM mutation.
+      if (document.getAnimations?.().some(animation => animation.playState === 'running')
+        || document.querySelector?.('video, canvas, iframe, object, embed')) dirty = true;
+      return {
+        assertGeometry() {
+          const currentPosition = surface.getPosition(), currentGeometry = surface.getCaptureRect();
+          const currentMetrics = surface.getMetrics();
+          if (['x', 'y'].some(key => Math.abs(currentPosition[key] - position[key]) > 0.5)
+            || ['left', 'top', 'width', 'height'].some(key => Math.abs(currentGeometry[key] - geometry[key]) > 0.5)
+            || ['viewportWidth', 'viewportHeight', 'fullWidth'].some(key => Math.abs(currentMetrics[key] - metrics[key]) > 0.5)) {
+            throw layoutChangedError();
+          }
+        },
+        textIsStable() {
+          if (observer) consume(observer.takeRecords());
+          if (cssFingerprint() !== initialCss) dirty = true;
+          return !dirty && pixelTextAssociationVerified;
+        },
+        close() { observer?.disconnect(); }
+      };
+    }
+
     function surfacePointToClient(surface, point) {
       const rect = surface.getCaptureRect(), position = surface.getPosition();
       return { x: rect.left + (point.x - position.x) * (rect.scaleX || 1),
@@ -593,7 +680,7 @@
       findScrollSurface, findScrollSurfaceAtPoint, getSurfaceMaxScroll,
       assertSurfacePosition, settleVisibleResources, stabilizePageDimensions,
       suspendPageMotion, createAnchoredElementManager, layoutChangedError,
-      assertStableMetrics, getSurfaceCaptureCrop
+      assertStableMetrics, getSurfaceCaptureCrop, createAcquisitionGuard
     });
   }
 

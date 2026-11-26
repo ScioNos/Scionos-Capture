@@ -1,0 +1,705 @@
+[
+  {
+    "name": "canvas",
+    "url": "https://api.github.com/repos/Brooooooklyn/canvas/compare/v1.1.1...v1.2.1",
+    "status": 200,
+    "compare": "https://github.com/Brooooooklyn/canvas/compare/v1.1.1...v1.2.1",
+    "totalCommits": 14,
+    "commits": [
+      {
+        "sha": "29fa8462986db43ed1b35c97fdc3d7631576abdf",
+        "message": "chore(deps): update rust to v1.100.0 (#1457)\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>"
+      },
+      {
+        "sha": "8590948d35327878f81707d18965bcbf883f8d9c",
+        "message": "fix(deps): update and group libavif crates (#1461)"
+      },
+      {
+        "sha": "e38d73f22ac60028a9f88bd2910b6b7f79443d23",
+        "message": "feat(fonts): `@font-face` descriptors in GlobalFonts.register (#1464)\n\nCo-authored-by: LongYinan <lynweklm@gmail.com>\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>"
+      },
+      {
+        "sha": "e7dd9f1199ff388569846d126bc7b9eb1c588feb",
+        "message": "feat(fonts): @font-face descriptor follow-ups of #1464 (#1465)\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>"
+      },
+      {
+        "sha": "25449f536054521412b0a724c5e3762c44c421d2",
+        "message": "feat(encode): PNG compressionLevel and filters (#1463)\n\nCo-authored-by: LongYinan <lynweklm@gmail.com>"
+      },
+      {
+        "sha": "0e6a445275a3ca93f748fb3006451df981e0c385",
+        "message": "feat(canvas): add ctx.antialias property (#1466)"
+      },
+      {
+        "sha": "2dde24ad561e76be573baf5d4c4fb88caeae4767",
+        "message": "feat(fonts): support @font-face stretch descriptor and fix static font-stretch matching (#1467)"
+      },
+      {
+        "sha": "3093c348b73e98bc6235394e761d571443573521",
+        "message": "feat(text): use DirectWrite and Fontations on Windows in system text renderer (#1468)"
+      },
+      {
+        "sha": "7d290bd3034f7db7367e774f4589d69882d739eb",
+        "message": "1.2.0"
+      },
+      {
+        "sha": "b3698ce3fbb63dceda9adde50a5f5222fa98a097",
+        "message": "feat: chrome/m158 (#1469)"
+      },
+      {
+        "sha": "841992ae52f21ed4d5fdeff94ea8ab7c0878564d",
+        "message": "fix(fonts): align fontVariationSettings with Chrome CSS and fix VF edge cases (#1470)"
+      },
+      {
+        "sha": "9c622bb18c7eee7461432e38ac83dc2261b8bc83",
+        "message": "chore(deps): update yarn to v4.19.0 (#1471)\n\nCo-authored-by: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>"
+      },
+      {
+        "sha": "1d6ea3993b159a5917c9989eaf40a069beabaf85",
+        "message": "fix(node-canvas): registerFont descriptors and private cleanup registrations (#1473)\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>"
+      },
+      {
+        "sha": "040880ce4d72e7353319657d816536878fd478f8",
+        "message": "1.2.1"
+      }
+    ],
+    "files": [
+      ".cargo/config.toml",
+      ".github/renovate.json",
+      ".github/workflows/skia.yaml",
+      ".yarn/releases/yarn-4.19.0.cjs",
+      ".yarnrc.yml",
+      "CHANGELOG.md",
+      "Cargo.lock",
+      "Cargo.toml",
+      "README-zh.md",
+      "README.md",
+      "__test__/alpha-false.spec.ts",
+      "__test__/antialias.spec.ts",
+      "__test__/blink-shaper-layout.spec.ts",
+      "__test__/draw.spec.ts",
+      "__test__/font-descriptors.spec.ts",
+      "__test__/font-fixtures.ts",
+      "__test__/font-stretch-static.spec.ts",
+      "__test__/fonts/FontStyleTest-LICENSE.txt",
+      "__test__/fonts/FontStyleTest-ital-VF.woff2",
+      "__test__/fonts/FontStyleTest-slnt_ital-VF.woff2",
+      "__test__/fonts/RMStatic-Bold.ttf",
+      "__test__/fonts/RMStatic-BoldItalic.ttf",
+      "__test__/fonts/RMStatic-Italic.ttf",
+      "__test__/fonts/RMStatic-LICENSE.txt",
+      "__test__/fonts/RMStatic-Regular.ttf",
+      "__test__/global-fonts.spec.ts",
+      "__test__/image-metadata.spec.ts",
+      "__test__/image-snapshot.ts",
+      "__test__/issue-1329-font-cache.spec.ts",
+      "__test__/node-canvas-compat.spec.ts",
+      "__test__/regression.spec.ts",
+      "__test__/small-caps-chrome.spec.ts",
+      "__test__/snapshots/win32/cursive-scripts-ignore-letter-spacing.png",
+      "__test__/snapshots/win32/cursive-scripts.png",
+      "__test__/snapshots/win32/direction-align-max-width.png",
+      "__test__/snapshots/win32/direction-align.png",
+      "__test__/snapshots/win32/direction-letter-spacing.png",
+      "__test__/snapshots/win32/direction-negative-letter-spacing.png",
+      "__test__/snapshots/win32/direction-save-restore.png",
+      "__test__/snapshots/win32/direction-stroke-letter-spacing.png",
+      "__test__/snapshots/win32/draw-non-string-text.png",
+      "__test__/snapshots/win32/draw-svg-with-text.png",
+      "__test__/snapshots/win32/draw-text-center-maxWidth.png",
+      "__test__/snapshots/win32/draw-text-maxWidth.png",
+      "__test__/snapshots/win32/draw-text-right-maxWidth.png",
+      "__test__/snapshots/win32/fillText-line-break-as-space.png",
+      "__test__/snapshots/win32/font-kerning.png",
+      "__test__/snapshots/win32/font-stretch.png",
+      "__test__/snapshots/win32/font-variant-caps-from-css-font-shorthand.png",
+      "__test__/snapshots/win32/font-variant-caps.png",
+      "__test__/snapshots/win32/font-variation-settings-with-font-family.png",
+      "__test__/snapshots/win32/font-variation-settings.png",
+      "__test__/snapshots/win32/letter-spacing.png",
+      "__test__/snapshots/win32/negative-letter-spacing.png",
+      "__test__/snapshots/win32/scale-svg-image.png",
+      "__test__/snapshots/win32/shadow-blur-with-translate.png",
+      "__test__/snapshots/win32/shadow-blur-zero-with-text.png",
+      "__test__/snapshots/win32/shadow-clipping-beyond-canvas-bounds.png",
+      "__test__/snapshots/win32/strokeText-line-break-as-space.png",
+      "__test__/snapshots/win32/text-align-center.png",
+      "__test__/snapshots/win32/text-align-end.png",
+      "__test__/snapshots/win32/text-align-left.png",
+      "__test__/snapshots/win32/text-align-right.png",
+      "__test__/snapshots/win32/text-align-start.png",
+      "__test__/snapshots/win32/text-baseline-all.png",
+      "__test__/snapshots/win32/text-baseline.png",
+      "__test__/snapshots/win32/text-rendering-comparison.png",
+      "__test__/snapshots/win32/word-spacing.png",
+      "__test__/svg-synthetic-style.spec.ts",
+      "__test__/svg-text-fallback.spec.ts",
+      "__test__/text-bbox-chrome.spec.ts",
+      "__test__/text-metrics-chrome.spec.ts",
+      "__test__/text-raster.spec.ts",
+      "__test__/text-renderer.spec.ts",
+      "__test__/text-whitespace-chrome.spec.ts",
+      "__test__/variable-fonts-chrome.spec.ts",
+      "__test__/variable-fonts.spec.ts",
+      "build.rs",
+      "cmake/msvc-static.cmake",
+      "crates/skia-fontations/Cargo.toml",
+      "index.d.ts",
+      "index.js",
+      "node-canvas.d.ts",
+      "node-canvas.js",
+      "npm/android-arm64/package.json",
+      "npm/darwin-arm64/package.json",
+      "npm/darwin-x64/package.json",
+      "npm/linux-arm-gnueabihf/package.json",
+      "npm/linux-arm64-gnu/package.json",
+      "npm/linux-arm64-musl/package.json",
+      "npm/linux-riscv64-gnu/package.json",
+      "npm/linux-x64-gnu/package.json",
+      "npm/linux-x64-musl/package.json",
+      "npm/win32-arm64-msvc/package.json",
+      "npm/win32-x64-msvc/package.json",
+      "package.json",
+      "rust-toolchain.toml",
+      "scripts/__test__/libskia-flags.spec.ts",
+      "skia",
+      "skia-c/font_families.cpp",
+      "skia-c/font_scalers.cpp",
+      "skia-c/font_selection.cpp",
+      "skia-c/font_selection.hpp",
+      "skia-c/shaper.cpp",
+      "skia-c/shaper.hpp",
+      "skia-c/shaper_fallback_installed.cpp",
+      "skia-c/shaper_font.cpp",
+      "skia-c/skia_c.cpp",
+      "skia-c/skia_c.hpp",
+      "skia-c/svg_image.cpp",
+      "skia-c/text.cpp",
+      "skia-c/text.hpp",
+      "skia-c/text_caches.hpp",
+      "skia-c/text_raster.cpp",
+      "skia-c/text_raster.hpp",
+      "skia-c/text_styles.cpp",
+      "src/ctx.rs",
+      "src/encoding.rs",
+      "src/font.rs",
+      "src/font_props.rs",
+      "src/global_fonts.rs",
+      "src/lib.rs",
+      "src/page_recorder.rs",
+      "src/sk.rs",
+      "src/state.rs",
+      "src/webidl.rs"
+    ]
+  },
+  {
+    "name": "b4a",
+    "url": "https://api.github.com/repos/holepunchto/b4a/compare/v1.8.1...v1.9.0",
+    "status": 200,
+    "compare": "https://github.com/holepunchto/b4a/compare/v1.8.1...v1.9.0",
+    "totalCommits": 4,
+    "commits": [
+      {
+        "sha": "d3810e4ae14861e77fc56fe0dd076113e4ee59e7",
+        "message": "Add Typescript typings (#20)"
+      },
+      {
+        "sha": "4969e0780bb7c171a9c1003669b4fe94a15eb215",
+        "message": "Audit the workflows on every change (#21)"
+      },
+      {
+        "sha": "b21970c34134e051fa2156c988a2757c908db791",
+        "message": "add toHex to save the world a lot of bytes written (#22)"
+      },
+      {
+        "sha": "ff7aea3d28f2be699fc079a9a00841e83eeaabf8",
+        "message": "1.9.0"
+      }
+    ],
+    "files": [
+      ".github/workflows/integrate.yml",
+      "browser.js",
+      "index.d.ts",
+      "index.js",
+      "package.json",
+      "runtime.d.ts",
+      "test/browser.mjs",
+      "test/node.mjs"
+    ]
+  },
+  {
+    "name": "bare-events",
+    "url": "https://api.github.com/repos/holepunchto/bare-events/compare/v2.9.1...v2.9.2",
+    "status": 200,
+    "compare": "https://github.com/holepunchto/bare-events/compare/v2.9.1...v2.9.2",
+    "totalCommits": 4,
+    "commits": [
+      {
+        "sha": "f052abfad11201877a5c42e9e5ed6f3307f62c1d",
+        "message": "2.9.1 (#16)"
+      },
+      {
+        "sha": "fc6c0fbe96c23816a6597610972d262d1d61601a",
+        "message": "Fix several issues and rework typings (#18)"
+      },
+      {
+        "sha": "936951cb2e9fd0255785632f44f41a40e57a540b",
+        "message": "Fix reentrancy and minor issues (#19)"
+      },
+      {
+        "sha": "d3bb6aba4fc1e0e1a395832a2967a11540d18efd",
+        "message": "2.9.2"
+      }
+    ],
+    "files": [
+      "index.d.ts",
+      "index.js",
+      "lib/errors.js",
+      "package.json",
+      "test.js",
+      "web.js"
+    ]
+  },
+  {
+    "name": "bare-fs",
+    "url": "https://api.github.com/repos/holepunchto/bare-fs/compare/v4.8.0...v4.8.7",
+    "status": 200,
+    "compare": "https://github.com/holepunchto/bare-fs/compare/v4.8.0...v4.8.7",
+    "totalCommits": 19,
+    "commits": [
+      {
+        "sha": "fe4a9911ef5eaafc806b3ddeef58f25c64b998dc",
+        "message": "4.8.0 (#46)"
+      },
+      {
+        "sha": "0d97eeb1aa8392c92db2abfc9ab801d4e15eded6",
+        "message": "docs: document the public API as TSDoc (generated from type declarations) (#44)\n\nCo-authored-by: Claude Opus 4.8 <noreply@anthropic.com>"
+      },
+      {
+        "sha": "d98333fd6f8f527e7b6cc7d1e5d44cb572b092b4",
+        "message": "fix createReadStream for unix character devices (#47)"
+      },
+      {
+        "sha": "b23018b55b4d731e3e8465e1bd9356896e31e86f",
+        "message": "4.8.1 (#48)"
+      },
+      {
+        "sha": "7152cadf2288dcf4b3b15cff1a51355e4d06368e",
+        "message": "Grant publish permissions to the publish job only (#49)"
+      },
+      {
+        "sha": "b052cd354b79945061dcc9e60285b6abbb05798f",
+        "message": "Audit the workflows on every change (#50)"
+      },
+      {
+        "sha": "97ffb1fffdc5b201e6cd41ebab53656a53fc00d2",
+        "message": "Fix some `fs.watch()` issues (#53)"
+      },
+      {
+        "sha": "23b525b39e8cee799e4b9d35ca6e9233066294ce",
+        "message": "4.8.2 (#54)"
+      },
+      {
+        "sha": "47e9298b0d95b1594ab66a97beaaf1f94db1cc7d",
+        "message": "Fix copying of symlinks (#55)"
+      },
+      {
+        "sha": "4fb14a5907eedc1bf4120ce0ec8675f530fbc7d4",
+        "message": "4.8.3 (#56)"
+      },
+      {
+        "sha": "5506e57390b079127b724c0b5903158d32dcbd46",
+        "message": "Ensure timestamps use 64-bit multiplication (#57)"
+      },
+      {
+        "sha": "84e6b9759e7ae680415896e7ce0aba07833090c4",
+        "message": "4.8.4 (#58)"
+      },
+      {
+        "sha": "709b378ffe3e9357e374c003627a824b9b2022bb",
+        "message": "chore: bump cmake-bare to 1.18.0 (#59)\n\nSigned-off-by: Tony Gorez <tonygo@reversesociety.co>"
+      },
+      {
+        "sha": "416e560e0bb05af17a52aba7ac5c3b5a28fd9b53",
+        "message": "ci: bump macOS runner to 15 (#60)\n\nSigned-off-by: Tony Gorez <tonygo@reversesociety.co>"
+      },
+      {
+        "sha": "9fc2b3025fb897bcd69060c4b3c65beaf33eb3b2",
+        "message": "4.8.5 (#61)"
+      },
+      {
+        "sha": "1a156e8f736f62350ae278e2dfb39ea096d2e583",
+        "message": "Reject `NULL` characters in paths (#62)"
+      },
+      {
+        "sha": "b5680c4d804a1d0c10df2faa53633b61748248e3",
+        "message": "4.8.6 (#63)"
+      },
+      {
+        "sha": "db8321cb7ab48863fe175594c28b505b9b7b72eb",
+        "message": "fix return value of mkdtemp/mkdtempSync (#64)\n\nCo-authored-by: rafapaezbas <rafael.paez@tether.io>\nCo-authored-by: Kasper Isager Dalsgarð <kasperisager@hey.com>"
+      },
+      {
+        "sha": "8a7261cfdae27ee449499735b6fc10f32a5b3e98",
+        "message": "4.8.7"
+      }
+    ],
+    "files": [
+      ".github/workflows/integrate.yml",
+      ".github/workflows/prebuild.yml",
+      ".github/workflows/publish.yml",
+      "README.md",
+      "binding.c",
+      "index.d.ts",
+      "index.js",
+      "lib/constants.d.ts",
+      "lib/errors.d.ts",
+      "package.json",
+      "promises.d.ts",
+      "test.js",
+      "test/threads/read-from-exit-listener.js",
+      "test/threads/watch-missing-path.js"
+    ]
+  },
+  {
+    "name": "bare-path",
+    "url": "https://api.github.com/repos/holepunchto/bare-path/compare/v3.1.1...v3.1.3",
+    "status": 200,
+    "compare": "https://github.com/holepunchto/bare-path/compare/v3.1.1...v3.1.3",
+    "totalCommits": 11,
+    "commits": [
+      {
+        "sha": "53dcc41e4ed95131b131a460e3a90a55bd6d9459",
+        "message": "3.1.1 (#8)"
+      },
+      {
+        "sha": "22a7cf8954476cd58207c93dca9c4afad051428b",
+        "message": "Expand test coverage (#10)"
+      },
+      {
+        "sha": "ce57295346cddd596dcfe850d0c2069efcb823be",
+        "message": "Grant publish permissions to the publish job only (#12)"
+      },
+      {
+        "sha": "29de81c5d60b76d93f88a2e2f6686ff945a3db82",
+        "message": "Audit the workflows on every change (#13)"
+      },
+      {
+        "sha": "c3587ef78cd9730a968e1d0c75466f5f1be57bfe",
+        "message": "Verify arguments in bindings (#14)"
+      },
+      {
+        "sha": "77116a33ba194052c3965486d2a7a62857d7a0ea",
+        "message": "3.1.2 (#15)"
+      },
+      {
+        "sha": "c0083af9600f6204fa77c3866628e38b5977456a",
+        "message": "docs: document the public API as TSDoc (generated from type declarations) (#11)\n\nCo-authored-by: Claude Opus 4.8 <noreply@anthropic.com>"
+      },
+      {
+        "sha": "944c37bf985c52b1a2df5f6fedfeac57b7e9e0e8",
+        "message": "Add threat model (#16)"
+      },
+      {
+        "sha": "78535fd9d84b6bf7bb1be0a0aa265cd547bac349",
+        "message": "Reduce size of stack buffers (#17)"
+      },
+      {
+        "sha": "c906eb3e71130119b10dc3ee8a15e467204caae8",
+        "message": "Use macOS 15"
+      },
+      {
+        "sha": "2281a902c48a5481ad4d83ce5540fa1d65248542",
+        "message": "3.1.3"
+      }
+    ],
+    "files": [
+      ".github/workflows/integrate.yml",
+      ".github/workflows/prebuild.yml",
+      ".github/workflows/publish.yml",
+      "README.md",
+      "binding.c",
+      "docs/threat-model.md",
+      "index.d.ts",
+      "package.json",
+      "test.js"
+    ]
+  },
+  {
+    "name": "bare-stream",
+    "url": "https://api.github.com/repos/holepunchto/bare-stream/compare/v2.13.3...v2.13.4",
+    "status": 200,
+    "compare": "https://github.com/holepunchto/bare-stream/compare/v2.13.3...v2.13.4",
+    "totalCommits": 3,
+    "commits": [
+      {
+        "sha": "33feeb313ef7fe46b89ebbf3f7c714bedf55b50e",
+        "message": "2.13.3 (#30)"
+      },
+      {
+        "sha": "d5d44829ca3e78b8ab9d589e20c3c80afa5bb4e3",
+        "message": "Move `highWaterMark` to `StreamOptions` (#32)"
+      },
+      {
+        "sha": "e00cde60234e0b28599a5eeedfe0401ebf237ded",
+        "message": "2.13.4"
+      }
+    ],
+    "files": [
+      "index.d.ts",
+      "package.json"
+    ]
+  },
+  {
+    "name": "bare-url",
+    "url": "https://api.github.com/repos/holepunchto/bare-url/compare/v2.5.2...v2.5.8",
+    "status": 200,
+    "compare": "https://github.com/holepunchto/bare-url/compare/v2.5.2...v2.5.8",
+    "totalCommits": 19,
+    "commits": [
+      {
+        "sha": "4d7e9570122eeb89fa547e3fa1f3804945614bc8",
+        "message": "2.5.2 (#35)"
+      },
+      {
+        "sha": "9f9681143ff398aa504aa1f6190b4b07f4b5a688",
+        "message": "Grant publish permissions to the publish job only (#36)"
+      },
+      {
+        "sha": "d56f529f6accb5c439b2f811c09bd966454c8f5c",
+        "message": "Audit the workflows on every change (#37)"
+      },
+      {
+        "sha": "5f7367b9dce7e10ce6482fd910f096112c2839a8",
+        "message": "Match lone surrogates without a lookbehind (#38)"
+      },
+      {
+        "sha": "76d462516d51c285e5631ab245f12ecc6e16dc9e",
+        "message": "Harden bindings and prevent setters leaking into other components (#39)"
+      },
+      {
+        "sha": "d18eacb49bba2be506016abf150a4fefe76a0229",
+        "message": "docs: document the public API as TSDoc (generated from type declarations) (#20)\n\nCo-authored-by: Claude Opus 4.8 <noreply@anthropic.com>"
+      },
+      {
+        "sha": "31589d5e37b14cdf4cd8dbe5210a67d8005f2873",
+        "message": "2.5.3 (#40)"
+      },
+      {
+        "sha": "1af075d831ec2550ea52d3da508663c3d816334b",
+        "message": "Release string view on allocation error (#41)"
+      },
+      {
+        "sha": "011459693e974b610510bec1fc30cc336c2fa09c",
+        "message": "2.5.4 (#42)"
+      },
+      {
+        "sha": "20eeff6b08d1e49705873287dc138fe954fbbed5",
+        "message": "Add threat model (#43)"
+      },
+      {
+        "sha": "1a8e1d9fb14d222232d8e196a48bd2797ef36f68",
+        "message": "Handle Windows extended-length paths in pathToFileURL (#44)\n\nSigned-off-by: Darshan Sen <raisinten@gmail.com>\nCo-authored-by: Kasper Isager Dalsgarð <kasperisager@hey.com>"
+      },
+      {
+        "sha": "99b884f1891aa255da8b36f9be9822a13bff2f7d",
+        "message": "2.5.5 (#45)"
+      },
+      {
+        "sha": "a6f9ae4ced6879d3ccea821abe819045797fc175",
+        "message": "Fix query string escapes (#47)"
+      },
+      {
+        "sha": "0bdc074a8c063dab391fdf052188a5483682cdc9",
+        "message": "2.5.6 (#48)"
+      },
+      {
+        "sha": "6cd19a6d4dca5b40e99f0e07447d12ea61fea905",
+        "message": "Update dependencies"
+      },
+      {
+        "sha": "71d3b4142c3cc12224b540df8121815af89d8c5d",
+        "message": "Use macOS 15"
+      },
+      {
+        "sha": "d9c5b4e7ce443e4212637363b0eae8bb7c231a18",
+        "message": "2.5.7 (#49)"
+      },
+      {
+        "sha": "427b8d11da0e3b48c5c51582680a55aeb7dafa10",
+        "message": "Update dependencies"
+      },
+      {
+        "sha": "754946ff780e921c64b8f163e8ccc9dabc75f67a",
+        "message": "2.5.8"
+      }
+    ],
+    "files": [
+      ".github/workflows/integrate.yml",
+      ".github/workflows/prebuild.yml",
+      ".github/workflows/publish.yml",
+      "CMakeLists.txt",
+      "README.md",
+      "binding.c",
+      "docs/threat-model.md",
+      "global.d.ts",
+      "index.d.ts",
+      "index.js",
+      "lib/errors.js",
+      "lib/url-search-params.d.ts",
+      "lib/url-search-params.js",
+      "package.json",
+      "test.js",
+      "test/file-url.js",
+      "test/search-params.js",
+      "test/setters-injection.js"
+    ]
+  },
+  {
+    "name": "brace-expansion",
+    "url": "https://api.github.com/repos/juliangruber/brace-expansion/compare/v5.0.13...v5.1.0",
+    "status": 200,
+    "compare": "https://github.com/juliangruber/brace-expansion/compare/v5.0.13...v5.1.0",
+    "totalCommits": 3,
+    "commits": [
+      {
+        "sha": "ed36f7274524b75b44b7fb0dfa4ef1d9c657fe93",
+        "message": "test: keep failed sequences and their nested groups literal (#169)\n\nBash keeps a group literal, along with every group nested in it, when its\nbody has a top-level `..` but is not a valid sequence. A `}` only closes a\ngroup once a top-level `,` or `..` has come before it, so a `{` with no\ncomma can run past its matching `}` to a later one and become such a\nfailed sequence. main already follows both rules, but no test pinned\nthem, so #166 could change them without a test failing."
+      },
+      {
+        "sha": "91a3df13298df63322f1d5c98c631fc289a091b2",
+        "message": "Expose expand as a default export (#171)\n\n* feat: expose expand as a default export\n\n* test: cover default export behavior"
+      },
+      {
+        "sha": "ab59541e3a5fa25501b3025454b07136b21e86e4",
+        "message": "5.1.0"
+      }
+    ],
+    "files": [
+      "README.md",
+      "package-lock.json",
+      "package.json",
+      "src/index.ts",
+      "test/index.js"
+    ]
+  },
+  {
+    "name": "streamx",
+    "url": "https://api.github.com/repos/mafintosh/streamx/compare/v2.28.0...v2.28.1",
+    "status": 200,
+    "compare": "https://github.com/mafintosh/streamx/compare/v2.28.0...v2.28.1",
+    "totalCommits": 2,
+    "commits": [
+      {
+        "sha": "263b686569279b82acd47f4d08c8c0b3ae007a63",
+        "message": "types: allow piping to Node.js core streams (#125)\n\nwrite() already returns boolean. pipe() already ducks Node dests.\nEventEmitter signatures now match Node's events so Node Readable.pipe(writable) typechecks.\n\nsetMaxListeners returns this (Node events). On Bare the method is a no-op."
+      },
+      {
+        "sha": "767c8140a532e10d530750bb4d0b200903e24b71",
+        "message": "2.28.1"
+      }
+    ],
+    "files": [
+      "index.d.ts",
+      "package.json",
+      "runtime.d.ts"
+    ]
+  },
+  {
+    "name": "tar-stream",
+    "url": "https://api.github.com/repos/mafintosh/tar-stream/compare/v3.2.0...v3.3.0",
+    "status": 200,
+    "compare": "https://github.com/mafintosh/tar-stream/compare/v3.2.0...v3.3.0",
+    "totalCommits": 10,
+    "commits": [
+      {
+        "sha": "5aa24f7a694faa91d3902b0a757122e3fce32df4",
+        "message": "Add TypeScript typings (#179)\n\n* Add TypeScript typings\n\nCo-authored-by: alvis <alvis@hilbert.space>\n\n* Use `Uint8Array` instead of `Buffer`\n\n---------\n\nCo-authored-by: alvis <alvis@hilbert.space>"
+      },
+      {
+        "sha": "246572f479d92b0748b21c873e58c64a84a0b826",
+        "message": "3.2.1"
+      },
+      {
+        "sha": "5992b928c67c0be4a5284cdbc0764b55797a173b",
+        "message": "bump deps"
+      },
+      {
+        "sha": "d49f05b495b432d57042d461bd91036b58439c6a",
+        "message": "3.2.2"
+      },
+      {
+        "sha": "edb9e1ee1a1c80c7b6baebd983952d76848c6803",
+        "message": "fix unhandled entry stream errors and stack overflow on sync entry callbacks (#194)"
+      },
+      {
+        "sha": "1e6d6ed5a44d452ab1411a7f2641725a8edbcebe",
+        "message": "Wait for streamed symlink targets before finishing entries (#193)"
+      },
+      {
+        "sha": "f45a08285c1f1a67304b2fb6a857137413efa176",
+        "message": "Decode negative base-256 fields as twos complement (#190)"
+      },
+      {
+        "sha": "04017b5d46661202aeefa73c2bb91ea0f93e117b",
+        "message": "reject pax paths containing null bytes (#195)"
+      },
+      {
+        "sha": "cf39329a49512d5ff69296ccff5e07bd64a79053",
+        "message": "encode mtimes outside the 32-bit range correctly (#196)"
+      },
+      {
+        "sha": "9ac0eb519365346a94dbbe9fc275b0c19d4a89e5",
+        "message": "3.3.0"
+      }
+    ],
+    "files": [
+      "extract.js",
+      "headers.js",
+      "index.d.ts",
+      "pack.js",
+      "package.json",
+      "test/base-256.js",
+      "test/extract.js",
+      "test/fixtures/negative-base-256.tar",
+      "test/pack.js"
+    ]
+  },
+  {
+    "name": "semver",
+    "url": "https://api.github.com/repos/npm/node-semver/compare/v7.8.5...v7.8.6",
+    "status": 200,
+    "compare": "https://github.com/npm/node-semver/compare/v7.8.5...v7.8.6",
+    "totalCommits": 3,
+    "commits": [
+      {
+        "sha": "7257c14239476205b4b0bf7e47b07b3e7a517be6",
+        "message": "chore: cover comparator normalization (#917)\n\n## Summary\n- Add regression fixtures and integration coverage for comparator\nwhitespace, equality boundaries, and malformed loose alternatives.\n- Cover long prerelease identifiers, build-metadata normalization, and\nexisting version limits across strict/loose and prerelease options.\n- Tests only; no production behavior changes.\n\n## Stack\nFirst of two stacked PRs; followed by #918. Contains only commit\n1eda6b48b211d87b9f5857a6e53361abe7622ef8. Merge this PR before the\nperformance implementation.\n\n## Validation\nFull `npm test` (including coverage, ESLint, and template checks) passes\non the combined stack.\n\nCo-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>\nCopilot-Session: 03b4a44c-26a3-4d56-9b26-cd46006844c6"
+      },
+      {
+        "sha": "69b305d8a243c1ae9e0982dbe67217ab2bb9474b",
+        "message": "fix: improve range parsing performance (#918)\n\n## Summary\n- Replace comparator whitespace normalization with a regex-free scanner\nthat preserves legacy match boundaries.\n- Cache numeric lookahead to avoid repeatedly scanning overlapping digit\nruns.\n- Share the ECMAScript whitespace definition between production and\ntests, using a byte lookup table rather than a Set.\n- Add legacy compatibility checks and large-prefix/numeric-input\nregression coverage.\n\n## Stack\nOriginally stacked on #917, which was squash-merged into `main` as\n7257c14239476205b4b0bf7e47b07b3e7a517be6. Rebased onto `main` after that\nmerge so this PR contains only the comparator normalization\nimplementation and its tests. The implementation patch is unchanged.\n\n## Validation\n- Full `npm test` passed: 54 test files, 100% coverage, ESLint, and\ntemplate checks.\n- Differential review: 302,520 scanner cases and 100,000 Range cases\nmatched the parent implementation.\n- Whitespace lookup: 196,608 differential cases matched the original\nscanner across all UTF-16 code units.\n- Large invalid-prefix parsing improved dramatically; numeric-lookahead\naccess counts scaled linearly through one million characters.\n\n## Performance tradeoff\nLocal Node v26 benchmarks showed approximately 6–7% slower ordinary\nuncached Range parsing versus the original regex. The shared byte-table\nlookup did not introduce the additional slowdown observed with Set-based\nmembership checks. Measurements are local microbenchmarks, not\ncross-runtime guarantees.\n\nCo-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>\nCopilot-Session: 03b4a44c-26a3-4d56-9b26-cd46006844c6"
+      },
+      {
+        "sha": "b37b033b585ad5e575afeccadb426ea41bc6cea4",
+        "message": "chore: release 7.8.6 (#940)\n\n:robot: I have created a release *beep* *boop*\n---\n\n\n## [7.8.6](https://github.com/npm/node-semver/compare/v7.8.5...v7.8.6)\n(2026-11-02)\n### Bug Fixes\n*\n[`69b305d`](https://github.com/npm/node-semver/commit/69b305d8a243c1ae9e0982dbe67217ab2bb9474b)\n[#918](https://github.com/npm/node-semver/pull/918) improve range\nparsing performance (#918) (@reggi, @Copilot)\n### Chores\n*\n[`7257c14`](https://github.com/npm/node-semver/commit/7257c14239476205b4b0bf7e47b07b3e7a517be6)\n[#917](https://github.com/npm/node-semver/pull/917) cover comparator\nnormalization (#917) (@reggi, @Copilot)\n\n---\nThis PR was generated with [Release\nPlease](https://github.com/googleapis/release-please). See\n[documentation](https://github.com/googleapis/release-please#release-please).\n\nCo-authored-by: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+      }
+    ],
+    "files": [
+      ".release-please-manifest.json",
+      "CHANGELOG.md",
+      "classes/range.js",
+      "internal/constants.js",
+      "internal/trim-comparator-whitespace.js",
+      "package.json",
+      "test/classes/range.js",
+      "test/fixtures/range-parse.js",
+      "test/integration/comparator-normalization.js",
+      "test/integration/long-identifiers.js",
+      "test/integration/whitespace.js",
+      "test/internal/constants.js",
+      "test/internal/re.js",
+      "test/internal/trim-comparator-whitespace.js"
+    ]
+  }
+]

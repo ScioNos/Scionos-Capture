@@ -11,7 +11,7 @@ import { setInterval, clearInterval } from 'node:timers';
 import { chromium } from '@playwright/test';
 
 const checkout = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const options = { root: checkout, output: path.join(checkout, 'dist/verify-1.5.2/pdf-performance.json') };
+const options = { root: checkout, output: path.join(checkout, 'dist/consolidation-1.5.3/pdf-performance.json') };
 for (let index = 2; index < process.argv.length; index += 2) {
   const key = process.argv[index], value = process.argv[index + 1];
   assert(value && ['--root', '--output'].includes(key), 'Use --root ABS and --output dist/report.json.');

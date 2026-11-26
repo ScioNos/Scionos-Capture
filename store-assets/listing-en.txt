@@ -1,26 +1,27 @@
-Draft listing for candidate 1.5.2 — in preparation, unpublished. Version 1.5.1 is published on GitHub; current Chrome Web Store status is unconfirmed.
+Scionos Capture 1.5.3
 
-Scionos Capture lets you capture a web page, annotate it and prepare a document on your device. No account is required and screenshots are not sent to a server.
+Local 1.5.3 preparation, unpublished. No change to the remote Store listing or public 1.5.2 links.
 
-Capture a page
-Choose the visible area, a selection, a scrolling region, the whole page or an element. Adjust the bounds before confirming. A cancellable delay lets you prepare a menu or a temporary page state.
+Capture web pages, annotate images and prepare documents locally with Scionos Capture. No account is required. Screenshots are processed on your device without sending them to a processing server.
 
-Compose and annotate
-Combine and reorder multiple imported or pasted images, with titles and captions. Candidate 1.5.2 prepares fixes for interrupted drags, internal editor thumbnails and preview, and exports. Exporting a portable project preserves the unsaved-changes indicator; a “download requested” message does not guarantee that the file was written. The editor provides drawing, text, arrows, highlighting, shapes, cropping and masking. Supported annotations remain editable in saved projects.
+FIVE CAPTURE MODES
+Choose the visible area, a selection, a scrolling region, the whole page or an element. Adjust the bounds before confirming a selection. A cancellable delay lets you prepare a menu or a temporary page state. Browser internal pages and extension stores are protected and cannot be captured.
 
-Keep your work
-Save a portable project to resume later, or store it in the local library. Search, rename, duplicate and delete projects there. The storage quota and retention period are adjustable, including a no-expiration option.
+COMPOSE AND ANNOTATE
+Import or paste multiple images, reorder them and arrange them vertically or horizontally. Add titles, captions, text, arrows, shapes, drawings and highlights. Crop images and use solid masks to protect confidential information.
 
-Share a result
-Save an image or document, copy the result or use printing. Presentation settings provide margins, orientation and pagination. Review content and metadata before sharing.
+RESUME YOUR WORK
+Save a portable .scionos project to reopen later. Supported annotations remain editable; masks and crops become permanent when saved. The local library lets you search, rename, duplicate and delete projects. Its quota and retention period are adjustable, including a no-expiration option.
 
-Privacy and limitations
-Choose a source policy in Document settings: sanitized (default) removes URL queries and fragments; none removes sources and links; full keeps URLs without embedded credentials. This applies to saved projects and exports; library exports always use sanitized. Sources removed on save cannot be recovered. Paths, images, titles and captions may still be sensitive. Use solid masks to protect pixels; blur is only visual. Masks and crops become permanent when saved. Image files above 16 million pixels or 16,384 pixels per side are rejected before decoding; a document remains limited to 32 million pixels total.
+EXPORT AND SHARE
+Export PNG, JPEG, WebP, HTML or Markdown/ZIP. Use your browser’s print function to save a PDF, with margin, orientation and pagination settings. Visible text collected during capture can make PDFs searchable; imported images do not provide OCR text recognition.
 
-For candidate 1.5.2, print/PDF is limited to 32 million cumulative pixels, 128 MiB of cumulative blobs and 200 pages.
+PRIVACY AND LIMITATIONS
+Choose a source policy: sanitized removes URL queries and fragments; none removes sources and links; full keeps URLs without embedded credentials. Library exports use sanitized. URL paths, images, titles and captions may still contain sensitive information: review the result before sharing. Blur is a visual effect and does not replace a solid mask.
 
-The interface and help are available in French, English, Spanish and German. Users manage the retention and deletion of separately saved files.
+Imports are limited to 30 images, 16 million pixels per image and 32 million pixels in total. Print/PDF is limited to 32 million rendered pixels, 128 MiB of page images and 200 pages; a budget may be reached before the maximum page count. You control separately exported files.
 
+Interface and help in French, English, Spanish and German.
 Developed by eyelo SA, Switzerland, under the ScioNos brand.
 Support: https://github.com/ScioNos/Scionos-Capture/issues
 Privacy: https://github.com/ScioNos/Scionos-Capture/blob/main/PRIVACY.md

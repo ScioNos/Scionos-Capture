@@ -444,7 +444,7 @@
     "message": "Bearbeitung & Exportformate"
   },
   "helpEditorText": {
-    "message": "Versehen Sie Ihre Aufnahmen mit Pfeilen, Text, Schrittmarken oder Formen. Zensieren Sie vertrauliche Daten mit solider Maskierung (Weichzeichner ist rein visuell). Exportieren Sie als PNG, durchsuchbares PDF mit Links oder interaktiven HTML-Bericht."
+    "message": "Ergänzen Sie Pfeile, Texte, Schrittmarken oder Formen. Verdecken Sie vertrauliche Daten mit deckenden Masken (Unschärfe ist nur visuell). Exportieren Sie als PNG, PDF oder eigenständigen HTML-Bericht. Der Text der Quellseite wird im PDF weggelassen. Hinzugefügte Titel und Bildunterschriften können durchsuchbar bleiben; PDF nur als Bild deaktiviert alle Textebenen und die zugehörigen Links."
   },
   "helpShortcutsHeader": {
     "message": "Tastenkombinationen"
@@ -492,7 +492,22 @@
     "message": "Hilfe schließen"
   },
   "textLayerLimitedNotice": {
-    "message": "Die durchsuchbare PDF-Ebene enthält nur Text mit überprüfbarer Sichtbarkeit. Das aufgenommene Bild bleibt erhalten."
+    "message": "Der Text der Quellseite wird im PDF weggelassen, da seine Übereinstimmung mit den aufgenommenen Pixeln nicht nachgewiesen werden kann. Das Bild bleibt erhalten. Hinzugefügte Titel und Bildunterschriften können durchsuchbar bleiben, außer im Modus PDF nur als Bild."
+  },
+  "captureDurationLimitError": {
+    "message": "Die Aufnahme hat die Grenze von 180 Sekunden überschritten. Wählen Sie einen kleineren Bereich und versuchen Sie es erneut."
+  },
+  "capturePortionLimitError": {
+    "message": "Die Aufnahme erfordert mehr als 256 Teilaufnahmen. Wählen Sie einen kleineren Bereich und versuchen Sie es erneut."
+  },
+  "captureCancelledError": {
+    "message": "Aufnahme abgebrochen."
+  },
+  "pdfResourceLimitError": {
+    "message": "Das PDF überschreitet die Ressourcengrenzen. Verkleinern Sie die Zusammenstellung, die Bilder oder den Text und versuchen Sie es erneut."
+  },
+  "projectResourceLimitError": {
+    "message": "Das Projekt überschreitet die Ressourcengrenzen: 1 MiB JSON-Manifest oder 128 MiB ZIP-Archiv. Reduzieren Sie Text, Linien oder Bilder und versuchen Sie es erneut."
   },
   "exportPendingDraft": {
     "message": "Übernehmen oder verwerfen Sie die ausstehende Änderung vor dem Export."

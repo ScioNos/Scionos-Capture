@@ -1,0 +1,4736 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-11-26T09:37:15.358Z",
+  "platform": {
+    "platform": "win32",
+    "release": "10.0.26300",
+    "node": "v26.13.1"
+  },
+  "configuration": {
+    "root": "D:/Serveurs/Projet_ScioNos/Scionos-Capture",
+    "output": "D:\\Serveurs\\Projet_ScioNos\\Scionos-Capture\\dist\\consolidation-1.5.3\\resource-memory-final-comparison.json",
+    "label": "current",
+    "repeats": 1,
+    "samples": 1,
+    "interval": 100,
+    "baseline-root": "D:/Serveurs/Projet_ScioNos/Scionos-Capture/dist/consolidation-1.5.3/baseline"
+  },
+  "methodology": {
+    "processScope": "Only PIDs returned by SystemInfo.getProcessInfo on this disposable browser connection; no process-name enumeration.",
+    "memory": "Windows WorkingSet64 and PrivateMemorySize64 (private committed bytes, not private resident memory); Linux VmRSS and smaps_rollup private clean+dirty+hugetlb where permitted. Working-set/RSS sums may double-count shared pages and are not exclusive physical memory.",
+    "sampling": "Bounded post-action stage snapshots; maxima are observed stage samples, not exact transient peaks. No forced GC. Action duration excludes snapshots, whose wall time and sampler work are reported separately. Playwright overhead remains included.",
+    "fixtures": "Deterministic 1600x1200 PNGs, no user data; library metadata + 96x64 synthetic PNG thumbnails + 1KiB placeholder project blobs inserted directly into temporary IndexedDB, never opened as projects.",
+    "limitations": [
+      "Headless synthetic extension-origin workload, not native OS screen capture or captureVisibleTab pipeline.",
+      "Fresh profile per root/repetition. Same host/browser required for comparison; no arbitrary thresholds.",
+      "Snapshots observe retained memory and allocator caching after closure; they do not prove leak absence."
+    ]
+  },
+  "runs": [
+    {
+      "label": "baseline",
+      "iteration": 0,
+      "source": {
+        "root": "D:/Serveurs/Projet_ScioNos/Scionos-Capture/dist/consolidation-1.5.3/baseline",
+        "files": {
+          ".htmlvalidate.json": "e1f59cbf126e13fda5232970d22c6ecb39ab6cc42daf8aaaea25ebb50f759a75",
+          "annotation-model.js": "6cdafeec4852c5e61e7329264a6b3f9ef177eb14094a392db05989ab19496ea8",
+          "background.js": "908eacc79b285d54a27b2500ff7e07073f5544702ebb192c85082af2801edc05",
+          "capture-content-utils.js": "3ea02354df7c964638c96c78dbc52bf1acc0f7c4294c3da5669bef39804da57a",
+          "capture-store.js": "f97296ba46d203a5b4534665ba878a444eb7a140b1130589fbc6836bc85651d0",
+          "capture-utils.js": "c85f998f2f32bde194dd40b2321fc4424ab7449bb3b81731f093ccfed456a436",
+          "composition-export.js": "a86a00b18d7748e8f4fd4de97f5f4d5c8b03c452e497780e7668632cb783eb86",
+          "composition-utils.js": "5923f37a701a6d84e9dc24acebac2b2185a51090eeec34d73eac3aa7883cc859",
+          "content-capture.js": "2665a2b787af2b139f59853840580d82d267a3a72dd332b68df77d67fb880d37",
+          "content-dom.js": "14e3b3f192a74c79fd6f6b95ce66ebf1cc6c60fe910b232cf68cddbd32ef1565",
+          "content-selection.js": "37eec7a327a3ee9e5aa602dfa692d09d2b8fd7213f1021cd9f5723747e7d1bed",
+          "content-transfer.js": "76aa5fd9c71dfec717ac3dc6367e641aba496332de5e2da24b2b8006bb0ce792",
+          "content.js": "5cefcab5be3757655c4981e0c894e83e8f496eb148ea408a7f59519c162c9db9",
+          "editor-export.js": "4076079449fff3aa7cad3419c318f8a72c6c66be5916638938b35816b72f7af5",
+          "editor-operations.js": "2485084ac2108ad2aedec1f75559f35120a444a6afaf7119cba0d1b4222050f8",
+          "editor.html": "7fe69a39acbec288562349027cb39a988480300fd695343ae0603daa8bc15cb8",
+          "editor.js": "f5e36ccefd0350099ed17631e8e584cfcc683aed753d2912f67771a9e135392a",
+          "eslint.config.js": "6e10daa0aae2934447dd96445636db171fdbf8c9c1d85e2bc07ff33141921c26",
+          "help.html": "c48f974acd045b75404989092f905bf3dc08dc5005848f035b3753baa730a8a3",
+          "help.js": "1b9542bc3d9d49200c2fe1baf2027cbd10813c33f0b55d8b822dfc392bb87e4c",
+          "i18n.js": "946c65c958e62c2a4305eec0f47b5c68d57d37ea7b3ef1e3b075fe3b62685f33",
+          "library.html": "4b164b799fd3104681f6084e4c7a9c223f36bf044eee8694bef8bbd4e2ab06e1",
+          "library.js": "d9114bf7a6804b9c5c5ab582dc4e411949dc1ccc93aec1415664edbc2281f6a8",
+          "manifest.json": "c5fd17ee274ee5000cf35e2833bb85c5df428e072fdee7618d549ad48a7f5e28",
+          "package-lock.json": "f9a25d7889d54a0497f470b9925628f17127cfa59502b93c8de19aee895ace4f",
+          "package.json": "976210717fc051144580c533eba850bd0a36a50ecce010a741f978f9b70bebaf",
+          "playwright.config.js": "4e842402c340e4c1851017c82480aabf672c159a2736de8f2aac46f25a1e583d",
+          "popup.html": "34ce9b64fb2cc6754a45ee03670827ed54ae818a978c84df227fe36caad8e8c5",
+          "popup.js": "d7b41c2d02c9babb9061c58047fde7592bbfa0f01bb15332017f8d28954cd7ba"
+        }
+      },
+      "stages": [
+        {
+          "name": "browser-idle",
+          "durationMs": 503.75,
+          "snapshotWallMs": 337.35699999999997,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:16.881Z",
+                "elapsedMs": 337.0883000000001,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 122867712,
+                    "privateBytes": 35692544,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 50663424,
+                    "privateBytes": 24137728,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 11216,
+                    "workingSetBytes": 34091008,
+                    "privateBytes": 16711680,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48701440,
+                    "privateBytes": 18997248,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 75870208,
+                    "privateBytes": 38662144,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 106643456,
+                    "privateBytes": 164958208,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 32673792,
+                    "privateBytes": 12513280,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21430272,
+                    "privateBytes": 9572352,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 492941312,
+                "privateSumBytes": 321245184
+              }
+            ],
+            "heap": null,
+            "samplerWorkMs": 337.0883000000001,
+            "maxObservedWorkingSetSumBytes": 492941312,
+            "maxObservedPrivateSumBytes": 321245184
+          }
+        },
+        {
+          "name": "capture-store-synthetic",
+          "durationMs": 13.810799999999972,
+          "result": {
+            "width": 1600,
+            "height": 1200,
+            "bytes": 87844
+          },
+          "snapshotWallMs": 365.67499999999995,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:17.345Z",
+                "elapsedMs": 363.39819999999986,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 127696896,
+                    "privateBytes": 38756352,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 92221440,
+                    "privateBytes": 43290624,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48701440,
+                    "privateBytes": 18997248,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 23628,
+                    "workingSetBytes": 36802560,
+                    "privateBytes": 19435520,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 75902976,
+                    "privateBytes": 38662144,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 112574464,
+                    "privateBytes": 209928192,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 32960512,
+                    "privateBytes": 12587008,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21430272,
+                    "privateBytes": 9572352,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 548290560,
+                "privateSumBytes": 391229440
+              }
+            ],
+            "heap": {
+              "usedSize": 4585768,
+              "totalSize": 7094272,
+              "embedderHeapUsedSize": 2941448,
+              "backingStorageSize": 565850
+            },
+            "samplerWorkMs": 363.39819999999986,
+            "maxObservedWorkingSetSumBytes": 548290560,
+            "maxObservedPrivateSumBytes": 391229440
+          }
+        },
+        {
+          "name": "capture-editor-load",
+          "durationMs": 85.00030000000015,
+          "snapshotWallMs": 319.8272999999999,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:17.750Z",
+                "elapsedMs": 317.96050000000014,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 128901120,
+                    "privateBytes": 39882752,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 123240448,
+                    "privateBytes": 62259200,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48701440,
+                    "privateBytes": 18997248,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 23628,
+                    "workingSetBytes": 36802560,
+                    "privateBytes": 19435520,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 75902976,
+                    "privateBytes": 38662144,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 123371520,
+                    "privateBytes": 264065024,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 32960512,
+                    "privateBytes": 12587008,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21430272,
+                    "privateBytes": 9572352,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 591310848,
+                "privateSumBytes": 465461248
+              }
+            ],
+            "heap": {
+              "usedSize": 3311680,
+              "totalSize": 8265728,
+              "embedderHeapUsedSize": 5368240,
+              "backingStorageSize": 834319
+            },
+            "samplerWorkMs": 317.96050000000014,
+            "maxObservedWorkingSetSumBytes": 591310848,
+            "maxObservedPrivateSumBytes": 465461248
+          }
+        },
+        {
+          "name": "capture-editor-closed-settled",
+          "durationMs": 1507.9039999999995,
+          "snapshotWallMs": 316.6912999999995,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:19.583Z",
+                "elapsedMs": 316.6692000000003,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 150253568,
+                    "privateBytes": 49504256,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 116039680,
+                    "privateBytes": 54870016,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48734208,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 23628,
+                    "workingSetBytes": 36847616,
+                    "privateBytes": 19435520,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 75939840,
+                    "privateBytes": 38662144,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 124104704,
+                    "privateBytes": 269004800,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33058816,
+                    "privateBytes": 12587008,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21471232,
+                    "privateBytes": 9572352,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 606449664,
+                "privateSumBytes": 472637440
+              }
+            ],
+            "heap": null,
+            "samplerWorkMs": 316.6692000000003,
+            "maxObservedWorkingSetSumBytes": 606449664,
+            "maxObservedPrivateSumBytes": 472637440
+          }
+        },
+        {
+          "name": "editor-1-empty",
+          "durationMs": 43.74579999999969,
+          "snapshotWallMs": 337.2672999999995,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:19.980Z",
+                "elapsedMs": 335.39989999999943,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 150429696,
+                    "privateBytes": 49684480,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 23636,
+                    "workingSetBytes": 36859904,
+                    "privateBytes": 19472384,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 121348096,
+                    "privateBytes": 59056128,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48738304,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 75948032,
+                    "privateBytes": 38662144,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 124686336,
+                    "privateBytes": 269565952,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33058816,
+                    "privateBytes": 12587008,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21471232,
+                    "privateBytes": 9572352,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 612540416,
+                "privateSumBytes": 477601792
+              }
+            ],
+            "heap": {
+              "usedSize": 5128748,
+              "totalSize": 8617984,
+              "embedderHeapUsedSize": 7644864,
+              "backingStorageSize": 1086600
+            },
+            "samplerWorkMs": 335.39989999999943,
+            "maxObservedWorkingSetSumBytes": 612540416,
+            "maxObservedPrivateSumBytes": 477601792
+          }
+        },
+        {
+          "name": "editor-1-import",
+          "durationMs": 37.629399999999805,
+          "result": {
+            "images": 1,
+            "dimensions": [
+              1600,
+              1200
+            ]
+          },
+          "snapshotWallMs": 336.8872999999994,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:20.354Z",
+                "elapsedMs": 335.2451999999994,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 150011904,
+                    "privateBytes": 48889856,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 23636,
+                    "workingSetBytes": 36859904,
+                    "privateBytes": 19472384,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 132575232,
+                    "privateBytes": 69509120,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48738304,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 75948032,
+                    "privateBytes": 38662144,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 124907520,
+                    "privateBytes": 288395264,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33058816,
+                    "privateBytes": 12587008,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21471232,
+                    "privateBytes": 9572352,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 623570944,
+                "privateSumBytes": 506089472
+              }
+            ],
+            "heap": {
+              "usedSize": 7829388,
+              "totalSize": 11255808,
+              "embedderHeapUsedSize": 7706192,
+              "backingStorageSize": 1316292
+            },
+            "samplerWorkMs": 335.2451999999994,
+            "maxObservedWorkingSetSumBytes": 623570944,
+            "maxObservedPrivateSumBytes": 506089472
+          }
+        },
+        {
+          "name": "editor-1-crop-retained",
+          "durationMs": 74.86849999999959,
+          "result": {
+            "crop": [
+              100,
+              100,
+              800,
+              600
+            ],
+            "undoEnabled": true
+          },
+          "snapshotWallMs": 320.89960000000065,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:20.750Z",
+                "elapsedMs": 318.9218000000001,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 151252992,
+                    "privateBytes": 49737728,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 23636,
+                    "workingSetBytes": 36859904,
+                    "privateBytes": 19472384,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 138514432,
+                    "privateBytes": 71860224,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48750592,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 75960320,
+                    "privateBytes": 38662144,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 127025152,
+                    "privateBytes": 399511552,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33083392,
+                    "privateBytes": 12587008,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21471232,
+                    "privateBytes": 9572352,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 632918016,
+                "privateSumBytes": 620404736
+              }
+            ],
+            "heap": {
+              "usedSize": 5743500,
+              "totalSize": 10121216,
+              "embedderHeapUsedSize": 8153168,
+              "backingStorageSize": 1375247
+            },
+            "samplerWorkMs": 318.9218000000001,
+            "maxObservedWorkingSetSumBytes": 632918016,
+            "maxObservedPrivateSumBytes": 620404736
+          }
+        },
+        {
+          "name": "editor-1-save-library",
+          "durationMs": 51.76520000000073,
+          "snapshotWallMs": 343.3690999999999,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:21.145Z",
+                "elapsedMs": 341.4913000000006,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 151838720,
+                    "privateBytes": 50249728,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 23636,
+                    "workingSetBytes": 36859904,
+                    "privateBytes": 19472384,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 148189184,
+                    "privateBytes": 80261120,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48750592,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 75960320,
+                    "privateBytes": 38662144,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 129523712,
+                    "privateBytes": 391770112,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33083392,
+                    "privateBytes": 12587008,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21471232,
+                    "privateBytes": 9572352,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 645677056,
+                "privateSumBytes": 621576192
+              }
+            ],
+            "heap": {
+              "usedSize": 8368336,
+              "totalSize": 14839808,
+              "embedderHeapUsedSize": 8786696,
+              "backingStorageSize": 3405846
+            },
+            "samplerWorkMs": 341.4913000000006,
+            "maxObservedWorkingSetSumBytes": 645677056,
+            "maxObservedPrivateSumBytes": 621576192
+          }
+        },
+        {
+          "name": "editor-1-project-export",
+          "durationMs": 149.0616,
+          "result": {
+            "filename": "Synthetic_1_2026-11-26_10-37.scionos",
+            "bytes": 27924
+          },
+          "snapshotWallMs": 342.25,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:21.637Z",
+                "elapsedMs": 340.65030000000024,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 152510464,
+                    "privateBytes": 50241536,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 23636,
+                    "workingSetBytes": 36929536,
+                    "privateBytes": 19472384,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 153481216,
+                    "privateBytes": 83288064,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48750592,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 75960320,
+                    "privateBytes": 38662144,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 131457024,
+                    "privateBytes": 392441856,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33083392,
+                    "privateBytes": 12587008,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21471232,
+                    "privateBytes": 9572352,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 653643776,
+                "privateSumBytes": 625266688
+              }
+            ],
+            "heap": {
+              "usedSize": 6460076,
+              "totalSize": 14839808,
+              "embedderHeapUsedSize": 8739808,
+              "backingStorageSize": 5436208
+            },
+            "samplerWorkMs": 340.65030000000024,
+            "maxObservedWorkingSetSumBytes": 653643776,
+            "maxObservedPrivateSumBytes": 625266688
+          }
+        },
+        {
+          "name": "editor-1-html-export",
+          "durationMs": 96.55580000000009,
+          "result": {
+            "filename": "Synthetic_1_2026-11-26_10-37.html",
+            "bytes": 37062
+          },
+          "snapshotWallMs": 336.58410000000003,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:22.070Z",
+                "elapsedMs": 334.90749999999935,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 152969216,
+                    "privateBytes": 50642944,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 23636,
+                    "workingSetBytes": 36929536,
+                    "privateBytes": 19472384,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 156340224,
+                    "privateBytes": 85766144,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48750592,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 75960320,
+                    "privateBytes": 38662144,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 131395584,
+                    "privateBytes": 392441856,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33083392,
+                    "privateBytes": 12587008,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21471232,
+                    "privateBytes": 9572352,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 656900096,
+                "privateSumBytes": 628146176
+              }
+            ],
+            "heap": {
+              "usedSize": 8210884,
+              "totalSize": 15101952,
+              "embedderHeapUsedSize": 8707136,
+              "backingStorageSize": 7473933
+            },
+            "samplerWorkMs": 334.90749999999935,
+            "maxObservedWorkingSetSumBytes": 656900096,
+            "maxObservedPrivateSumBytes": 628146176
+          }
+        },
+        {
+          "name": "editor-1-png-export",
+          "durationMs": 169.40070000000014,
+          "result": {
+            "filename": "Synthetic_1_2026-11-26_10-37.png",
+            "bytes": 31152
+          },
+          "snapshotWallMs": 318.6203000000005,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:22.558Z",
+                "elapsedMs": 316.8674000000001,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 153268224,
+                    "privateBytes": 50921472,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 23636,
+                    "workingSetBytes": 36929536,
+                    "privateBytes": 19472384,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 142069760,
+                    "privateBytes": 68558848,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48750592,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 75960320,
+                    "privateBytes": 38662144,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 135663616,
+                    "privateBytes": 397713408,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33083392,
+                    "privateBytes": 12587008,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21471232,
+                    "privateBytes": 9572352,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 647196672,
+                "privateSumBytes": 616488960
+              }
+            ],
+            "heap": {
+              "usedSize": 4571280,
+              "totalSize": 7548928,
+              "embedderHeapUsedSize": 3897168,
+              "backingStorageSize": 435492
+            },
+            "samplerWorkMs": 316.8674000000001,
+            "maxObservedWorkingSetSumBytes": 647196672,
+            "maxObservedPrivateSumBytes": 616488960
+          }
+        },
+        {
+          "name": "editor-1-closed-settled",
+          "durationMs": 1508.2945,
+          "snapshotWallMs": 311.3124000000007,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:24.387Z",
+                "elapsedMs": 311.3008000000009,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 153513984,
+                    "privateBytes": 51122176,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 23636,
+                    "workingSetBytes": 36929536,
+                    "privateBytes": 19472384,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 133038080,
+                    "privateBytes": 59162624,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48750592,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 75960320,
+                    "privateBytes": 38662144,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 133455872,
+                    "privateBytes": 394461184,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33263616,
+                    "privateBytes": 12800000,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21471232,
+                    "privateBytes": 9572352,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 636383232,
+                "privateSumBytes": 604254208
+              }
+            ],
+            "heap": null,
+            "samplerWorkMs": 311.3008000000009,
+            "maxObservedWorkingSetSumBytes": 636383232,
+            "maxObservedPrivateSumBytes": 604254208
+          }
+        },
+        {
+          "name": "editor-4-empty",
+          "durationMs": 37.902399999999034,
+          "snapshotWallMs": 354.1345000000001,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:24.797Z",
+                "elapsedMs": 352.4253000000008,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 153620480,
+                    "privateBytes": 50126848,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 55648,
+                    "workingSetBytes": 34037760,
+                    "privateBytes": 16662528,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 136364032,
+                    "privateBytes": 62103552,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48750592,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 75972608,
+                    "privateBytes": 38662144,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 137179136,
+                    "privateBytes": 398741504,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33263616,
+                    "privateBytes": 12800000,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21475328,
+                    "privateBytes": 9576448,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 640663552,
+                "privateSumBytes": 607674368
+              }
+            ],
+            "heap": {
+              "usedSize": 6115956,
+              "totalSize": 7880704,
+              "embedderHeapUsedSize": 6268520,
+              "backingStorageSize": 704244
+            },
+            "samplerWorkMs": 352.4253000000008,
+            "maxObservedWorkingSetSumBytes": 640663552,
+            "maxObservedPrivateSumBytes": 607674368
+          }
+        },
+        {
+          "name": "editor-4-import",
+          "durationMs": 115.21899999999914,
+          "result": {
+            "images": 4,
+            "dimensions": [
+              1600,
+              1200
+            ]
+          },
+          "snapshotWallMs": 326.3667999999998,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:25.239Z",
+                "elapsedMs": 324.6194000000014,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 154386432,
+                    "privateBytes": 51265536,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 55648,
+                    "workingSetBytes": 34037760,
+                    "privateBytes": 16662528,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 168214528,
+                    "privateBytes": 95129600,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48750592,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 75972608,
+                    "privateBytes": 38662144,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 138387456,
+                    "privateBytes": 399712256,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33263616,
+                    "privateBytes": 12800000,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21475328,
+                    "privateBytes": 9576448,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 674488320,
+                "privateSumBytes": 642809856
+              }
+            ],
+            "heap": {
+              "usedSize": 4844520,
+              "totalSize": 6189056,
+              "embedderHeapUsedSize": 3462336,
+              "backingStorageSize": 939336
+            },
+            "samplerWorkMs": 324.6194000000014,
+            "maxObservedWorkingSetSumBytes": 674488320,
+            "maxObservedPrivateSumBytes": 642809856
+          }
+        },
+        {
+          "name": "editor-4-crop-retained",
+          "durationMs": 64.36669999999867,
+          "result": {
+            "crop": [
+              100,
+              100,
+              800,
+              600
+            ],
+            "undoEnabled": true
+          },
+          "snapshotWallMs": 311.2456999999995,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:25.615Z",
+                "elapsedMs": 309.4415000000008,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 153989120,
+                    "privateBytes": 50475008,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 55648,
+                    "workingSetBytes": 34037760,
+                    "privateBytes": 16662528,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 169517056,
+                    "privateBytes": 96563200,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48750592,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 75972608,
+                    "privateBytes": 38662144,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 138457088,
+                    "privateBytes": 500391936,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33263616,
+                    "privateBytes": 12800000,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21479424,
+                    "privateBytes": 9576448,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 675467264,
+                "privateSumBytes": 744132608
+              }
+            ],
+            "heap": {
+              "usedSize": 5179308,
+              "totalSize": 6451200,
+              "embedderHeapUsedSize": 3809112,
+              "backingStorageSize": 998061
+            },
+            "samplerWorkMs": 309.4415000000008,
+            "maxObservedWorkingSetSumBytes": 675467264,
+            "maxObservedPrivateSumBytes": 744132608
+          }
+        },
+        {
+          "name": "editor-4-save-library",
+          "durationMs": 50.820299999999406,
+          "snapshotWallMs": 334.39730000000054,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:25.983Z",
+                "elapsedMs": 315.4205000000002,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 155336704,
+                    "privateBytes": 51818496,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 55648,
+                    "workingSetBytes": 34037760,
+                    "privateBytes": 16662528,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 197529600,
+                    "privateBytes": 116453376,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48762880,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 75997184,
+                    "privateBytes": 38662144,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 155869184,
+                    "privateBytes": 500424704,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33300480,
+                    "privateBytes": 12804096,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21479424,
+                    "privateBytes": 9576448,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 722313216,
+                "privateSumBytes": 765403136
+              }
+            ],
+            "heap": {
+              "usedSize": 4662776,
+              "totalSize": 7761920,
+              "embedderHeapUsedSize": 2464392,
+              "backingStorageSize": 8901181
+            },
+            "samplerWorkMs": 315.4205000000002,
+            "maxObservedWorkingSetSumBytes": 722313216,
+            "maxObservedPrivateSumBytes": 765403136
+          }
+        },
+        {
+          "name": "editor-4-project-export",
+          "durationMs": 438.0185999999994,
+          "result": {
+            "filename": "Synthetic_4_2026-11-26_10-37.scionos",
+            "bytes": 295056
+          },
+          "snapshotWallMs": 314.2480000000014,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:26.752Z",
+                "elapsedMs": 312.7474000000002,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 154886144,
+                    "privateBytes": 52219904,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 55648,
+                    "workingSetBytes": 34107392,
+                    "privateBytes": 16662528,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 203747328,
+                    "privateBytes": 122277888,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48762880,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 75997184,
+                    "privateBytes": 38662144,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 155963392,
+                    "privateBytes": 500424704,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33300480,
+                    "privateBytes": 12804096,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21479424,
+                    "privateBytes": 9576448,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 728244224,
+                "privateSumBytes": 771629056
+              }
+            ],
+            "heap": {
+              "usedSize": 4289444,
+              "totalSize": 6975488,
+              "embedderHeapUsedSize": 2519544,
+              "backingStorageSize": 26977712
+            },
+            "samplerWorkMs": 312.7474000000002,
+            "maxObservedWorkingSetSumBytes": 728244224,
+            "maxObservedPrivateSumBytes": 771629056
+          }
+        },
+        {
+          "name": "editor-4-html-export",
+          "durationMs": 3357.5977999999996,
+          "result": {
+            "filename": "Synthetic_4_2026-11-26_10-37.html",
+            "bytes": 392416
+          },
+          "snapshotWallMs": 319.3607000000011,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:30.429Z",
+                "elapsedMs": 317.8809999999994,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 155774976,
+                    "privateBytes": 52703232,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 55648,
+                    "workingSetBytes": 34115584,
+                    "privateBytes": 16662528,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 205176832,
+                    "privateBytes": 123850752,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48762880,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 75997184,
+                    "privateBytes": 38662144,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 154140672,
+                    "privateBytes": 455245824,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33312768,
+                    "privateBytes": 12808192,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21479424,
+                    "privateBytes": 9576448,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 728760320,
+                "privateSumBytes": 728510464
+              }
+            ],
+            "heap": {
+              "usedSize": 5001276,
+              "totalSize": 7368704,
+              "embedderHeapUsedSize": 2399832,
+              "backingStorageSize": 27072448
+            },
+            "samplerWorkMs": 317.8809999999994,
+            "maxObservedWorkingSetSumBytes": 728760320,
+            "maxObservedPrivateSumBytes": 728510464
+          }
+        },
+        {
+          "name": "editor-4-png-export",
+          "durationMs": 444.89870000000155,
+          "result": {
+            "filename": "Synthetic_4_2026-11-26_10-37.png",
+            "bytes": 197697
+          },
+          "snapshotWallMs": 309.46149999999943,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:31.184Z",
+                "elapsedMs": 307.8165000000008,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 155230208,
+                    "privateBytes": 52539392,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 55648,
+                    "workingSetBytes": 34115584,
+                    "privateBytes": 16662528,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 190705664,
+                    "privateBytes": 105693184,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48762880,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 75997184,
+                    "privateBytes": 38662144,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 165146624,
+                    "privateBytes": 456380416,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33312768,
+                    "privateBytes": 12808192,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21479424,
+                    "privateBytes": 9576448,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 724750336,
+                "privateSumBytes": 711323648
+              }
+            ],
+            "heap": {
+              "usedSize": 4766980,
+              "totalSize": 7499776,
+              "embedderHeapUsedSize": 2493856,
+              "backingStorageSize": 8874546
+            },
+            "samplerWorkMs": 307.8165000000008,
+            "maxObservedWorkingSetSumBytes": 724750336,
+            "maxObservedPrivateSumBytes": 711323648
+          }
+        },
+        {
+          "name": "editor-4-closed-settled",
+          "durationMs": 1509.5486999999994,
+          "snapshotWallMs": 341.0429000000004,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:33.043Z",
+                "elapsedMs": 341.0275999999976,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 153952256,
+                    "privateBytes": 50974720,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 55648,
+                    "workingSetBytes": 34115584,
+                    "privateBytes": 16662528,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 159952896,
+                    "privateBytes": 74838016,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48762880,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 75997184,
+                    "privateBytes": 38662144,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 162979840,
+                    "privateBytes": 452984832,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33312768,
+                    "privateBytes": 12808192,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21479424,
+                    "privateBytes": 9576448,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 690552832,
+                "privateSumBytes": 675508224
+              }
+            ],
+            "heap": null,
+            "samplerWorkMs": 341.0275999999976,
+            "maxObservedWorkingSetSumBytes": 690552832,
+            "maxObservedPrivateSumBytes": 675508224
+          }
+        },
+        {
+          "name": "library-100-listing",
+          "durationMs": 106.51180000000022,
+          "result": {
+            "projects": 100,
+            "cards": 100,
+            "domElements": 1167,
+            "thumbnails": {
+              "total": 100,
+              "loaded": 100
+            }
+          },
+          "snapshotWallMs": 337.068299999999,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:33.638Z",
+                "elapsedMs": 335.0139999999992,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 159535104,
+                    "privateBytes": 55873536,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 48184,
+                    "workingSetBytes": 36769792,
+                    "privateBytes": 19394560,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 171560960,
+                    "privateBytes": 85008384,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48762880,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 76562432,
+                    "privateBytes": 38703104,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 167051264,
+                    "privateBytes": 456003584,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33341440,
+                    "privateBytes": 12836864,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21479424,
+                    "privateBytes": 9576448,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 715063296,
+                "privateSumBytes": 696397824
+              }
+            ],
+            "heap": {
+              "usedSize": 7159348,
+              "totalSize": 8880128,
+              "embedderHeapUsedSize": 12456840,
+              "backingStorageSize": 9235570
+            },
+            "samplerWorkMs": 335.0139999999992,
+            "maxObservedWorkingSetSumBytes": 715063296,
+            "maxObservedPrivateSumBytes": 696397824
+          }
+        },
+        {
+          "name": "library-100-search",
+          "durationMs": 8.35150000000067,
+          "result": {
+            "matches": 1
+          },
+          "snapshotWallMs": 341.10099999999875,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:33.988Z",
+                "elapsedMs": 339.15450000000055,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 159535104,
+                    "privateBytes": 55873536,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 48184,
+                    "workingSetBytes": 36769792,
+                    "privateBytes": 19394560,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 171986944,
+                    "privateBytes": 85241856,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48762880,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 76562432,
+                    "privateBytes": 38703104,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 167059456,
+                    "privateBytes": 429285376,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33341440,
+                    "privateBytes": 12836864,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21479424,
+                    "privateBytes": 9576448,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 715497472,
+                "privateSumBytes": 669913088
+              }
+            ],
+            "heap": {
+              "usedSize": 7280816,
+              "totalSize": 8880128,
+              "embedderHeapUsedSize": 12529200,
+              "backingStorageSize": 9235750
+            },
+            "samplerWorkMs": 339.15450000000055,
+            "maxObservedWorkingSetSumBytes": 715497472,
+            "maxObservedPrivateSumBytes": 669913088
+          }
+        },
+        {
+          "name": "library-100-clear-search",
+          "durationMs": 41.21589999999924,
+          "snapshotWallMs": 322.0239999999976,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:34.351Z",
+                "elapsedMs": 320.6160999999993,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 159698944,
+                    "privateBytes": 55951360,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 48184,
+                    "workingSetBytes": 36769792,
+                    "privateBytes": 19394560,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 180662272,
+                    "privateBytes": 93597696,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48762880,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 76562432,
+                    "privateBytes": 38703104,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 166567936,
+                    "privateBytes": 331644928,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33341440,
+                    "privateBytes": 12836864,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21479424,
+                    "privateBytes": 9576448,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 723845120,
+                "privateSumBytes": 580706304
+              }
+            ],
+            "heap": {
+              "usedSize": 7482896,
+              "totalSize": 9142272,
+              "embedderHeapUsedSize": 18669296,
+              "backingStorageSize": 9245050
+            },
+            "samplerWorkMs": 320.6160999999993,
+            "maxObservedWorkingSetSumBytes": 723845120,
+            "maxObservedPrivateSumBytes": 580706304
+          }
+        },
+        {
+          "name": "library-100-closed-settled",
+          "durationMs": 1512.8102999999974,
+          "snapshotWallMs": 321.1508999999969,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:36.193Z",
+                "elapsedMs": 321.1355000000003,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 159764480,
+                    "privateBytes": 56004608,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 48184,
+                    "workingSetBytes": 36769792,
+                    "privateBytes": 19394560,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 184315904,
+                    "privateBytes": 97497088,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48762880,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 76566528,
+                    "privateBytes": 38707200,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 163045376,
+                    "privateBytes": 317198336,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33341440,
+                    "privateBytes": 12836864,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21479424,
+                    "privateBytes": 9576448,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 724045824,
+                "privateSumBytes": 570216448
+              }
+            ],
+            "heap": null,
+            "samplerWorkMs": 321.1355000000003,
+            "maxObservedWorkingSetSumBytes": 724045824,
+            "maxObservedPrivateSumBytes": 570216448
+          }
+        },
+        {
+          "name": "library-1000-listing",
+          "durationMs": 473.7317000000003,
+          "result": {
+            "projects": 1000,
+            "cards": 1000,
+            "domElements": 11067,
+            "thumbnails": {
+              "total": 1000,
+              "loaded": 1000
+            }
+          },
+          "snapshotWallMs": 351.83460000000196,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:37.771Z",
+                "elapsedMs": 349.46500000000015,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 201900032,
+                    "privateBytes": 98308096,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 259203072,
+                    "privateBytes": 173400064,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48762880,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56436,
+                    "workingSetBytes": 34037760,
+                    "privateBytes": 16654336,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 76570624,
+                    "privateBytes": 38711296,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 164966400,
+                    "privateBytes": 317394944,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33341440,
+                    "privateBytes": 12836864,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21483520,
+                    "privateBytes": 9580544,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 840265728,
+                "privateSumBytes": 685887488
+              }
+            ],
+            "heap": {
+              "usedSize": 8600556,
+              "totalSize": 11669504,
+              "embedderHeapUsedSize": 43879016,
+              "backingStorageSize": 842314
+            },
+            "samplerWorkMs": 349.46500000000015,
+            "maxObservedWorkingSetSumBytes": 840265728,
+            "maxObservedPrivateSumBytes": 685887488
+          }
+        },
+        {
+          "name": "library-1000-search",
+          "durationMs": 20.708699999999226,
+          "result": {
+            "matches": 1
+          },
+          "snapshotWallMs": 338.34500000000116,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:38.131Z",
+                "elapsedMs": 336.647399999998,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 195997696,
+                    "privateBytes": 92348416,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 259461120,
+                    "privateBytes": 173969408,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48762880,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56436,
+                    "workingSetBytes": 34037760,
+                    "privateBytes": 16654336,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 76570624,
+                    "privateBytes": 38711296,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 164966400,
+                    "privateBytes": 317399040,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33341440,
+                    "privateBytes": 12836864,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21483520,
+                    "privateBytes": 9580544,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 834621440,
+                "privateSumBytes": 680501248
+              }
+            ],
+            "heap": {
+              "usedSize": 9033616,
+              "totalSize": 11669504,
+              "embedderHeapUsedSize": 44351752,
+              "backingStorageSize": 842532
+            },
+            "samplerWorkMs": 336.647399999998,
+            "maxObservedWorkingSetSumBytes": 834621440,
+            "maxObservedPrivateSumBytes": 680501248
+          }
+        },
+        {
+          "name": "library-1000-clear-search",
+          "durationMs": 362.4601999999977,
+          "snapshotWallMs": 317.03150000000096,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:38.810Z",
+                "elapsedMs": 315.33650000000125,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 201863168,
+                    "privateBytes": 97992704,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 286834688,
+                    "privateBytes": 200245248,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48762880,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56436,
+                    "workingSetBytes": 34037760,
+                    "privateBytes": 16654336,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 76570624,
+                    "privateBytes": 38711296,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 165191680,
+                    "privateBytes": 317399040,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33341440,
+                    "privateBytes": 12836864,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21483520,
+                    "privateBytes": 9580544,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 868085760,
+                "privateSumBytes": 712421376
+              }
+            ],
+            "heap": {
+              "usedSize": 5154596,
+              "totalSize": 9928704,
+              "embedderHeapUsedSize": 38110128,
+              "backingStorageSize": 862263
+            },
+            "samplerWorkMs": 315.33650000000125,
+            "maxObservedWorkingSetSumBytes": 868085760,
+            "maxObservedPrivateSumBytes": 712421376
+          }
+        },
+        {
+          "name": "library-1000-closed-settled",
+          "durationMs": 1506.578300000001,
+          "snapshotWallMs": 309.087099999997,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:40.642Z",
+                "elapsedMs": 309.0756999999976,
+                "processes": [
+                  {
+                    "pid": 32852,
+                    "workingSetBytes": 196300800,
+                    "privateBytes": 92401664,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 57224,
+                    "workingSetBytes": 286257152,
+                    "privateBytes": 199684096,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 42872,
+                    "workingSetBytes": 48762880,
+                    "privateBytes": 19001344,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56436,
+                    "workingSetBytes": 34037760,
+                    "privateBytes": 16654336,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 43092,
+                    "workingSetBytes": 76570624,
+                    "privateBytes": 38711296,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 56060,
+                    "workingSetBytes": 158908416,
+                    "privateBytes": 308674560,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 29512,
+                    "workingSetBytes": 33341440,
+                    "privateBytes": 12836864,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 25960,
+                    "workingSetBytes": 21483520,
+                    "privateBytes": 9580544,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 855662592,
+                "privateSumBytes": 697544704
+              }
+            ],
+            "heap": null,
+            "samplerWorkMs": 309.0756999999976,
+            "maxObservedWorkingSetSumBytes": 855662592,
+            "maxObservedPrivateSumBytes": 697544704
+          }
+        }
+      ],
+      "browserVersion": "159.0.8154.6",
+      "fixtures": [
+        {
+          "name": "synthetic-0.png",
+          "bytes": 87844,
+          "sha256": "924e083dd8145cdfc9d5ae270a276f214964669b510253ac06ca72cbde5205f6"
+        },
+        {
+          "name": "synthetic-1.png",
+          "bytes": 88578,
+          "sha256": "17c3d83b4eb8e6974f417ddada0f4549d2a0a936a75a66bb147642f5d55fa96b"
+        },
+        {
+          "name": "synthetic-2.png",
+          "bytes": 88891,
+          "sha256": "b3c009732224c424a75c8b56b0de309b6c58fbd17cf483c06e7430d0b4f03f2d"
+        },
+        {
+          "name": "synthetic-3.png",
+          "bytes": 88832,
+          "sha256": "f0ca4fa98fa2261139828a740be8c6a65af966f9a67b7375ced92c16f8980e50"
+        }
+      ],
+      "sourceAfter": {
+        "root": "D:/Serveurs/Projet_ScioNos/Scionos-Capture/dist/consolidation-1.5.3/baseline",
+        "files": {
+          ".htmlvalidate.json": "e1f59cbf126e13fda5232970d22c6ecb39ab6cc42daf8aaaea25ebb50f759a75",
+          "annotation-model.js": "6cdafeec4852c5e61e7329264a6b3f9ef177eb14094a392db05989ab19496ea8",
+          "background.js": "908eacc79b285d54a27b2500ff7e07073f5544702ebb192c85082af2801edc05",
+          "capture-content-utils.js": "3ea02354df7c964638c96c78dbc52bf1acc0f7c4294c3da5669bef39804da57a",
+          "capture-store.js": "f97296ba46d203a5b4534665ba878a444eb7a140b1130589fbc6836bc85651d0",
+          "capture-utils.js": "c85f998f2f32bde194dd40b2321fc4424ab7449bb3b81731f093ccfed456a436",
+          "composition-export.js": "a86a00b18d7748e8f4fd4de97f5f4d5c8b03c452e497780e7668632cb783eb86",
+          "composition-utils.js": "5923f37a701a6d84e9dc24acebac2b2185a51090eeec34d73eac3aa7883cc859",
+          "content-capture.js": "2665a2b787af2b139f59853840580d82d267a3a72dd332b68df77d67fb880d37",
+          "content-dom.js": "14e3b3f192a74c79fd6f6b95ce66ebf1cc6c60fe910b232cf68cddbd32ef1565",
+          "content-selection.js": "37eec7a327a3ee9e5aa602dfa692d09d2b8fd7213f1021cd9f5723747e7d1bed",
+          "content-transfer.js": "76aa5fd9c71dfec717ac3dc6367e641aba496332de5e2da24b2b8006bb0ce792",
+          "content.js": "5cefcab5be3757655c4981e0c894e83e8f496eb148ea408a7f59519c162c9db9",
+          "editor-export.js": "4076079449fff3aa7cad3419c318f8a72c6c66be5916638938b35816b72f7af5",
+          "editor-operations.js": "2485084ac2108ad2aedec1f75559f35120a444a6afaf7119cba0d1b4222050f8",
+          "editor.html": "7fe69a39acbec288562349027cb39a988480300fd695343ae0603daa8bc15cb8",
+          "editor.js": "f5e36ccefd0350099ed17631e8e584cfcc683aed753d2912f67771a9e135392a",
+          "eslint.config.js": "6e10daa0aae2934447dd96445636db171fdbf8c9c1d85e2bc07ff33141921c26",
+          "help.html": "c48f974acd045b75404989092f905bf3dc08dc5005848f035b3753baa730a8a3",
+          "help.js": "1b9542bc3d9d49200c2fe1baf2027cbd10813c33f0b55d8b822dfc392bb87e4c",
+          "i18n.js": "946c65c958e62c2a4305eec0f47b5c68d57d37ea7b3ef1e3b075fe3b62685f33",
+          "library.html": "4b164b799fd3104681f6084e4c7a9c223f36bf044eee8694bef8bbd4e2ab06e1",
+          "library.js": "d9114bf7a6804b9c5c5ab582dc4e411949dc1ccc93aec1415664edbc2281f6a8",
+          "manifest.json": "c5fd17ee274ee5000cf35e2833bb85c5df428e072fdee7618d549ad48a7f5e28",
+          "package-lock.json": "f9a25d7889d54a0497f470b9925628f17127cfa59502b93c8de19aee895ace4f",
+          "package.json": "976210717fc051144580c533eba850bd0a36a50ecce010a741f978f9b70bebaf",
+          "playwright.config.js": "4e842402c340e4c1851017c82480aabf672c159a2736de8f2aac46f25a1e583d",
+          "popup.html": "34ce9b64fb2cc6754a45ee03670827ed54ae818a978c84df227fe36caad8e8c5",
+          "popup.js": "d7b41c2d02c9babb9061c58047fde7592bbfa0f01bb15332017f8d28954cd7ba"
+        }
+      },
+      "sourceStable": true
+    },
+    {
+      "label": "current",
+      "iteration": 0,
+      "source": {
+        "root": "D:/Serveurs/Projet_ScioNos/Scionos-Capture",
+        "files": {
+          ".htmlvalidate.json": "e1f59cbf126e13fda5232970d22c6ecb39ab6cc42daf8aaaea25ebb50f759a75",
+          "annotation-model.js": "85e1d1bea3972eed8eb469b040ea2d0325e841ec5b27ac248c58379c15f63871",
+          "background.js": "909148c5a0310b3d6c054d9a7fc7dff74073e68c8f1900bf9ed91821d93a5136",
+          "capture-content-utils.js": "3ea02354df7c964638c96c78dbc52bf1acc0f7c4294c3da5669bef39804da57a",
+          "capture-store.js": "028f068861ec8a7824ce0673d46d30eb28d3e818302397aad7e1c9ddc6cc201b",
+          "capture-utils.js": "c85f998f2f32bde194dd40b2321fc4424ab7449bb3b81731f093ccfed456a436",
+          "composition-export.js": "a86a00b18d7748e8f4fd4de97f5f4d5c8b03c452e497780e7668632cb783eb86",
+          "composition-utils.js": "9a2b69feb40de7f5c1650c130fac56f8c9807abdc89422064f7bf3eaec2d2130",
+          "content-capture.js": "b3871896ea7b8138437a8831e6d1bbd85ba322e3c4b7e4b0bfe0683e66cc4ec0",
+          "content-dom.js": "6f656b8a9a20a230a3bd0f986cb4cf3aae6ac912e50f421469838290963d4d1a",
+          "content-selection.js": "37eec7a327a3ee9e5aa602dfa692d09d2b8fd7213f1021cd9f5723747e7d1bed",
+          "content-transfer.js": "be2cf94ff5083b794a66a5c2f2952e8cfa8845b34c2a9ac47db5cb754e0f9f5e",
+          "content.js": "5cefcab5be3757655c4981e0c894e83e8f496eb148ea408a7f59519c162c9db9",
+          "editor-export.js": "4076079449fff3aa7cad3419c318f8a72c6c66be5916638938b35816b72f7af5",
+          "editor-operations.js": "2af657e7cef94dfbd0a9bdc390f5edb5f3e68959b30ff6538af34445293b49fb",
+          "editor.html": "61d010ec44fa512fc727f40a74f5596e75179b4af0c404fca7e64723949c2252",
+          "editor.js": "c43dfe8e8fd5a1643828a900b2b5ed33d427c9c41abfd6a9029d857149c62b19",
+          "eslint.config.js": "6e10daa0aae2934447dd96445636db171fdbf8c9c1d85e2bc07ff33141921c26",
+          "help.html": "c48f974acd045b75404989092f905bf3dc08dc5005848f035b3753baa730a8a3",
+          "help.js": "1b9542bc3d9d49200c2fe1baf2027cbd10813c33f0b55d8b822dfc392bb87e4c",
+          "i18n.js": "946c65c958e62c2a4305eec0f47b5c68d57d37ea7b3ef1e3b075fe3b62685f33",
+          "library.html": "4b164b799fd3104681f6084e4c7a9c223f36bf044eee8694bef8bbd4e2ab06e1",
+          "library.js": "a29207e607043bf4357f397480931fa9a16b3bcc43bef9b2cce9b7c79e7162ce",
+          "manifest.json": "1eb778a299e212649db462a36acf55c0255a03310bcece7ddf6c4d417f3f7984",
+          "package-lock.json": "25678be0148c7db299f7de5b20bd45e16c3dcf031087156bec01baea89f3ed71",
+          "package.json": "c7a9a930a0c5f9e47cfe08c8ea7afc93e1d4720470b6aa759277c8bbca51e6db",
+          "playwright.config.js": "4e842402c340e4c1851017c82480aabf672c159a2736de8f2aac46f25a1e583d",
+          "popup.html": "34ce9b64fb2cc6754a45ee03670827ed54ae818a978c84df227fe36caad8e8c5",
+          "popup.js": "d7b41c2d02c9babb9061c58047fde7592bbfa0f01bb15332017f8d28954cd7ba"
+        }
+      },
+      "stages": [
+        {
+          "name": "browser-idle",
+          "durationMs": 500.6347999999998,
+          "snapshotWallMs": 354.44950000000244,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:42.492Z",
+                "elapsedMs": 354.4375,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 122757120,
+                    "privateBytes": 34639872,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 50884608,
+                    "privateBytes": 24510464,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 49900,
+                    "workingSetBytes": 34086912,
+                    "privateBytes": 16740352,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48775168,
+                    "privateBytes": 19062784,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 75276288,
+                    "privateBytes": 37994496,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 106659840,
+                    "privateBytes": 181456896,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 32657408,
+                    "privateBytes": 12521472,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21385216,
+                    "privateBytes": 9494528,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 492482560,
+                "privateSumBytes": 336420864
+              }
+            ],
+            "heap": null,
+            "samplerWorkMs": 354.4375,
+            "maxObservedWorkingSetSumBytes": 492482560,
+            "maxObservedPrivateSumBytes": 336420864
+          }
+        },
+        {
+          "name": "capture-store-synthetic",
+          "durationMs": 12.54200000000128,
+          "result": {
+            "width": 1600,
+            "height": 1200,
+            "bytes": 87844
+          },
+          "snapshotWallMs": 342.6493999999984,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:42.921Z",
+                "elapsedMs": 340.941899999998,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 127967232,
+                    "privateBytes": 39002112,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 92303360,
+                    "privateBytes": 43741184,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48775168,
+                    "privateBytes": 19062784,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57440,
+                    "workingSetBytes": 33959936,
+                    "privateBytes": 16584704,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 75300864,
+                    "privateBytes": 37994496,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 114176000,
+                    "privateBytes": 212246528,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 32935936,
+                    "privateBytes": 12591104,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21385216,
+                    "privateBytes": 9494528,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 546803712,
+                "privateSumBytes": 390717440
+              }
+            ],
+            "heap": {
+              "usedSize": 4419160,
+              "totalSize": 7356416,
+              "embedderHeapUsedSize": 2953336,
+              "backingStorageSize": 569049
+            },
+            "samplerWorkMs": 340.941899999998,
+            "maxObservedWorkingSetSumBytes": 546803712,
+            "maxObservedPrivateSumBytes": 390717440
+          }
+        },
+        {
+          "name": "capture-editor-load",
+          "durationMs": 71.23960000000079,
+          "snapshotWallMs": 341.39220000000205,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:43.334Z",
+                "elapsedMs": 339.58190000000104,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 128032768,
+                    "privateBytes": 38907904,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 122859520,
+                    "privateBytes": 61759488,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48775168,
+                    "privateBytes": 19062784,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57440,
+                    "workingSetBytes": 33959936,
+                    "privateBytes": 16584704,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 75300864,
+                    "privateBytes": 37994496,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 124207104,
+                    "privateBytes": 255270912,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 32935936,
+                    "privateBytes": 12591104,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21385216,
+                    "privateBytes": 9494528,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 587456512,
+                "privateSumBytes": 451665920
+              }
+            ],
+            "heap": {
+              "usedSize": 5880876,
+              "totalSize": 9523200,
+              "embedderHeapUsedSize": 4932248,
+              "backingStorageSize": 840701
+            },
+            "samplerWorkMs": 339.58190000000104,
+            "maxObservedWorkingSetSumBytes": 587456512,
+            "maxObservedPrivateSumBytes": 451665920
+          }
+        },
+        {
+          "name": "capture-editor-closed-settled",
+          "durationMs": 1513.9138999999996,
+          "snapshotWallMs": 330.8839000000007,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:45.187Z",
+                "elapsedMs": 330.8700000000026,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 149360640,
+                    "privateBytes": 48537600,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 115695616,
+                    "privateBytes": 54382592,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48803840,
+                    "privateBytes": 19062784,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57440,
+                    "workingSetBytes": 34000896,
+                    "privateBytes": 16584704,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 75337728,
+                    "privateBytes": 37994496,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 124776448,
+                    "privateBytes": 260145152,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33034240,
+                    "privateBytes": 12591104,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21426176,
+                    "privateBytes": 9494528,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 602435584,
+                "privateSumBytes": 458792960
+              }
+            ],
+            "heap": null,
+            "samplerWorkMs": 330.8700000000026,
+            "maxObservedWorkingSetSumBytes": 602435584,
+            "maxObservedPrivateSumBytes": 458792960
+          }
+        },
+        {
+          "name": "editor-1-empty",
+          "durationMs": 47.20440000000235,
+          "snapshotWallMs": 350.7259000000013,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:45.603Z",
+                "elapsedMs": 348.8194999999978,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 150261760,
+                    "privateBytes": 49438720,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 16704,
+                    "workingSetBytes": 34017280,
+                    "privateBytes": 16654336,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 121065472,
+                    "privateBytes": 58404864,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48807936,
+                    "privateBytes": 19062784,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 75337728,
+                    "privateBytes": 37994496,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 125435904,
+                    "privateBytes": 261095424,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33034240,
+                    "privateBytes": 12591104,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21426176,
+                    "privateBytes": 9494528,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 609386496,
+                "privateSumBytes": 464736256
+              }
+            ],
+            "heap": {
+              "usedSize": 5221720,
+              "totalSize": 8810496,
+              "embedderHeapUsedSize": 7111600,
+              "backingStorageSize": 1096181
+            },
+            "samplerWorkMs": 348.8194999999978,
+            "maxObservedWorkingSetSumBytes": 609386496,
+            "maxObservedPrivateSumBytes": 464736256
+          }
+        },
+        {
+          "name": "editor-1-import",
+          "durationMs": 26.382300000001123,
+          "result": {
+            "images": 1,
+            "dimensions": [
+              1600,
+              1200
+            ]
+          },
+          "snapshotWallMs": 312.8081999999995,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:45.943Z",
+                "elapsedMs": 311.2376000000004,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 150589440,
+                    "privateBytes": 49762304,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 16704,
+                    "workingSetBytes": 34017280,
+                    "privateBytes": 16654336,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 134438912,
+                    "privateBytes": 71548928,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48807936,
+                    "privateBytes": 19062784,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 75337728,
+                    "privateBytes": 37994496,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 125943808,
+                    "privateBytes": 269475840,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33034240,
+                    "privateBytes": 12591104,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21426176,
+                    "privateBytes": 9494528,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 623595520,
+                "privateSumBytes": 486584320
+              }
+            ],
+            "heap": {
+              "usedSize": 7924592,
+              "totalSize": 11681792,
+              "embedderHeapUsedSize": 7319424,
+              "backingStorageSize": 1325873
+            },
+            "samplerWorkMs": 311.2376000000004,
+            "maxObservedWorkingSetSumBytes": 623595520,
+            "maxObservedPrivateSumBytes": 486584320
+          }
+        },
+        {
+          "name": "editor-1-crop-retained",
+          "durationMs": 69.39069999999992,
+          "result": {
+            "crop": [
+              100,
+              100,
+              800,
+              600
+            ],
+            "undoEnabled": true
+          },
+          "snapshotWallMs": 343.2304000000004,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:46.355Z",
+                "elapsedMs": 341.2695999999996,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 150618112,
+                    "privateBytes": 49025024,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 16704,
+                    "workingSetBytes": 34017280,
+                    "privateBytes": 16654336,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 138231808,
+                    "privateBytes": 71749632,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48820224,
+                    "privateBytes": 19062784,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 75350016,
+                    "privateBytes": 37994496,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 127139840,
+                    "privateBytes": 379699200,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33058816,
+                    "privateBytes": 12591104,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21426176,
+                    "privateBytes": 9494528,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 628662272,
+                "privateSumBytes": 596271104
+              }
+            ],
+            "heap": {
+              "usedSize": 5772756,
+              "totalSize": 10670080,
+              "embedderHeapUsedSize": 7697432,
+              "backingStorageSize": 1384828
+            },
+            "samplerWorkMs": 341.2695999999996,
+            "maxObservedWorkingSetSumBytes": 628662272,
+            "maxObservedPrivateSumBytes": 596271104
+          }
+        },
+        {
+          "name": "editor-1-save-library",
+          "durationMs": 46.71519999999873,
+          "snapshotWallMs": 325.945499999998,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:46.728Z",
+                "elapsedMs": 323.8809000000001,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 151228416,
+                    "privateBytes": 49561600,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 16704,
+                    "workingSetBytes": 34017280,
+                    "privateBytes": 16654336,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 148254720,
+                    "privateBytes": 80142336,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48820224,
+                    "privateBytes": 19062784,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 75350016,
+                    "privateBytes": 37994496,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 129581056,
+                    "privateBytes": 384450560,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33058816,
+                    "privateBytes": 12591104,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21426176,
+                    "privateBytes": 9494528,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 641736704,
+                "privateSumBytes": 609951744
+              }
+            ],
+            "heap": {
+              "usedSize": 8381444,
+              "totalSize": 15126528,
+              "embedderHeapUsedSize": 8245112,
+              "backingStorageSize": 3415427
+            },
+            "samplerWorkMs": 323.8809000000001,
+            "maxObservedWorkingSetSumBytes": 641736704,
+            "maxObservedPrivateSumBytes": 609951744
+          }
+        },
+        {
+          "name": "editor-1-project-export",
+          "durationMs": 128.42020000000048,
+          "result": {
+            "filename": "Synthetic_1_2026-11-26_10-37.scionos",
+            "bytes": 27924
+          },
+          "snapshotWallMs": 326.71240000000034,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:47.183Z",
+                "elapsedMs": 324.97739999999976,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 153804800,
+                    "privateBytes": 51417088,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 16704,
+                    "workingSetBytes": 34086912,
+                    "privateBytes": 16654336,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 153636864,
+                    "privateBytes": 83607552,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48824320,
+                    "privateBytes": 19066880,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 75350016,
+                    "privateBytes": 37994496,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 130400256,
+                    "privateBytes": 383672320,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33058816,
+                    "privateBytes": 12591104,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21426176,
+                    "privateBytes": 9494528,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 650588160,
+                "privateSumBytes": 614498304
+              }
+            ],
+            "heap": {
+              "usedSize": 6528812,
+              "totalSize": 15388672,
+              "embedderHeapUsedSize": 8326912,
+              "backingStorageSize": 5445789
+            },
+            "samplerWorkMs": 324.97739999999976,
+            "maxObservedWorkingSetSumBytes": 650588160,
+            "maxObservedPrivateSumBytes": 614498304
+          }
+        },
+        {
+          "name": "editor-1-html-export",
+          "durationMs": 104.61349999999948,
+          "result": {
+            "filename": "Synthetic_1_2026-11-26_10-37.html",
+            "bytes": 37062
+          },
+          "snapshotWallMs": 350.0089999999982,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:47.638Z",
+                "elapsedMs": 348.3797999999988,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 152678400,
+                    "privateBytes": 50241536,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 16704,
+                    "workingSetBytes": 34086912,
+                    "privateBytes": 16654336,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 155090944,
+                    "privateBytes": 84267008,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48824320,
+                    "privateBytes": 19066880,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 75350016,
+                    "privateBytes": 37994496,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 130347008,
+                    "privateBytes": 383684608,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33058816,
+                    "privateBytes": 12591104,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21426176,
+                    "privateBytes": 9494528,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 650862592,
+                "privateSumBytes": 613994496
+              }
+            ],
+            "heap": {
+              "usedSize": 8280444,
+              "totalSize": 15388672,
+              "embedderHeapUsedSize": 8308792,
+              "backingStorageSize": 7483514
+            },
+            "samplerWorkMs": 348.3797999999988,
+            "maxObservedWorkingSetSumBytes": 650862592,
+            "maxObservedPrivateSumBytes": 613994496
+          }
+        },
+        {
+          "name": "editor-1-png-export",
+          "durationMs": 161.83919999999853,
+          "result": {
+            "filename": "Synthetic_1_2026-11-26_10-37.png",
+            "bytes": 31152
+          },
+          "snapshotWallMs": 320.82000000000335,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:48.120Z",
+                "elapsedMs": 319.11019999999553,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 153026560,
+                    "privateBytes": 50556928,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 16704,
+                    "workingSetBytes": 34086912,
+                    "privateBytes": 16654336,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 141062144,
+                    "privateBytes": 67317760,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48824320,
+                    "privateBytes": 19066880,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 75350016,
+                    "privateBytes": 37994496,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 135151616,
+                    "privateBytes": 392151040,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33058816,
+                    "privateBytes": 12591104,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21426176,
+                    "privateBytes": 9494528,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 641986560,
+                "privateSumBytes": 605827072
+              }
+            ],
+            "heap": {
+              "usedSize": 4575056,
+              "totalSize": 7024640,
+              "embedderHeapUsedSize": 3924632,
+              "backingStorageSize": 438675
+            },
+            "samplerWorkMs": 319.11019999999553,
+            "maxObservedWorkingSetSumBytes": 641986560,
+            "maxObservedPrivateSumBytes": 605827072
+          }
+        },
+        {
+          "name": "editor-1-closed-settled",
+          "durationMs": 1509.154300000002,
+          "snapshotWallMs": 310.70620000000054,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:49.948Z",
+                "elapsedMs": 310.6814999999988,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 153251840,
+                    "privateBytes": 50737152,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 16704,
+                    "workingSetBytes": 34086912,
+                    "privateBytes": 16654336,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 133386240,
+                    "privateBytes": 59596800,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48824320,
+                    "privateBytes": 19066880,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 75350016,
+                    "privateBytes": 37994496,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 133156864,
+                    "privateBytes": 389165056,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33218560,
+                    "privateBytes": 12853248,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21426176,
+                    "privateBytes": 9494528,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 632700928,
+                "privateSumBytes": 595562496
+              }
+            ],
+            "heap": null,
+            "samplerWorkMs": 310.6814999999988,
+            "maxObservedWorkingSetSumBytes": 632700928,
+            "maxObservedPrivateSumBytes": 595562496
+          }
+        },
+        {
+          "name": "editor-4-empty",
+          "durationMs": 49.47490000000107,
+          "snapshotWallMs": 356.19950000000244,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:50.375Z",
+                "elapsedMs": 354.45440000000235,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 153432064,
+                    "privateBytes": 49823744,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 53736,
+                    "workingSetBytes": 34009088,
+                    "privateBytes": 16629760,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 134631424,
+                    "privateBytes": 60235776,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48824320,
+                    "privateBytes": 19066880,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 75354112,
+                    "privateBytes": 37998592,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 136388608,
+                    "privateBytes": 393043968,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33222656,
+                    "privateBytes": 12857344,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21430272,
+                    "privateBytes": 9498624,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 637292544,
+                "privateSumBytes": 599154688
+              }
+            ],
+            "heap": {
+              "usedSize": 6123028,
+              "totalSize": 7356416,
+              "embedderHeapUsedSize": 6237848,
+              "backingStorageSize": 710626
+            },
+            "samplerWorkMs": 354.45440000000235,
+            "maxObservedWorkingSetSumBytes": 637292544,
+            "maxObservedPrivateSumBytes": 599154688
+          }
+        },
+        {
+          "name": "editor-4-import",
+          "durationMs": 113.08260000000155,
+          "result": {
+            "images": 4,
+            "dimensions": [
+              1600,
+              1200
+            ]
+          },
+          "snapshotWallMs": 313.2051999999967,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:50.802Z",
+                "elapsedMs": 311.5427999999956,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 154288128,
+                    "privateBytes": 50995200,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 53736,
+                    "workingSetBytes": 34009088,
+                    "privateBytes": 16629760,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 167735296,
+                    "privateBytes": 95006720,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48824320,
+                    "privateBytes": 19066880,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 75354112,
+                    "privateBytes": 37998592,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 137486336,
+                    "privateBytes": 394309632,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33222656,
+                    "privateBytes": 12857344,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21430272,
+                    "privateBytes": 9498624,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 672350208,
+                "privateSumBytes": 636362752
+              }
+            ],
+            "heap": {
+              "usedSize": 4844756,
+              "totalSize": 6451200,
+              "embedderHeapUsedSize": 3155136,
+              "backingStorageSize": 853687
+            },
+            "samplerWorkMs": 311.5427999999956,
+            "maxObservedWorkingSetSumBytes": 672350208,
+            "maxObservedPrivateSumBytes": 636362752
+          }
+        },
+        {
+          "name": "editor-4-crop-retained",
+          "durationMs": 51.10090000000491,
+          "result": {
+            "crop": [
+              100,
+              100,
+              800,
+              600
+            ],
+            "undoEnabled": true
+          },
+          "snapshotWallMs": 335.0547000000006,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:51.188Z",
+                "elapsedMs": 333.22359999999753,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 155127808,
+                    "privateBytes": 51843072,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 53736,
+                    "workingSetBytes": 34009088,
+                    "privateBytes": 16629760,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 168947712,
+                    "privateBytes": 96505856,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48824320,
+                    "privateBytes": 19066880,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 75354112,
+                    "privateBytes": 37998592,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 137531392,
+                    "privateBytes": 495169536,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33222656,
+                    "privateBytes": 12857344,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21434368,
+                    "privateBytes": 9498624,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 674451456,
+                "privateSumBytes": 739569664
+              }
+            ],
+            "heap": {
+              "usedSize": 5181400,
+              "totalSize": 6713344,
+              "embedderHeapUsedSize": 3685816,
+              "backingStorageSize": 912412
+            },
+            "samplerWorkMs": 333.22359999999753,
+            "maxObservedWorkingSetSumBytes": 674451456,
+            "maxObservedPrivateSumBytes": 739569664
+          }
+        },
+        {
+          "name": "editor-4-save-library",
+          "durationMs": 60.315199999997276,
+          "snapshotWallMs": 343.80249999999796,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:51.592Z",
+                "elapsedMs": 342.2418000000034,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 155197440,
+                    "privateBytes": 51552256,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 53736,
+                    "workingSetBytes": 34009088,
+                    "privateBytes": 16629760,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 224567296,
+                    "privateBytes": 144179200,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48836608,
+                    "privateBytes": 19066880,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 75378688,
+                    "privateBytes": 37998592,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 155033600,
+                    "privateBytes": 495218688,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33255424,
+                    "privateBytes": 12857344,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21434368,
+                    "privateBytes": 9498624,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 747712512,
+                "privateSumBytes": 787001344
+              }
+            ],
+            "heap": {
+              "usedSize": 4292388,
+              "totalSize": 7761920,
+              "embedderHeapUsedSize": 2683408,
+              "backingStorageSize": 9289639
+            },
+            "samplerWorkMs": 342.2418000000034,
+            "maxObservedWorkingSetSumBytes": 747712512,
+            "maxObservedPrivateSumBytes": 787001344
+          }
+        },
+        {
+          "name": "editor-4-project-export",
+          "durationMs": 411.58029999999417,
+          "result": {
+            "filename": "Synthetic_4_2026-11-26_10-37.scionos",
+            "bytes": 295056
+          },
+          "snapshotWallMs": 349.19840000000113,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:52.353Z",
+                "elapsedMs": 347.34999999999854,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 154853376,
+                    "privateBytes": 52019200,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 53736,
+                    "workingSetBytes": 34078720,
+                    "privateBytes": 16629760,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 203968512,
+                    "privateBytes": 122392576,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48836608,
+                    "privateBytes": 19066880,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 75378688,
+                    "privateBytes": 37998592,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 155013120,
+                    "privateBytes": 495218688,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33255424,
+                    "privateBytes": 12857344,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21434368,
+                    "privateBytes": 9498624,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 726818816,
+                "privateSumBytes": 765681664
+              }
+            ],
+            "heap": {
+              "usedSize": 4296568,
+              "totalSize": 7237632,
+              "embedderHeapUsedSize": 2575168,
+              "backingStorageSize": 26980895
+            },
+            "samplerWorkMs": 347.34999999999854,
+            "maxObservedWorkingSetSumBytes": 726818816,
+            "maxObservedPrivateSumBytes": 765681664
+          }
+        },
+        {
+          "name": "editor-4-html-export",
+          "durationMs": 3368.2144000000044,
+          "result": {
+            "filename": "Synthetic_4_2026-11-26_10-37.html",
+            "bytes": 392416
+          },
+          "snapshotWallMs": 356.38589999999385,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:56.078Z",
+                "elapsedMs": 354.98710000000574,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 155717632,
+                    "privateBytes": 52432896,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 53736,
+                    "workingSetBytes": 34086912,
+                    "privateBytes": 16629760,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 204996608,
+                    "privateBytes": 123539456,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48836608,
+                    "privateBytes": 19066880,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 75378688,
+                    "privateBytes": 37998592,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 151764992,
+                    "privateBytes": 434225152,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33263616,
+                    "privateBytes": 12857344,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21434368,
+                    "privateBytes": 9498624,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 725479424,
+                "privateSumBytes": 706248704
+              }
+            ],
+            "heap": {
+              "usedSize": 5007800,
+              "totalSize": 7368704,
+              "embedderHeapUsedSize": 2385104,
+              "backingStorageSize": 27075631
+            },
+            "samplerWorkMs": 354.98710000000574,
+            "maxObservedWorkingSetSumBytes": 725479424,
+            "maxObservedPrivateSumBytes": 706248704
+          }
+        },
+        {
+          "name": "editor-4-png-export",
+          "durationMs": 452.6362999999983,
+          "result": {
+            "filename": "Synthetic_4_2026-11-26_10-37.png",
+            "bytes": 197697
+          },
+          "snapshotWallMs": 303.92439999999624,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:56.834Z",
+                "elapsedMs": 302.44490000000224,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 155246592,
+                    "privateBytes": 52543488,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 53736,
+                    "workingSetBytes": 34086912,
+                    "privateBytes": 16629760,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 198893568,
+                    "privateBytes": 106532864,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48836608,
+                    "privateBytes": 19066880,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 75378688,
+                    "privateBytes": 37998592,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 171094016,
+                    "privateBytes": 435617792,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33263616,
+                    "privateBytes": 12857344,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21434368,
+                    "privateBytes": 9498624,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 738234368,
+                "privateSumBytes": 690745344
+              }
+            ],
+            "heap": {
+              "usedSize": 4771440,
+              "totalSize": 8024064,
+              "embedderHeapUsedSize": 2395368,
+              "backingStorageSize": 8877729
+            },
+            "samplerWorkMs": 302.44490000000224,
+            "maxObservedWorkingSetSumBytes": 738234368,
+            "maxObservedPrivateSumBytes": 690745344
+          }
+        },
+        {
+          "name": "editor-4-closed-settled",
+          "durationMs": 1508.5311999999976,
+          "snapshotWallMs": 318.8949999999968,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:58.671Z",
+                "elapsedMs": 318.88210000000254,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 153923584,
+                    "privateBytes": 50778112,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 53736,
+                    "workingSetBytes": 34086912,
+                    "privateBytes": 16629760,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 168136704,
+                    "privateBytes": 75681792,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48836608,
+                    "privateBytes": 19066880,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 75378688,
+                    "privateBytes": 37998592,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 168230912,
+                    "privateBytes": 431529984,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33263616,
+                    "privateBytes": 12857344,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21434368,
+                    "privateBytes": 9498624,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 703291392,
+                "privateSumBytes": 654041088
+              }
+            ],
+            "heap": null,
+            "samplerWorkMs": 318.88210000000254,
+            "maxObservedWorkingSetSumBytes": 703291392,
+            "maxObservedPrivateSumBytes": 654041088
+          }
+        },
+        {
+          "name": "library-100-listing",
+          "durationMs": 120.20830000000569,
+          "result": {
+            "projects": 100,
+            "cards": 100,
+            "domElements": 1167,
+            "thumbnails": {
+              "total": 100,
+              "loaded": 30
+            }
+          },
+          "snapshotWallMs": 350.34219999999914,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:59.278Z",
+                "elapsedMs": 348.396799999995,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 161005568,
+                    "privateBytes": 57552896,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 27020,
+                    "workingSetBytes": 33992704,
+                    "privateBytes": 16617472,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 177205248,
+                    "privateBytes": 82030592,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48836608,
+                    "privateBytes": 19066880,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 76025856,
+                    "privateBytes": 38608896,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 173363200,
+                    "privateBytes": 436363264,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33288192,
+                    "privateBytes": 12881920,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21434368,
+                    "privateBytes": 9498624,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 725151744,
+                "privateSumBytes": 672620544
+              }
+            ],
+            "heap": {
+              "usedSize": 7216020,
+              "totalSize": 8880128,
+              "embedderHeapUsedSize": 11878048,
+              "backingStorageSize": 9245280
+            },
+            "samplerWorkMs": 348.396799999995,
+            "maxObservedWorkingSetSumBytes": 725151744,
+            "maxObservedPrivateSumBytes": 672620544
+          }
+        },
+        {
+          "name": "library-100-search",
+          "durationMs": 9.549999999995634,
+          "result": {
+            "matches": 1
+          },
+          "snapshotWallMs": 321.6972999999998,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:59.610Z",
+                "elapsedMs": 320.2046999999948,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 161005568,
+                    "privateBytes": 57552896,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 27020,
+                    "workingSetBytes": 33992704,
+                    "privateBytes": 16617472,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 178061312,
+                    "privateBytes": 83349504,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48836608,
+                    "privateBytes": 19066880,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 76025856,
+                    "privateBytes": 38608896,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 173367296,
+                    "privateBytes": 436158464,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33288192,
+                    "privateBytes": 12881920,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21434368,
+                    "privateBytes": 9498624,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 726011904,
+                "privateSumBytes": 673734656
+              }
+            ],
+            "heap": {
+              "usedSize": 7370356,
+              "totalSize": 9142272,
+              "embedderHeapUsedSize": 12170496,
+              "backingStorageSize": 9245367
+            },
+            "samplerWorkMs": 320.2046999999948,
+            "maxObservedWorkingSetSumBytes": 726011904,
+            "maxObservedPrivateSumBytes": 673734656
+          }
+        },
+        {
+          "name": "library-100-clear-search",
+          "durationMs": 10.057000000000698,
+          "snapshotWallMs": 315.6261000000013,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:37:59.936Z",
+                "elapsedMs": 313.85570000000007,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 161095680,
+                    "privateBytes": 57552896,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 27020,
+                    "workingSetBytes": 33992704,
+                    "privateBytes": 16617472,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 182714368,
+                    "privateBytes": 87314432,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48836608,
+                    "privateBytes": 19066880,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 76025856,
+                    "privateBytes": 38608896,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 172519424,
+                    "privateBytes": 377999360,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33288192,
+                    "privateBytes": 12881920,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21434368,
+                    "privateBytes": 9498624,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 729907200,
+                "privateSumBytes": 619540480
+              }
+            ],
+            "heap": {
+              "usedSize": 7466928,
+              "totalSize": 9142272,
+              "embedderHeapUsedSize": 16011616,
+              "backingStorageSize": 9245367
+            },
+            "samplerWorkMs": 313.85570000000007,
+            "maxObservedWorkingSetSumBytes": 729907200,
+            "maxObservedPrivateSumBytes": 619540480
+          }
+        },
+        {
+          "name": "library-100-closed-settled",
+          "durationMs": 1510.8122999999978,
+          "snapshotWallMs": 309.00650000000314,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:38:01.764Z",
+                "elapsedMs": 308.9936999999991,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 161157120,
+                    "privateBytes": 57593856,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 27020,
+                    "workingSetBytes": 33992704,
+                    "privateBytes": 16617472,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 182104064,
+                    "privateBytes": 87179264,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48836608,
+                    "privateBytes": 19066880,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 76025856,
+                    "privateBytes": 38608896,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 170057728,
+                    "privateBytes": 375152640,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33288192,
+                    "privateBytes": 12881920,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21434368,
+                    "privateBytes": 9498624,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 726896640,
+                "privateSumBytes": 616599552
+              }
+            ],
+            "heap": null,
+            "samplerWorkMs": 308.9936999999991,
+            "maxObservedWorkingSetSumBytes": 726896640,
+            "maxObservedPrivateSumBytes": 616599552
+          }
+        },
+        {
+          "name": "library-1000-listing",
+          "durationMs": 313.7927000000054,
+          "result": {
+            "projects": 1000,
+            "cards": 1000,
+            "domElements": 11067,
+            "thumbnails": {
+              "total": 1000,
+              "loaded": 30
+            }
+          },
+          "snapshotWallMs": 348.00130000000354,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:38:03.237Z",
+                "elapsedMs": 346.20730000000185,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 192475136,
+                    "privateBytes": 89382912,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 231133184,
+                    "privateBytes": 136474624,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48836608,
+                    "privateBytes": 19066880,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 35548,
+                    "workingSetBytes": 34086912,
+                    "privateBytes": 16723968,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 76029952,
+                    "privateBytes": 38612992,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 165572608,
+                    "privateBytes": 303050752,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33288192,
+                    "privateBytes": 12881920,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21434368,
+                    "privateBytes": 9498624,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 802856960,
+                "privateSumBytes": 625692672
+              }
+            ],
+            "heap": {
+              "usedSize": 7199748,
+              "totalSize": 10715136,
+              "embedderHeapUsedSize": 33137664,
+              "backingStorageSize": 851606
+            },
+            "samplerWorkMs": 346.20730000000185,
+            "maxObservedWorkingSetSumBytes": 802856960,
+            "maxObservedPrivateSumBytes": 625692672
+          }
+        },
+        {
+          "name": "library-1000-search",
+          "durationMs": 12.081599999997707,
+          "result": {
+            "matches": 1
+          },
+          "snapshotWallMs": 335.6273000000001,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:38:03.585Z",
+                "elapsedMs": 333.88230000000476,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 192479232,
+                    "privateBytes": 89387008,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 231424000,
+                    "privateBytes": 136814592,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48836608,
+                    "privateBytes": 19066880,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 35548,
+                    "workingSetBytes": 34086912,
+                    "privateBytes": 16723968,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 76029952,
+                    "privateBytes": 38612992,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 165576704,
+                    "privateBytes": 303054848,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33288192,
+                    "privateBytes": 12881920,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21434368,
+                    "privateBytes": 9498624,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 803155968,
+                "privateSumBytes": 626040832
+              }
+            ],
+            "heap": {
+              "usedSize": 7940804,
+              "totalSize": 10715136,
+              "embedderHeapUsedSize": 33558096,
+              "backingStorageSize": 851709
+            },
+            "samplerWorkMs": 333.88230000000476,
+            "maxObservedWorkingSetSumBytes": 803155968,
+            "maxObservedPrivateSumBytes": 626040832
+          }
+        },
+        {
+          "name": "library-1000-clear-search",
+          "durationMs": 84.77719999999681,
+          "snapshotWallMs": 320.5549000000028,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:38:03.990Z",
+                "elapsedMs": 319.0732999999964,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 192462848,
+                    "privateBytes": 89407488,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 247746560,
+                    "privateBytes": 153247744,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48836608,
+                    "privateBytes": 19066880,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 35548,
+                    "workingSetBytes": 34086912,
+                    "privateBytes": 16723968,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 76029952,
+                    "privateBytes": 38612992,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 165560320,
+                    "privateBytes": 303071232,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33288192,
+                    "privateBytes": 12881920,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21434368,
+                    "privateBytes": 9498624,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 819445760,
+                "privateSumBytes": 642510848
+              }
+            ],
+            "heap": {
+              "usedSize": 7454528,
+              "totalSize": 10977280,
+              "embedderHeapUsedSize": 71929672,
+              "backingStorageSize": 851709
+            },
+            "samplerWorkMs": 319.0732999999964,
+            "maxObservedWorkingSetSumBytes": 819445760,
+            "maxObservedPrivateSumBytes": 642510848
+          }
+        },
+        {
+          "name": "library-1000-closed-settled",
+          "durationMs": 1512.8885999999984,
+          "snapshotWallMs": 324.9979000000021,
+          "memory": {
+            "samples": [
+              {
+                "timestamp": "2026-11-26T09:38:05.849Z",
+                "elapsedMs": 324.97819999999774,
+                "processes": [
+                  {
+                    "pid": 18944,
+                    "workingSetBytes": 189947904,
+                    "privateBytes": 86433792,
+                    "type": "browser"
+                  },
+                  {
+                    "pid": 57236,
+                    "workingSetBytes": 248803328,
+                    "privateBytes": 154906624,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 14652,
+                    "workingSetBytes": 48836608,
+                    "privateBytes": 19066880,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 35548,
+                    "workingSetBytes": 34086912,
+                    "privateBytes": 16723968,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 30124,
+                    "workingSetBytes": 76029952,
+                    "privateBytes": 38612992,
+                    "type": "renderer"
+                  },
+                  {
+                    "pid": 55880,
+                    "workingSetBytes": 159719424,
+                    "privateBytes": 293322752,
+                    "type": "GPU"
+                  },
+                  {
+                    "pid": 5008,
+                    "workingSetBytes": 33288192,
+                    "privateBytes": 12881920,
+                    "type": "network.mojom.NetworkService"
+                  },
+                  {
+                    "pid": 20000,
+                    "workingSetBytes": 21434368,
+                    "privateBytes": 9498624,
+                    "type": "storage.mojom.StorageService"
+                  }
+                ],
+                "missingPids": [],
+                "workingSetSumBytes": 812146688,
+                "privateSumBytes": 631447552
+              }
+            ],
+            "heap": null,
+            "samplerWorkMs": 324.97819999999774,
+            "maxObservedWorkingSetSumBytes": 812146688,
+            "maxObservedPrivateSumBytes": 631447552
+          }
+        }
+      ],
+      "browserVersion": "159.0.8154.6",
+      "fixtures": [
+        {
+          "name": "synthetic-0.png",
+          "bytes": 87844,
+          "sha256": "924e083dd8145cdfc9d5ae270a276f214964669b510253ac06ca72cbde5205f6"
+        },
+        {
+          "name": "synthetic-1.png",
+          "bytes": 88578,
+          "sha256": "17c3d83b4eb8e6974f417ddada0f4549d2a0a936a75a66bb147642f5d55fa96b"
+        },
+        {
+          "name": "synthetic-2.png",
+          "bytes": 88891,
+          "sha256": "b3c009732224c424a75c8b56b0de309b6c58fbd17cf483c06e7430d0b4f03f2d"
+        },
+        {
+          "name": "synthetic-3.png",
+          "bytes": 88832,
+          "sha256": "f0ca4fa98fa2261139828a740be8c6a65af966f9a67b7375ced92c16f8980e50"
+        }
+      ],
+      "sourceAfter": {
+        "root": "D:/Serveurs/Projet_ScioNos/Scionos-Capture",
+        "files": {
+          ".htmlvalidate.json": "e1f59cbf126e13fda5232970d22c6ecb39ab6cc42daf8aaaea25ebb50f759a75",
+          "annotation-model.js": "85e1d1bea3972eed8eb469b040ea2d0325e841ec5b27ac248c58379c15f63871",
+          "background.js": "909148c5a0310b3d6c054d9a7fc7dff74073e68c8f1900bf9ed91821d93a5136",
+          "capture-content-utils.js": "3ea02354df7c964638c96c78dbc52bf1acc0f7c4294c3da5669bef39804da57a",
+          "capture-store.js": "028f068861ec8a7824ce0673d46d30eb28d3e818302397aad7e1c9ddc6cc201b",
+          "capture-utils.js": "c85f998f2f32bde194dd40b2321fc4424ab7449bb3b81731f093ccfed456a436",
+          "composition-export.js": "a86a00b18d7748e8f4fd4de97f5f4d5c8b03c452e497780e7668632cb783eb86",
+          "composition-utils.js": "9a2b69feb40de7f5c1650c130fac56f8c9807abdc89422064f7bf3eaec2d2130",
+          "content-capture.js": "b3871896ea7b8138437a8831e6d1bbd85ba322e3c4b7e4b0bfe0683e66cc4ec0",
+          "content-dom.js": "6f656b8a9a20a230a3bd0f986cb4cf3aae6ac912e50f421469838290963d4d1a",
+          "content-selection.js": "37eec7a327a3ee9e5aa602dfa692d09d2b8fd7213f1021cd9f5723747e7d1bed",
+          "content-transfer.js": "be2cf94ff5083b794a66a5c2f2952e8cfa8845b34c2a9ac47db5cb754e0f9f5e",
+          "content.js": "5cefcab5be3757655c4981e0c894e83e8f496eb148ea408a7f59519c162c9db9",
+          "editor-export.js": "4076079449fff3aa7cad3419c318f8a72c6c66be5916638938b35816b72f7af5",
+          "editor-operations.js": "2af657e7cef94dfbd0a9bdc390f5edb5f3e68959b30ff6538af34445293b49fb",
+          "editor.html": "61d010ec44fa512fc727f40a74f5596e75179b4af0c404fca7e64723949c2252",
+          "editor.js": "c43dfe8e8fd5a1643828a900b2b5ed33d427c9c41abfd6a9029d857149c62b19",
+          "eslint.config.js": "6e10daa0aae2934447dd96445636db171fdbf8c9c1d85e2bc07ff33141921c26",
+          "help.html": "c48f974acd045b75404989092f905bf3dc08dc5005848f035b3753baa730a8a3",
+          "help.js": "1b9542bc3d9d49200c2fe1baf2027cbd10813c33f0b55d8b822dfc392bb87e4c",
+          "i18n.js": "946c65c958e62c2a4305eec0f47b5c68d57d37ea7b3ef1e3b075fe3b62685f33",
+          "library.html": "4b164b799fd3104681f6084e4c7a9c223f36bf044eee8694bef8bbd4e2ab06e1",
+          "library.js": "a29207e607043bf4357f397480931fa9a16b3bcc43bef9b2cce9b7c79e7162ce",
+          "manifest.json": "1eb778a299e212649db462a36acf55c0255a03310bcece7ddf6c4d417f3f7984",
+          "package-lock.json": "25678be0148c7db299f7de5b20bd45e16c3dcf031087156bec01baea89f3ed71",
+          "package.json": "c7a9a930a0c5f9e47cfe08c8ea7afc93e1d4720470b6aa759277c8bbca51e6db",
+          "playwright.config.js": "4e842402c340e4c1851017c82480aabf672c159a2736de8f2aac46f25a1e583d",
+          "popup.html": "34ce9b64fb2cc6754a45ee03670827ed54ae818a978c84df227fe36caad8e8c5",
+          "popup.js": "d7b41c2d02c9babb9061c58047fde7592bbfa0f01bb15332017f8d28954cd7ba"
+        }
+      },
+      "sourceStable": true
+    }
+  ],
+  "comparison": [
+    {
+      "iteration": 0,
+      "stage": "browser-idle",
+      "durationDeltaMs": -3.1152000000001863,
+      "workingSetDeltaBytes": -458752,
+      "privateDeltaBytes": 15175680
+    },
+    {
+      "iteration": 0,
+      "stage": "capture-store-synthetic",
+      "durationDeltaMs": -1.2687999999986914,
+      "workingSetDeltaBytes": -1486848,
+      "privateDeltaBytes": -512000
+    },
+    {
+      "iteration": 0,
+      "stage": "capture-editor-load",
+      "durationDeltaMs": -13.76069999999936,
+      "workingSetDeltaBytes": -3854336,
+      "privateDeltaBytes": -13795328
+    },
+    {
+      "iteration": 0,
+      "stage": "capture-editor-closed-settled",
+      "durationDeltaMs": 6.009900000000016,
+      "workingSetDeltaBytes": -4014080,
+      "privateDeltaBytes": -13844480
+    },
+    {
+      "iteration": 0,
+      "stage": "editor-1-empty",
+      "durationDeltaMs": 3.4586000000026615,
+      "workingSetDeltaBytes": -3153920,
+      "privateDeltaBytes": -12865536
+    },
+    {
+      "iteration": 0,
+      "stage": "editor-1-import",
+      "durationDeltaMs": -11.247099999998682,
+      "workingSetDeltaBytes": 24576,
+      "privateDeltaBytes": -19505152
+    },
+    {
+      "iteration": 0,
+      "stage": "editor-1-crop-retained",
+      "durationDeltaMs": -5.477799999999661,
+      "workingSetDeltaBytes": -4255744,
+      "privateDeltaBytes": -24133632
+    },
+    {
+      "iteration": 0,
+      "stage": "editor-1-save-library",
+      "durationDeltaMs": -5.050000000002001,
+      "workingSetDeltaBytes": -3940352,
+      "privateDeltaBytes": -11624448
+    },
+    {
+      "iteration": 0,
+      "stage": "editor-1-project-export",
+      "durationDeltaMs": -20.64139999999952,
+      "workingSetDeltaBytes": -3055616,
+      "privateDeltaBytes": -10768384
+    },
+    {
+      "iteration": 0,
+      "stage": "editor-1-html-export",
+      "durationDeltaMs": 8.057699999999386,
+      "workingSetDeltaBytes": -6037504,
+      "privateDeltaBytes": -14151680
+    },
+    {
+      "iteration": 0,
+      "stage": "editor-1-png-export",
+      "durationDeltaMs": -7.561500000001615,
+      "workingSetDeltaBytes": -5210112,
+      "privateDeltaBytes": -10661888
+    },
+    {
+      "iteration": 0,
+      "stage": "editor-1-closed-settled",
+      "durationDeltaMs": 0.8598000000019965,
+      "workingSetDeltaBytes": -3682304,
+      "privateDeltaBytes": -8691712
+    },
+    {
+      "iteration": 0,
+      "stage": "editor-4-empty",
+      "durationDeltaMs": 11.572500000002037,
+      "workingSetDeltaBytes": -3371008,
+      "privateDeltaBytes": -8519680
+    },
+    {
+      "iteration": 0,
+      "stage": "editor-4-import",
+      "durationDeltaMs": -2.136399999997593,
+      "workingSetDeltaBytes": -2138112,
+      "privateDeltaBytes": -6447104
+    },
+    {
+      "iteration": 0,
+      "stage": "editor-4-crop-retained",
+      "durationDeltaMs": -13.26579999999376,
+      "workingSetDeltaBytes": -1015808,
+      "privateDeltaBytes": -4562944
+    },
+    {
+      "iteration": 0,
+      "stage": "editor-4-save-library",
+      "durationDeltaMs": 9.49489999999787,
+      "workingSetDeltaBytes": 25399296,
+      "privateDeltaBytes": 21598208
+    },
+    {
+      "iteration": 0,
+      "stage": "editor-4-project-export",
+      "durationDeltaMs": -26.438300000005256,
+      "workingSetDeltaBytes": -1425408,
+      "privateDeltaBytes": -5947392
+    },
+    {
+      "iteration": 0,
+      "stage": "editor-4-html-export",
+      "durationDeltaMs": 10.616600000004837,
+      "workingSetDeltaBytes": -3280896,
+      "privateDeltaBytes": -22261760
+    },
+    {
+      "iteration": 0,
+      "stage": "editor-4-png-export",
+      "durationDeltaMs": 7.737599999996746,
+      "workingSetDeltaBytes": 13484032,
+      "privateDeltaBytes": -20578304
+    },
+    {
+      "iteration": 0,
+      "stage": "editor-4-closed-settled",
+      "durationDeltaMs": -1.0175000000017462,
+      "workingSetDeltaBytes": 12738560,
+      "privateDeltaBytes": -21467136
+    },
+    {
+      "iteration": 0,
+      "stage": "library-100-listing",
+      "durationDeltaMs": 13.696500000005472,
+      "workingSetDeltaBytes": 10088448,
+      "privateDeltaBytes": -23777280
+    },
+    {
+      "iteration": 0,
+      "stage": "library-100-search",
+      "durationDeltaMs": 1.198499999994965,
+      "workingSetDeltaBytes": 10514432,
+      "privateDeltaBytes": 3821568
+    },
+    {
+      "iteration": 0,
+      "stage": "library-100-clear-search",
+      "durationDeltaMs": -31.15889999999854,
+      "workingSetDeltaBytes": 6062080,
+      "privateDeltaBytes": 38834176
+    },
+    {
+      "iteration": 0,
+      "stage": "library-100-closed-settled",
+      "durationDeltaMs": -1.9979999999995925,
+      "workingSetDeltaBytes": 2850816,
+      "privateDeltaBytes": 46383104
+    },
+    {
+      "iteration": 0,
+      "stage": "library-1000-listing",
+      "durationDeltaMs": -159.93899999999485,
+      "workingSetDeltaBytes": -37408768,
+      "privateDeltaBytes": -60194816
+    },
+    {
+      "iteration": 0,
+      "stage": "library-1000-search",
+      "durationDeltaMs": -8.62710000000152,
+      "workingSetDeltaBytes": -31465472,
+      "privateDeltaBytes": -54460416
+    },
+    {
+      "iteration": 0,
+      "stage": "library-1000-clear-search",
+      "durationDeltaMs": -277.6830000000009,
+      "workingSetDeltaBytes": -48640000,
+      "privateDeltaBytes": -69910528
+    },
+    {
+      "iteration": 0,
+      "stage": "library-1000-closed-settled",
+      "durationDeltaMs": 6.310299999997369,
+      "workingSetDeltaBytes": -43515904,
+      "privateDeltaBytes": -66097152
+    }
+  ],
+  "finishedAt": "2026-11-26T09:38:06.130Z"
+}

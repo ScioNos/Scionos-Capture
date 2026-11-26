@@ -2,7 +2,22 @@
 
 [Français](PRIVACY.md) · [English](PRIVACY.en.md) · [Español](PRIVACY.es.md) · [Deutsch](PRIVACY.de.md)
 
-Zuletzt aktualisiert: 17. November 2026 — Dokumentation der Version 1.5.2.
+## Vorbereitung von 1.5.3 — 26. November 2026
+
+**Abschließende lokale Qualifizierung von 1.5.3 bestanden; unveröffentlichte Version.** Gesamtlauf bestanden: 178 Unit-Tests, 179 E2E-Tests, fünf native Modi in Chrome 158.0.8127.37 und Edge 158.0.4370.33, drei Unterbrechungen je Browser, drei Leistungswiederholungen und zehn PDF-Szenarien. Linux-Prüfungen bestehen auch mit den exakten Node-Mindestversionen 22.22.0 und 24.8.0 (je 178 Unit-Tests). Siehe [Konsolidierungsbericht](RAPPORT_CONSOLIDATION_1.5.3.md). Anwendungs-Commit `3352a12` wird in [PR #1](https://github.com/ScioNos/Scionos-Capture/pull/1) vorgeschlagen, offen und nicht zusammengeführt; die Zusammenführung erfordert eine ausdrückliche Freigabe. Linux-E2E und Windows-Skalierung bestanden auf diesem Commit; Node-22/24-Core-Prüfungen und Filter bestanden auf `81f7849` nach Korrektur der Nachweislinks. Den neuesten SHA zeigen die [PR-Prüfungen](https://github.com/ScioNos/Scionos-Capture/pull/1/checks); ein Gesamterfolg dieses letzten CI-Laufs wird noch nicht behauptet. Endgültiges Archiv: 175.572 Bytes, SHA-256 `f863e10d835425c9023cdb716f7f6bdaa5ce191f34982042417312a50a733d81`. Kein GitHub-Release und keine Store-Einreichung; öffentliche Links von 1.5.2 bleiben erhalten.
+
+- Exportabbruch: Abbrechen und Escape verhindern die Ausgabe auch nach Beginn der Momentaufnahme, während der PDF-Rasterung oder der Bildmodus-Seitenbänder; acht bestandene gezielte Szenarien prüfen temporäre URL-Bereinigung und erneuten Versuch.
+
+Prüfungen der Aufnahmeidentität und zu Beginn festgelegte Metadaten sollen die Vermischung von Seiten oder Dokumenten vermeiden. Das Entfernen des Caches ändert die lokale Aufbewahrung nicht; IndexedDB bleibt maßgeblich. Das Schließen aufgegebener Verbindungen und die lokal bereits vorhandene transaktionale Gesamtlöschung verbessern die Speicherkonsistenz. Bereits gespeicherte Exporte müssen Benutzer weiterhin separat löschen.
+
+- Aufnahme: aktiven Tab, Fenster und Navigation vor und nach der Erfassung prüfen, mit einer an die `documentId` gebundenen Prüfung. URL und Titel werden zu Beginn der Sitzung festgelegt.
+- PDF: `captureVisibleTab` liefert keinen Nachweis, dass aufgenommene Pixel und DOM übereinstimmen. Selbst identische beobachtete Zustände vor und nach der Aufnahme können eine vorübergehende Änderung übersehen. Deshalb wird sämtlicher aus dem DOM abgeleiteter Quelltext bei nativen Aufnahmen weggelassen. Text in Benutzerannotationen wird als Pixel gerendert; Titel, Bildunterschriften sowie Kopf- und Fußzeilen bleiben außerhalb des reinen Bildmodus durchsuchbar.
+- PDF nur als Bild: Option im Bereich Dokument, in alle vier Sprachen übersetzt und mit den Projekteinstellungen gespeichert. Sie entfernt durchsuchbare Textebenen und rastert auch Kopf- und Fußzeilen. Sichtbare Pixel können weiterhin Geheimnisse enthalten; dieser Modus ersetzt keine deckende Maske.
+- Projekte: Manifest auf 1 MiB UTF-8-JSON (einschließlich Escape-Sequenzen), STORE-ZIP-Archiv auf 128 MiB einschließlich Headern und Verzeichnis begrenzt. Eine Vorprüfung lehnt Überschreitungen vor Kopien/Momentaufnahmen ab; der Codec prüft auch die endgültig kodierten Größen. Die Annotationsverläufe für Rückgängig/Wiederholen teilen zusätzlich ein Gesamtbudget von 1 MiB rohem UTF-8-JSON mit einer Reserve pro Zustand. Der Kompositionsverlauf für Titel und Bildunterschriften ist ebenfalls auf 50 Zustände und ein gemeinsames Budget von 1 MiB UTF-8-JSON begrenzt; Änderungen an PDF-Einstellungen und Quellenrichtlinie werden vor der Zustandsänderung geprüft.
+- Speicherung: Aufnahme-Cache entfernen, um veraltete Daten zwischen Kontexten zu vermeiden; aufgegebene IndexedDB-Verbindungen schließen. Die im lokalen Arbeitsbaum bereits vorhandene transaktionale Gesamtlöschung wird integriert und beibehalten, mit vollständigem Rollback bei Fehlern.
+- Importe: strenge Validierung der PNG-Transparenzdaten `tRNS`. Projekte v1/v2 bleiben lesbar, geschrieben wird v2. Keine neue Berechtigung oder Telemetrie.
+
+Zuletzt aktualisiert: 26. November 2026 — Dokumentation der lokal qualifizierten Version 1.5.3.
 
 **Verantwortlicher Herausgeber:** eyelo SA (UID: CHE-108.174.302), Waadt (Vaud), Schweiz — Marke **ScioNos** ([scionos.ch](https://scionos.ch)) — Kontakt: info@eyelo.ch
 
@@ -16,7 +31,7 @@ Aufnahmen und Textmetadaten bleiben in lokalem IndexedDB. Fragmente werden nach 
 
 Sprache und Aufnahmeverzögerung (`captureDelaySeconds`, 0, 3, 5 oder 10 Sekunden) liegen in `chrome.storage.local`, die temporäre Editor-Zuordnung in `chrome.storage.session`. Elementauswahl und Countdown bleiben lokal und benötigen keine weiteren Berechtigungen oder Netzwerkziele. Verzögerte Aufnahmen werden ausdrücklich gestartet und können abgebrochen werden. Von der Erweiterung gespeicherte Daten können über die Erweiterungsverwaltung oder Deinstallation entfernt werden. Exportierte Dateien oder auf dem Gerät gespeicherte Projekte müssen Benutzer separat löschen. Datenschutz-Kontakt: info@eyelo.ch. Für Schwachstellen siehe [SECURITY.de.md](SECURITY.de.md).
 
-Die durchsuchbare PDF-Ebene enthält nur vollständige Wörter mit überprüfbarer Sichtbarkeit. Unsichere Wörter werden aus dieser Ebene ausgelassen; das aufgenommene Bild bleibt erhalten. Ältere Ebenen mit ungeprüften Koordinaten werden ebenfalls ausgelassen. Vertrauliche Pixel müssen deckend maskiert werden; Unschärfe ist nur ein visueller Effekt.
+In der lokal qualifizierten Version 1.5.3 liefern native Aufnahmen keine aus dem DOM abgeleitete Quelltextebene: Die API beweist deren Übereinstimmung mit den Pixeln nicht. Importierte Bilder und erneut geöffnete Projekte stellen keine zuverlässige Quelltextebene wieder her. Text in Benutzerannotationen wird als Pixel gerendert; Titel, Bildunterschriften sowie Kopf- und Fußzeilen bleiben außerhalb des Modus „PDF nur als Bild“ durchsuchbar. Diese Option wird in den Projekteinstellungen gespeichert und rastert auch Kopf- und Fußzeilen. Das Bild bleibt erhalten; vertrauliche Pixel müssen deckend maskiert werden, da Unschärfe nur ein visueller Effekt ist.
 
 Ausstehende Änderungen vor jedem Export übernehmen oder verwerfen. Unschärfe bleibt ein visueller Effekt; Geheimnisse deckend maskieren.
 

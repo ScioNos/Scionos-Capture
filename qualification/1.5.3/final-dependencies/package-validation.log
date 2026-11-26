@@ -1,0 +1,16 @@
+✔ manifest, locale catalogs, icons and referenced files are valid (39.0536ms)
+✔ manifest policy allows only the current permission set and local CSP (1.0841ms)
+✔ manifest policy rejects remote CSP and unsafe evaluation across scopes (0.5195ms)
+✔ PNG dimensions require a complete PNG signature and IHDR header (0.6148ms)
+✔ version sync rejects a missing or malformed lockfile before changing package.json (17.0534ms)
+✔ version sync updates all version files after validating a complete lockfile (32.0303ms)
+✔ unreleased synchronization preserves published links and history and is idempotent (152.9374ms)
+✔ Markdown validation checks relative files and anchors including local ignored documents (32.8693ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 327.9232

@@ -111,32 +111,39 @@
     const { capture } = dependencies();
     const dimensions = capture.computeOutputDimensions(rect.width, rect.height, scale);
     const canvas = document.createElement('canvas');
-    canvas.width = dimensions.width;
-    canvas.height = dimensions.height;
-    const context = canvas.getContext('2d');
-    if (!context) throw new Error('Canvas rendering is unavailable.');
-    if (opaque) { context.fillStyle = '#ffffff'; context.fillRect(0, 0, canvas.width, canvas.height); }
-    context.scale(canvas.width / rect.width, canvas.height / rect.height);
-    context.translate(-rect.x, -rect.y);
-    context.fillStyle = prepared.layout.background;
-    context.fillRect(rect.x, rect.y, rect.width, rect.height);
-    context.imageSmoothingEnabled = true;
-    context.imageSmoothingQuality = 'high';
-    for (let index = 0; index < prepared.layout.items.length; index++) {
-      const geometry = prepared.layout.items[index];
-      if (!intersects(rect, { x: geometry.imageX, y: geometry.imageY, width: geometry.imageWidth, height: geometry.imageHeight })) continue;
-      const decoded = await openImage(prepared.items[index]);
-      try { context.drawImage(decoded.image, geometry.imageX, geometry.imageY, geometry.imageWidth, geometry.imageHeight); }
-      finally { decoded.close(); }
+    let rendered = false;
+    try {
+      canvas.width = dimensions.width;
+      canvas.height = dimensions.height;
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('Canvas rendering is unavailable.');
+      if (opaque) { context.fillStyle = '#ffffff'; context.fillRect(0, 0, canvas.width, canvas.height); }
+      context.scale(canvas.width / rect.width, canvas.height / rect.height);
+      context.translate(-rect.x, -rect.y);
+      context.fillStyle = prepared.layout.background;
+      context.fillRect(rect.x, rect.y, rect.width, rect.height);
+      context.imageSmoothingEnabled = true;
+      context.imageSmoothingQuality = 'high';
+      for (let index = 0; index < prepared.layout.items.length; index++) {
+        const geometry = prepared.layout.items[index];
+        if (!intersects(rect, { x: geometry.imageX, y: geometry.imageY, width: geometry.imageWidth, height: geometry.imageHeight })) continue;
+        const decoded = await openImage(prepared.items[index]);
+        try { context.drawImage(decoded.image, geometry.imageX, geometry.imageY, geometry.imageWidth, geometry.imageHeight); }
+        finally { decoded.close(); }
+      }
+      context.fillStyle = '#111827';
+      context.textBaseline = 'top';
+      for (const run of textRuns(prepared.layout)) {
+        if (!intersects(rect, run)) continue;
+        context.font = `${run.weight} ${run.fontSize}px ${FONT}`;
+        context.fillText(run.text, run.x, run.y, run.width);
+      }
+      rendered = true;
+      return canvas;
+    } finally {
+      // Successful render hands the canvas to its caller; failures keep ownership here.
+      if (!rendered) canvas.width = canvas.height = 1;
     }
-    context.fillStyle = '#111827';
-    context.textBaseline = 'top';
-    for (const run of textRuns(prepared.layout)) {
-      if (!intersects(rect, run)) continue;
-      context.font = `${run.weight} ${run.fontSize}px ${FONT}`;
-      context.fillText(run.text, run.x, run.y, run.width);
-    }
-    return canvas;
   }
   async function render(snapshot, rect, scale = 1) { return renderPrepared(await prepare(snapshot), rect, scale); }
   async function image(snapshot, format = 'png', quality = 0.9) {
@@ -283,7 +290,7 @@
       return block.url ? `<a class="composition-search-text" href="${esc(block.url)}" style="${style}">${esc(block.text)}</a>` : `<span class="composition-search-text" style="${style}">${esc(block.text)}</span>`;
     }).join('');
   }
-  function bandMarkup(config, prepared, page, total, lang) {
+  function bandText(config, prepared, page, total, lang) {
     if (!config.enabled) return '';
     const pieces = [];
     if (config.title) pieces.push(prepared.title);
@@ -296,23 +303,57 @@
       }
     }
     if (config.pagination) pieces.push(`${page} / ${total}`);
-    return pieces.map(esc).join(' · ');
+    return pieces.filter(value => value !== undefined && value !== null).join(' · ');
+  }
+  function bandMarkup(config, prepared, page, total, lang) {
+    return esc(bandText(config, prepared, page, total, lang));
+  }
+  function rasterBand(config, prepared, page, total, lang, widthMm, owner) {
+    const canvas = owner.createElement('canvas');
+    const pixelsPerMm = 96 / 25.4;
+    canvas.width = Math.max(1, Math.ceil(widthMm * pixelsPerMm));
+    canvas.height = Math.max(1, Math.ceil(config.heightMm * pixelsPerMm));
+    try {
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('Canvas rendering is unavailable.');
+      context.font = '12px Arial, sans-serif';
+      context.fillStyle = '#334155';
+      context.textBaseline = 'top';
+      let line = '', y = 0;
+      // Break long URLs as well as words; clipped pixels do not create hidden text.
+      for (const character of bandText(config, prepared, page, total, lang)) {
+        if (context.measureText(line + character).width > canvas.width && line) {
+          context.fillText(line, 0, y); y += 14.4; line = '';
+          if (y >= canvas.height) break;
+        }
+        line += character;
+      }
+      if (y < canvas.height) context.fillText(line, 0, y);
+      return canvas;
+    } catch (error) { canvas.width = canvas.height = 1; throw error; }
   }
   async function print(snapshot, options = {}, printArea, lang = 'fr') {
     if (!printArea || typeof printArea.replaceChildren !== 'function' || !printArea.ownerDocument) throw new Error('A print container is required.');
     const request = {};
     printRequests.set(printArea, request);
     const assertCurrent = () => {
+      options.signal?.throwIfAborted();
       if (printRequests.get(printArea) !== request) throw new Error('Composition print was superseded by a newer request.');
     };
     const prepared = await prepare(snapshot);
     assertCurrent();
-    const blocks = compositionBlocks(prepared);
-    const plan = avoidTextCuts(dependencies().utils.buildPagePlan(prepared.layout.width, prepared.layout.height, pdfSettings({ ...prepared.exportSettings, ...options })), blocks);
+    const settings = pdfSettings({ ...prepared.exportSettings, ...options });
+    const blocks = settings.imageOnly === true ? [] : compositionBlocks(prepared);
+    const plan = avoidTextCuts(dependencies().utils.buildPagePlan(prepared.layout.width, prepared.layout.height, settings), blocks);
     if (!plan.pages.length || plan.pages.length > MAX_PAGES) throw new Error('PDF page limit exceeded (200 pages).');
     let printPixels = 0, printImageBytes = 0;
     for (const page of plan.pages) {
       printPixels += Math.ceil(page.sourceWidth) * Math.ceil(page.sourceHeight);
+      if (settings.imageOnly === true) {
+        for (const band of [plan.settings.header, plan.settings.footer]) {
+          if (band.enabled) printPixels += Math.ceil(plan.contentWidthMm * 96 / 25.4) * Math.ceil(band.heightMm * 96 / 25.4);
+        }
+      }
       if (printPixels > MAX_PRINT_PIXELS) throw new Error('PDF image pixel budget exceeded (32 million pixels).');
     }
     trace('print-prepared', { pages: plan.pages.length, pixels: printPixels });
@@ -331,6 +372,7 @@
       urls.splice(0).forEach(url => URL.revokeObjectURL(url));
       printWindow.removeEventListener('afterprint', cleanup);
       printWindow.removeEventListener('pagehide', cleanup);
+      options.signal?.removeEventListener('abort', cleanup);
       if (timer) clearTimeout(timer);
       if (printJobs.get(printArea) === cleanup) {
         printJobs.delete(printArea);
@@ -342,7 +384,9 @@
       }
     };
     printJobs.set(printArea, cleanup);
+    options.signal?.addEventListener('abort', cleanup, { once: true });
     try {
+      assertCurrent();
       const pages = [];
       for (const page of plan.pages) {
         const canvas = await renderPrepared(prepared, { x: page.sourceX, y: page.sourceY, width: page.sourceWidth, height: page.sourceHeight });
@@ -355,7 +399,21 @@
         urls.push(url);
         const s = plan.settings;
         const bandStyle = `left:${s.marginsMm.left}mm;width:${plan.contentWidthMm}mm;`;
-        pages.push(`<section class="composition-print-page" style="width:${plan.pageWidthMm}mm;height:${plan.pageHeightMm}mm"><div class="composition-print-band" style="${bandStyle}top:${s.marginsMm.top}mm;height:${s.header.heightMm}mm">${bandMarkup(s.header, prepared, page.page, plan.pages.length, lang)}</div><div class="composition-print-slice" style="left:${page.xMm}mm;top:${page.yMm}mm;width:${page.widthMm}mm;height:${page.heightMm}mm"><img src="${esc(url)}" alt="${esc(prepared.title)}" style="width:${page.widthMm}mm;height:${page.heightMm}mm">${textLayer(blocks, page, plan.mmPerPixel)}</div><div class="composition-print-band" style="${bandStyle}bottom:${s.marginsMm.bottom}mm;height:${s.footer.heightMm}mm">${bandMarkup(s.footer, prepared, page.page, plan.pages.length, lang)}</div></section>`);
+        const bandContent = async config => {
+          if (settings.imageOnly !== true) return bandMarkup(config, prepared, page.page, plan.pages.length, lang);
+          if (!config.enabled) return '';
+          const bandCanvas = rasterBand(config, prepared, page.page, plan.pages.length, lang, plan.contentWidthMm, owner);
+          let bandBlob;
+          try { bandBlob = await canvasBlob(bandCanvas); } finally { bandCanvas.width = bandCanvas.height = 1; }
+          assertCurrent();
+          printImageBytes += bandBlob.size;
+          if (printImageBytes > MAX_PRINT_IMAGE_BYTES) throw new Error('PDF image byte budget exceeded (128 MiB).');
+          const bandUrl = URL.createObjectURL(bandBlob);
+          urls.push(bandUrl);
+          return `<img src="${esc(bandUrl)}" alt="" style="display:block;width:${plan.contentWidthMm}mm;height:${config.heightMm}mm">`;
+        };
+        const header = await bandContent(s.header), footer = await bandContent(s.footer);
+        pages.push(`<section class="composition-print-page" style="width:${plan.pageWidthMm}mm;height:${plan.pageHeightMm}mm"><div class="composition-print-band" style="${bandStyle}top:${s.marginsMm.top}mm;height:${s.header.heightMm}mm">${header}</div><div class="composition-print-slice" style="left:${page.xMm}mm;top:${page.yMm}mm;width:${page.widthMm}mm;height:${page.heightMm}mm"><img src="${esc(url)}" alt="${settings.imageOnly === true ? '' : esc(prepared.title)}" style="width:${page.widthMm}mm;height:${page.heightMm}mm">${settings.imageOnly === true ? '' : textLayer(blocks, page, plan.mmPerPixel)}</div><div class="composition-print-band" style="${bandStyle}bottom:${s.marginsMm.bottom}mm;height:${s.footer.heightMm}mm">${footer}</div></section>`);
       }
       const style = owner.createElement('style');
       style.textContent = `@page{size:${plan.pageWidthMm}mm ${plan.pageHeightMm}mm;margin:0}@media screen{[data-composition-print]{display:none!important}}@media print{html,body{height:auto!important;min-height:0!important;margin:0!important;padding:0!important;overflow:visible!important}body{display:block!important}body>*:not([data-composition-print]):not(:has([data-composition-print])){display:none!important}[data-composition-print]{display:block!important;margin:0!important;padding:0!important;background:#fff!important;color:#111!important}[data-composition-print] .composition-print-page{position:relative!important;box-sizing:border-box!important;margin:0!important;padding:0!important;overflow:hidden!important;break-inside:avoid!important;break-after:page!important;page-break-after:always!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}[data-composition-print] .composition-print-page:last-child{break-after:auto!important;page-break-after:auto!important}[data-composition-print] .composition-print-slice{position:absolute!important;overflow:hidden!important}[data-composition-print] .composition-print-slice>img{display:block!important;max-width:none!important;margin:0!important;padding:0!important;position:absolute!important;left:0;top:0}[data-composition-print] .composition-search-text{position:absolute!important;color:transparent!important;text-decoration:none!important;white-space:pre!important;overflow:hidden!important;font-family:Arial,sans-serif!important;margin:0!important;padding:0!important}[data-composition-print] .composition-print-band{position:absolute!important;box-sizing:border-box!important;margin:0!important;padding:0!important;font:9pt/1.2 Arial,sans-serif!important;overflow:hidden!important;overflow-wrap:anywhere!important;color:#334155!important}}`;

@@ -1,0 +1,222 @@
+{
+  "verifiedAt": "2026-11-26T12:20:00.898Z",
+  "version": "1.5.3",
+  "file": "D:\\Serveurs\\Projet_ScioNos\\Scionos-Capture\\dist\\scionos-capture-v1.5.3.zip",
+  "size": 175572,
+  "sha256": "f863e10d835425c9023cdb716f7f6bdaa5ce191f34982042417312a50a733d81",
+  "entries": [
+    {
+      "name": "LICENSE",
+      "size": 1075,
+      "crc32": "9f96b56b",
+      "sha256": "cacaccd731be75c382a700d0e63a30d90044fc5887ee5c50b4765df168087586"
+    },
+    {
+      "name": "capture-store.js",
+      "size": 22669,
+      "crc32": "4c75a7ab",
+      "sha256": "028f068861ec8a7824ce0673d46d30eb28d3e818302397aad7e1c9ddc6cc201b"
+    },
+    {
+      "name": "manifest.json",
+      "size": 747,
+      "crc32": "97c779d0",
+      "sha256": "1eb778a299e212649db462a36acf55c0255a03310bcece7ddf6c4d417f3f7984"
+    },
+    {
+      "name": "background.js",
+      "size": 24428,
+      "crc32": "b3aea8f3",
+      "sha256": "909148c5a0310b3d6c054d9a7fc7dff74073e68c8f1900bf9ed91821d93a5136"
+    },
+    {
+      "name": "capture-content-utils.js",
+      "size": 1725,
+      "crc32": "f3bdeb40",
+      "sha256": "3ea02354df7c964638c96c78dbc52bf1acc0f7c4294c3da5669bef39804da57a"
+    },
+    {
+      "name": "capture-utils.js",
+      "size": 45143,
+      "crc32": "21d8da55",
+      "sha256": "c85f998f2f32bde194dd40b2321fc4424ab7449bb3b81731f093ccfed456a436"
+    },
+    {
+      "name": "content-dom.js",
+      "size": 36639,
+      "crc32": "fe19c6de",
+      "sha256": "14858a844b27d0c8617476935d2d98cf84d42fa1cf2bd5a728a744cb765e889d"
+    },
+    {
+      "name": "content-transfer.js",
+      "size": 7680,
+      "crc32": "68ffddb5",
+      "sha256": "be2cf94ff5083b794a66a5c2f2952e8cfa8845b34c2a9ac47db5cb754e0f9f5e"
+    },
+    {
+      "name": "content.js",
+      "size": 2026,
+      "crc32": "e07d7d53",
+      "sha256": "5cefcab5be3757655c4981e0c894e83e8f496eb148ea408a7f59519c162c9db9"
+    },
+    {
+      "name": "editor.html",
+      "size": 37227,
+      "crc32": "913ce2a6",
+      "sha256": "eb9199441a51fd97b19cddbcb46a1343e667e43a5ab727f5d72f4c0a5da7dab1"
+    },
+    {
+      "name": "content-selection.js",
+      "size": 12662,
+      "crc32": "8abba645",
+      "sha256": "37eec7a327a3ee9e5aa602dfa692d09d2b8fd7213f1021cd9f5723747e7d1bed"
+    },
+    {
+      "name": "content-capture.js",
+      "size": 47427,
+      "crc32": "9b73cab1",
+      "sha256": "13d17511ab8a9c5245ee6a7ff2ddb504927756332634e6a8efcffbcfeb0d09c8"
+    },
+    {
+      "name": "editor-operations.js",
+      "size": 14800,
+      "crc32": "2510ec77",
+      "sha256": "ba6d32910c43ba642dd9fa551e174911c4b54825111439269c643e5220305d27"
+    },
+    {
+      "name": "composition-utils.js",
+      "size": 38008,
+      "crc32": "0a6f7356",
+      "sha256": "c060bb2a557d86a79d45b930cc9716b3bb27e31f764dd7ff1baba6fd9eb139c2"
+    },
+    {
+      "name": "composition-export.js",
+      "size": 30996,
+      "crc32": "9e395132",
+      "sha256": "de5002cb09a28d651f4e0f5c0d0bcc9c4f901a78957cdc68b75a7c365650ec9c"
+    },
+    {
+      "name": "editor.js",
+      "size": 98785,
+      "crc32": "d9721891",
+      "sha256": "fa82263327146916440fbb0d51e8556b7606d7eb198f733d89f1cda8d2dabe53"
+    },
+    {
+      "name": "annotation-model.js",
+      "size": 11799,
+      "crc32": "4c9c4ea7",
+      "sha256": "85e1d1bea3972eed8eb469b040ea2d0325e841ec5b27ac248c58379c15f63871"
+    },
+    {
+      "name": "library.html",
+      "size": 7320,
+      "crc32": "207cdec5",
+      "sha256": "4b164b799fd3104681f6084e4c7a9c223f36bf044eee8694bef8bbd4e2ab06e1"
+    },
+    {
+      "name": "library.js",
+      "size": 19590,
+      "crc32": "b98c55b5",
+      "sha256": "a29207e607043bf4357f397480931fa9a16b3bcc43bef9b2cce9b7c79e7162ce"
+    },
+    {
+      "name": "help.html",
+      "size": 12734,
+      "crc32": "d87c8528",
+      "sha256": "c48f974acd045b75404989092f905bf3dc08dc5005848f035b3753baa730a8a3"
+    },
+    {
+      "name": "help.js",
+      "size": 3369,
+      "crc32": "4ca22a19",
+      "sha256": "1b9542bc3d9d49200c2fe1baf2027cbd10813c33f0b55d8b822dfc392bb87e4c"
+    },
+    {
+      "name": "i18n.js",
+      "size": 7731,
+      "crc32": "f8528b5d",
+      "sha256": "946c65c958e62c2a4305eec0f47b5c68d57d37ea7b3ef1e3b075fe3b62685f33"
+    },
+    {
+      "name": "popup.html",
+      "size": 14072,
+      "crc32": "1011a865",
+      "sha256": "34ce9b64fb2cc6754a45ee03670827ed54ae818a978c84df227fe36caad8e8c5"
+    },
+    {
+      "name": "popup.js",
+      "size": 10360,
+      "crc32": "10b782d2",
+      "sha256": "9023a31b041011ea122b745e0530fd58199077b162b37704a4f363eeac32dc19"
+    },
+    {
+      "name": "images/icon16.png",
+      "size": 824,
+      "crc32": "09068a76",
+      "sha256": "7bcc8543ad0e31b980d2764e060e3ccc4048dc4d508f0f21152f421f7847a0ae"
+    },
+    {
+      "name": "images/icon48.png",
+      "size": 3831,
+      "crc32": "8f7faba4",
+      "sha256": "3f35bf2d50152c895b9475d47391a92917954150f0f33f85075e1c27c92f3722"
+    },
+    {
+      "name": "images/icon128.png",
+      "size": 16637,
+      "crc32": "678acf9b",
+      "sha256": "ac91dd3506d7b74c7e66fd5b08bc11f11d69d4ef31b237f252e54054eca7bf5d"
+    },
+    {
+      "name": "_locales/fr/messages.json",
+      "size": 17460,
+      "crc32": "9ded043e",
+      "sha256": "df7957863b15c8f142f648550e822f58ad6dba43c4ae766bcb9b4175aeec2b1e"
+    },
+    {
+      "name": "_locales/en/messages.json",
+      "size": 15705,
+      "crc32": "687505e2",
+      "sha256": "1afb780556744c803347ab6401237aa091bb4f09c7be25fef7bc9debd23c7dfb"
+    },
+    {
+      "name": "_locales/es/messages.json",
+      "size": 16811,
+      "crc32": "30e8fa41",
+      "sha256": "6169d3710e047f11e6930977647d18576938a76c2791c854108d87df57999767"
+    },
+    {
+      "name": "_locales/de/messages.json",
+      "size": 17612,
+      "crc32": "6c46ae63",
+      "sha256": "3d1d7c0cc135b98beadc19cbe94fcbe880f659f9173923d9b0e163ea9ca42731"
+    },
+    {
+      "name": "images/flags/fr.svg",
+      "size": 239,
+      "crc32": "bf0cdf9d",
+      "sha256": "c694663bd826b9e7c3ce73368de1bde0911b591dc2789e47f80c75681638bb8b"
+    },
+    {
+      "name": "images/flags/en.svg",
+      "size": 586,
+      "crc32": "9f2d5fd5",
+      "sha256": "0a8c5a31859651a170bbdab102c3f94d7ab16ee6cf7e8078e0bc7d59807f359c"
+    },
+    {
+      "name": "images/flags/es.svg",
+      "size": 201,
+      "crc32": "0d160379",
+      "sha256": "449db5c0b2e5de2bdee078a775de0b62bacf45db15f0c8c63ee01059cfed31dd"
+    },
+    {
+      "name": "images/flags/de.svg",
+      "size": 239,
+      "crc32": "3e299a7f",
+      "sha256": "7977bfe75bd9a34e535c8a3bcb641a46392ac9d7bde657e5d359ed5e3b0ab195"
+    }
+  ],
+  "crcVerified": true,
+  "sourcesByteIdentical": true,
+  "allowListExact": true
+}

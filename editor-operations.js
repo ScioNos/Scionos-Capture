@@ -31,13 +31,16 @@
     function operationBounds(operation, sourceWidth, sourceHeight) {
       let bounds;
       if (operation.shape === 'free') {
-        const xs = operation.points.map(point => point.x);
-        const ys = operation.points.map(point => point.y);
+        let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
+        for (const point of operation.points) {
+          left = Math.min(left, point.x); top = Math.min(top, point.y);
+          right = Math.max(right, point.x); bottom = Math.max(bottom, point.y);
+        }
         bounds = {
-          x: Math.min(...xs) - operation.radius,
-          y: Math.min(...ys) - operation.radius,
-          width: Math.max(...xs) - Math.min(...xs) + operation.radius * 2,
-          height: Math.max(...ys) - Math.min(...ys) + operation.radius * 2
+          x: left - operation.radius,
+          y: top - operation.radius,
+          width: right - left + operation.radius * 2,
+          height: bottom - top + operation.radius * 2
         };
       } else {
         bounds = normalizeBounds(operation.start, operation.end);
@@ -136,25 +139,29 @@
       const targetContext = surface.getContext('2d');
       if (operation.type === 'color') {
         targetContext.save();
-        targetContext.fillStyle = operation.color;
-        drawCensorShape(targetContext, operation);
-        targetContext.restore();
+        try {
+          targetContext.fillStyle = operation.color;
+          drawCensorShape(targetContext, operation);
+        } finally { targetContext.restore(); }
         return;
       }
 
       const bounds = operationBounds(operation, surface.width, surface.height);
       const source = createSurface(bounds.width, bounds.height);
-      source.getContext('2d').drawImage(
-        surface, bounds.x, bounds.y, bounds.width, bounds.height,
-        0, 0, bounds.width, bounds.height
-      );
-      targetContext.save();
-      targetContext.beginPath();
-      createCensorPath(targetContext, operation);
-      targetContext.clip();
-      targetContext.filter = `blur(${operation.blur}px)`;
-      targetContext.drawImage(source, bounds.x, bounds.y);
-      targetContext.restore();
+      try {
+        source.getContext('2d').drawImage(
+          surface, bounds.x, bounds.y, bounds.width, bounds.height,
+          0, 0, bounds.width, bounds.height
+        );
+        targetContext.save();
+        try {
+          targetContext.beginPath();
+          createCensorPath(targetContext, operation);
+          targetContext.clip();
+          targetContext.filter = `blur(${operation.blur}px)`;
+          targetContext.drawImage(source, bounds.x, bounds.y);
+        } finally { targetContext.restore(); }
+      } finally { source.width = source.height = 1; }
     }
 
     function drawArrow(targetContext, operation) {
@@ -291,11 +298,16 @@
       if (operation.kind === 'crop') {
         const crop = normalizeCrop(operation, surface.width, surface.height);
         const cropped = createSurface(crop.width, crop.height);
-        cropped.getContext('2d').drawImage(
-          surface, crop.x, crop.y, crop.width, crop.height,
-          0, 0, crop.width, crop.height
-        );
-        return cropped;
+        try {
+          cropped.getContext('2d').drawImage(
+            surface, crop.x, crop.y, crop.width, crop.height,
+            0, 0, crop.width, crop.height
+          );
+          return cropped;
+        } catch (error) {
+          cropped.width = cropped.height = 1;
+          throw error;
+        }
       }
       const ctx = surface.getContext('2d');
       if (operation.kind === 'draw') drawPath(ctx, operation);

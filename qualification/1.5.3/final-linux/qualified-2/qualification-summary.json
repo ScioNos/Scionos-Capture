@@ -1,0 +1,147 @@
+{
+  "createdAt": "2026-11-26T11:55:03.819Z",
+  "snapshot": {
+    "createdAt": "2026-11-26T11:51:44.318Z",
+    "fileCount": 194,
+    "totalBytes": 5327674,
+    "digest": "659d9e04e5726de671f909c0a4975fa5ac2b7c32b0e9a2fe44c93cd1c0349d97",
+    "manifestSha256": "932ed15de7bfe68b2ce1bf253c0e9352431215d60f8933a72b9d2d394f3edae0",
+    "sourceHashes": [
+      {
+        "path": "RELEASE_NOTES.md",
+        "bytes": 44838,
+        "sha256": "ef50c92166c32c572157ddbc2450dae5fb32ecde509847ee78c2d6ef672d7a4c"
+      },
+      {
+        "path": "composition-export.js",
+        "bytes": 30996,
+        "sha256": "de5002cb09a28d651f4e0f5c0d0bcc9c4f901a78957cdc68b75a7c365650ec9c"
+      },
+      {
+        "path": "editor.js",
+        "bytes": 98785,
+        "sha256": "fa82263327146916440fbb0d51e8556b7606d7eb198f733d89f1cda8d2dabe53"
+      },
+      {
+        "path": "manifest.json",
+        "bytes": 747,
+        "sha256": "1eb778a299e212649db462a36acf55c0255a03310bcece7ddf6c4d417f3f7984"
+      },
+      {
+        "path": "package-lock.json",
+        "bytes": 72327,
+        "sha256": "af3a9d7c14436c7d738758212baededf2722a1b46fa175ef11f2f14fea6e870b"
+      },
+      {
+        "path": "package.json",
+        "bytes": 2221,
+        "sha256": "c7a9a930a0c5f9e47cfe08c8ea7afc93e1d4720470b6aa759277c8bbca51e6db"
+      }
+    ]
+  },
+  "results": [
+    {
+      "label": "node22",
+      "version": "22.22.0",
+      "image": "node:22.22.0-bookworm-slim",
+      "startedAt": "2026-11-26T11:52:40.3585537Z",
+      "container": "scionos-qualified-2-node22",
+      "memory": "2g",
+      "cpus": 2,
+      "pids": 256,
+      "sourceMount": "read-only",
+      "environment": "Image defaults and explicit CI=1 only; no host environment passed",
+      "installExit": 0,
+      "coreExit": 0,
+      "networkDisconnected": true,
+      "finishedAt": "2026-11-26T11:52:49.8161713Z",
+      "unitTests": {
+        "passed": 178,
+        "total": 178
+      },
+      "locales": 4,
+      "keys": 194,
+      "references": 49,
+      "markdownDocuments": 40,
+      "localLinks": 417,
+      "zipFiles": 35,
+      "zipSha256": "09c06d5dca2c0d56550904a77bc246717b4aa4ebe5bf335f40fc25ec1a82827f",
+      "zipBytes": 175572,
+      "proofHashes": [
+        {
+          "name": "npm-ci.log",
+          "sha256": "2ca7e577b5e698b6d9d6eb9099c342f613a955ad2c4164d36cca8ee5b8737fd1"
+        },
+        {
+          "name": "verify-core.log",
+          "sha256": "7afd0bf9c3aa37a43834d04b7b98994c66037c4e538cb3798cb334996e15446c"
+        },
+        {
+          "name": "runtime-artifact-hashes.txt",
+          "sha256": "3deb5a1b4a1dfbd0f02604d9acc30a85a292adeab1a6d7c3d3977c8330ba8034"
+        },
+        {
+          "name": "status.json",
+          "sha256": "391aa83453bf5970f180b6238fe2ed24e60893c8e0fe43fdcd3463ff40a05ee4"
+        },
+        {
+          "name": "core-network.json",
+          "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+        }
+      ]
+    },
+    {
+      "label": "node24",
+      "version": "24.8.0",
+      "image": "node:24.8.0-bookworm-slim",
+      "startedAt": "2026-11-26T11:53:15.2795999Z",
+      "container": "scionos-qualified-2-node24",
+      "memory": "2g",
+      "cpus": 2,
+      "pids": 256,
+      "sourceMount": "read-only",
+      "environment": "Image defaults and explicit CI=1 only; no host environment passed",
+      "installExit": 0,
+      "coreExit": 0,
+      "networkDisconnected": true,
+      "finishedAt": "2026-11-26T11:53:24.1197296Z",
+      "unitTests": {
+        "passed": 178,
+        "total": 178
+      },
+      "locales": 4,
+      "keys": 194,
+      "references": 49,
+      "markdownDocuments": 40,
+      "localLinks": 417,
+      "zipFiles": 35,
+      "zipSha256": "09c06d5dca2c0d56550904a77bc246717b4aa4ebe5bf335f40fc25ec1a82827f",
+      "zipBytes": 175572,
+      "proofHashes": [
+        {
+          "name": "npm-ci.log",
+          "sha256": "1367e1250444a337a7241705eba08148367d2151290fac020cef01dd35c2c583"
+        },
+        {
+          "name": "verify-core.log",
+          "sha256": "f4286ecd4ed5569c944eee8a4933b9ad2585c425501cfa0006fe9d0ba8bcdd50"
+        },
+        {
+          "name": "runtime-artifact-hashes.txt",
+          "sha256": "2c821e3c20fa797be933c3443828f9654de6b4c086e2c62d2959114eb0137137"
+        },
+        {
+          "name": "status.json",
+          "sha256": "a1d7b00245cb551a40d0838b7364c997fcdc000ee4b491b132e46ce728e42016"
+        },
+        {
+          "name": "core-network.json",
+          "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+        }
+      ]
+    }
+  ],
+  "sameZipAcrossNodeVersions": true,
+  "currentChangesSinceSnapshot": [],
+  "note": "Qualification of frozen working-tree snapshot; no browser test and no final commit claim. Intermediate177/178 remains in parent final-linux directory."
+}

@@ -346,19 +346,54 @@ test('composition exports never embed credentials from the captured source URL',
   } finally { await page.close(); }
 });
 
-test('composition PDF retains public source text but never restores masked confidential text', async () => {
+test('image-only PDF contains raster pages and bands but no searchable text or link annotations', async () => {
+  const page = await context.newPage();
+  try {
+    const { secret, visible } = await seedTextCapture(page);
+    await page.locator('#composition-title').fill('IMAGE ONLY REPORT');
+    await page.locator('#btn-pdf').click();
+    await page.locator('#pdf-image-only').check();
+    await page.evaluate(() => { globalThis.print = () => {}; });
+    await page.locator('#export-confirm').click();
+    await expect(page.locator('#export-dialog')).not.toBeVisible();
+    await expect(page.locator('#print-area .composition-print-slice > img')).toHaveCount(1);
+    await expect(page.locator('#print-area .composition-print-band > img')).toHaveCount(2);
+    await expect(page.locator('#print-area .composition-search-text, #print-area a')).toHaveCount(0);
+    const bytes = await page.pdf({ preferCSSPageSize: true, printBackground: true, displayHeaderFooter: false });
+    const { getDocument } = await import('pdfjs-dist/legacy/build/pdf.mjs');
+    const task = getDocument({ data: new Uint8Array(bytes), isEvalSupported: false, useSystemFonts: true });
+    try {
+      const pdf = await task.promise;
+      expect(pdf.numPages).toBeGreaterThan(0);
+      for (let index = 1; index <= pdf.numPages; index++) {
+        const pdfPage = await pdf.getPage(index);
+        expect((await pdfPage.getTextContent()).items).toEqual([]);
+        expect((await pdfPage.getAnnotations()).filter(annotation => annotation.subtype === 'Link')).toEqual([]);
+      }
+    } finally { await task.destroy(); }
+    // Visible source pixels remain present even though neither marker is searchable.
+    expect(bytes.length).toBeGreaterThan(1000);
+    expect(await pdfText(page)).not.toContain(secret);
+    expect(await pdfText(page)).not.toContain(visible);
+    const saved = await saveProject(page);
+    const manifest = JSON.parse(unzipEntries(saved.buffer).get('manifest.json').toString('utf8'));
+    expect(manifest.exportSettings.imageOnly).toBe(true);
+  } finally { await page.close(); }
+});
+
+test('composition PDF omits inherited source text and keeps explicit metadata after redaction', async () => {
   const page = await context.newPage();
   try {
     const { secret, visible } = await seedTextCapture(page);
     await expect(page.locator('#tool-censor')).toBeEnabled();
     await preparePdf(page);
-    const baseline = await pdfText(page); expect(baseline).toContain(secret); expect(baseline).toContain(visible);
+    const baseline = await pdfText(page); expect(baseline).not.toContain(secret); expect(baseline).not.toContain(visible);
     await solidMask(page, { x: 30, y: 30, width: 520, height: 50 });
     const second = await pngFixture(page, 'second.png', '#0000ff', 640, 100);
     await page.locator('#image-files').setInputFiles(second); await expect(items(page)).toHaveCount(2);
     await page.locator('#composition-title').fill('Safe report');
     await preparePdf(page);
-    const redacted = await pdfText(page); expect(redacted).toContain(visible); expect(redacted).toContain('Safe report'); expect(redacted).not.toContain(secret);
+    const redacted = await pdfText(page); expect(redacted).not.toContain(visible); expect(redacted).toContain('Safe report'); expect(redacted).not.toContain(secret);
     const project = await saveProject(page);
     const entries = unzipEntries(project.buffer);
     expect(entries.get('manifest.json').toString('utf8')).not.toContain(secret);

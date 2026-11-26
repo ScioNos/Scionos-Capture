@@ -1,3 +1,5 @@
 * text=auto eol=lf
 *.png binary
 *.zip binary
+# Qualification evidence is hashed as captured, including original line endings.
+qualification/** -text

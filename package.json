@@ -1,6 +1,6 @@
 {
   "name": "scionos-capture",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "private": true,
   "license": "MIT",
   "description": "Extension Manifest V3 de capture d’écran locale pour Chrome et Edge.",
@@ -13,30 +13,31 @@
     "test": "node scripts/test.mjs",
     "test:e2e": "playwright test",
     "test:native": "node scripts/native-capture-smoke.mjs",
+    "test:native:acquisition": "node scripts/native-acquisition-smoke.mjs",
     "test:performance": "node scripts/performance-smoke.mjs",
     "test:performance:pdf": "node scripts/pdf-performance-smoke.mjs",
+    "test:performance:resources": "node scripts/resource-memory-smoke.mjs",
     "package": "node scripts/package.mjs",
     "verify:core": "npm run check && npm run lint && npm test && npm run validate && npm run package",
     "verify": "npm run verify:core && npm run test:e2e",
-    "verify:release": "npm run verify && npm run test:native && npm run test:performance && npm run test:performance:pdf"
+    "verify:release": "npm run verify && npm run test:native && npm run test:native:acquisition && npm run test:performance && npm run test:performance:pdf"
   },
   "engines": {
     "node": "^22.22.0 || >=24.8.0"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.14.0",
+    "@axe-core/playwright": "^4.14.1",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.65.1",
     "archiver": "^8.0.0",
     "eslint": "^10.15.0",
     "fake-indexeddb": "^6.2.8",
-    "html-validate": "^11.21.1",
+    "html-validate": "^11.22.1",
     "pdfjs-dist": "6.5.438"
   },
   "overrides": {
-    "glob": "14.0.2",
     "readdir-glob": {
-      "minimatch": "11.0.1"
+      "minimatch": "11.0.9"
     }
   }
 }

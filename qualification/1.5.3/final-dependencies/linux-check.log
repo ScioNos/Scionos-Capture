@@ -1,0 +1,100 @@
+Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]
+Get:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
+Get:3 http://deb.debian.org/debian-security bookworm-security InRelease [34.8 kB]
+Get:4 http://deb.debian.org/debian bookworm/main amd64 Packages [8790 kB]
+Get:5 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [6924 B]
+Get:6 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [381 kB]
+Fetched 9420 kB in 1s (6691 kB/s)
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following NEW packages will be installed:
+  fonts-dejavu-core
+0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+Need to get 1068 kB of archives.
+After this operation, 3031 kB of additional disk space will be used.
+Get:1 http://deb.debian.org/debian bookworm/main amd64 fonts-dejavu-core all 2.37-6 [1068 kB]
+debconf: delaying package configuration, since apt-utils is not installed
+Fetched 1068 kB in 0s (7211 kB/s)
+Selecting previously unselected package fonts-dejavu-core.
+(Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 6096 files and directories currently installed.)
+Preparing to unpack .../fonts-dejavu-core_2.37-6_all.deb ...
+Unpacking fonts-dejavu-core (2.37-6) ...
+Setting up fonts-dejavu-core (2.37-6) ...
+v24.22.3
+11.19.1
+added 142 packages, and audited 143 packages in 3s
+
+28 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+npm notice
+npm notice New major version of npm available! 11.19.1 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice
+{
+  "date": "2026-11-26T10:31:40.699Z",
+  "platform": "linux",
+  "node": "v24.22.3",
+  "status": "passed",
+  "zip": {
+    "names": [
+      "café.txt",
+      "espace et é/naïve.txt",
+      "日本語/画像-😀.txt"
+    ],
+    "utf8": true,
+    "contentsVerified": true
+  },
+  "braces": true,
+  "tar": {
+    "names": [
+      "café.txt",
+      "espace et é/naïve.txt",
+      "日本語/画像-😀.txt"
+    ],
+    "contentsVerified": true
+  },
+  "canvas": {
+    "version": "1.2.1",
+    "pngBytes": 2773,
+    "width": 320,
+    "height": 120
+  },
+  "pdf": {
+    "pages": 1,
+    "text": true,
+    "nativeCanvasFactory": true,
+    "renderedWidth": 600,
+    "renderedHeight": 240,
+    "pngBytes": 10412
+  },
+  "limitations": [
+    "Bare native bindings are not executed on Node.",
+    "No Linux execution is implied by the Windows result."
+  ]
+}

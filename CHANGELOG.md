@@ -6,10 +6,33 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 
 ## [Unreleased]
 
+### Préparation 1.5.3 — 26 novembre 2026
+
+**Qualification locale finale 1.5.3 réussie, version non publiée.** La campagne complète passe : 178 tests unitaires, 179 E2E, cinq modes natifs dans Chrome 158.0.8127.37 et Edge 158.0.4370.33, trois interruptions par navigateur, trois répétitions de performance et dix scénarios PDF. Les contrôles Linux aux minima exacts Node 22.22.0 et 24.8.0 passent aussi (178 unitaires chacun). Voir le [rapport de consolidation](RAPPORT_CONSOLIDATION_1.5.3.md). Le commit applicatif `3352a12` est proposé dans la [PR #1](https://github.com/ScioNos/Scionos-Capture/pull/1), ouverte et non fusionnée ; sa fusion exige une validation explicite. Les E2E Linux et le scaling Windows ont réussi sur ce commit ; les contrôles core Node 22/24 et le filtre ont réussi sur `81f7849`, après correction des liens de preuves. Consultez les [checks de la PR](https://github.com/ScioNos/Scionos-Capture/pull/1/checks) pour le dernier SHA ; aucun succès global de cette dernière CI n’est encore revendiqué. Archive définitive : 175 572 octets, SHA-256 `f863e10d835425c9023cdb716f7f6bdaa5ce191f34982042417312a50a733d81`. Aucune release GitHub ni soumission Store ; les liens publics 1.5.2 sont conservés.
+
+- Annulation des exports : Annuler et Échap arrêtent la publication du résultat même après le début du snapshot, pendant la rasterisation PDF ou les bandes image uniquement ; nettoyage des URL temporaires et nouvelle tentative couverts par huit scénarios ciblés réussis.
+
+- Capture : contrôles de l’onglet actif, de la fenêtre et de la navigation avant et après acquisition, avec sonde liée au `documentId`. L’URL et le titre sont figés au début de la session.
+- PDF : `captureVisibleTab` ne fournit aucune preuve de correspondance entre les pixels capturés et le DOM. Même si les états observés avant et après sont identiques, un changement transitoire peut échapper aux contrôles : toute couche source issue du DOM est donc omise des captures natives. Le texte des annotations utilisateur est rendu dans les pixels ; les titres, légendes et bandes de page restent recherchables hors mode image uniquement.
+- PDF image uniquement : option du panneau Document, traduite dans les quatre langues et conservée avec les paramètres du projet. Elle supprime les couches de texte recherchable et rasterise aussi les en-têtes et pieds de page. Les pixels visibles peuvent toujours contenir des secrets ; ce mode ne remplace pas un masque solide.
+- Projets : manifeste limité à 1 Mio de JSON UTF-8 (échappements inclus), archive ZIP STORE à 128 Mio, en-têtes et répertoire compris. Un précontrôle refuse les dépassements avant les copies/instantanés ; le codec contrôle aussi les tailles finales encodées. Les historiques d’annotations Annuler/Refaire partagent en plus un budget total de 1 Mio de JSON brut UTF-8, avec une réserve par état. L’historique de composition des titres et légendes est lui aussi limité à 50 états et 1 Mio de JSON UTF-8 partagé ; les changements de paramètres PDF et de politique des sources sont contrôlés avant mutation.
+- Captures : budget de 180 secondes contrôlé coopérativement aux points de contrôle, et maximum de 256 portions. Il ne s’agit pas d’une interruption préemptive à 180 secondes ; les pages trop longues sont refusées.
+- Ressources : budget cumulé de 32 millions de pixels, incluant les originaux conservés après rognage ; Annuler/Refaire reste borné par ce budget. Au plus deux instantanés sont simultanément en vol, jusqu’à la fin de l’export, de la copie dans le presse-papiers ou de la sauvegarde. Les surfaces Canvas créées par ces opérations sont réduites à 1 × 1 dans `finally`, sans modifier les surfaces reçues en entrée.
+- Annotations : 1 000 par image et 5 000 par document ; 10 000 points par tracé et 100 000 par document. Historique global limité à 100 états, 100 000 points et 5 000 opérations, en plus du budget JSON partagé.
+- Stockage : cache de captures retiré pour éviter les données périmées entre contextes ; fermeture des connexions IndexedDB abandonnées. La suppression totale transactionnelle déjà présente dans l’arbre local est intégrée et préservée, avec annulation intégrale en cas d’échec.
+- Imports : validation stricte des données de transparence PNG `tRNS`. Lecture des projets v1/v2 et écriture v2 conservées. Aucune nouvelle permission ni télémétrie.
+- Interface : correction du chevauchement de la barre d’outils ; les commandes d’annotation restent groupées dans la même barre de 56 px, sans déplacement du canevas ni décalage pendant le glisser. Les états inertes `historyRevision`, `historyConsolidation` et `redoOperations` sont retirés.
+- Compatibilité : minimum du manifeste Chrome/Edge 106 au lieu de 102 ; CSS `:has()` exige Chrome 105 et `documentId` Chrome 106. Ce minimum est identifié par analyse statique ; les seules exécutions natives attestées concernent Chrome/Edge 158, sans exécution démontrée de Chrome/Edge 106.
+- Outils : `@axe-core/playwright` 4.14.1, `html-validate` 11.22.1, override `minimatch` 11.0.9 ; override `glob` inactif retiré. Douze mises à jour transitives compatibles appliquées ; Actions GitHub épinglées par SHA de commit. Voir la [revue des dépendances](DEPENDENCY_REVIEW_1.5.3.md) et la [revue des transitives](DEPENDENCY_TRANSITIVES_1.5.3.md).
+- Bibliothèque : réutilisation bornée des cartes et miniatures. Les mesures comparatives antérieures sont documentées dans le [rapport](RAPPORT_CONSOLIDATION_1.5.3.md), avec leurs limites ; elles ne prouvent pas une accélération générale. Le traitement par lots n’est pas implémenté.
+
 ## [1.5.2] — 2026-11-17
 
-**1.5.2 — publiée sur GitHub.** Release GitHub : [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). Le statut actuel du Chrome Web Store n’est pas confirmé ; aucune soumission de la 1.5.2 n’est effectuée ici.
+**Candidate Store 1.5.2 corrigée localement.** La release GitHub existante conserve son tag et son archive antérieure ; elle ne contient pas ces nouvelles corrections. Aucune soumission Store effectuée. Voir [le bilan de préparation](STORE_READINESS_1.5.2.md).
 
+- Sélections : suivi du pointeur actif, rejet des pointeurs secondaires et nettoyage des gestes interrompus.
+- Capture : restauration des éléments masqués même en cas d’exception pendant leur préparation.
+- Bibliothèque : suppression globale atomique, avec rejet des listes périmées et annulation intégrale en cas d’échec.
 - Glissers dans l’éditeur : suivi du `pointerId` actif et gestion des interruptions du geste.
 - Miniatures internes de l’éditeur et aperçu de composition : reconstruction à la réouverture du projet pour inclure les annotations.
 - Bouton « Exporter projet » : l’état « modifications non enregistrées » reste actif ; le message indique que le téléchargement a été demandé, sans garantir son enregistrement par le navigateur.
@@ -19,7 +42,7 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 - Outils de test mis à jour : axe-core/Playwright 4.14.0, Playwright Test 1.65.1, fake-indexeddb 6.2.8 et PDF.js 6.5.438. Outils ESLint et HTML-Validate migrés vers @eslint/js 10.0.1, eslint 10.15.0 et html-validate 11.21.1. Prérequis Node.js : ^22.22.0 ou >=24.8.0 ; la matrice CI cible Node.js 22.22.0 et 24.8.0, sans exécution GitHub attestée pour cette migration. Détails : [migration majeure des dépendances](MAJOR_DEPENDENCY_MIGRATION.md).
 - Accessibilité : le nom annoncé du sélecteur de langue inclut son code visible, avec vérification dans les quatre langues.
 
-Validation 1.5.2 : `npm run verify:release` a réussi — 133 tests unitaires, 126 tests navigateur, cinq modes chacun dans Chrome 157.0.8103.79 et Edge 157.0.4341.60, trois répétitions de performance et dix scénarios PDF. Résultats et environnement : [revue des dépendances et validation](DEPENDENCY_REVIEW_1.5.2.md).
+Validations historiques de 1.5.2 : voir la [revue des dépendances](DEPENDENCY_REVIEW_1.5.2.md) et le [bilan de la candidate Store corrigée](STORE_READINESS_1.5.2.md). Ces résultats concernent des états antérieurs et ne qualifient pas la 1.5.3.
 
 ## [1.5.1] — publiée sur GitHub
 
