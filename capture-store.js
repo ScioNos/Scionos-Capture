@@ -63,6 +63,7 @@
   function openDatabase() {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(DATABASE_NAME, DATABASE_VERSION);
+      let abandoned = false;
       request.onupgradeneeded = event => {
         const database = request.result;
         const transaction = request.transaction;
@@ -72,60 +73,41 @@
       };
       request.onsuccess = () => {
         const database = request.result;
+        // A blocked open cannot be cancelled. If it eventually succeeds, its
+        // caller has already failed and cannot own or close this connection.
+        if (abandoned) { database.close(); return; }
         database.onversionchange = () => database.close();
         resolve(database);
       };
       request.onerror = () => reject(request.error || new Error('Impossible d’ouvrir le stockage temporaire.'));
-      request.onblocked = () => reject(new Error('La mise à jour du stockage est bloquée par une autre page. Fermez les anciennes pages puis réessayez.'));
+      request.onblocked = () => {
+        abandoned = true;
+        reject(new Error('La mise à jour du stockage est bloquée par une autre page. Fermez les anciennes pages puis réessayez.'));
+      };
     });
   }
 
-  function runRequest(storeName, mode, createRequest) {
-    return openDatabase().then(database => new Promise((resolve, reject) => {
-      const transaction = database.transaction(storeName, mode);
-      const request = createRequest(transaction.objectStore(storeName));
-      let result;
-      request.onsuccess = () => { result = request.result; };
-      request.onerror = () => reject(request.error || new Error('Opération de stockage impossible.'));
-      transaction.oncomplete = () => { database.close(); resolve(result); };
-      transaction.onerror = () => { database.close(); reject(transaction.error || new Error('Opération de stockage impossible.')); };
-      transaction.onabort = () => { database.close(); reject(transaction.error || new Error('Opération de stockage annulée.')); };
-    }));
+  async function runRequest(storeName, mode, createRequest) {
+    const database = await openDatabase();
+    try {
+      return await new Promise((resolve, reject) => {
+        const transaction = database.transaction(storeName, mode);
+        const request = createRequest(transaction.objectStore(storeName));
+        let result;
+        request.onsuccess = () => { result = request.result; };
+        request.onerror = () => reject(request.error || new Error('Opération de stockage impossible.'));
+        transaction.oncomplete = () => resolve(result);
+        transaction.onerror = () => reject(transaction.error || new Error('Opération de stockage impossible.'));
+        transaction.onabort = () => reject(transaction.error || new Error('Opération de stockage annulée.'));
+      });
+    } finally { database.close(); }
   }
 
-  const captureCache = new Map();
-  const CAPTURE_CACHE_LIMIT = 5;
-
-  function cacheCapture(record) {
-    if (!record || !record.id) return;
-    captureCache.delete(record.id);
-    captureCache.set(record.id, record);
-    while (captureCache.size > CAPTURE_CACHE_LIMIT) {
-      captureCache.delete(captureCache.keys().next().value);
-    }
-  }
-
-  const putCapture = async record => {
-    const result = await runRequest(CAPTURE_STORE, 'readwrite', store => store.put(record));
-    cacheCapture(record);
-    return result;
-  };
-
-  const getCapture = async id => {
-    if (captureCache.has(id)) {
-      const cached = captureCache.get(id);
-      cacheCapture(cached);
-      return cached;
-    }
-    const record = await runRequest(CAPTURE_STORE, 'readonly', store => store.get(id));
-    if (record) cacheCapture(record);
-    return record;
-  };
-
-  const deleteCapture = async id => {
-    captureCache.delete(id);
-    return runRequest(CAPTURE_STORE, 'readwrite', store => store.delete(id));
-  };
+  // IndexedDB is authoritative across extension pages and worker lifetimes.
+  // A per-context cache can retain deleted records and caller-owned mutations.
+  const putCapture = record => runRequest(CAPTURE_STORE, 'readwrite', store => store.put(record));
+  const getCapture = id => runRequest(CAPTURE_STORE, 'readonly', store => store.get(id));
+  const deleteCapture = id => runRequest(CAPTURE_STORE, 'readwrite', store => store.delete(id));
   const listCaptures = () => runRequest(CAPTURE_STORE, 'readonly', store => store.getAll());
   const putTransfer = record => runRequest(TRANSFER_STORE, 'readwrite', store => store.put(record));
   const getTransfer = id => runRequest(TRANSFER_STORE, 'readonly', store => store.get(id));
@@ -230,7 +212,6 @@
 
   async function purgeExpiredCaptures(maxAgeMs, now = Date.now()) {
     const deleted = await purgeByIndex(CAPTURE_STORE, 'createdAt', now - maxAgeMs);
-    deleted.forEach(id => captureCache.delete(id));
     return deleted.length;
   }
 
@@ -281,11 +262,11 @@
 
   // All library read-modify-write operations share these stores, so IndexedDB
   // serializes quota and revision checks across tabs as well as this instance.
-  async function libraryTransaction(mode, operation) {
+  async function libraryTransaction(mode, operation, storeNames = [LIBRARY_META, LIBRARY_CONTENT, LIBRARY_CONFIG]) {
     const database = await openDatabase();
     try {
       return await new Promise((resolve, reject) => {
-        const transaction = database.transaction([LIBRARY_META, LIBRARY_CONTENT, LIBRARY_CONFIG], mode);
+        const transaction = database.transaction(storeNames, mode);
         let result, failure;
         transaction.oncomplete = () => resolve(result);
         transaction.onabort = () => reject(failure || transaction.error || new Error('Library transaction aborted.'));
@@ -390,6 +371,34 @@
     });
   }
 
+  // The snapshot must cover the entire library. Additions, removals or changed
+  // revisions since confirmation reject the whole operation before any delete.
+  async function deleteAllLibraryProjects(expectedProjects) {
+    if (!Array.isArray(expectedProjects)) throw libraryError('INVALID_LIBRARY_INPUT', 'A library snapshot is required.');
+    const expected = new Map();
+    for (const project of expectedProjects) {
+      if (!project || typeof project !== 'object') throw libraryError('INVALID_LIBRARY_INPUT', 'Invalid library snapshot.');
+      validId(project.id);
+      if (!Number.isSafeInteger(project.revision) || project.revision < 1 || expected.has(project.id)) {
+        throw libraryError('INVALID_LIBRARY_INPUT', 'Snapshot revisions must be positive and ids unique.');
+      }
+      expected.set(project.id, project.revision);
+    }
+    return libraryTransaction('readwrite', async transaction => {
+      const metaStore = transaction.objectStore(LIBRARY_META);
+      const current = await libraryRequest(metaStore.getAll());
+      if (current.length !== expected.size || current.some(project => expected.get(project.id) !== project.revision)) {
+        throw libraryError('LIBRARY_CONFLICT', 'Library changed since confirmation.');
+      }
+      const contentStore = transaction.objectStore(LIBRARY_CONTENT);
+      for (const project of current) {
+        metaStore.delete(project.id);
+        contentStore.delete(project.id);
+      }
+      return current.length;
+    }, [LIBRARY_META, LIBRARY_CONTENT]);
+  }
+
   async function duplicateLibraryProject(id, newId, { title, expectedRevision } = {}) {
     validId(id); validId(newId);
     if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 1) throw libraryError('INVALID_LIBRARY_INPUT', 'A positive expected revision is required.');
@@ -423,7 +432,7 @@
   }
 
   return {
-    saveLibraryProject, getLibraryProject, listLibraryProjects, deleteLibraryProject, duplicateLibraryProject,
+    saveLibraryProject, getLibraryProject, listLibraryProjects, deleteLibraryProject, deleteAllLibraryProjects, duplicateLibraryProject,
     purgeExpiredLibraryProjects, getLibrarySettings, setLibrarySettings, DEFAULT_LIBRARY_SETTINGS,
     putCapture, getCapture, listCaptures, deleteCapture, purgeExpiredCaptures,
     putTransfer, getTransfer, listTransfers, putTransferChunk, getTransferChunk, appendTransferChunk,

@@ -31,13 +31,16 @@
     function operationBounds(operation, sourceWidth, sourceHeight) {
       let bounds;
       if (operation.shape === 'free') {
-        const xs = operation.points.map(point => point.x);
-        const ys = operation.points.map(point => point.y);
+        let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
+        for (const point of operation.points) {
+          left = Math.min(left, point.x); top = Math.min(top, point.y);
+          right = Math.max(right, point.x); bottom = Math.max(bottom, point.y);
+        }
         bounds = {
-          x: Math.min(...xs) - operation.radius,
-          y: Math.min(...ys) - operation.radius,
-          width: Math.max(...xs) - Math.min(...xs) + operation.radius * 2,
-          height: Math.max(...ys) - Math.min(...ys) + operation.radius * 2
+          x: left - operation.radius,
+          y: top - operation.radius,
+          width: right - left + operation.radius * 2,
+          height: bottom - top + operation.radius * 2
         };
       } else {
         bounds = normalizeBounds(operation.start, operation.end);

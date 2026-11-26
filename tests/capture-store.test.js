@@ -74,7 +74,7 @@ test('returns stored captures and drops them on deletion', async () => {
   assert.equal(await CaptureStore.getCapture(id), undefined);
 });
 
-test('keeps every capture readable when the memory cache overflows', async () => {
+test('keeps multiple captures readable without retaining a local record cache', async () => {
   const ids = [];
   for (let i = 0; i < 8; i += 1) {
     const id = `lru-${Date.now()}-${i}`;
@@ -167,6 +167,61 @@ test('library stores metadata separately and provides revision-checked atomic up
   await CaptureStore.deleteLibraryProject(id, 2);
   await CaptureStore.deleteLibraryProject('library-copy', 1);
   assert.equal(await CaptureStore.getLibraryProject(id), undefined);
+});
+
+test('delete all removes both library stores and preserves configuration and temporary captures', async () => {
+  const settings = await CaptureStore.getLibrarySettings();
+  await CaptureStore.saveLibraryProject(makeProject('all-first'), { expectedRevision: null });
+  await CaptureStore.saveLibraryProject(makeProject('all-second'), { expectedRevision: null });
+  await CaptureStore.putCapture({ id: 'all-first', createdAt: Date.now() });
+  const snapshot = await CaptureStore.listLibraryProjects();
+  assert.equal(await CaptureStore.deleteAllLibraryProjects(snapshot), snapshot.length);
+  assert.deepEqual(await CaptureStore.listLibraryProjects(), []);
+  for (const { id } of snapshot) assert.equal(await CaptureStore.getLibraryProject(id), undefined);
+  assert.deepEqual(await CaptureStore.getLibrarySettings(), settings);
+  assert.ok(await CaptureStore.getCapture('all-first'));
+  await CaptureStore.deleteCapture('all-first');
+  assert.equal(await CaptureStore.deleteAllLibraryProjects([]), 0);
+});
+
+test('delete all rejects changed, missing and added projects without deleting any survivor', async () => {
+  await CaptureStore.saveLibraryProject(makeProject('all-conflict'), { expectedRevision: null });
+  const snapshot = await CaptureStore.listLibraryProjects();
+  await CaptureStore.saveLibraryProject(makeProject('all-conflict', { title: 'Changed' }), { expectedRevision: 1 });
+  await assert.rejects(CaptureStore.deleteAllLibraryProjects(snapshot), { code: 'LIBRARY_CONFLICT' });
+  assert.equal((await CaptureStore.getLibraryProject('all-conflict')).title, 'Changed');
+  const current = await CaptureStore.listLibraryProjects();
+  await CaptureStore.saveLibraryProject(makeProject('all-added'), { expectedRevision: null });
+  await assert.rejects(CaptureStore.deleteAllLibraryProjects(current), { code: 'LIBRARY_CONFLICT' });
+  const withAdded = await CaptureStore.listLibraryProjects();
+  await CaptureStore.deleteLibraryProject('all-added', 1);
+  await assert.rejects(CaptureStore.deleteAllLibraryProjects(withAdded), { code: 'LIBRARY_CONFLICT' });
+  assert.ok(await CaptureStore.getLibraryProject('all-conflict'));
+  await assert.rejects(CaptureStore.deleteAllLibraryProjects([{ id: 'all-conflict', revision: 2 }, { id: 'all-conflict', revision: 2 }]), { code: 'INVALID_LIBRARY_INPUT' });
+  await CaptureStore.deleteAllLibraryProjects(await CaptureStore.listLibraryProjects());
+});
+
+test('delete all rolls back successful deletes in both stores when the transaction aborts', async () => {
+  await CaptureStore.saveLibraryProject(makeProject('all-rollback-a'), { expectedRevision: null });
+  await CaptureStore.saveLibraryProject(makeProject('all-rollback-b'), { expectedRevision: null });
+  const snapshot = await CaptureStore.listLibraryProjects();
+  const originalDelete = globalThis.IDBObjectStore.prototype.delete;
+  let successfulDeletes = 0;
+  globalThis.IDBObjectStore.prototype.delete = function(key) {
+    const request = originalDelete.call(this, key);
+    if (this.name.startsWith('library')) request.addEventListener('success', () => {
+      successfulDeletes++;
+      if (successfulDeletes === 2) this.transaction.abort();
+    });
+    return request;
+  };
+  try {
+    await assert.rejects(CaptureStore.deleteAllLibraryProjects(snapshot));
+    assert.equal(successfulDeletes, 2);
+  } finally { globalThis.IDBObjectStore.prototype.delete = originalDelete; }
+  assert.equal((await CaptureStore.listLibraryProjects()).length, snapshot.length);
+  for (const { id } of snapshot) assert.equal(await (await CaptureStore.getLibraryProject(id)).blob.text(), 'project');
+  await CaptureStore.deleteAllLibraryProjects(await CaptureStore.listLibraryProjects());
 });
 
 test('concurrent updates with the same revision allow exactly one writer', async () => {

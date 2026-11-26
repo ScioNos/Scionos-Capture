@@ -1,5 +1,7 @@
 # Contributing to Scionos Capture
 
+Local 1.5.3 preparation, unpublished. No change to the remote Store listing or public 1.5.2 links.
+
 [Français](CONTRIBUTING.md) · [English](CONTRIBUTING.en.md) · [Español](CONTRIBUTING.es.md) · [Deutsch](CONTRIBUTING.de.md)
 
 Never attach screenshots containing personal data, credentials, or secrets.

@@ -2,6 +2,17 @@
 
 [Français](PRIVACY.md) · [English](PRIVACY.en.md) · [Español](PRIVACY.es.md) · [Deutsch](PRIVACY.de.md)
 
+## 1.5.3 preparation — November 26, 2026
+
+**Local preparation, not published.** Final test validation is still in progress; results and limitations will be recorded in the [consolidation report](CONSOLIDATION_1.5.3.md). No GitHub release or Store submission is performed. Public 1.5.2 links and archives still refer to the existing publication.
+
+Capture identity checks and metadata fixed at startup aim to avoid mixing pages or documents. Removing the cache does not change local retention; IndexedDB remains authoritative. Closing abandoned connections and the transactional full deletion already present locally improve storage consistency. Users must still delete previously saved exports separately.
+
+- Capture: check the active tab, window and navigation before and after acquisition, with a probe tied to `documentId`. The URL and title are fixed at the start of the session.
+- PDF: invalidate the text layer for DOM/CSSOM mutations, inaccessible CSS stylesheets, media changes or animations; exclude white-on-white text and omit text under blend modes or image backgrounds when visibility is uncertain (the invisible-on-white `SECRET_BLEND` regression was confirmed and fixed). These checks do not prove an absolute pixel/text match when a transient CSSOM change is restored between observations. Omission of text is preferred when uncertain; review the pixels and use a solid mask for secrets.
+- Storage: remove the capture cache to avoid stale data across contexts; close abandoned IndexedDB connections. Transactional full deletion already present in the local tree is integrated and preserved, with complete rollback on failure.
+- Imports: strictly validate PNG `tRNS` transparency data. Project v1/v2 reading and v2 writing are retained. No new permission or telemetry.
+
 Last updated: November 17, 2026 — version 1.5.2 documentation.
 
 **Publisher:** eyelo SA (UID: CHE-108.174.302), Vaud, Switzerland — Brand **ScioNos** ([scionos.ch](https://scionos.ch)) — Contact: info@eyelo.ch

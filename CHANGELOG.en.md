@@ -6,10 +6,29 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### 1.5.3 preparation — November 26, 2026
+
+**Local preparation, not published.** Final test validation is still in progress; results and limitations will be recorded in the [consolidation report](CONSOLIDATION_1.5.3.md). No GitHub release or Store submission is performed. Public 1.5.2 links and archives still refer to the existing publication.
+
+- Capture: check the active tab, window and navigation before and after acquisition, with a probe tied to `documentId`. The URL and title are fixed at the start of the session.
+- PDF: invalidate the text layer for DOM/CSSOM mutations, inaccessible CSS stylesheets, media changes or animations; exclude white-on-white text and omit text under blend modes or image backgrounds when visibility is uncertain (the invisible-on-white `SECRET_BLEND` regression was confirmed and fixed). These checks do not prove an absolute pixel/text match when a transient CSSOM change is restored between observations. Omission of text is preferred when uncertain; review the pixels and use a solid mask for secrets.
+- Captures: a 180-second budget checked cooperatively at checkpoints, and at most 256 portions. This is not a preemptive interruption at 180 seconds; excessively long pages are rejected.
+- Resources: a cumulative 32-million-pixel budget includes originals retained after cropping; Undo/Redo remains bounded by this budget. At most two snapshots are in flight simultaneously, until export, clipboard copying or saving finishes. Canvas surfaces owned by these operations are reduced to 1 × 1 in `finally`, preserving input surfaces.
+- Annotations: 1,000 per image and 5,000 per document; 10,000 points per stroke and 100,000 per document. Global history is limited to 100 states, 100,000 points and 5,000 operations.
+- Storage: remove the capture cache to avoid stale data across contexts; close abandoned IndexedDB connections. Transactional full deletion already present in the local tree is integrated and preserved, with complete rollback on failure.
+- Imports: strictly validate PNG `tRNS` transparency data. Project v1/v2 reading and v2 writing are retained. No new permission or telemetry.
+- Interface: fix toolbar overlap; annotation controls stay grouped in the same 56 px toolbar, without canvas shifts or drag offsets. Inert `historyRevision`, `historyConsolidation` and `redoOperations` state is removed.
+- Compatibility: manifest minimum Chrome/Edge 106 instead of 102; CSS `:has()` requires Chrome 105 and `documentId` requires Chrome 106. This minimum is identified by static analysis; the only attested native runs concern Chrome/Edge 158, with no demonstrated run on Chrome/Edge 106.
+- Tools: `@axe-core/playwright` 4.14.1, `html-validate` 11.22.1, `minimatch` override 11.0.9; remove the inactive `glob` override and update Actions. See the [dependency review](DEPENDENCY_REVIEW_1.5.3.md).
+- Library: bounded card and thumbnail reuse is implemented; performance gain measurement remains in progress. Batch processing targeted for 1.6 is not implemented.
+
 ## [1.5.2] — 2026-11-17
 
-**1.5.2 — published on GitHub.** GitHub release: [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). Current Chrome Web Store status is unconfirmed; no 1.5.2 Store submission is performed here.
+**Locally corrected Store candidate 1.5.2.** The existing GitHub release keeps its tag and earlier archive; it does not contain these new fixes. No Store submission performed. See [the readiness report](STORE_READINESS_1.5.2.md).
 
+- Selections: track the active pointer, ignore secondary pointers and clean up interrupted gestures.
+- Capture: restore hidden elements even when their preparation throws.
+- Library: atomic bulk deletion, rejecting stale snapshots and rolling back the entire operation on failure.
 - Editor drags: track the active `pointerId` and handle gesture interruptions.
 - Internal editor thumbnails and composition preview: reconstruct them when reopening a project to include annotations.
 - The “Export project” button: keep the unsaved-changes state; the message says the download was requested without guaranteeing that the browser saved the file.
@@ -19,7 +38,7 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Updated test tools: axe-core/Playwright 4.14.0, Playwright Test 1.65.1, fake-indexeddb 6.2.8 and PDF.js 6.5.438. ESLint and HTML-Validate migrated to @eslint/js 10.0.1, eslint 10.15.0 and html-validate 11.21.1. Node.js requirement: ^22.22.0 or >=24.8.0; the CI matrix targets Node.js 22.22.0 and 24.8.0, with no GitHub run attested for this migration. Details: [major dependency migration](MAJOR_DEPENDENCY_MIGRATION.md).
 - Accessibility: the language selector’s accessible name includes its visible code, checked in all four languages.
 
-Version 1.5.2 validation: `npm run verify:release` passed — 133 unit tests, 126 browser tests, five modes each in Chrome 157.0.8103.79 and Edge 157.0.4341.60, three performance repetitions and ten PDF scenarios. Results and environment: [dependency review and validation](DEPENDENCY_REVIEW_1.5.2.md).
+Candidate validation: 136 unit tests and 136 browser tests passed, five native modes in Chrome and Edge, three performance repetitions and ten PDF scenarios. Details, limits and final checksum: [Store readiness](STORE_READINESS_1.5.2.md).
 
 ## [1.5.1] — published on GitHub
 

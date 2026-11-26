@@ -10,16 +10,33 @@
 
 [Français](README.md) · [English](README.en.md) · [Deutsch](README.de.md) · [Español](README.es.md)
 
-[![Versión](https://img.shields.io/badge/version-1.5.2-blue)](https://github.com/ScioNos/Scionos-Capture) [![Verificación](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml/badge.svg)](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml) [![Licencia MIT](https://img.shields.io/badge/licence-MIT-green)](LICENSE) ![Chrome y Edge](https://img.shields.io/badge/Chrome_%26_Edge-Manifest_V3-4285F4)
+[![Versión](https://img.shields.io/badge/version-1.5.3-blue)](https://github.com/ScioNos/Scionos-Capture) [![Verificación](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml/badge.svg)](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml) [![Licencia MIT](https://img.shields.io/badge/licence-MIT-green)](LICENSE) ![Chrome y Edge](https://img.shields.io/badge/Chrome_%26_Edge-Manifest_V3-4285F4)
 
 **[Descargar la versión 1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2)** · **[Ver la ficha de Chrome Web Store](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe)** · **[Obtener ayuda](https://github.com/ScioNos/Scionos-Capture/issues)**
 
-<!-- source-version --> **1.5.2 — publicada en GitHub.** Versión GitHub: [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). El estado actual de Chrome Web Store no está confirmado; aquí no se realiza ningún envío de la 1.5.2 a la tienda.
+<!-- source-version --> **1.5.3 — en preparación, no publicada.** La publicación GitHub mantiene su etiqueta y archivo anterior; no contiene estas nuevas correcciones. No se ha enviado a la tienda. Véase [el informe de preparación](STORE_READINESS_1.5.2.md).
+
+## Preparación de 1.5.3 — 26 de noviembre de 2026
+
+**Preparación local, sin publicar.** La validación final de las pruebas sigue en curso; los resultados y límites se documentarán en el [informe de consolidación](CONSOLIDATION_1.5.3.md). No se realiza ninguna publicación en GitHub ni envío a la tienda. Los enlaces públicos y archivos de 1.5.2 siguen correspondiendo a la publicación existente.
+
+- Captura: comprobaciones de pestaña activa, ventana y navegación antes y después de la adquisición, con una sonda vinculada al `documentId`. La URL y el título se fijan al inicio de la sesión.
+- PDF: invalidación de la capa de texto ante mutaciones DOM/CSSOM, hojas CSS inaccesibles, cambios de medios o animaciones; exclusión del texto blanco sobre blanco y omisión del texto con modos de fusión o fondos de imagen si su visibilidad es incierta (regresión `SECRET_BLEND` invisible sobre blanco confirmada y corregida). Estas comprobaciones no demuestran una correspondencia absoluta entre píxeles y texto cuando un cambio CSSOM transitorio se revierte entre observaciones. Ante la duda se prefiere omitir el texto; revisa los píxeles y usa una máscara sólida para secretos.
+- Capturas: presupuesto de 180 segundos comprobado de forma cooperativa en los puntos de control y un máximo de 256 porciones. No es una interrupción preventiva a los 180 segundos; las páginas demasiado largas se rechazan.
+- Recursos: el presupuesto acumulado de 32 millones de píxeles incluye los originales conservados tras recortar; Deshacer/Rehacer sigue limitado por ese presupuesto. Como máximo hay dos instantáneas simultáneas en curso hasta finalizar la exportación, la copia al portapapeles o el guardado. Los Canvas propios de estas operaciones se reducen a 1 × 1 en `finally`, conservando las superficies de entrada.
+- Anotaciones: 1.000 por imagen y 5.000 por documento; 10.000 puntos por trazo y 100.000 por documento. Historial global limitado a 100 estados, 100.000 puntos y 5.000 operaciones.
+- Almacenamiento: retirada de la caché de capturas para evitar datos obsoletos entre contextos; cierre de conexiones IndexedDB abandonadas. La eliminación total transaccional ya presente en el árbol local se integra y conserva, con reversión completa en caso de error.
+- Importaciones: validación estricta de los datos de transparencia PNG `tRNS`. Se conserva la lectura de proyectos v1/v2 y la escritura v2. Sin nuevos permisos ni telemetría.
+- Interfaz: corrección del solapamiento de la barra de herramientas; los controles de anotación permanecen agrupados en la misma barra de 56 px, sin desplazar el lienzo ni alterar el arrastre. Se retiran los estados inertes `historyRevision`, `historyConsolidation` y `redoOperations`.
+- Compatibilidad: mínimo del manifiesto Chrome/Edge 106 en lugar de 102; CSS `:has()` requiere Chrome 105 y `documentId` Chrome 106. Este mínimo se identifica mediante análisis estático; las únicas ejecuciones nativas acreditadas son en Chrome/Edge 158, sin ejecución demostrada en Chrome/Edge 106.
+- Herramientas: `@axe-core/playwright` 4.14.1, `html-validate` 11.22.1, override de `minimatch` 11.0.9; retirada del override inactivo de `glob` y actualización de Actions. Véase la [revisión de dependencias](DEPENDENCY_REVIEW_1.5.3.md).
+- Biblioteca: reutilización limitada de tarjetas y miniaturas implementada; medición de la mejora de rendimiento todavía en curso. El procesamiento por lotes previsto para 1.6 no está implementado.
 
 ## Versión 1.5.2 — correcciones y fiabilidad
 
-**Aviso:** la versión v1.5.2 corregida mantiene el mismo número de versión e incluye ESLint 10.15.0, `@eslint/js` 10.0.1 y html-validate 11.21.1; el rango de Node.js ya está configurado como `^22.22.0 || >=24.8.0`.
-
+- Selecciones: seguimiento del puntero activo, exclusión de punteros secundarios y limpieza de gestos interrumpidos.
+- Captura: restauración de elementos ocultos incluso si falla su preparación.
+- Biblioteca: eliminación global atómica, con rechazo de listas obsoletas y reversión completa en caso de error.
 - Arrastres en el editor: seguimiento del `pointerId` activo y gestión de interrupciones del gesto.
 - Miniaturas internas del editor y vista previa de composición: reconstrucción al reabrir el proyecto para incluir las anotaciones.
 - Botón «Exportar proyecto»: se mantiene el estado de cambios sin guardar; el mensaje indica que se ha solicitado la descarga sin garantizar que el navegador haya guardado el archivo.
@@ -28,7 +45,7 @@
 - Paquete: módulo antiguo `editor-export.js` retirado, con 35 archivos de distribución.
 
 
-![Editor de Scionos Capture 1.5.0: anotación de una imagen y vista previa de una composición horizontal](store-assets/screenshot-real-1-composition-v1.5.0.png)
+![Editor de Scionos Capture 1.5.2: anotación de una imagen y vista previa de una composición horizontal](store-assets/screenshot-real-1-composition-v1.5.2.png)
 
 *Interfaz real de la versión 1.5.0, con contenido de demostración local.*
 
@@ -65,7 +82,7 @@ Puedes definir un área desplazable con dos puntos o mediante el teclado. Mantie
 <details>
 <summary>Ver la selección y sus ajustes</summary>
 
-![Selección ajustable: tiradores, coordenadas y confirmación antes de capturar](store-assets/screenshot-real-4-selection-v1.5.0.png)
+![Selección ajustable: tiradores, coordenadas y confirmación antes de capturar](store-assets/screenshot-real-4-selection-v1.5.2.png)
 
 </details>
 
@@ -85,7 +102,7 @@ En el editor, selecciona y modifica las anotaciones compatibles. Dibujo, resalta
 <details>
 <summary>Ver los ajustes de exportación y presentación</summary>
 
-![Diálogo de exportación: presentación PDF, márgenes, orientación y paginación](store-assets/screenshot-real-3-export-v1.5.0.png)
+![Diálogo de exportación: presentación PDF, márgenes, orientación y paginación](store-assets/screenshot-real-3-export-v1.5.2.png)
 
 </details>
 
@@ -95,7 +112,7 @@ La biblioteca conserva los proyectos **cuando los guardas explícitamente**, inc
 
 Elige una duración de **0, 7, 30 o 90 días** y una cuota de **64 a 1.024 MiB** — **256 MiB** por defecto. **0 días** significa sin caducidad automática. Un archivo portátil permite conservar una copia separada de la biblioteca.
 
-![Biblioteca local: proyectos guardados, acciones y ajustes de conservación](store-assets/screenshot-real-2-bibliotheque-v1.5.0.png)
+![Biblioteca local: proyectos guardados, acciones y ajustes de conservación](store-assets/screenshot-real-2-bibliotheque-v1.5.2.png)
 
 ## Privacidad y control de los datos
 
@@ -145,7 +162,9 @@ npm run verify
 
 Sincronización de versión para la publicación GitHub: `npm run version:sync -- 1.5.2`; en PowerShell: `npm.cmd run version:sync -- 1.5.2`. Este comando también modifica los archivos de versión del paquete; ejecútalo solo dentro de su actualización coordinada.
 
-<!-- local-package --> Archivo local validado: `scionos-capture-v1.5.2.zip`, 35 archivos. SHA-256: `d20d607afc0bdb4e8d942a04b770803ffa0215d311b657436c5388c023dd5d98`.
+Paquete local corregido: `dist/scionos-capture-v1.5.2.zip`, 35 archivos. La suma de esta candidata consta en [el informe](STORE_READINESS_1.5.2.md) y en el archivo `.sha256` adjunto; difiere del archivo GitHub existente.
+
+<!-- local-package --> Archivo local : `scionos-capture-v1.5.3.zip` · SHA-256 : `scionos-capture-v1.5.3.zip.sha256`.
 
 [Contribuir](CONTRIBUTING.es.md) · [Cambios](CHANGELOG.es.md) · [Notas de versión](RELEASE_NOTES.md) · [Informar de un problema](https://github.com/ScioNos/Scionos-Capture/issues) · [Informar de una vulnerabilidad](SECURITY.es.md)
 
@@ -153,4 +172,4 @@ Sincronización de versión para la publicación GitHub: `npm run version:sync -
 
 Desarrollado por **eyelo SA, Suiza**, bajo la marca **ScioNos**. [Sitio web](https://scionos.ch) · [Contacto](mailto:info@eyelo.ch) · [Licencia MIT](LICENSE)
 
-Validación 1.5.2: `npm run verify:release` completado con éxito — 133 pruebas unitarias, 126 pruebas de navegador, cinco modos en Chrome 157.0.8103.79 y en Edge 157.0.4341.60, tres repeticiones de rendimiento y diez escenarios PDF. Resultados y entorno: [revisión de dependencias y validación](DEPENDENCY_REVIEW_1.5.2.md).
+Validación de esta candidata: 136 pruebas unitarias y 136 pruebas de navegador superadas, cinco modos nativos en Chrome y Edge, tres repeticiones de rendimiento y diez escenarios PDF. Detalles, límites y suma final: [preparación para la tienda](STORE_READINESS_1.5.2.md).

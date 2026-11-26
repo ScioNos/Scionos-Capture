@@ -2,6 +2,17 @@
 
 [Français](PRIVACY.md) · [English](PRIVACY.en.md) · [Español](PRIVACY.es.md) · [Deutsch](PRIVACY.de.md)
 
+## Vorbereitung von 1.5.3 — 26. November 2026
+
+**Lokale Vorbereitung, nicht veröffentlicht.** Die abschließende Testvalidierung läuft noch; Ergebnisse und Grenzen werden im [Konsolidierungsbericht](CONSOLIDATION_1.5.3.md) festgehalten. Es erfolgt weder eine GitHub-Veröffentlichung noch eine Store-Einreichung. Öffentliche Links und Archive von 1.5.2 verweisen weiterhin auf die bestehende Veröffentlichung.
+
+Prüfungen der Aufnahmeidentität und zu Beginn festgelegte Metadaten sollen die Vermischung von Seiten oder Dokumenten vermeiden. Das Entfernen des Caches ändert die lokale Aufbewahrung nicht; IndexedDB bleibt maßgeblich. Das Schließen aufgegebener Verbindungen und die lokal bereits vorhandene transaktionale Gesamtlöschung verbessern die Speicherkonsistenz. Bereits gespeicherte Exporte müssen Benutzer weiterhin separat löschen.
+
+- Aufnahme: aktiven Tab, Fenster und Navigation vor und nach der Erfassung prüfen, mit einer an die `documentId` gebundenen Prüfung. URL und Titel werden zu Beginn der Sitzung festgelegt.
+- PDF: Textebene bei DOM-/CSSOM-Änderungen, unzugänglichen CSS-Stylesheets, Medienänderungen oder Animationen verwerfen; weißen Text auf weißem Hintergrund ausschließen und Text bei Mischmodi oder Bildhintergründen mit unklarer Sichtbarkeit weglassen (unsichtbare `SECRET_BLEND`-Regression auf Weiß bestätigt und korrigiert). Diese Prüfungen beweisen keine absolute Übereinstimmung von Pixeln und Text, wenn eine vorübergehende CSSOM-Änderung zwischen den Beobachtungen rückgängig gemacht wird. Im Zweifel wird Text bevorzugt weggelassen; Pixel prüfen und Geheimnisse deckend maskieren.
+- Speicherung: Aufnahme-Cache entfernen, um veraltete Daten zwischen Kontexten zu vermeiden; aufgegebene IndexedDB-Verbindungen schließen. Die im lokalen Arbeitsbaum bereits vorhandene transaktionale Gesamtlöschung wird integriert und beibehalten, mit vollständigem Rollback bei Fehlern.
+- Importe: strenge Validierung der PNG-Transparenzdaten `tRNS`. Projekte v1/v2 bleiben lesbar, geschrieben wird v2. Keine neue Berechtigung oder Telemetrie.
+
 Zuletzt aktualisiert: 17. November 2026 — Dokumentation der Version 1.5.2.
 
 **Verantwortlicher Herausgeber:** eyelo SA (UID: CHE-108.174.302), Waadt (Vaud), Schweiz — Marke **ScioNos** ([scionos.ch](https://scionos.ch)) — Kontakt: info@eyelo.ch

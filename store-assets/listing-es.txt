@@ -1,26 +1,27 @@
-Borrador de ficha para la candidata 1.5.2 — en preparación, no publicada. La 1.5.1 está publicada en GitHub; el estado actual de Chrome Web Store no está confirmado.
+Scionos Capture 1.5.3
 
-Scionos Capture permite capturar una página web, anotarla y preparar un documento en tu dispositivo. No necesita cuenta ni envía las capturas a un servidor.
+Preparación local 1.5.3, sin publicar. Sin cambios en la ficha remota de la tienda ni en los enlaces públicos 1.5.2.
 
-Capturar una página
-Elige el área visible, una selección, una región desplazable, la página completa o un elemento. Ajusta los límites antes de confirmar. Un retardo cancelable permite preparar un menú o un estado temporal de la página.
+Captura páginas web, anota imágenes y prepara documentos localmente con Scionos Capture. No necesitas una cuenta. Las capturas se procesan en tu dispositivo sin enviarlas a un servidor de procesamiento.
 
-Componer y anotar
-Combina y reordena varias imágenes importadas o pegadas, con títulos y leyendas. La candidata 1.5.2 prepara correcciones de arrastres interrumpidos, miniaturas internas del editor y vista previa, y exportaciones. Exportar un proyecto portátil mantiene el indicador de cambios sin guardar; el mensaje «descarga solicitada» no garantiza la escritura del archivo. El editor ofrece dibujo, texto, flechas, resaltado, formas, recorte y enmascarado. Las anotaciones compatibles siguen siendo editables en los proyectos guardados.
+CINCO MODOS DE CAPTURA
+Elige el área visible, una selección, una región desplazable, la página completa o un elemento. Ajusta los límites antes de confirmar una selección. Un retardo cancelable permite preparar un menú o un estado temporal de la página. Las páginas internas del navegador y las tiendas de extensiones están protegidas y no se pueden capturar.
 
-Conservar el trabajo
-Guarda un proyecto portátil para retomarlo después o consérvalo en la biblioteca local. Allí puedes buscar, renombrar, duplicar y eliminar proyectos. La cuota de almacenamiento y el periodo de conservación son ajustables, con opción sin caducidad.
+COMPONER Y ANOTAR
+Importa o pega varias imágenes, cambia su orden y organízalas vertical u horizontalmente. Añade títulos, leyendas, texto, flechas, formas, dibujos y resaltados. Recorta imágenes y utiliza máscaras sólidas para proteger información confidencial.
 
-Compartir el resultado
-Guarda una imagen o documento, copia el resultado o utiliza la impresión. Los ajustes de presentación incluyen márgenes, orientación y paginación. Revisa contenido y metadatos antes de compartirlos.
+RETOMAR EL TRABAJO
+Guarda un proyecto portátil .scionos para abrirlo más adelante. Las anotaciones compatibles siguen siendo editables; las máscaras y los recortes son permanentes al guardar. La biblioteca local permite buscar, renombrar, duplicar y eliminar proyectos. Su cuota y su periodo de conservación son ajustables, con una opción sin caducidad.
 
-Privacidad y límites
-En Documento, elige una política de fuentes: sanitized (por defecto) elimina parámetros y fragmentos de URL; none elimina fuentes y enlaces; full conserva las URL sin credenciales integradas. Se aplica a proyectos guardados y exportaciones; la biblioteca siempre exporta con sanitized. Las fuentes eliminadas al guardar no se recuperan. Las rutas, imágenes, títulos y leyendas pueden seguir siendo sensibles. Para proteger los píxeles, usa máscaras sólidas: el desenfoque es solo visual. Las máscaras y los recortes son definitivos al guardar. Los archivos de imagen de más de 16 millones de píxeles o 16.384 por lado se rechazan antes de decodificar; cada documento sigue limitado a 32 millones de píxeles.
+EXPORTAR Y COMPARTIR
+Exporta en PNG, JPEG, WebP, HTML o Markdown/ZIP. Utiliza la impresión del navegador para guardar un PDF, con ajustes de márgenes, orientación y paginación. El texto visible recogido durante la captura puede permitir búsquedas en el PDF; las imágenes importadas no ofrecen reconocimiento de texto OCR.
 
-Para la candidata 1.5.2, impresión/PDF se limita a 32 millones de píxeles acumulados, 128 MiB de blobs acumulados y 200 páginas.
+PRIVACIDAD Y LÍMITES
+Elige una política de fuentes: sanitized elimina parámetros y fragmentos de URL; none elimina fuentes y enlaces; full conserva las URL sin credenciales integradas. Las exportaciones de biblioteca utilizan sanitized. Las rutas de URL, imágenes, títulos y leyendas pueden seguir conteniendo información sensible: revisa el resultado antes de compartirlo. El desenfoque es un efecto visual y no sustituye una máscara sólida.
 
-Interfaz y ayuda disponibles en francés, inglés, español y alemán. El usuario gestiona la conservación y eliminación de archivos guardados por separado.
+Las importaciones se limitan a 30 imágenes, 16 millones de píxeles por imagen y 32 millones de píxeles en total. Impresión/PDF se limita a 32 millones de píxeles renderizados, 128 MiB de imágenes de páginas y 200 páginas; un límite puede alcanzarse antes del número máximo de páginas. Tú controlas los archivos exportados por separado.
 
+Interfaz y ayuda en francés, inglés, español y alemán.
 Desarrollado por eyelo SA, Suiza, bajo la marca ScioNos.
 Soporte: https://github.com/ScioNos/Scionos-Capture/issues
 Privacidad: https://github.com/ScioNos/Scionos-Capture/blob/main/PRIVACY.md

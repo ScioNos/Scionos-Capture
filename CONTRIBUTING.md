@@ -1,5 +1,7 @@
 # Contribuer à Scionos Capture
 
+Préparation locale 1.5.3, non publiée. Aucune modification de la fiche Store distante ni des liens publics 1.5.2.
+
 [Français](CONTRIBUTING.md) · [English](CONTRIBUTING.en.md) · [Español](CONTRIBUTING.es.md) · [Deutsch](CONTRIBUTING.de.md)
 
 Merci de contribuer. Ne joignez jamais de capture contenant des données personnelles, identifiants ou secrets.

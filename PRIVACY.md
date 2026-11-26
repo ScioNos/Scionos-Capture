@@ -2,6 +2,17 @@
 
 [Français](PRIVACY.md) · [English](PRIVACY.en.md) · [Español](PRIVACY.es.md) · [Deutsch](PRIVACY.de.md)
 
+## Préparation 1.5.3 — 26 novembre 2026
+
+**Préparation locale, non publiée.** La validation finale des tests est encore en cours ; les résultats et limites seront consignés dans le [rapport de consolidation](CONSOLIDATION_1.5.3.md). Aucune release GitHub ni soumission Store n’est effectuée. Les liens publics 1.5.2 et leurs archives restent ceux de la publication existante.
+
+Les contrôles d’identité de capture et les métadonnées figées au démarrage visent à éviter de mélanger des pages ou des documents. Le retrait du cache ne modifie pas la rétention locale ; IndexedDB reste la source faisant autorité. La fermeture des connexions abandonnées et la suppression totale transactionnelle déjà locale renforcent la cohérence du stockage. Les exports déjà enregistrés doivent toujours être supprimés séparément par l’utilisateur.
+
+- Capture : contrôles de l’onglet actif, de la fenêtre et de la navigation avant et après acquisition, avec sonde liée au `documentId`. L’URL et le titre sont figés au début de la session.
+- PDF : invalidation de la couche texte lors de mutations DOM/CSSOM, de feuilles CSS inaccessibles, de changements de média ou d’animations ; exclusion du texte blanc sur blanc et omission du texte sous modes de fusion ou fonds image lorsque sa visibilité est incertaine (régression `SECRET_BLEND` invisible sur fond blanc confirmée et corrigée). Ces contrôles ne prouvent pas une correspondance absolue pixels/texte lorsqu’un changement CSSOM transitoire est rétabli entre les observations. L’absence de texte est privilégiée en cas de doute ; vérifiez les pixels et utilisez un masque solide pour les secrets.
+- Stockage : cache de captures retiré pour éviter les données périmées entre contextes ; fermeture des connexions IndexedDB abandonnées. La suppression totale transactionnelle déjà présente dans l’arbre local est intégrée et préservée, avec annulation intégrale en cas d’échec.
+- Imports : validation stricte des données de transparence PNG `tRNS`. Lecture des projets v1/v2 et écriture v2 conservées. Aucune nouvelle permission ni télémétrie.
+
 Dernière mise à jour : 17 novembre 2026 — documentation version 1.5.2.
 
 **Éditeur responsable :** eyelo SA (IDE : CHE-108.174.302), Vaud, Suisse — Marque **ScioNos** ([scionos.ch](https://scionos.ch)) — Contact : info@eyelo.ch

@@ -52,9 +52,13 @@
       return { x: op.x - radius - pad, y: op.y - radius - pad, width: (radius + pad) * 2, height: (radius + pad) * 2 };
     }
     if (op.kind === 'draw' || op.kind === 'highlight') {
-      const xs = op.points.map(p => p.x), ys = op.points.map(p => p.y);
+      let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
+      for (const point of op.points) {
+        left = Math.min(left, point.x); top = Math.min(top, point.y);
+        right = Math.max(right, point.x); bottom = Math.max(bottom, point.y);
+      }
       const width = op.kind === 'highlight' ? Math.max(8, op.width || 16) : op.width;
-      return inflate(normalized(Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)), width / 2);
+      return inflate(normalized(left, top, right, bottom), width / 2);
     }
     if (op.kind === 'shape') return inflate(normalized(op.start.x, op.start.y, op.end.x, op.end.y), op.mode === 'stroke' ? (op.width || 4) / 2 : 0);
     const { start, end } = op;

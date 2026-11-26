@@ -26,6 +26,8 @@ async function createHarness(store = CaptureStore, { clock, delay } = {}) {
   let nextTabId = 80;
   const tabs = new Map([[7, { id: 7, windowId: 3 }]]);
   const updatedEvent = eventHook();
+  const focusEvent = eventHook();
+  const activatedEvent = eventHook();
   const chrome = {
     runtime: {
       id: 'test-extension',
@@ -35,6 +37,7 @@ async function createHarness(store = CaptureStore, { clock, delay } = {}) {
         .map(tab => ({ contextType: 'TAB', tabId: tab.id, documentUrl: tab.url })),
       onMessage: messageEvent, onStartup: startupEvent, onInstalled: installedEvent
     },
+    windows: { get: async () => ({ focused: true }), onFocusChanged: focusEvent },
     alarms: {
       create: async (name, options) => { alarms.set(name, options); },
       clear: async name => alarms.delete(name),
@@ -60,7 +63,7 @@ async function createHarness(store = CaptureStore, { clock, delay } = {}) {
       captureVisibleTab: async () => '',
       create: async options => { const tab = { id: ++nextTabId, url: options.url }; tabs.set(tab.id, tab); return tab; },
       remove: async id => { tabs.delete(id); await removedEvent.listener(id); },
-      onRemoved: removedEvent, onUpdated: updatedEvent
+      onRemoved: removedEvent, onUpdated: updatedEvent, onActivated: activatedEvent
     }
   };
   const context = vm.createContext({
@@ -121,6 +124,54 @@ test('visible capture queue rechecks the active tab after waiting', async () => 
   assert.equal(response.success, false);
   assert.equal(response.errorCode, 'TAB_CHANGED');
   assert.equal(captures, 1);
+});
+
+test('capture rejects active-tab changes during the native acquisition', async () => {
+  const h = await createHarness();
+  let activeId = 7;
+  h.chrome.tabs.query = async options => options.active ? [{ id: activeId, windowId: 3 }] : [...h.tabs.values()];
+  h.chrome.tabs.captureVisibleTab = async () => { activeId = 8; return 'wrong-tab-pixels'; };
+  const response = await send(h.messageEvent.listener, { action: 'CAPTURE_VISIBLE_TAB' },
+    { id: 'test-extension', tab: { id: 7, windowId: 3 }, url: 'https://example.test/a' });
+  assert.equal(response.success, false);
+  assert.equal(response.errorCode, 'TAB_CHANGED');
+});
+
+test('capture rejects window focus and tab switch-return during acquisition', async () => {
+  for (const change of [h => { h.chrome.windows.onFocusChanged.listener(9); h.chrome.windows.onFocusChanged.listener(3); },
+    h => { h.chrome.tabs.onActivated.listener({ windowId: 3, tabId: 8 }); h.chrome.tabs.onActivated.listener({ windowId: 3, tabId: 7 }); }]) {
+    const h = await createHarness();
+    h.chrome.tabs.captureVisibleTab = async () => { change(h); return 'uncertain'; };
+    const response = await send(h.messageEvent.listener, { action: 'CAPTURE_VISIBLE_TAB' },
+      { id: 'test-extension', tab: { id: 7, windowId: 3 } });
+    assert.equal(response.success, false); assert.equal(response.errorCode, 'TAB_CHANGED');
+  }
+});
+
+test('capture probes the sending document and rejects its disappearance', async () => {
+  const h = await createHarness();
+  let alive = true;
+  h.chrome.tabs.sendMessage = async (_tabId, _message, options) => {
+    assert.equal(options.documentId, 'source-document');
+    if (!alive) throw new Error('Document unavailable');
+    return { loaded: true };
+  };
+  h.chrome.tabs.captureVisibleTab = async () => { alive = false; return 'other-document'; };
+  const response = await send(h.messageEvent.listener, { action: 'CAPTURE_VISIBLE_TAB' },
+    { id: 'test-extension', tab: { id: 7, windowId: 3 }, documentId: 'source-document' });
+  assert.equal(response.success, false); assert.equal(response.errorCode, 'NAVIGATION_CHANGED');
+});
+
+test('capture rejects navigation even when the original URL is restored during acquisition', async () => {
+  const h = await createHarness();
+  h.chrome.tabs.captureVisibleTab = async () => {
+    await h.chrome.tabs.onUpdated.listener(7, { status: 'loading' });
+    return 'other-document-pixels';
+  };
+  const response = await send(h.messageEvent.listener, { action: 'CAPTURE_VISIBLE_TAB' },
+    { id: 'test-extension', tab: { id: 7, windowId: 3 }, url: 'https://example.test/a' });
+  assert.equal(response.success, false);
+  assert.equal(response.errorCode, 'NAVIGATION_CHANGED');
 });
 
 test('library retention reconciles at wake-up and reschedules without deleting future projects', async () => {

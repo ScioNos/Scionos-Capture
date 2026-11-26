@@ -283,10 +283,17 @@
         width = view.getUint32(p + 8); height = view.getUint32(p + 12); depth = bytes[p + 16]; color = bytes[p + 17]; interlace = bytes[p + 20];
         if (!width || !height || width > LIMITS.imageDimension || height > LIMITS.imageDimension || width * height > LIMITS.imagePixels || !({ 0:[1,2,4,8,16], 2:[8,16], 3:[1,2,4,8], 4:[8,16], 6:[8,16] }[color] || []).includes(depth) || bytes[p + 18] || bytes[p + 19] || interlace > 1) fail('Invalid PNG dimensions/encoding');
       } else if (kind === 'PLTE') {
-        if (palette || seenData || !size || size % 3 || size > 768 || [0,4].includes(color) || color === 3 && size / 3 > 2 ** depth) fail('Invalid PNG palette');
-        palette = true;
+        if (palette || transparent || seenData || !size || size % 3 || size > 768 || [0,4].includes(color) || color === 3 && size / 3 > 2 ** depth) fail('Invalid PNG palette');
+        palette = size / 3;
       } else if (kind === 'tRNS') {
-        if (transparent || seenData || ![0,2,3].includes(color) || color === 0 && size !== 2 || color === 2 && size !== 6 || color === 3 && (!palette || !size || size > 256)) fail('Invalid PNG transparency');
+        if (transparent || seenData || ![0,2,3].includes(color) || color === 0 && size !== 2 || color === 2 && size !== 6 || color === 3 && (!palette || !size || size > palette)) fail('Invalid PNG transparency');
+        // tRNS uses 16-bit samples even for lower bit depths. Values outside
+        // the image sample range are malformed, not extra hidden palette data.
+        if (color !== 3) {
+          for (let offset = p + 8; offset < p + 8 + size; offset += 2) {
+            if (view.getUint16(offset) >= 2 ** depth) fail('Invalid PNG transparency sample');
+          }
+        }
         transparent = true;
       } else if (kind === 'IDAT') {
         if (closedData || color === 3 && !palette) fail('Invalid PNG IDAT order');

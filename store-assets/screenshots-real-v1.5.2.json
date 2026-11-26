@@ -1,0 +1,94 @@
+{
+  "version": "1.5.2",
+  "generatedAt": "2026-11-17T18:27:26.154Z",
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "locale": "fr-FR",
+  "disposableProfile": true,
+  "extensionUiModified": false,
+  "demoContent": "Local fictional demonstration guide. No personal data or remote site.",
+  "selectionCoverage": "Production UI scripts injected by existing e2e helper; transport stubbed; no capture requested.",
+  "popupCoverage": "Actual popup document opened as extension tab at native 340px body width.",
+  "validations": {
+    "markdownZip": {
+      "name": "Guide_de_capture_—_Démonstration_2026-11-17_19-27.zip",
+      "bytes": 134964,
+      "signature": "PK0304"
+    },
+    "project": {
+      "items": 2,
+      "annotations": [
+        1,
+        0
+      ]
+    }
+  },
+  "images": [
+    {
+      "name": "screenshot-real-1-composition-v1.5.2.png",
+      "width": 1280,
+      "height": 800,
+      "bytes": 166137,
+      "sha256": "10669a48793ec3eddb0dc7c1f243c3ea01f51fc13a53a299208e1c50cd937f98",
+      "checks": [
+        "real editor",
+        "installed version",
+        "two imported demo images",
+        "editable arrow annotation",
+        "library save"
+      ]
+    },
+    {
+      "name": "screenshot-real-2-bibliotheque-v1.5.2.png",
+      "width": 1280,
+      "height": 800,
+      "bytes": 66411,
+      "sha256": "317965695c1def2991dcfbc8462cffc54475a013119c94882c58954960223172",
+      "checks": [
+        "real saved projects",
+        "duplicate and rename through UI",
+        "30-day retention and 256 MiB quota"
+      ]
+    },
+    {
+      "name": "screenshot-real-3-export-v1.5.2.png",
+      "width": 1280,
+      "height": 800,
+      "bytes": 112908,
+      "sha256": "25f2fa80a05683e796d3fe9a429deeb3c34d1b14a2d2fa23ca86df59f3a02496",
+      "checks": [
+        "real export dialog",
+        "six formats asserted",
+        "PDF paper, orientation, margins, headers and pagination visible"
+      ]
+    },
+    {
+      "name": "screenshot-real-4-selection-v1.5.2.png",
+      "width": 1280,
+      "height": 800,
+      "bytes": 52912,
+      "sha256": "c8e09a9b36facbc1f93356d1c324310c3d53e574b958cb31d769a97ebb407720",
+      "checks": [
+        "production selection overlay",
+        "real resize handles",
+        "local demo page",
+        "no synthetic captured pixels"
+      ]
+    },
+    {
+      "name": "screenshot-real-5-popup-v1.5.2.png",
+      "width": 1280,
+      "height": 800,
+      "bytes": 183113,
+      "sha256": "ff7e00eddea4f9d8869df66be5de45f416ce2e46f674315f397c527f2f764aee",
+      "checks": [
+        "unmodified popup document",
+        "installed version",
+        "composition entry",
+        "three-second delay"
+      ]
+    }
+  ]
+}

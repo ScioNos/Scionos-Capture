@@ -12,7 +12,10 @@
   const text = (key, values = {}) => Object.entries(values).reduce((message, [name, value]) => message.replaceAll(`{${name}}`, String(value)), (strings[ScionosI18n.language] || strings.en)[key] || key);
   let records = [];
   let settings = { quotaBytes: 256 * MiB, retentionDays: null };
-  let urls = [];
+  // Live cards belong to the list; only this bounded map retains detached cards.
+  const cards = new Map();
+  const cardEntries = new WeakMap();
+  const maxCachedCards = 1000;
   let busy = false;
   let refreshRevision = 0;
   let browserStorage = null;
@@ -34,10 +37,25 @@
     status.classList.toggle('error', error);
     status.setAttribute('role', error ? 'alert' : 'status');
   }
-  function revokeThumbnails() { urls.forEach(url => URL.revokeObjectURL(url)); urls = []; }
+  function releaseCard(entry) {
+    if (entry.url) URL.revokeObjectURL(entry.url);
+    entry.url = null;
+    entry.image.removeAttribute('src');
+  }
+  function clearCards() {
+    ++refreshRevision; // An in-flight refresh must not recreate URLs after pagehide.
+    const entries = new Set(cards.values());
+    for (const node of byId('project-list').children) entries.add(cardEntries.get(node));
+    for (const entry of entries) if (entry) releaseCard(entry);
+    cards.clear();
+    byId('project-list').replaceChildren();
+  }
   function setBusy(value) {
     busy = value;
-    for (const button of document.querySelectorAll('#project-list button, #save-preferences, #delete-all')) button.disabled = value;
+    const nodes = new Set([...cards.values()].map(entry => entry.node));
+    for (const node of byId('project-list').children) nodes.add(node);
+    for (const node of nodes) for (const button of node.querySelectorAll('button')) button.disabled = value;
+    for (const button of document.querySelectorAll('#save-preferences, #delete-all')) button.disabled = value;
   }
   function dateLabel(value) {
     const date = new Date(value);
@@ -75,55 +93,105 @@
     button.addEventListener('click', handler);
     return button;
   }
-  function render() {
-    revokeThumbnails();
-    const list = byId('project-list');
-    list.replaceChildren();
-    const search = byId('library-search').value.trim().toLocaleLowerCase(ScionosI18n.language);
-    const visible = records.filter(record => [record.title, record.source].some(value => String(value || '').toLocaleLowerCase(ScionosI18n.language).includes(search)));
-    byId('library-empty').hidden = visible.length > 0;
-    byId('library-empty').textContent = text(records.length ? 'noMatch' : 'empty');
-    for (const record of visible) {
-      const li = document.createElement('li');
-      li.className = 'card';
-      const image = document.createElement('img');
-      image.className = 'thumbnail';
-      image.alt = '';
-      if (record.thumbnail instanceof Blob && record.thumbnail.size && /^image\/(png|jpeg|webp)$/u.test(record.thumbnail.type)) {
-        const url = URL.createObjectURL(record.thumbnail); urls.push(url); image.src = url;
-      } else { image.hidden = true; }
-      const body = document.createElement('div'); body.className = 'card-content';
-      const title = document.createElement('h2'); title.textContent = record.title || text('untitled');
-      const meta = document.createElement('p'); meta.className = 'meta';
-      const expiration = record.expiresAt == null ? '' : `${expiresLabels[ScionosI18n.language] || expiresLabels.en} ${new Date(record.expiresAt).toLocaleString(ScionosI18n.language)}`;
-      meta.textContent = [record.source || '', dateLabel(record.updatedAt), expiration].filter(Boolean).join(' · ');
-      const actions = document.createElement('div'); actions.className = 'actions';
-      actions.append(
-        cardButton('open', () => openProject(record.id)),
-        cardButton('rename', () => {
-          const titleValue = window.prompt(text('renamePrompt'), record.title || '');
-          if (titleValue === null) return;
-          const newTitle = titleValue.trim();
-          if (!newTitle || newTitle === record.title) return;
-          void run(async () => {
-            const current = await CaptureStore.getLibraryProject(record.id);
-            if (!current || current.revision !== record.revision) throw new Error('Project changed or no longer exists.');
-            const blob = await globalThis.ScionosCompositionUtils.rewriteProjectMetadata(current.blob, { title: newTitle });
-            await CaptureStore.saveLibraryProject({ id: current.id, title: newTitle, source: current.source, thumbnail: current.thumbnail, blob }, { expectedRevision: current.revision });
-          }, 'renamed');
-        }),
-        cardButton('duplicate', () => { void run(async () => {
+  function localizeCard(entry) {
+    const { record, title, meta, actions } = entry;
+    entry.language = ScionosI18n.language;
+    title.textContent = record.title || text('untitled');
+    const expiration = record.expiresAt == null ? '' : `${expiresLabels[entry.language] || expiresLabels.en} ${new Date(record.expiresAt).toLocaleString(entry.language)}`;
+    meta.textContent = [record.source || '', dateLabel(record.updatedAt), expiration].filter(Boolean).join(' · ');
+    ['open', 'rename', 'duplicate', 'export', 'remove'].forEach((label, index) => { actions.children[index].textContent = text(label); });
+    entry.search = [record.title, record.source].map(value => String(value || '').toLocaleLowerCase(entry.language));
+  }
+  function createCard(record) {
+    const li = document.createElement('li');
+    li.className = 'card';
+    const image = document.createElement('img');
+    image.className = 'thumbnail';
+    image.alt = '';
+    image.loading = 'lazy';
+    image.decoding = 'async';
+    let url = null;
+    if (record.thumbnail instanceof Blob && record.thumbnail.size && /^image\/(png|jpeg|webp)$/u.test(record.thumbnail.type)) {
+      url = URL.createObjectURL(record.thumbnail); image.src = url;
+    } else { image.hidden = true; }
+    const body = document.createElement('div'); body.className = 'card-content';
+    const title = document.createElement('h2');
+    const meta = document.createElement('p'); meta.className = 'meta';
+    const actions = document.createElement('div'); actions.className = 'actions';
+    actions.append(
+      cardButton('open', () => openProject(record.id)),
+      cardButton('rename', () => {
+        const titleValue = window.prompt(text('renamePrompt'), record.title || '');
+        if (titleValue === null) return;
+        const newTitle = titleValue.trim();
+        if (!newTitle || newTitle === record.title) return;
+        void run(async () => {
           const current = await CaptureStore.getLibraryProject(record.id);
           if (!current || current.revision !== record.revision) throw new Error('Project changed or no longer exists.');
-          const newTitle = (record.title || text('untitled')) + text('duplicateSuffix');
           const blob = await globalThis.ScionosCompositionUtils.rewriteProjectMetadata(current.blob, { title: newTitle });
-          await CaptureStore.saveLibraryProject({ id: crypto.randomUUID(), title: newTitle, source: current.source, thumbnail: current.thumbnail, blob }, { expectedRevision: null });
-        }, 'duplicated'); }),
-        cardButton('export', () => { void run(async () => { const project = await CaptureStore.getLibraryProject(record.id); if (!project || project.revision !== record.revision) throw new Error('Project changed or no longer exists.'); download(await globalThis.ScionosCompositionUtils.rewriteProjectMetadata(project.blob, { sourcePolicy: 'sanitized' }), project.title); }); }),
-        cardButton('remove', () => { if (window.confirm(text('deleteConfirm'))) void run(() => CaptureStore.deleteLibraryProject(record.id, record.revision), 'removed'); }, true)
-      );
-      body.append(title, meta, actions); li.append(image, body); list.append(li);
+          await CaptureStore.saveLibraryProject({ id: current.id, title: newTitle, source: current.source, thumbnail: current.thumbnail, blob }, { expectedRevision: current.revision });
+        }, 'renamed');
+      }),
+      cardButton('duplicate', () => { void run(async () => {
+        const current = await CaptureStore.getLibraryProject(record.id);
+        if (!current || current.revision !== record.revision) throw new Error('Project changed or no longer exists.');
+        const newTitle = (record.title || text('untitled')) + text('duplicateSuffix');
+        const blob = await globalThis.ScionosCompositionUtils.rewriteProjectMetadata(current.blob, { title: newTitle });
+        await CaptureStore.saveLibraryProject({ id: crypto.randomUUID(), title: newTitle, source: current.source, thumbnail: current.thumbnail, blob }, { expectedRevision: null });
+      }, 'duplicated'); }),
+      cardButton('export', () => { void run(async () => { const project = await CaptureStore.getLibraryProject(record.id); if (!project || project.revision !== record.revision) throw new Error('Project changed or no longer exists.'); download(await globalThis.ScionosCompositionUtils.rewriteProjectMetadata(project.blob, { sourcePolicy: 'sanitized' }), project.title); }); }),
+      cardButton('remove', () => { if (window.confirm(text('deleteConfirm'))) void run(() => CaptureStore.deleteLibraryProject(record.id, record.revision), 'removed'); }, true)
+    );
+    body.append(title, meta, actions); li.append(image, body);
+    const entry = { node: li, image, title, meta, actions, record, url, language: null, search: [] };
+    cardEntries.set(li, entry);
+    localizeCard(entry);
+    for (const button of actions.children) button.disabled = busy;
+    return entry;
+  }
+  function render() {
+    const list = byId('project-list');
+    const available = new Map(cards);
+    for (const node of list.children) {
+      const entry = cardEntries.get(node);
+      if (entry) available.set(entry.record.id, entry);
     }
+    const current = new Map(records.map(record => [record.id, record]));
+    for (const [id, entry] of available) {
+      // Revision is part of the identity: action closures must never retain stale revisions.
+      if (!current.has(id) || current.get(id).revision !== entry.record.revision) {
+        releaseCard(entry);
+        entry.node.remove();
+        available.delete(id);
+      }
+    }
+    const search = byId('library-search').value.trim().toLocaleLowerCase(ScionosI18n.language);
+    const visible = new Set();
+    let cursor = list.firstElementChild;
+    for (const record of records) {
+      let entry = available.get(record.id);
+      if (entry && entry.language !== ScionosI18n.language) localizeCard(entry);
+      const matches = entry ? entry.search.some(value => value.includes(search))
+        : [record.title, record.source].some(value => String(value || '').toLocaleLowerCase(ScionosI18n.language).includes(search));
+      if (!matches) continue;
+      if (!entry) { entry = createCard(record); available.set(record.id, entry); }
+      visible.add(entry.node);
+      if (entry.node !== cursor) {
+        if (typeof list.moveBefore === 'function' && entry.node.parentNode === list) list.moveBefore(entry.node, cursor);
+        else list.insertBefore(entry.node, cursor);
+      }
+      cursor = entry.node.nextElementSibling;
+    }
+    for (const node of [...list.children]) if (!visible.has(node)) node.remove();
+    // Prefer retaining visible entries, then recently reused detached entries. No project is hidden by the limit.
+    cards.clear();
+    const ordered = [...available.values()].sort((a, b) => Number(visible.has(b.node)) - Number(visible.has(a.node)));
+    for (const entry of ordered) {
+      if (cards.size < maxCachedCards) cards.set(entry.record.id, entry);
+      else if (!visible.has(entry.node)) releaseCard(entry);
+    }
+    byId('library-empty').hidden = visible.size > 0;
+    byId('library-empty').textContent = text(records.length ? 'noMatch' : 'empty');
     const total = records.reduce((sum, record) => sum + (Number(record.size) || 0), 0);
     byId('storage-estimate').textContent = text('used', { used: (total / MiB).toFixed(2), limit: (settings.quotaBytes / MiB).toFixed(0) });
     if (browserStorage && Number.isFinite(browserStorage.usage) && Number.isFinite(browserStorage.quota)) {
@@ -167,11 +235,13 @@
       void run(() => CaptureStore.setLibrarySettings({ quotaBytes: quota * MiB, retentionDays: retentionDays || null }), 'saved');
     });
     byId('delete-all').addEventListener('click', () => {
-      if (!records.length || !window.confirm(text('deleteAllConfirm'))) return;
-      void run(async () => { for (const record of records) await CaptureStore.deleteLibraryProject(record.id, record.revision); }, 'allRemoved');
+      const snapshot = records.map(({ id, revision }) => ({ id, revision }));
+      if (!snapshot.length || !window.confirm(text('deleteAllConfirm'))) return;
+      void run(() => CaptureStore.deleteAllLibraryProjects(snapshot), 'allRemoved');
     });
     window.addEventListener('scionos-language-change', updateLanguage);
-    window.addEventListener('pagehide', revokeThumbnails);
+    window.addEventListener('pagehide', clearCards);
+    window.addEventListener('pageshow', event => { if (event.persisted) void refresh(); });
     setStatus(text('loading'));
     try { await refresh(); setStatus(''); } catch (error) { setStatus(text('failed') + (error?.message || String(error)), true); }
   });

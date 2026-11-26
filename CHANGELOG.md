@@ -6,10 +6,29 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et v
 
 ## [Unreleased]
 
+### Préparation 1.5.3 — 26 novembre 2026
+
+**Préparation locale, non publiée.** La validation finale des tests est encore en cours ; les résultats et limites seront consignés dans le [rapport de consolidation](CONSOLIDATION_1.5.3.md). Aucune release GitHub ni soumission Store n’est effectuée. Les liens publics 1.5.2 et leurs archives restent ceux de la publication existante.
+
+- Capture : contrôles de l’onglet actif, de la fenêtre et de la navigation avant et après acquisition, avec sonde liée au `documentId`. L’URL et le titre sont figés au début de la session.
+- PDF : invalidation de la couche texte lors de mutations DOM/CSSOM, de feuilles CSS inaccessibles, de changements de média ou d’animations ; exclusion du texte blanc sur blanc et omission du texte sous modes de fusion ou fonds image lorsque sa visibilité est incertaine (régression `SECRET_BLEND` invisible sur fond blanc confirmée et corrigée). Ces contrôles ne prouvent pas une correspondance absolue pixels/texte lorsqu’un changement CSSOM transitoire est rétabli entre les observations. L’absence de texte est privilégiée en cas de doute ; vérifiez les pixels et utilisez un masque solide pour les secrets.
+- Captures : budget de 180 secondes contrôlé coopérativement aux points de contrôle, et maximum de 256 portions. Il ne s’agit pas d’une interruption préemptive à 180 secondes ; les pages trop longues sont refusées.
+- Ressources : budget cumulé de 32 millions de pixels, incluant les originaux conservés après rognage ; Annuler/Refaire reste borné par ce budget. Au plus deux instantanés sont simultanément en vol, jusqu’à la fin de l’export, de la copie dans le presse-papiers ou de la sauvegarde. Les surfaces Canvas créées par ces opérations sont réduites à 1 × 1 dans `finally`, sans modifier les surfaces reçues en entrée.
+- Annotations : 1 000 par image et 5 000 par document ; 10 000 points par tracé et 100 000 par document. Historique global limité à 100 états, 100 000 points et 5 000 opérations.
+- Stockage : cache de captures retiré pour éviter les données périmées entre contextes ; fermeture des connexions IndexedDB abandonnées. La suppression totale transactionnelle déjà présente dans l’arbre local est intégrée et préservée, avec annulation intégrale en cas d’échec.
+- Imports : validation stricte des données de transparence PNG `tRNS`. Lecture des projets v1/v2 et écriture v2 conservées. Aucune nouvelle permission ni télémétrie.
+- Interface : correction du chevauchement de la barre d’outils ; les commandes d’annotation restent groupées dans la même barre de 56 px, sans déplacement du canevas ni décalage pendant le glisser. Les états inertes `historyRevision`, `historyConsolidation` et `redoOperations` sont retirés.
+- Compatibilité : minimum du manifeste Chrome/Edge 106 au lieu de 102 ; CSS `:has()` exige Chrome 105 et `documentId` Chrome 106. Ce minimum est identifié par analyse statique ; les seules exécutions natives attestées concernent Chrome/Edge 158, sans exécution démontrée de Chrome/Edge 106.
+- Outils : `@axe-core/playwright` 4.14.1, `html-validate` 11.22.1, override `minimatch` 11.0.9 ; override `glob` inactif retiré et Actions mises à jour. Voir la [revue des dépendances](DEPENDENCY_REVIEW_1.5.3.md).
+- Bibliothèque : réutilisation bornée des cartes et miniatures implémentée ; mesure du gain de performance encore en cours. Le traitement par lots visé pour 1.6 n’est pas implémenté.
+
 ## [1.5.2] — 2026-11-17
 
-**1.5.2 — publiée sur GitHub.** Release GitHub : [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). Le statut actuel du Chrome Web Store n’est pas confirmé ; aucune soumission de la 1.5.2 n’est effectuée ici.
+**Candidate Store 1.5.2 corrigée localement.** La release GitHub existante conserve son tag et son archive antérieure ; elle ne contient pas ces nouvelles corrections. Aucune soumission Store effectuée. Voir [le bilan de préparation](STORE_READINESS_1.5.2.md).
 
+- Sélections : suivi du pointeur actif, rejet des pointeurs secondaires et nettoyage des gestes interrompus.
+- Capture : restauration des éléments masqués même en cas d’exception pendant leur préparation.
+- Bibliothèque : suppression globale atomique, avec rejet des listes périmées et annulation intégrale en cas d’échec.
 - Glissers dans l’éditeur : suivi du `pointerId` actif et gestion des interruptions du geste.
 - Miniatures internes de l’éditeur et aperçu de composition : reconstruction à la réouverture du projet pour inclure les annotations.
 - Bouton « Exporter projet » : l’état « modifications non enregistrées » reste actif ; le message indique que le téléchargement a été demandé, sans garantir son enregistrement par le navigateur.

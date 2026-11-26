@@ -9,6 +9,41 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    name: Detect documentation-only changes
+    runs-on: ubuntu-latest
+    outputs:
+      docs-only: ${{ steps.diff.outputs.docs-only }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+      - id: diff
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          docs_only=false
+          if git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null && git cat-file -e "$HEAD_SHA^{commit}" 2>/dev/null; then
+            compare_base="$BASE_SHA"
+            if [[ "$EVENT_NAME" == pull_request ]]; then
+              compare_base=$(git merge-base "$BASE_SHA" "$HEAD_SHA") || compare_base=""
+            fi
+            # NUL-delimited paths include deletions and both sides of renames.
+            if git diff --no-renames --name-only -z "$compare_base" "$HEAD_SHA" > "$RUNNER_TEMP/changed-paths"; then
+              docs_only=true
+              count=0
+              while IFS= read -r -d '' changed_path; do
+                count=$((count + 1))
+                if [[ "$changed_path" != *.md ]]; then docs_only=false; fi
+              done < "$RUNNER_TEMP/changed-paths"
+              if [[ "$count" == 0 ]]; then docs_only=false; fi
+            fi
+          fi
+          echo "docs-only=$docs_only" >> "$GITHUB_OUTPUT"
+
   core:
     name: Core checks (Node ${{ matrix.node }})
     runs-on: ubuntu-latest
@@ -16,31 +51,33 @@ jobs:
       matrix:
         node: ['22.22.0', '24.8.0']
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version: ${{ matrix.node }}
           cache: npm
       - run: npm ci
       - run: npm run verify:core
       - if: matrix.node == '24.8.0'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: scionos-capture-package
           path: dist/*
 
   accessibility:
+    needs: changes
+    if: ${{ always() && !cancelled() && needs.changes.outputs.docs-only != 'true' }}
     name: Chromium E2E and accessibility
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version: 24
           cache: npm
       - run: npm ci
       - name: Cache Playwright Chromium binaries
-        uses: actions/cache@v4
+        uses: actions/cache@v6.1.0
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
@@ -54,17 +91,19 @@ jobs:
       - run: npm run test:e2e
 
   windows-scaling:
+    needs: changes
+    if: ${{ always() && !cancelled() && needs.changes.outputs.docs-only != 'true' }}
     name: Windows scaling regression
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version: 24
           cache: npm
       - run: npm ci
       - name: Cache Playwright Chromium binaries
-        uses: actions/cache@v4
+        uses: actions/cache@v6.1.0
         id: playwright-cache-windows
         with:
           path: ~\AppData\Local\ms-playwright

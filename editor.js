@@ -65,19 +65,34 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   const MAX_OPERATIONS = 100;
+  const RESOURCE_LIMITS = globalThis.ScionosCompositionUtils.LIMITS;
+  const MAX_DOCUMENT_PIXELS = 32000000;
+  const MAX_SNAPSHOTS = 2;
+  let snapshotsInFlight = 0;
+  let annotationHistorySequence = 0;
+
+  // A crop keeps its original bitmap for undo; reserve its largest retained form.
+  function retainedItemPixels(item) {
+    return Math.max(item.baseImage.width * item.baseImage.height,
+      item.committedSurface.width * item.committedSurface.height);
+  }
+
+  function reserveSnapshot() {
+    if (snapshotsInFlight >= MAX_SNAPSHOTS) { showToast(compositionText('loading')); return null; }
+    snapshotsInFlight += 1;
+    let released = false;
+    return () => { if (!released) { released = true; snapshotsInFlight -= 1; } };
+  }
   const MIN_ZOOM = 0.2;
   const MAX_ZOOM = 3;
   let currentTool = 'select';
   let currentZoom = 1;
   let currentStepNumber = 1;
-  let historyRevision = 0;
-  let historyConsolidation = null;
   let pendingTextPoint = null;
   let activeTextBlocks = [];
   let baseImage = null;
   let committedSurface = null;
   let operations = [];
-  let redoOperations = [];
   let draftOperation = null;
   let activePointerId = null;
   let renderScheduled = false;
@@ -170,14 +185,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   function allowDocumentAction() {
     if (annotationDrag) { finishAnnotationDrag(annotationDrag.pointerId); showToast(compositionText('pending'), true); return false; }
     if (hasPendingEdit()) { showToast(compositionText('pending'), true); return false; }
-    if (compositionBusy || historyConsolidation) { showToast(compositionText('loading')); return false; }
+    if (compositionBusy) { showToast(compositionText('loading')); return false; }
     return true;
   }
 
   function persistActiveItem() {
     const item = compositionItems.find(entry => entry.id === activeItemId);
     if (!item) return;
-    Object.assign(item, { baseImage, operations, redoOperations, annotationUndo, annotationRedo, activeTextBlocks, committedSurface, captureRecord, currentStepNumber, historyRevision });
+    Object.assign(item, { baseImage, operations, annotationUndo, annotationRedo, activeTextBlocks, committedSurface, captureRecord, currentStepNumber });
     updateItemThumbnail(item);
   }
 
@@ -189,7 +204,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     activeItemId = item?.id || null;
     baseImage = item?.baseImage || null;
     operations = item?.operations || [];
-    redoOperations = item?.redoOperations || [];
     annotationUndo = item?.annotationUndo || [];
     annotationRedo = item?.annotationRedo || [];
     selectedAnnotation = -1;
@@ -197,7 +211,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     committedSurface = item?.committedSurface || null;
     captureRecord = item?.captureRecord || null;
     currentStepNumber = item?.currentStepNumber || 1;
-    historyRevision = item?.historyRevision || 0;
     container.hidden = !item;
     emptyState.hidden = Boolean(item);
     emptyState.textContent = compositionText('empty');
@@ -300,7 +313,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     thumbnail.width = Math.max(1, Math.round(bitmap.width * thumbnailScale));
     thumbnail.height = Math.max(1, Math.round(bitmap.height * thumbnailScale));
     thumbnail.getContext('2d').drawImage(bitmap, 0, 0, thumbnail.width, thumbnail.height);
-    return { id: metadata.id || crypto.randomUUID(), title: metadata.title || '', caption: metadata.caption || '', thumbnail: thumbnail.toDataURL('image/png'), inputBytes: metadata.inputBytes || record.blob?.size || 0, baseImage: bitmap, operations: [], redoOperations: [], annotationUndo: [], annotationRedo: [], activeTextBlocks: record.textCoordinateSpace === 'bitmap' ? [...(record.textBlocks || [])] : [], committedSurface: surface, captureRecord: record, currentStepNumber: 1, historyRevision: 0 };
+    return { id: metadata.id || crypto.randomUUID(), title: metadata.title || '', caption: metadata.caption || '', thumbnail: thumbnail.toDataURL('image/png'), inputBytes: metadata.inputBytes || record.blob?.size || 0, baseImage: bitmap, operations: [], annotationUndo: [], annotationRedo: [], activeTextBlocks: record.textCoordinateSpace === 'bitmap' ? [...(record.textBlocks || [])] : [], committedSurface: surface, captureRecord: record, currentStepNumber: 1 };
   }
 
   function updateItemThumbnail(item) {
@@ -332,8 +345,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
           const header = ScionosCaptureUtils.readImageDimensions(new Uint8Array(await file.arrayBuffer()), file.type);
           if (!header || header.width > 16384 || header.height > 16384 || header.width * header.height > 16000000) throw new Error(compositionText('imageDimensions'));
-          const reservedPixels = [...compositionItems, ...additions].reduce((sum, item) => sum + item.committedSurface.width * item.committedSurface.height, 0);
-          if (reservedPixels + header.width * header.height > 32000000) throw new Error(compositionText('memoryLimit'));
+          const reservedPixels = [...compositionItems, ...additions].reduce((sum, item) => sum + retainedItemPixels(item), 0);
+          if (reservedPixels + header.width * header.height > MAX_DOCUMENT_PIXELS) throw new Error(compositionText('memoryLimit'));
           bitmap = await createImageBitmap(file);
           // Browser decoders can ignore EXIF for some formats. Both raw and
           // oriented dimensions have the same bounded pixel count.
@@ -341,8 +354,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           const matchesOriented = bitmap.width === header.orientedWidth && bitmap.height === header.orientedHeight;
           if ((!matchesRaw && !matchesOriented) || bitmap.width > 16384 || bitmap.height > 16384 || bitmap.width * bitmap.height > 16000000) throw new Error(compositionText('imageDimensions'));
           const dimensions = ScionosCaptureUtils.computeOutputDimensions(bitmap.width, bitmap.height, 1);
-          const usedPixels = [...compositionItems, ...additions].reduce((sum, item) => sum + item.committedSurface.width * item.committedSurface.height, 0);
-          if (usedPixels + dimensions.width * dimensions.height > 32000000) throw new Error(compositionText('memoryLimit'));
+          const usedPixels = [...compositionItems, ...additions].reduce((sum, item) => sum + retainedItemPixels(item), 0);
+          if (usedPixels + dimensions.width * dimensions.height > MAX_DOCUMENT_PIXELS) throw new Error(compositionText('memoryLimit'));
           if (dimensions.reduced) {
             const resized = await createImageBitmap(bitmap, { resizeWidth: dimensions.width, resizeHeight: dimensions.height, resizeQuality: 'high' });
             bitmap.close();
@@ -467,6 +480,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function saveProject() {
+    const release = reserveSnapshot();
+    if (!release) return;
     try {
       const snapshot = await snapshotComposition('project');
       if (!snapshot) return;
@@ -474,14 +489,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       downloadBlob(blob, 'scionos', snapshot.title);
       showToast(compositionText('projectExportRequested'));
     } catch (error) { showToast(compositionText('failure') + error.message, true); }
+    finally { release(); }
   }
 
   function saveLibraryProject() {
+    const release = reserveSnapshot();
+    if (!release) return;
     const session = librarySession;
     // Snapshot now, before joining the queue: later edits must not change a click's
     // contents. Attach rejection handling immediately even while a save is pending.
     const pendingSnapshot = snapshotComposition('library').then(snapshot => ({ snapshot }), error => ({ error }));
-    session.saves = session.saves.then(() => saveLibrarySnapshot(session, pendingSnapshot));
+    session.saves = session.saves.then(() => saveLibrarySnapshot(session, pendingSnapshot)).finally(release);
   }
 
   async function saveLibrarySnapshot(session, pendingSnapshot) {
@@ -512,7 +530,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const prepared = [];
     try {
       const decoded = await globalThis.ScionosCompositionUtils.decodeProject(file);
-      if (decoded.items.reduce((sum, item) => sum + item.width * item.height, 0) > 32000000) throw new Error(compositionText('memoryLimit'));
+      if (decoded.items.reduce((sum, item) => sum + item.width * item.height, 0) > MAX_DOCUMENT_PIXELS) throw new Error(compositionText('memoryLimit'));
       for (const item of decoded.items) {
         const bitmap = await createImageBitmap(item.blob);
         const entry = makeSessionItem(bitmap, { blob: item.blob, title: item.title, url: item.url, timestamp: item.timestamp, scale: 1, textBlocks: [], textCoordinateSpace: 'bitmap' }, item);
@@ -524,7 +542,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateItemThumbnail(entry);
         prepared.push(entry);
       }
-      if (hasPendingEdit() || historyConsolidation) throw new Error(compositionText('pending'));
+      if (hasPendingEdit()) throw new Error(compositionText('pending'));
       if (documentDirty && !window.confirm(compositionText('replace'))) { prepared.forEach(item => item.baseImage.close()); return; }
       compositionItems.forEach(item => item.baseImage.close?.());
       compositionItems.splice(0, compositionItems.length, ...prepared);
@@ -585,6 +603,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function runCompositionExport(format) {
+    const release = reserveSnapshot();
+    if (!release) return;
     const button = byId('export-confirm');
     button.disabled = true;
     byId('export-status').textContent = compositionText('loading');
@@ -612,7 +632,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       byId('export-dialog').close();
       traceExport('dialog-close', { format });
     } catch (error) { byId('export-status').textContent = compositionText('failure') + error.message; showToast(compositionText('failure') + error.message, true); }
-    finally { button.disabled = false; }
+    finally { release(); button.disabled = false; }
   }
 
   function updateStepBadge() {
@@ -860,10 +880,41 @@ document.addEventListener('DOMContentLoaded', async () => {
     return bounds.width >= 2 && bounds.height >= 2;
   }
 
+  function operationPoints(list) { return list.reduce((sum, operation) => sum + (operation.points?.length || 0), 0); }
+
+  function allowOperations(next) {
+    const others = compositionItems.filter(item => item.id !== activeItemId);
+    const count = next.length + others.reduce((sum, item) => sum + item.operations.length, 0);
+    const points = operationPoints(next) + others.reduce((sum, item) => sum + operationPoints(item.operations), 0);
+    if (next.length > RESOURCE_LIMITS.annotationsPerItem || count > RESOURCE_LIMITS.annotationsPerDocument
+      || next.some(operation => (operation.points?.length || 0) > RESOURCE_LIMITS.pointsPerAnnotation
+        || (operation.kind === 'text' && operation.text.length > 10000)) || points > RESOURCE_LIMITS.pointsPerDocument) {
+      showToast(compositionText('limit'), true);
+      return false;
+    }
+    return true;
+  }
+
+  // Bound all item histories together, including redo, before cloning another state.
+  function pushAnnotationHistory(target) {
+    const stacks = [annotationUndo, annotationRedo];
+    for (const item of compositionItems) if (item.id !== activeItemId) stacks.push(item.annotationUndo, item.annotationRedo);
+    const entries = stacks.flatMap(stack => stack.map(state => ({ stack, state })))
+      .sort((a, b) => a.state.sequence - b.state.sequence);
+    let points = operationPoints(operations) + entries.reduce((sum, entry) => sum + operationPoints(entry.state.operations), 0);
+    let count = operations.length + entries.reduce((sum, entry) => sum + entry.state.operations.length, 0);
+    while (entries.length && (entries.length >= MAX_OPERATIONS || points > RESOURCE_LIMITS.pointsPerDocument || count > RESOURCE_LIMITS.annotationsPerDocument)) {
+      const { stack, state } = entries.shift();
+      stack.splice(stack.indexOf(state), 1);
+      points -= operationPoints(state.operations);
+      count -= state.operations.length;
+    }
+    target.push({ operations: globalThis.structuredClone(operations), step: currentStepNumber, sequence: ++annotationHistorySequence });
+  }
+
   function recordAnnotationHistory() {
-    annotationUndo.push({ operations: globalThis.structuredClone(operations), step: currentStepNumber });
-    if (annotationUndo.length > MAX_OPERATIONS) annotationUndo.shift();
     annotationRedo = [];
+    pushAnnotationHistory(annotationUndo);
   }
 
   async function commitOperation(operation) {
@@ -871,12 +922,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       cancelDraft();
       return;
     }
+    if (!allowOperations([...operations, operation])) { cancelDraft(); return; }
     recordAnnotationHistory();
     selectedAnnotation = -1;
-    historyRevision += 1;
     if (!['crop', 'censor'].includes(operation.kind)) operation.id = operation.id || crypto.randomUUID();
     operations.push(operation);
-    redoOperations = [];
     draftOperation = null;
     geometryPanel.hidden = true;
     applyCommittedOperation(operation);
@@ -1132,9 +1182,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function updateSelectedAnnotation(next) {
     if (selectedAnnotation < 0 || !next) return;
+    if (!allowOperations(operations.map((operation, index) => index === selectedAnnotation ? next : operation))) return;
     recordAnnotationHistory();
     operations[selectedAnnotation] = next;
-    historyRevision += 1;
     rebuildCommittedSurface();
     markDocumentDirty();
   }
@@ -1203,14 +1253,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       const model = globalThis.ScionosAnnotationModel;
       const next = annotationDrag.handle ? model.resize(annotationDrag.original, annotationDrag.handle, point, { context }) : model.move(annotationDrag.original, deltaX, deltaY);
       if (!annotationDrag.moved && Math.hypot(deltaX, deltaY) > 0.5) { recordAnnotationHistory(); annotationDrag.moved = true; }
-      if (annotationDrag.moved) { operations[annotationDrag.index] = next; historyRevision += 1; rebuildCommittedSurface(); markDocumentDirty(); }
+      if (annotationDrag.moved) { operations[annotationDrag.index] = next; rebuildCommittedSurface(); markDocumentDirty(); }
       return;
     }
     if (!draftOperation || event.pointerId !== activePointerId) return;
     const point = getCanvasCoords(event);
     if (draftOperation.kind === 'draw' || draftOperation.kind === 'highlight' || draftOperation.shape === 'free') {
       const previous = draftOperation.points[draftOperation.points.length - 1];
-      if (!previous || Math.hypot(point.x - previous.x, point.y - previous.y) >= 0.75) draftOperation.points.push(point);
+      if (draftOperation.points.length < RESOURCE_LIMITS.pointsPerAnnotation
+        && (!previous || Math.hypot(point.x - previous.x, point.y - previous.y) >= 0.75)) draftOperation.points.push(point);
     } else {
       draftOperation.end = point;
     }
@@ -1305,12 +1356,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function restoreAnnotationHistory(from, to) {
     if (!from.length) return;
-    to.push({ operations: globalThis.structuredClone(operations), step: currentStepNumber });
+    if (!allowOperations(from[from.length - 1].operations)) return;
     const state = from.pop();
+    pushAnnotationHistory(to);
     operations = state.operations;
     currentStepNumber = state.step;
     selectedAnnotation = -1;
-    historyRevision += 1;
     cancelDraft();
     rebuildCommittedSurface();
     updateStepBadge();
@@ -1435,13 +1486,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   byId('annotation-delete').addEventListener('click', () => {
     if (selectedAnnotation < 0) return;
     recordAnnotationHistory(); operations.splice(selectedAnnotation, 1); selectedAnnotation = -1;
-    historyRevision += 1; rebuildCommittedSurface(); markDocumentDirty();
+    rebuildCommittedSurface(); markDocumentDirty();
   });
   byId('annotation-duplicate').addEventListener('click', () => {
     if (selectedAnnotation < 0) return;
     const copy = globalThis.ScionosAnnotationModel.move(operations[selectedAnnotation], 10, 10);
+    if (!allowOperations([...operations, copy])) return;
     copy.id = crypto.randomUUID(); recordAnnotationHistory(); operations.push(copy); selectedAnnotation = operations.length - 1;
-    historyRevision += 1; rebuildCommittedSurface(); markDocumentDirty();
+    rebuildCommittedSurface(); markDocumentDirty();
   });
   for (const property of ['color', 'width', 'text']) byId(`annotation-${property}`).addEventListener('change', event => {
     const operation = operations[selectedAnnotation];
@@ -1513,6 +1565,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   htmlButton.addEventListener('click', () => { void runCompositionExport('html'); });
   printButton.addEventListener('click', () => openExport('pdf'));
   copyButton.addEventListener('click', async () => {
+    const release = reserveSnapshot();
+    if (!release) return;
     try {
       const snapshot = await snapshotComposition();
       if (!snapshot) return;
@@ -1520,6 +1574,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': result.blob })]);
       showToast(getI18nText('copied'));
     } catch (error) { showToast(compositionText('failure') + error.message, true); }
+    finally { release(); }
   });
   byId('source-policy').addEventListener('change', markDocumentDirty);
   byId('export-format').addEventListener('change', updateExportFields);

@@ -1,8 +1,82 @@
+# Scionos Capture 1.5.3 — préparation / preparation / preparación / Vorbereitung
+
+## Français — Préparation 1.5.3 — 26 novembre 2026
+
+**Préparation locale, non publiée.** La validation finale des tests est encore en cours ; les résultats et limites seront consignés dans le [rapport de consolidation](CONSOLIDATION_1.5.3.md). Aucune release GitHub ni soumission Store n’est effectuée. Les liens publics 1.5.2 et leurs archives restent ceux de la publication existante.
+
+- Capture : contrôles de l’onglet actif, de la fenêtre et de la navigation avant et après acquisition, avec sonde liée au `documentId`. L’URL et le titre sont figés au début de la session.
+- PDF : invalidation de la couche texte lors de mutations DOM/CSSOM, de feuilles CSS inaccessibles, de changements de média ou d’animations ; exclusion du texte blanc sur blanc et omission du texte sous modes de fusion ou fonds image lorsque sa visibilité est incertaine (régression `SECRET_BLEND` invisible sur fond blanc confirmée et corrigée). Ces contrôles ne prouvent pas une correspondance absolue pixels/texte lorsqu’un changement CSSOM transitoire est rétabli entre les observations. L’absence de texte est privilégiée en cas de doute ; vérifiez les pixels et utilisez un masque solide pour les secrets.
+- Captures : budget de 180 secondes contrôlé coopérativement aux points de contrôle, et maximum de 256 portions. Il ne s’agit pas d’une interruption préemptive à 180 secondes ; les pages trop longues sont refusées.
+- Ressources : budget cumulé de 32 millions de pixels, incluant les originaux conservés après rognage ; Annuler/Refaire reste borné par ce budget. Au plus deux instantanés sont simultanément en vol, jusqu’à la fin de l’export, de la copie dans le presse-papiers ou de la sauvegarde. Les surfaces Canvas créées par ces opérations sont réduites à 1 × 1 dans `finally`, sans modifier les surfaces reçues en entrée.
+- Annotations : 1 000 par image et 5 000 par document ; 10 000 points par tracé et 100 000 par document. Historique global limité à 100 états, 100 000 points et 5 000 opérations.
+- Stockage : cache de captures retiré pour éviter les données périmées entre contextes ; fermeture des connexions IndexedDB abandonnées. La suppression totale transactionnelle déjà présente dans l’arbre local est intégrée et préservée, avec annulation intégrale en cas d’échec.
+- Imports : validation stricte des données de transparence PNG `tRNS`. Lecture des projets v1/v2 et écriture v2 conservées. Aucune nouvelle permission ni télémétrie.
+- Interface : correction du chevauchement de la barre d’outils ; les commandes d’annotation restent groupées dans la même barre de 56 px, sans déplacement du canevas ni décalage pendant le glisser. Les états inertes `historyRevision`, `historyConsolidation` et `redoOperations` sont retirés.
+- Compatibilité : minimum du manifeste Chrome/Edge 106 au lieu de 102 ; CSS `:has()` exige Chrome 105 et `documentId` Chrome 106. Ce minimum est identifié par analyse statique ; les seules exécutions natives attestées concernent Chrome/Edge 158, sans exécution démontrée de Chrome/Edge 106.
+- Outils : `@axe-core/playwright` 4.14.1, `html-validate` 11.22.1, override `minimatch` 11.0.9 ; override `glob` inactif retiré et Actions mises à jour. Voir la [revue des dépendances](DEPENDENCY_REVIEW_1.5.3.md).
+- Bibliothèque : réutilisation bornée des cartes et miniatures implémentée ; mesure du gain de performance encore en cours. Le traitement par lots visé pour 1.6 n’est pas implémenté.
+
+## English — 1.5.3 preparation — November 26, 2026
+
+**Local preparation, not published.** Final test validation is still in progress; results and limitations will be recorded in the [consolidation report](CONSOLIDATION_1.5.3.md). No GitHub release or Store submission is performed. Public 1.5.2 links and archives still refer to the existing publication.
+
+- Capture: check the active tab, window and navigation before and after acquisition, with a probe tied to `documentId`. The URL and title are fixed at the start of the session.
+- PDF: invalidate the text layer for DOM/CSSOM mutations, inaccessible CSS stylesheets, media changes or animations; exclude white-on-white text and omit text under blend modes or image backgrounds when visibility is uncertain (the invisible-on-white `SECRET_BLEND` regression was confirmed and fixed). These checks do not prove an absolute pixel/text match when a transient CSSOM change is restored between observations. Omission of text is preferred when uncertain; review the pixels and use a solid mask for secrets.
+- Captures: a 180-second budget checked cooperatively at checkpoints, and at most 256 portions. This is not a preemptive interruption at 180 seconds; excessively long pages are rejected.
+- Resources: a cumulative 32-million-pixel budget includes originals retained after cropping; Undo/Redo remains bounded by this budget. At most two snapshots are in flight simultaneously, until export, clipboard copying or saving finishes. Canvas surfaces owned by these operations are reduced to 1 × 1 in `finally`, preserving input surfaces.
+- Annotations: 1,000 per image and 5,000 per document; 10,000 points per stroke and 100,000 per document. Global history is limited to 100 states, 100,000 points and 5,000 operations.
+- Storage: remove the capture cache to avoid stale data across contexts; close abandoned IndexedDB connections. Transactional full deletion already present in the local tree is integrated and preserved, with complete rollback on failure.
+- Imports: strictly validate PNG `tRNS` transparency data. Project v1/v2 reading and v2 writing are retained. No new permission or telemetry.
+- Interface: fix toolbar overlap; annotation controls stay grouped in the same 56 px toolbar, without canvas shifts or drag offsets. Inert `historyRevision`, `historyConsolidation` and `redoOperations` state is removed.
+- Compatibility: manifest minimum Chrome/Edge 106 instead of 102; CSS `:has()` requires Chrome 105 and `documentId` requires Chrome 106. This minimum is identified by static analysis; the only attested native runs concern Chrome/Edge 158, with no demonstrated run on Chrome/Edge 106.
+- Tools: `@axe-core/playwright` 4.14.1, `html-validate` 11.22.1, `minimatch` override 11.0.9; remove the inactive `glob` override and update Actions. See the [dependency review](DEPENDENCY_REVIEW_1.5.3.md).
+- Library: bounded card and thumbnail reuse is implemented; performance gain measurement remains in progress. Batch processing targeted for 1.6 is not implemented.
+
+## Español — Preparación de 1.5.3 — 26 de noviembre de 2026
+
+**Preparación local, sin publicar.** La validación final de las pruebas sigue en curso; los resultados y límites se documentarán en el [informe de consolidación](CONSOLIDATION_1.5.3.md). No se realiza ninguna publicación en GitHub ni envío a la tienda. Los enlaces públicos y archivos de 1.5.2 siguen correspondiendo a la publicación existente.
+
+- Captura: comprobaciones de pestaña activa, ventana y navegación antes y después de la adquisición, con una sonda vinculada al `documentId`. La URL y el título se fijan al inicio de la sesión.
+- PDF: invalidación de la capa de texto ante mutaciones DOM/CSSOM, hojas CSS inaccesibles, cambios de medios o animaciones; exclusión del texto blanco sobre blanco y omisión del texto con modos de fusión o fondos de imagen si su visibilidad es incierta (regresión `SECRET_BLEND` invisible sobre blanco confirmada y corregida). Estas comprobaciones no demuestran una correspondencia absoluta entre píxeles y texto cuando un cambio CSSOM transitorio se revierte entre observaciones. Ante la duda se prefiere omitir el texto; revisa los píxeles y usa una máscara sólida para secretos.
+- Capturas: presupuesto de 180 segundos comprobado de forma cooperativa en los puntos de control y un máximo de 256 porciones. No es una interrupción preventiva a los 180 segundos; las páginas demasiado largas se rechazan.
+- Recursos: el presupuesto acumulado de 32 millones de píxeles incluye los originales conservados tras recortar; Deshacer/Rehacer sigue limitado por ese presupuesto. Como máximo hay dos instantáneas simultáneas en curso hasta finalizar la exportación, la copia al portapapeles o el guardado. Los Canvas propios de estas operaciones se reducen a 1 × 1 en `finally`, conservando las superficies de entrada.
+- Anotaciones: 1.000 por imagen y 5.000 por documento; 10.000 puntos por trazo y 100.000 por documento. Historial global limitado a 100 estados, 100.000 puntos y 5.000 operaciones.
+- Almacenamiento: retirada de la caché de capturas para evitar datos obsoletos entre contextos; cierre de conexiones IndexedDB abandonadas. La eliminación total transaccional ya presente en el árbol local se integra y conserva, con reversión completa en caso de error.
+- Importaciones: validación estricta de los datos de transparencia PNG `tRNS`. Se conserva la lectura de proyectos v1/v2 y la escritura v2. Sin nuevos permisos ni telemetría.
+- Interfaz: corrección del solapamiento de la barra de herramientas; los controles de anotación permanecen agrupados en la misma barra de 56 px, sin desplazar el lienzo ni alterar el arrastre. Se retiran los estados inertes `historyRevision`, `historyConsolidation` y `redoOperations`.
+- Compatibilidad: mínimo del manifiesto Chrome/Edge 106 en lugar de 102; CSS `:has()` requiere Chrome 105 y `documentId` Chrome 106. Este mínimo se identifica mediante análisis estático; las únicas ejecuciones nativas acreditadas son en Chrome/Edge 158, sin ejecución demostrada en Chrome/Edge 106.
+- Herramientas: `@axe-core/playwright` 4.14.1, `html-validate` 11.22.1, override de `minimatch` 11.0.9; retirada del override inactivo de `glob` y actualización de Actions. Véase la [revisión de dependencias](DEPENDENCY_REVIEW_1.5.3.md).
+- Biblioteca: reutilización limitada de tarjetas y miniaturas implementada; medición de la mejora de rendimiento todavía en curso. El procesamiento por lotes previsto para 1.6 no está implementado.
+
+## Deutsch — Vorbereitung von 1.5.3 — 26. November 2026
+
+**Lokale Vorbereitung, nicht veröffentlicht.** Die abschließende Testvalidierung läuft noch; Ergebnisse und Grenzen werden im [Konsolidierungsbericht](CONSOLIDATION_1.5.3.md) festgehalten. Es erfolgt weder eine GitHub-Veröffentlichung noch eine Store-Einreichung. Öffentliche Links und Archive von 1.5.2 verweisen weiterhin auf die bestehende Veröffentlichung.
+
+- Aufnahme: aktiven Tab, Fenster und Navigation vor und nach der Erfassung prüfen, mit einer an die `documentId` gebundenen Prüfung. URL und Titel werden zu Beginn der Sitzung festgelegt.
+- PDF: Textebene bei DOM-/CSSOM-Änderungen, unzugänglichen CSS-Stylesheets, Medienänderungen oder Animationen verwerfen; weißen Text auf weißem Hintergrund ausschließen und Text bei Mischmodi oder Bildhintergründen mit unklarer Sichtbarkeit weglassen (unsichtbare `SECRET_BLEND`-Regression auf Weiß bestätigt und korrigiert). Diese Prüfungen beweisen keine absolute Übereinstimmung von Pixeln und Text, wenn eine vorübergehende CSSOM-Änderung zwischen den Beobachtungen rückgängig gemacht wird. Im Zweifel wird Text bevorzugt weggelassen; Pixel prüfen und Geheimnisse deckend maskieren.
+- Aufnahmen: Zeitbudget von 180 Sekunden, kooperativ an Kontrollpunkten geprüft, und höchstens 256 Teilaufnahmen. Dies ist keine präemptive Unterbrechung nach 180 Sekunden; zu lange Seiten werden abgelehnt.
+- Ressourcen: Das Gesamtbudget von 32 Millionen Pixeln umfasst nach einem Zuschnitt aufbewahrte Originale; Rückgängig/Wiederholen bleibt durch dieses Budget begrenzt. Höchstens zwei Momentaufnahmen sind gleichzeitig in Bearbeitung, bis Export, Kopieren in die Zwischenablage oder Speicherung abgeschlossen ist. Eigene Canvas-Flächen dieser Vorgänge werden in `finally` auf 1 × 1 verkleinert; Eingabeflächen bleiben erhalten.
+- Annotationen: 1.000 pro Bild und 5.000 pro Dokument; 10.000 Punkte pro Zeichenstrich und 100.000 pro Dokument. Der globale Verlauf ist auf 100 Zustände, 100.000 Punkte und 5.000 Operationen begrenzt.
+- Speicherung: Aufnahme-Cache entfernen, um veraltete Daten zwischen Kontexten zu vermeiden; aufgegebene IndexedDB-Verbindungen schließen. Die im lokalen Arbeitsbaum bereits vorhandene transaktionale Gesamtlöschung wird integriert und beibehalten, mit vollständigem Rollback bei Fehlern.
+- Importe: strenge Validierung der PNG-Transparenzdaten `tRNS`. Projekte v1/v2 bleiben lesbar, geschrieben wird v2. Keine neue Berechtigung oder Telemetrie.
+- Oberfläche: Überlappung der Werkzeugleiste korrigiert; Annotationsbefehle bleiben in derselben 56 px hohen Leiste gruppiert, ohne Verschiebung der Zeichenfläche oder Versatz beim Ziehen. Inaktive Zustände `historyRevision`, `historyConsolidation` und `redoOperations` sind entfernt.
+- Kompatibilität: Manifest-Minimum Chrome/Edge 106 statt 102; CSS `:has()` benötigt Chrome 105 und `documentId` Chrome 106. Dieses Minimum wurde statisch ermittelt; die einzigen belegten nativen Ausführungen betreffen Chrome/Edge 158, ohne nachgewiesene Ausführung unter Chrome/Edge 106.
+- Werkzeuge: `@axe-core/playwright` 4.14.1, `html-validate` 11.22.1, `minimatch`-Override 11.0.9; inaktiven `glob`-Override entfernt und Actions aktualisiert. Siehe [Abhängigkeitsprüfung](DEPENDENCY_REVIEW_1.5.3.md).
+- Bibliothek: begrenzte Wiederverwendung von Karten und Miniaturen implementiert; Messung des Leistungsgewinns läuft noch. Die für 1.6 geplante Stapelverarbeitung ist nicht implementiert.
+
+---
+
 # Scionos Capture 1.5.2
 
 ## Français
 
-**1.5.2 — publication GitHub.** Le statut actuel du Chrome Web Store reste distinct et non confirmé ; aucune soumission Store de cette version n’est attestée.
+**Candidate Store 1.5.2 corrigée localement.** La release GitHub existante conserve son tag et son archive antérieure ; elle ne contient pas ces nouvelles corrections. Aucune soumission Store effectuée. Voir [le bilan de préparation](STORE_READINESS_1.5.2.md).
+
+- Sélections : suivi du pointeur actif, rejet des pointeurs secondaires et nettoyage des gestes interrompus.
+- Capture : restauration des éléments masqués même en cas d’exception pendant leur préparation.
+- Bibliothèque : suppression globale atomique, avec rejet des listes périmées et annulation intégrale en cas d’échec.
+
+Validation de cette candidate : 136 tests unitaires et 136 tests navigateur réussis, cinq modes natifs dans Chrome et Edge, trois répétitions de performance et dix scénarios PDF. Détails, limites et empreinte finale : [préparation Store](STORE_READINESS_1.5.2.md).
 
 - Glissers dans l’éditeur : suivi du `pointerId` actif et gestion des interruptions du geste.
 - Miniatures internes de l’éditeur et aperçu de composition : reconstruction à la réouverture du projet pour inclure les annotations.
@@ -10,14 +84,19 @@
 - Rapports HTML : application de la politique de sources dans tous les chemins du générateur, avec retrait systématique des identifiants HTTP(S).
 - Impression/PDF : limites cumulées de 32 millions de pixels et 128 Mio de blobs, avec un maximum de 200 pages.
 - Paquet : retrait de l’ancien module `editor-export.js`, soit 35 fichiers de distribution.
-- Outils de test : @axe-core/playwright 4.14.0, @playwright/test 1.65.1, fake-indexeddb 6.2.8 et PDF.js 6.5.438. Dépendances de lint et validation majeures mises à jour : @eslint/js 10.0.1, eslint 10.15.0 et html-validate 11.21.1. Prérequis Node.js : ^22.22.0 ou >=24.8.0 ; matrice CI configurée pour 22.22.0 et 24.8.0, sans exécution GitHub attestée pour cette migration.
+- Outils de test : @axe-core/playwright 4.14.0, @playwright/test 1.65.1, fake-indexeddb 6.2.8 et PDF.js 6.5.438. Dépendances de lint et validation majeures mises à jour : @eslint/js 10.0.1, eslint 10.15.0 et html-validate 11.21.1. Prérequis Node.js : ^22.22.0 ou >=24.8.0 ; matrice CI configurée pour 22.22.0 et 24.8.0, sans nouveau résultat CI pour cette candidate locale.
 - Accessibilité : le nom annoncé du sélecteur de langue contient son code visible. La migration majeure ESLint et HTML-Validate est détaillée dans [la revue de migration](MAJOR_DEPENDENCY_MIGRATION.md).
 
-Validation locale réussie : 133 tests unitaires, 126 tests navigateur, cinq modes natifs dans Chrome et Edge, performances générales et dix scénarios PDF. Archive de 35 fichiers. Les résultats et l’empreinte du paquet sont consignés dans [la revue des dépendances et validations](DEPENDENCY_REVIEW_1.5.2.md).
 
 ## English
 
-**1.5.2 — GitHub release.** Chrome Web Store status remains separate and unconfirmed; no Store submission of this version is attested.
+**Locally corrected Store candidate 1.5.2.** The existing GitHub release keeps its tag and earlier archive; it does not contain these new fixes. No Store submission performed. See [the readiness report](STORE_READINESS_1.5.2.md).
+
+- Selections: track the active pointer, ignore secondary pointers and clean up interrupted gestures.
+- Capture: restore hidden elements even when their preparation throws.
+- Library: atomic bulk deletion, rejecting stale snapshots and rolling back the entire operation on failure.
+
+Candidate validation: 136 unit tests and 136 browser tests passed, five native modes in Chrome and Edge, three performance repetitions and ten PDF scenarios. Details, limits and final checksum: [Store readiness](STORE_READINESS_1.5.2.md).
 
 - Editor drags: track the active `pointerId` and handle gesture interruptions.
 - Internal editor thumbnails and composition preview: reconstruct them when reopening a project to include annotations.
@@ -25,14 +104,19 @@ Validation locale réussie : 133 tests unitaires, 126 tests navigateur, cinq mod
 - HTML reports: apply source policy throughout the generator, always removing HTTP(S) credentials.
 - Print/PDF: cumulative limits of 32 million pixels and 128 MiB of blobs, with a maximum of 200 pages.
 - Package: removed the legacy `editor-export.js` module, leaving 35 distribution files.
-- Test tools: @axe-core/playwright 4.14.0, @playwright/test 1.65.1, fake-indexeddb 6.2.8 and PDF.js 6.5.438. Major lint and validation tools upgraded: @eslint/js 10.0.1, eslint 10.15.0 and html-validate 11.21.1. Node.js requirement: ^22.22.0 or >=24.8.0; CI matrix configured for 22.22.0 and 24.8.0, with no GitHub run attested for this migration.
+- Test tools: @axe-core/playwright 4.14.0, @playwright/test 1.65.1, fake-indexeddb 6.2.8 and PDF.js 6.5.438. Major lint and validation tools upgraded: @eslint/js 10.0.1, eslint 10.15.0 and html-validate 11.21.1. Node.js requirement: ^22.22.0 or >=24.8.0; CI matrix configured for 22.22.0 and 24.8.0, with no new CI result for this local candidate.
 - Accessibility: the language selector’s accessible name contains its visible code. The ESLint and HTML-Validate major migration is detailed in the [migration review](MAJOR_DEPENDENCY_MIGRATION.md).
 
-Local validation passed: 133 unit tests, 126 browser tests, five native modes in Chrome and Edge, general performance runs and ten PDF scenarios. The archive contains 35 files. Results and the package checksum are recorded in the [dependency and validation review](DEPENDENCY_REVIEW_1.5.2.md).
 
 ## Español
 
-**1.5.2 — publicación en GitHub.** El estado de Chrome Web Store sigue siendo independiente y no confirmado; no se acredita un envío de esta versión a la tienda.
+**Candidata 1.5.2 corregida localmente para la tienda.** La publicación GitHub mantiene su etiqueta y archivo anterior; no contiene estas nuevas correcciones. No se ha enviado a la tienda. Véase [el informe de preparación](STORE_READINESS_1.5.2.md).
+
+- Selecciones: seguimiento del puntero activo, exclusión de punteros secundarios y limpieza de gestos interrumpidos.
+- Captura: restauración de elementos ocultos incluso si falla su preparación.
+- Biblioteca: eliminación global atómica, con rechazo de listas obsoletas y reversión completa en caso de error.
+
+Validación de esta candidata: 136 pruebas unitarias y 136 pruebas de navegador superadas, cinco modos nativos en Chrome y Edge, tres repeticiones de rendimiento y diez escenarios PDF. Detalles, límites y suma final: [preparación para la tienda](STORE_READINESS_1.5.2.md).
 
 - Arrastres en el editor: seguimiento del `pointerId` activo y gestión de interrupciones del gesto.
 - Miniaturas internas del editor y vista previa de composición: reconstrucción al reabrir el proyecto para incluir las anotaciones.
@@ -40,14 +124,19 @@ Local validation passed: 133 unit tests, 126 browser tests, five native modes in
 - Informes HTML: aplicación de la política de fuentes en todo el generador, eliminando siempre las credenciales HTTP(S).
 - Impresión/PDF: límites acumulados de 32 millones de píxeles y 128 MiB de blobs, con un máximo de 200 páginas.
 - Paquete: retirada del módulo antiguo `editor-export.js`, con 35 archivos de distribución.
-- Herramientas de prueba: @axe-core/playwright 4.14.0, @playwright/test 1.65.1, fake-indexeddb 6.2.8 y PDF.js 6.5.438. Herramientas principales de lint y validación actualizadas: @eslint/js 10.0.1, eslint 10.15.0 y html-validate 11.21.1. Node.js requerido: ^22.22.0 o >=24.8.0; matriz CI configurada para 22.22.0 y 24.8.0, sin ejecución en GitHub acreditada para esta migración.
+- Herramientas de prueba: @axe-core/playwright 4.14.0, @playwright/test 1.65.1, fake-indexeddb 6.2.8 y PDF.js 6.5.438. Herramientas principales de lint y validación actualizadas: @eslint/js 10.0.1, eslint 10.15.0 y html-validate 11.21.1. Node.js requerido: ^22.22.0 o >=24.8.0; matriz CI configurada para 22.22.0 y 24.8.0, sin un nuevo resultado CI para esta candidata local.
 - Accesibilidad: el nombre accesible del selector de idioma incluye su código visible. La migración mayor de ESLint y HTML-Validate se detalla en la [revisión de migración](MAJOR_DEPENDENCY_MIGRATION.md).
 
-Validación local superada: 133 pruebas unitarias, 126 pruebas de navegador, cinco modos nativos en Chrome y Edge, rendimiento general y diez escenarios PDF. Archivo de 35 elementos. Los resultados y la suma del paquete constan en la [revisión de dependencias y validaciones](DEPENDENCY_REVIEW_1.5.2.md).
 
 ## Deutsch
 
-**1.5.2 — GitHub-Release.** Der Chrome-Web-Store-Status bleibt unabhängig und unbestätigt; eine Store-Einreichung dieser Version wird nicht bestätigt.
+**Lokal korrigierter Store-Kandidat 1.5.2.** Das bestehende GitHub-Release behält Tag und bisheriges Archiv; diese neuen Korrekturen sind darin nicht enthalten. Keine Store-Einreichung erfolgt. Siehe [Prüfbericht](STORE_READINESS_1.5.2.md).
+
+- Auswahl: aktiven Zeiger verfolgen, weitere Zeiger ignorieren und unterbrochene Gesten bereinigen.
+- Aufnahme: ausgeblendete Elemente auch bei Fehlern während der Vorbereitung wiederherstellen.
+- Bibliothek: atomare Gesamtlöschung mit Ablehnung veralteter Listen und vollständigem Rollback bei Fehlern.
+
+Prüfung dieses Kandidaten: 136 Unit-Tests und 136 Browsertests bestanden, fünf native Modi in Chrome und Edge, drei Leistungswiederholungen und zehn PDF-Szenarien. Details, Grenzen und endgültige Prüfsumme: [Store-Vorbereitung](STORE_READINESS_1.5.2.md).
 
 - Ziehen im Editor: aktiven `pointerId` verfolgen und Unterbrechungen der Geste behandeln.
 - Interne Editor-Miniaturen und Kompositionsvorschau: beim erneuten Öffnen des Projekts einschließlich Annotationen rekonstruieren.
@@ -55,10 +144,9 @@ Validación local superada: 133 pruebas unitarias, 126 pruebas de navegador, cin
 - HTML-Berichte: Quellenrichtlinie im gesamten Generator anwenden und HTTP(S)-Zugangsdaten immer entfernen.
 - Drucken/PDF: kumulierte Grenzen von 32 Millionen Pixeln und 128 MiB Blobs, höchstens 200 Seiten.
 - Paket: altes Modul `editor-export.js` entfernt; damit 35 Distributionsdateien.
-- Testwerkzeuge: @axe-core/playwright 4.14.0, @playwright/test 1.65.1, fake-indexeddb 6.2.8 und PDF.js 6.5.438. Lint- und Validierungswerkzeuge aktualisiert: @eslint/js 10.0.1, eslint 10.15.0 und html-validate 11.21.1. Node.js-Anforderung: ^22.22.0 oder >=24.8.0; CI-Matrix für 22.22.0 und 24.8.0 konfiguriert, ein GitHub-Lauf für diese Migration ist nicht belegt.
+- Testwerkzeuge: @axe-core/playwright 4.14.0, @playwright/test 1.65.1, fake-indexeddb 6.2.8 und PDF.js 6.5.438. Lint- und Validierungswerkzeuge aktualisiert: @eslint/js 10.0.1, eslint 10.15.0 und html-validate 11.21.1. Node.js-Anforderung: ^22.22.0 oder >=24.8.0; CI-Matrix für 22.22.0 und 24.8.0 konfiguriert, für diesen lokalen Kandidaten liegt kein neuer CI-Lauf vor.
 - Barrierefreiheit: Der zugängliche Name der Sprachauswahl enthält den sichtbaren Sprachcode. Die Hauptversionsmigration von ESLint und HTML-Validate ist in der [Migrationsprüfung](MAJOR_DEPENDENCY_MIGRATION.md) dokumentiert.
 
-Lokale Prüfung bestanden: 133 Unit-Tests, 126 Browsertests, fünf native Modi in Chrome und Edge, allgemeine Leistungsmessungen und zehn PDF-Szenarien. Archiv mit 35 Dateien. Ergebnisse und Prüfsumme stehen in der [Abhängigkeits- und Validierungsprüfung](DEPENDENCY_REVIEW_1.5.2.md).
 
 ---
 

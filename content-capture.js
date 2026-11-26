@@ -18,6 +18,14 @@
     let activeSession = null;
     let sessionId = 0;
     function checkpoint() {
+      if (activeSession && !activeSession.committing && location.href !== activeSession.source.url) {
+        const error = new Error('The page navigated during capture.');
+        error.code = 'NAVIGATION_CHANGED';
+        throw error;
+      }
+      if (activeSession?.deadline && Date.now() > activeSession.deadline) {
+        throw new Error('Capture exceeded its time limit. Select a smaller region.');
+      }
       if (activeSession?.cancelled) {
         const error = new Error('Capture cancelled.');
         error.name = 'AbortError';
@@ -40,7 +48,8 @@
 
     async function runSession(operation) {
       if (activeSession) return;
-      const session = { id: ++sessionId, cancelled: false, onCancel: null, committing: false };
+      const session = { id: ++sessionId, cancelled: false, onCancel: null, committing: false,
+        source: { title: document.title, url: location.href }, deadline: null };
       activeSession = session;
       const previousFocus = document.activeElement;
       const cancel = event => {
@@ -80,14 +89,22 @@
     async function executeVisibleCapture() {
       try {
         await countdown();
-        const response = await captureVisibleTab();
-        const origin = dom.clientPointToSurface(getDocumentScrollSurface(), 0, 0);
-        const textBlocks = extractDomTextBlocks({
-          x: origin.x, y: origin.y,
-          width: window.innerWidth, height: window.innerHeight
-        });
-        const prepared = await prepareDataUrlForEditor(response.dataUrl, textBlocks);
-        await openPreparedCapture(prepared);
+        const surface = getDocumentScrollSurface();
+        const guard = dom.createAcquisitionGuard(surface);
+        try {
+          const response = await captureVisibleTab();
+          guard.assertGeometry();
+          const origin = dom.clientPointToSurface(surface, 0, 0);
+          const textBlocks = extractDomTextBlocks({
+            x: origin.x, y: origin.y, width: window.innerWidth, height: window.innerHeight
+          });
+          const prepared = await prepareDataUrlForEditor(response.dataUrl, textBlocks);
+          guard.assertGeometry();
+          if (!guard.textIsStable()) {
+            prepared.textBlocks = []; prepared.textLayerLimited = true;
+          }
+          await openPreparedCapture(prepared);
+        } finally { guard.close(); }
       } catch (error) {
         if (error.name === 'AbortError') return;
         console.error('Visible capture failed:', error);
@@ -137,6 +154,7 @@
 
     async function countdown() {
       checkpoint();
+      activeSession.deadline ||= Date.now() + 180_000;
       if (!requestedDelay) return;
       const indicator = createProgressIndicator();
       const status = document.createElement('span');
@@ -211,7 +229,7 @@
     async function openPreparedCapture(prepared) {
       checkpoint();
       await transfer.openEditor(prepared.blob, prepared.scale, prepared.textBlocks, prepared.textLayerLimited, checkpoint,
-        () => { checkpoint(); activeSession.committing = true; });
+        () => { checkpoint(); activeSession.committing = true; }, activeSession.source);
     }
 
     function collectTileText(blocks, surface, region, written) {
@@ -234,6 +252,9 @@
     }
 
     async function captureRegionAttempt(surface, region, baseline, progress, bounded = true) {
+      if (Math.ceil(region.width / baseline.viewportWidth) * Math.ceil(region.height / baseline.viewportHeight) > 256) {
+        throw new Error('Capture requires too many portions. Select a smaller region.');
+      }
       const xs = Utils.buildRegionCapturePlan(region.x, region.width, baseline.viewportWidth, baseline.fullWidth);
       const ys = Utils.buildRegionCapturePlan(region.y, region.height, baseline.viewportHeight, baseline.fullHeight);
       const initial = surface.getPosition();
@@ -245,6 +266,7 @@
       const patches = [];
       let canvas, context, bitmapSize;
       let outputScale = 1;
+      let textUncertain = false;
       const geometry = surface.getCaptureRect();
       for (let row = 0; row < ys.length; row += 1) {
         for (let column = 0; column < xs.length; column += 1) {
@@ -262,16 +284,23 @@
           const written = { x: region.x + xTile.destinationTop, y: region.y + yTile.destinationTop,
             width: xTile.sourceHeight, height: yTile.sourceHeight };
           updateProgress(progress, percent, outputScale < 0.9999);
-          anchored.prepare(index, xs.length * ys.length, dom.surfaceRectToClient(surface, written), row === ys.length - 1);
-          progress.style.visibility = 'hidden';
-          let image, bottomPatches;
+          let image, bottomPatches, guard;
           try {
+            anchored.prepare(index, xs.length * ys.length, dom.surfaceRectToClient(surface, written), row === ys.length - 1);
+            progress.style.visibility = 'hidden';
+            guard = dom.createAcquisitionGuard(surface);
             await waitForPaint();
             const response = await captureVisibleTab();
             image = await loadImage(response.dataUrl);
-            collectTileText(blocks, surface, region, written);
+            guard.assertGeometry();
+            assertStableMetrics(surface, baseline, bounded ? region : null);
+            if (!textUncertain) collectTileText(blocks, surface, region, written);
+            if (!guard.textIsStable()) {
+              textUncertain = true; blocks.items = []; blocks.limited = true;
+            }
             bottomPatches = anchored.getBottomPatches();
           } finally {
+            guard?.close();
             progress.style.visibility = 'visible';
             anchored.restore();
           }
@@ -339,7 +368,7 @@
         Object.assign(label.style, { position: 'absolute', bottom: '-30px', right: '0', background: '#101d2f', color: '#fff',
           padding: '4px 7px', font: '12px system-ui, sans-serif', borderRadius: '5px' });
         selectionBox.append(label); overlay.append(selectionBox); overlay.showModal();
-        let surface, start;
+        let surface, start, activePointerId = null;
         let pointer = { x: 0, y: 0 };
         let dragging = false, processing = false, settled = false, hasScrolled = false, raf = null;
         const stop = () => { if (raf !== null) cancelAnimationFrame(raf); raf = null; };
@@ -385,23 +414,23 @@
           } catch (error) { fail(error); finish(); }
         };
         overlay.addEventListener('pointerdown', event => {
-          if (event.button !== 0 || processing) return;
+          if (event.button !== 0 || event.isPrimary === false || dragging || processing || settled) return;
           try {
             checkpoint();
             surface = surfaceUnderOverlay(overlay, event.clientX, event.clientY);
             scrollState.remember(surface);
             start = dom.clientPointToSurface(surface, event.clientX, event.clientY, true);
-            pointer = { x: event.clientX, y: event.clientY }; dragging = true; hasScrolled = false;
+            pointer = { x: event.clientX, y: event.clientY }; activePointerId = event.pointerId; dragging = true; hasScrolled = false;
             overlay.setPointerCapture(event.pointerId); preview(); stop(); raf = requestAnimationFrame(autoScroll);
           } catch (error) { fail(error); finish(); }
         });
         overlay.addEventListener('pointermove', event => {
-          if (!dragging) return;
+          if (!dragging || event.pointerId !== activePointerId) return;
           pointer = { x: event.clientX, y: event.clientY };
           try { preview(); } catch (error) { fail(error); finish(); }
         });
         overlay.addEventListener('pointerup', async event => {
-          if (!dragging) return;
+          if (!dragging || event.pointerId !== activePointerId) return;
           dragging = false; processing = true; stop(); pointer = { x: event.clientX, y: event.clientY };
           let restoreMotion = () => {}, progress;
           hide();
@@ -423,7 +452,12 @@
           } catch (error) { fail(error); }
           finally { restoreMotion(); removeProgressIndicator(progress); finish(); }
         });
-        overlay.addEventListener('pointercancel', () => { activeSession.cancelled = true; activeSession.onCancel?.(); });
+        const cancelPointer = event => {
+          if (!dragging || event.pointerId !== activePointerId) return;
+          activeSession.cancelled = true; activeSession.onCancel?.();
+        };
+        overlay.addEventListener('pointercancel', cancelPointer);
+        overlay.addEventListener('lostpointercapture', cancelPointer);
       });
     }
 
@@ -572,6 +606,7 @@
           return Utils.normalizeScrollingRegion(first, second, horizontalViewport, metrics.fullHeight);
         };
         const cleanup = () => {
+          clearPointer();
           overlay.close();
           overlay.remove();
           activeSession.onCancel = null;
@@ -591,6 +626,7 @@
           settle({ region, surface: selectedSurface, scrollState });
         };
         const reset = () => {
+          clearPointer(); completedPointerId = null; dragSettled = false;
           firstPoint = null;
           selectedSurface = findScrollSurface();
           lockHorizontal();
@@ -660,16 +696,33 @@
         };
         const guardedKeyDown = guard(onKeyDown), guardedScroll = guard(updatePreview);
         let pointerDownPos = null;
+        let activePointerId = null, completedPointerId = null;
         let isDragging = false;
         let dragSettled = false;
+        const clearPointer = () => {
+          const pointerId = activePointerId;
+          activePointerId = null; pointerDownPos = null; isDragging = false;
+          if (pointerId !== null && overlay.hasPointerCapture(pointerId)) overlay.releasePointerCapture(pointerId);
+        };
+        const cancelPointer = event => {
+          if (event.pointerId !== activePointerId) return;
+          const wasDragging = isDragging;
+          clearPointer(); completedPointerId = null;
+          if (wasDragging) reset();
+          dragSettled = true;
+        };
+        overlay.addEventListener('pointercancel', cancelPointer);
+        overlay.addEventListener('lostpointercapture', cancelPointer);
 
         overlay.addEventListener('pointerdown', event => {
-          if (panel.contains(event.target) || event.button !== 0) return;
+          if (panel.contains(event.target) || event.button !== 0 || event.isPrimary === false || activePointerId !== null || settled) return;
+          activePointerId = event.pointerId; completedPointerId = null;
           pointerDownPos = { x: event.clientX, y: event.clientY };
           isDragging = false;
           dragSettled = false;
         });
         overlay.addEventListener('pointermove', guard(event => {
+          if (event.isPrimary === false || (activePointerId !== null && event.pointerId !== activePointerId)) return;
           if (!panel.contains(event.target)) {
             lastPointer = { x: event.clientX, y: event.clientY };
             if (pointerDownPos && !firstPoint) {
@@ -680,6 +733,7 @@
                 lockHorizontal();
                 scrollState.remember(selectedSurface);
                 firstPoint = surfacePoint(selectedSurface, pointerDownPos.x, pointerDownPos.y);
+                overlay.setPointerCapture(activePointerId);
                 instructions.textContent = text('scrollingInstructionEnd');
                 status.textContent = text('scrollingPointSet');
                 restartButton.disabled = false;
@@ -689,23 +743,25 @@
           }
         }));
         overlay.addEventListener('pointerup', guard(event => {
-          if (panel.contains(event.target)) return;
+          if (event.pointerId !== activePointerId) return;
+          completedPointerId = activePointerId;
+          if (panel.contains(event.target)) { clearPointer(); completedPointerId = null; return; }
           if (isDragging && firstPoint && pointerDownPos) {
             const deltaX = Math.abs(event.clientX - pointerDownPos.x);
             const deltaY = Math.abs(event.clientY - pointerDownPos.y);
             if (deltaX > 10 || deltaY > 10) {
               dragSettled = true;
               finish(normalize(firstPoint, surfacePoint(selectedSurface, event.clientX, event.clientY)));
-              pointerDownPos = null;
-              isDragging = false;
+              clearPointer();
               return;
             }
           }
-          pointerDownPos = null;
-          isDragging = false;
+          clearPointer();
         }));
         overlay.addEventListener('click', guard(event => {
-          if (panel.contains(event.target) || dragSettled || settled) return;
+          if (panel.contains(event.target) || dragSettled || settled || activePointerId !== null) return;
+          if (typeof event.pointerId === 'number' && event.pointerId >= 0 && event.pointerId !== completedPointerId) return;
+          completedPointerId = null;
           lastPointer = { x: event.clientX, y: event.clientY };
           if (!firstPoint) {
             selectedSurface = surfaceUnderOverlay(overlay, event.clientX, event.clientY);

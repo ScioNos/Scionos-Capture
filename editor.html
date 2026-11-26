@@ -28,6 +28,7 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr);
       grid-template-rows: auto auto minmax(0, 1fr);
+      grid-template-areas: "header" "tools" "body";
       overflow: hidden;
       font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
       background: var(--ink);
@@ -41,6 +42,7 @@
     [hidden] { display: none !important; }
 
     header {
+      grid-area: header;
       min-width: 0;
       min-height: 64px;
       display: flex;
@@ -99,8 +101,9 @@
     .auto-icon, .language-check { color: var(--cyan); text-align: center; font-weight: 800; }
     .language-label { font-size: 12px; }
 
+    #editor-toolbar { grid-area: tools; }
     .toolbar {
-      min-height: 54px;
+      min-height: 56px;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -188,7 +191,7 @@
       .geometry-panel { max-width: calc(100vw - 24px); right: 12px; left: 12px; transform: none; }
     }
 
-    .editor-body { display: grid; grid-template-columns: 292px minmax(0, 1fr); min-height: 0; }
+    .editor-body { grid-area: body; display: grid; grid-template-columns: 292px minmax(0, 1fr); min-height: 0; }
     .composition-panel { min-height: 0; overflow: auto; padding: 14px; border-right: 1px solid var(--line); background: var(--panel); }
     .composition-panel h2 { margin: 14px 0 8px; font-size: 13px; }
     .composition-panel h2:first-child { margin-top: 0; }
@@ -354,14 +357,14 @@
       <button id="btn-undo" class="tool-button" type="button" disabled><svg class="icon" viewBox="0 0 24 24"><path d="M9 7 4 12l5 5M5 12h8a6 6 0 1 1 0 12"/></svg><span id="txt-undo"></span></button>
       <button id="btn-redo" class="tool-button" type="button" disabled><svg class="icon" viewBox="0 0 24 24"><path d="m15 7 5 5-5 5m4-5h-8a6 6 0 1 0 0 12"/></svg><span id="txt-redo"></span></button>
     </div>
-  </div>
 
-  <div id="annotation-controls" class="toolbar" hidden role="group" aria-label="Annotation sélectionnée">
+    <div id="annotation-controls" class="tool-group" hidden role="group" aria-label="Annotation sélectionnée">
     <label class="field" for="annotation-color"><span id="annotation-color-label">Couleur</span><input id="annotation-color" type="color"></label>
     <label class="field" for="annotation-width"><span id="annotation-width-label">Épaisseur / taille</span><input id="annotation-width" type="number" min="1" max="256"></label>
     <label class="field" for="annotation-text"><span id="annotation-text-label">Texte</span><input id="annotation-text" type="text" maxlength="5000"></label>
     <button id="annotation-delete" type="button" class="compact-button">Supprimer</button>
     <button id="annotation-duplicate" type="button" class="compact-button">Dupliquer</button>
+    </div>
   </div>
   <div class="editor-body">
   <aside class="composition-panel" aria-labelledby="composition-heading">

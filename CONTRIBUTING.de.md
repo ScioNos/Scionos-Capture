@@ -1,5 +1,7 @@
 # Zu Scionos Capture beitragen
 
+Lokale Vorbereitung 1.5.3, unveröffentlicht. Keine Änderung am entfernten Store-Eintrag oder an öffentlichen Links für 1.5.2.
+
 [Français](CONTRIBUTING.md) · [English](CONTRIBUTING.en.md) · [Español](CONTRIBUTING.es.md) · [Deutsch](CONTRIBUTING.de.md)
 
 Keine Screenshots mit persönlichen Daten, Zugangsdaten oder Geheimnissen anhängen.

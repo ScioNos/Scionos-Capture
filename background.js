@@ -14,6 +14,18 @@ const MAX_METADATA_LENGTH = 4096;
 const MAX_TEXT_BLOCKS = 1500;
 const MAX_TEXT_BLOCK_SERIALIZED_BYTES = 4 * 1024 * 1024;
 const transferQueues = new Map();
+const pendingAcquisitions = new Set();
+chrome.tabs.onActivated?.addListener(({ windowId }) => {
+  for (const guard of pendingAcquisitions) {
+    if (guard.windowId === windowId) guard.tabChanged = true;
+  }
+});
+
+chrome.windows?.onFocusChanged?.addListener(windowId => {
+  for (const guard of pendingAcquisitions) {
+    if (guard.windowId !== windowId) guard.tabChanged = true;
+  }
+});
 
 let captureQueue = Promise.resolve();
 let lastCaptureStartedAt = 0;
@@ -178,21 +190,38 @@ async function reconcileStorage() {
 async function assertOriginalTabActive(senderTab) {
   if (!senderTab || !Number.isInteger(senderTab.id) || !Number.isInteger(senderTab.windowId)) throw new Error('Invalid capture source.');
   const [activeTab] = await chrome.tabs.query({ active: true, windowId: senderTab.windowId });
-  if (!activeTab || activeTab.id !== senderTab.id) {
+  const sourceWindow = chrome.windows?.get ? await chrome.windows.get(senderTab.windowId) : null;
+  if (!activeTab || activeTab.id !== senderTab.id || sourceWindow?.focused === false) {
     const error = new Error('The active tab changed during capture.');
     error.code = 'TAB_CHANGED';
     throw error;
   }
 }
 
-function enqueueVisibleCapture(senderTab) {
-  const task = captureQueue.then(async () => {
+function enqueueVisibleCapture(senderTab, documentId) {
+  const guard = { tabId: senderTab.id, windowId: senderTab.windowId, navigationChanged: false, tabChanged: false };
+  pendingAcquisitions.add(guard);
+  const assertAcquisition = async () => {
     await assertOriginalTabActive(senderTab);
+    if (documentId && chrome.tabs.sendMessage) {
+      try {
+        const response = await chrome.tabs.sendMessage(senderTab.id, { action: 'PING' }, { documentId });
+        if (!response?.loaded) guard.navigationChanged = true;
+      } catch { guard.navigationChanged = true; }
+    }
+    if (guard.tabChanged || guard.navigationChanged) {
+      const error = new Error('The capture source changed during acquisition.');
+      error.code = guard.tabChanged ? 'TAB_CHANGED' : 'NAVIGATION_CHANGED';
+      throw error;
+    }
+  };
+  const task = captureQueue.then(async () => {
+    await assertAcquisition();
     const remainingDelay = CAPTURE_INTERVAL_MS - (Date.now() - lastCaptureStartedAt);
     if (remainingDelay > 0) await ScionosCaptureUtils.delay(remainingDelay);
-    await assertOriginalTabActive(senderTab);
+    await assertAcquisition();
     lastCaptureStartedAt = Date.now();
-    return chrome.tabs.captureVisibleTab(senderTab.windowId, { format: 'png' }).catch(error => {
+    const dataUrl = await chrome.tabs.captureVisibleTab(senderTab.windowId, { format: 'png' }).catch(error => {
       const message = error && error.message ? error.message : '';
       if (/rate|limit|quota|timed out|timeout|busy/i.test(message)) {
         const tagged = new Error(message || 'Tab capture is rate limited, retrying.');
@@ -201,9 +230,12 @@ function enqueueVisibleCapture(senderTab) {
       }
       throw error;
     });
+    return dataUrl;
   });
-  captureQueue = task.catch(() => undefined);
-  return task;
+  const checkedTask = task.then(async dataUrl => { await assertAcquisition(); return dataUrl; })
+    .finally(() => pendingAcquisitions.delete(guard));
+  captureQueue = checkedTask.catch(() => undefined);
+  return checkedTask;
 }
 
 function safeMetadata(value, fallback = '') {
@@ -399,7 +431,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     'COMPLETE_CAPTURE_TRANSFER', 'ABORT_CAPTURE_TRANSFER', 'ACK_CAPTURE_LOADED'].includes(message.action)) return;
   storageInitialization.then(() => {
     let operation;
-    if (message.action === 'CAPTURE_VISIBLE_TAB') operation = enqueueVisibleCapture(sender.tab).then(dataUrl => ({ success: true, dataUrl }));
+    if (message.action === 'CAPTURE_VISIBLE_TAB') operation = enqueueVisibleCapture(sender.tab, sender.documentId).then(dataUrl => ({ success: true, dataUrl }));
     else if (message.action === 'BEGIN_CAPTURE_TRANSFER') operation = beginTransfer(message, sender.tab);
     else if (message.action === 'APPEND_CAPTURE_CHUNK') operation = appendTransferChunk(message, sender.tab);
     else if (message.action === 'COMPLETE_CAPTURE_TRANSFER') operation = completeTransfer(message, sender.tab);
@@ -468,6 +500,11 @@ chrome.tabs.onRemoved.addListener(async tabId => {
 
 // Navigation away from an editor makes its capture orphaned, even if the tab stays open.
 chrome.tabs.onUpdated.addListener(async (tabId, change) => {
+  if (change.url || change.status === 'loading') {
+    for (const guard of pendingAcquisitions) {
+      if (guard.tabId === tabId) guard.navigationChanged = true;
+    }
+  }
   if (!change.url) return;
   const key = mappingKey(tabId);
   const stored = await chrome.storage.session.get(key);

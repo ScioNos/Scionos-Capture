@@ -15,7 +15,9 @@ function extractionHarness({ diagnostics = false, nativeVisibility = false } = {
     style: { setProperty() {} } };
   if (nativeVisibility) parent.checkVisibility = () => { visibilityReads++; return style.visibility !== 'hidden'; };
   const nodes = [{ parentElement: parent, nodeValue: 'Private https://secret.example/' }, { parentElement: parent, nodeValue: 'hidden-data' }];
-  const colorContext = { canvas: {}, clearRect() {}, fillRect() {}, getImageData: () => ({ data: [0, 0, 0, 255] }) };
+  const colorContext = { canvas: {}, clearRect() {}, fillRect() {}, getImageData() {
+    return { data: this.fillStyle === 'Canvas' || this.fillStyle === 'white' ? [255, 255, 255, 255] : [0, 0, 0, 255] };
+  } };
   const getComputedStyle = (_element, pseudo) => {
     if (pseudo) return { content: style.pseudoContent || 'none' };
     styleReads++;

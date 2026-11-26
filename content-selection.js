@@ -9,7 +9,7 @@
         Object.assign(overlay.style, { position: 'fixed', inset: '0', margin: '0', padding: '0', border: '0', maxWidth: 'none', maxHeight: 'none', width: '100vw', height: '100vh', background: 'transparent', color: '#f8fafc', overflow: 'hidden' });
         const box = document.createElement('div');
         box.tabIndex = 0; box.setAttribute('aria-label', text('selectionTitle'));
-        Object.assign(box.style, { position: 'fixed', border: '2px solid #38bdf8', boxShadow: '0 0 0 9999px #030a1466', cursor: 'move', boxSizing: 'border-box' });
+        Object.assign(box.style, { position: 'fixed', border: '2px solid #38bdf8', boxShadow: '0 0 0 9999px #030a1466', cursor: 'move', boxSizing: 'border-box', touchAction: 'none' });
         const panel = document.createElement('form');
         Object.assign(panel.style, { position: 'fixed', right: '12px', top: '12px', maxWidth: '280px', maxHeight: 'calc(100vh - 24px)', overflowY: 'auto', padding: '12px', background: '#07111f', border: '1px solid #38bdf8', borderRadius: '8px', font: '13px system-ui', zIndex: '2' });
         const title = document.createElement('strong'); title.textContent = text('selectionTitle');
@@ -67,10 +67,22 @@
           if (button.disabled) button.style.display = 'none';
           box.append(button);
         }
-        box.addEventListener('pointerdown', event => { if (event.button !== 0) return; event.preventDefault(); event.stopPropagation(); box.focus(); drag = { x: event.clientX, y: event.clientY, handle: event.target.dataset.handle, region: { ...region } }; box.setPointerCapture(event.pointerId); });
-        box.addEventListener('pointermove', event => { if (!drag) return; const rect = surface.getCaptureRect(); shift((event.clientX-drag.x)/(rect.scaleX||1),(event.clientY-drag.y)/(rect.scaleY||1),drag.handle,drag.region); });
-        box.addEventListener('pointerup', () => { drag = null; });
-        box.addEventListener('pointercancel', () => { drag = null; });
+        const endDrag = event => {
+          if (!drag || event.pointerId !== drag.pointerId) return;
+          const pointerId = drag.pointerId;
+          drag = null;
+          if (box.hasPointerCapture(pointerId)) box.releasePointerCapture(pointerId);
+        };
+        box.addEventListener('pointerdown', event => {
+          if (event.button !== 0 || event.isPrimary === false || drag) return;
+          event.preventDefault(); event.stopPropagation(); box.focus({ preventScroll: true });
+          drag = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, handle: event.target.dataset.handle, region: { ...region } };
+          box.setPointerCapture(event.pointerId);
+        });
+        box.addEventListener('pointermove', event => { if (!drag || event.pointerId !== drag.pointerId) return; const rect = surface.getCaptureRect(); shift((event.clientX-drag.x)/(rect.scaleX||1),(event.clientY-drag.y)/(rect.scaleY||1),drag.handle,drag.region); });
+        box.addEventListener('pointerup', endDrag);
+        box.addEventListener('pointercancel', endDrag);
+        box.addEventListener('lostpointercapture', endDrag);
         panel.addEventListener('change', () => update(Object.fromEntries(Object.entries(inputs).map(([name,input])=>[name,Number(input.value)]))));
         const elementBounds = element?.getBoundingClientRect();
         panel.addEventListener('submit', event => {

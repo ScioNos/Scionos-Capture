@@ -28,13 +28,13 @@
       throw lastError || new Error('Capture failed.');
     }
 
-    async function openEditor(blob, scale, textBlocks = [], textLayerLimited = false, checkpoint = () => {}, commit = () => {}) {
+    async function openEditor(blob, scale, textBlocks = [], textLayerLimited = false, checkpoint = () => {}, commit = () => {}, source = { title: document.title, url: location.href }) {
       checkpoint();
       if (!(blob instanceof Blob) || blob.size < 1) throw new Error('Invalid capture image.');
       const expectedChunks = Math.ceil(blob.size / Utils.TRANSFER_CHUNK_BYTES);
       const begin = await sendMessage({
         action: 'BEGIN_CAPTURE_TRANSFER', expectedBytes: blob.size, expectedChunks,
-        title: document.title, url: location.href, scale, textLayerLimited, textCoordinateSpace: 'bitmap',
+        title: source.title, url: source.url, scale, textLayerLimited, textCoordinateSpace: 'bitmap',
         textBlocks: Array.isArray(textBlocks) ? textBlocks : []
       });
       if (!begin || !begin.success || !begin.transferId) {
@@ -83,43 +83,56 @@
 
     async function prepareDataUrlForEditor(dataUrl, textBlocks = []) {
       const image = await loadImage(dataUrl);
-      const dimensions = Utils.computeOutputDimensions(image.width, image.height, 1, 1);
-      const canvas = document.createElement('canvas');
-      canvas.width = dimensions.width;
-      canvas.height = dimensions.height;
-      canvas.getContext('2d').drawImage(image, 0, 0, dimensions.width, dimensions.height);
-      return prepareCanvasForEditor(canvas, dimensions.scale,
-        Utils.scaleTextBlocks(textBlocks, canvas.width / window.innerWidth, canvas.height / window.innerHeight),
-        Boolean(textBlocks.limited));
+      let canvas;
+      try {
+        const dimensions = Utils.computeOutputDimensions(image.width, image.height, 1, 1);
+        canvas = document.createElement('canvas');
+        canvas.width = dimensions.width;
+        canvas.height = dimensions.height;
+        canvas.getContext('2d').drawImage(image, 0, 0, dimensions.width, dimensions.height);
+        return await prepareCanvasForEditor(canvas, dimensions.scale,
+          Utils.scaleTextBlocks(textBlocks, canvas.width / window.innerWidth, canvas.height / window.innerHeight),
+          Boolean(textBlocks.limited));
+      } finally {
+        if (canvas) canvas.width = canvas.height = 1;
+        image.src = '';
+      }
     }
 
     async function prepareCanvasForEditor(sourceCanvas, baseScale = 1, textBlocks = [], textLayerLimited = false) {
       const dimensions = Utils.computeOutputDimensions(sourceCanvas.width, sourceCanvas.height, 1, 1);
+      const owned = new Set();
       let canvas = sourceCanvas;
       let scale = Math.max(0.01, Number(baseScale) || 1);
-      if (dimensions.reduced) {
-        canvas = document.createElement('canvas');
-        canvas.width = dimensions.width;
-        canvas.height = dimensions.height;
-        canvas.getContext('2d').drawImage(sourceCanvas, 0, 0, dimensions.width, dimensions.height);
-        scale *= dimensions.scale;
-      }
+      try {
+        if (dimensions.reduced) {
+          canvas = document.createElement('canvas'); owned.add(canvas);
+          canvas.width = dimensions.width;
+          canvas.height = dimensions.height;
+          canvas.getContext('2d').drawImage(sourceCanvas, 0, 0, dimensions.width, dimensions.height);
+          scale *= dimensions.scale;
+        }
 
-      let blob = await canvasToBlob(canvas);
-      for (let pass = 0; blob.size > Utils.MAX_TRANSFER_BYTES && pass < 4; pass += 1) {
-        const factor = Utils.computePayloadReductionScale(blob.size);
-        if (factor >= 0.999 || scale * factor < 0.1) break;
-        const reduced = document.createElement('canvas');
-        reduced.width = Math.max(1, Math.floor(canvas.width * factor));
-        reduced.height = Math.max(1, Math.floor(canvas.height * factor));
-        reduced.getContext('2d').drawImage(canvas, 0, 0, reduced.width, reduced.height);
-        canvas = reduced;
-        scale *= factor;
-        blob = await canvasToBlob(canvas);
+        let blob = await canvasToBlob(canvas);
+        for (let pass = 0; blob.size > Utils.MAX_TRANSFER_BYTES && pass < 4; pass += 1) {
+          const factor = Utils.computePayloadReductionScale(blob.size);
+          if (factor >= 0.999 || scale * factor < 0.1) break;
+          const reduced = document.createElement('canvas'); owned.add(reduced);
+          reduced.width = Math.max(1, Math.floor(canvas.width * factor));
+          reduced.height = Math.max(1, Math.floor(canvas.height * factor));
+          reduced.getContext('2d').drawImage(canvas, 0, 0, reduced.width, reduced.height);
+          if (canvas !== sourceCanvas) canvas.width = canvas.height = 1;
+          canvas = reduced;
+          scale *= factor;
+          blob = await canvasToBlob(canvas);
+        }
+        if (blob.size > Utils.MAX_TRANSFER_BYTES) throw new Error(text('captureTooLargeError'));
+        return { blob, scale, textLayerLimited,
+          textBlocks: Utils.scaleTextBlocks(textBlocks, canvas.width / sourceCanvas.width, canvas.height / sourceCanvas.height) };
+      } finally {
+        // The caller retains sourceCanvas. Only surfaces allocated here are ours.
+        for (const surface of owned) surface.width = surface.height = 1;
       }
-      if (blob.size > Utils.MAX_TRANSFER_BYTES) throw new Error(text('captureTooLargeError'));
-      return { blob, scale, textLayerLimited,
-        textBlocks: Utils.scaleTextBlocks(textBlocks, canvas.width / sourceCanvas.width, canvas.height / sourceCanvas.height) };
     }
 
     function canvasToBlob(canvas) {

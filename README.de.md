@@ -10,16 +10,33 @@
 
 [Français](README.md) · [English](README.en.md) · [Deutsch](README.de.md) · [Español](README.es.md)
 
-[![Version](https://img.shields.io/badge/version-1.5.2-blue)](https://github.com/ScioNos/Scionos-Capture) [![Prüfungen](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml/badge.svg)](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml) [![MIT-Lizenz](https://img.shields.io/badge/licence-MIT-green)](LICENSE) ![Chrome und Edge](https://img.shields.io/badge/Chrome_%26_Edge-Manifest_V3-4285F4)
+[![Version](https://img.shields.io/badge/version-1.5.3-blue)](https://github.com/ScioNos/Scionos-Capture) [![Prüfungen](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml/badge.svg)](https://github.com/ScioNos/Scionos-Capture/actions/workflows/ci.yml) [![MIT-Lizenz](https://img.shields.io/badge/licence-MIT-green)](LICENSE) ![Chrome und Edge](https://img.shields.io/badge/Chrome_%26_Edge-Manifest_V3-4285F4)
 
 **[Version 1.5.2 herunterladen](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2)** · **[Chrome-Web-Store-Eintrag ansehen](https://chromewebstore.google.com/detail/modfkdhgnhbfilpfanjginilabajchbe)** · **[Hilfe erhalten](https://github.com/ScioNos/Scionos-Capture/issues)**
 
-<!-- source-version --> **1.5.2 — auf GitHub veröffentlicht.** GitHub-Release: [v1.5.2](https://github.com/ScioNos/Scionos-Capture/releases/tag/v1.5.2). Der aktuelle Chrome-Web-Store-Status ist unbestätigt; hier erfolgt keine Store-Einreichung von 1.5.2.
+<!-- source-version --> **1.5.3 — in Vorbereitung, unveröffentlicht.** Das bestehende GitHub-Release behält Tag und bisheriges Archiv; diese neuen Korrekturen sind darin nicht enthalten. Keine Store-Einreichung erfolgt. Siehe [Prüfbericht](STORE_READINESS_1.5.2.md).
+
+## Vorbereitung von 1.5.3 — 26. November 2026
+
+**Lokale Vorbereitung, nicht veröffentlicht.** Die abschließende Testvalidierung läuft noch; Ergebnisse und Grenzen werden im [Konsolidierungsbericht](CONSOLIDATION_1.5.3.md) festgehalten. Es erfolgt weder eine GitHub-Veröffentlichung noch eine Store-Einreichung. Öffentliche Links und Archive von 1.5.2 verweisen weiterhin auf die bestehende Veröffentlichung.
+
+- Aufnahme: aktiven Tab, Fenster und Navigation vor und nach der Erfassung prüfen, mit einer an die `documentId` gebundenen Prüfung. URL und Titel werden zu Beginn der Sitzung festgelegt.
+- PDF: Textebene bei DOM-/CSSOM-Änderungen, unzugänglichen CSS-Stylesheets, Medienänderungen oder Animationen verwerfen; weißen Text auf weißem Hintergrund ausschließen und Text bei Mischmodi oder Bildhintergründen mit unklarer Sichtbarkeit weglassen (unsichtbare `SECRET_BLEND`-Regression auf Weiß bestätigt und korrigiert). Diese Prüfungen beweisen keine absolute Übereinstimmung von Pixeln und Text, wenn eine vorübergehende CSSOM-Änderung zwischen den Beobachtungen rückgängig gemacht wird. Im Zweifel wird Text bevorzugt weggelassen; Pixel prüfen und Geheimnisse deckend maskieren.
+- Aufnahmen: Zeitbudget von 180 Sekunden, kooperativ an Kontrollpunkten geprüft, und höchstens 256 Teilaufnahmen. Dies ist keine präemptive Unterbrechung nach 180 Sekunden; zu lange Seiten werden abgelehnt.
+- Ressourcen: Das Gesamtbudget von 32 Millionen Pixeln umfasst nach einem Zuschnitt aufbewahrte Originale; Rückgängig/Wiederholen bleibt durch dieses Budget begrenzt. Höchstens zwei Momentaufnahmen sind gleichzeitig in Bearbeitung, bis Export, Kopieren in die Zwischenablage oder Speicherung abgeschlossen ist. Eigene Canvas-Flächen dieser Vorgänge werden in `finally` auf 1 × 1 verkleinert; Eingabeflächen bleiben erhalten.
+- Annotationen: 1.000 pro Bild und 5.000 pro Dokument; 10.000 Punkte pro Zeichenstrich und 100.000 pro Dokument. Der globale Verlauf ist auf 100 Zustände, 100.000 Punkte und 5.000 Operationen begrenzt.
+- Speicherung: Aufnahme-Cache entfernen, um veraltete Daten zwischen Kontexten zu vermeiden; aufgegebene IndexedDB-Verbindungen schließen. Die im lokalen Arbeitsbaum bereits vorhandene transaktionale Gesamtlöschung wird integriert und beibehalten, mit vollständigem Rollback bei Fehlern.
+- Importe: strenge Validierung der PNG-Transparenzdaten `tRNS`. Projekte v1/v2 bleiben lesbar, geschrieben wird v2. Keine neue Berechtigung oder Telemetrie.
+- Oberfläche: Überlappung der Werkzeugleiste korrigiert; Annotationsbefehle bleiben in derselben 56 px hohen Leiste gruppiert, ohne Verschiebung der Zeichenfläche oder Versatz beim Ziehen. Inaktive Zustände `historyRevision`, `historyConsolidation` und `redoOperations` sind entfernt.
+- Kompatibilität: Manifest-Minimum Chrome/Edge 106 statt 102; CSS `:has()` benötigt Chrome 105 und `documentId` Chrome 106. Dieses Minimum wurde statisch ermittelt; die einzigen belegten nativen Ausführungen betreffen Chrome/Edge 158, ohne nachgewiesene Ausführung unter Chrome/Edge 106.
+- Werkzeuge: `@axe-core/playwright` 4.14.1, `html-validate` 11.22.1, `minimatch`-Override 11.0.9; inaktiven `glob`-Override entfernt und Actions aktualisiert. Siehe [Abhängigkeitsprüfung](DEPENDENCY_REVIEW_1.5.3.md).
+- Bibliothek: begrenzte Wiederverwendung von Karten und Miniaturen implementiert; Messung des Leistungsgewinns läuft noch. Die für 1.6 geplante Stapelverarbeitung ist nicht implementiert.
 
 ## Version 1.5.2 — Korrekturen und Zuverlässigkeit
 
-**Hinweis:** Das korrigierte Release v1.5.2 behält dieselbe Versionsnummer und enthält ESLint 10.15.0, `@eslint/js` 10.0.1 und html-validate 11.21.1; der Node.js-Bereich ist bereits auf `^22.22.0 || >=24.8.0` eingestellt.
-
+- Auswahl: aktiven Zeiger verfolgen, weitere Zeiger ignorieren und unterbrochene Gesten bereinigen.
+- Aufnahme: ausgeblendete Elemente auch bei Fehlern während der Vorbereitung wiederherstellen.
+- Bibliothek: atomare Gesamtlöschung mit Ablehnung veralteter Listen und vollständigem Rollback bei Fehlern.
 - Ziehen im Editor: aktiven `pointerId` verfolgen und Unterbrechungen der Geste behandeln.
 - Interne Editor-Miniaturen und Kompositionsvorschau: beim erneuten Öffnen des Projekts einschließlich Annotationen rekonstruieren.
 - Schaltfläche „Projekt exportieren“: Status ungespeicherter Änderungen beibehalten; die Meldung bestätigt die Download-Anforderung, ohne das Speichern durch den Browser zu garantieren.
@@ -28,9 +45,9 @@
 - Paket: altes Modul `editor-export.js` entfernt; damit 35 Distributionsdateien.
 
 
-![Scionos-Capture-Editor 1.5.0: Bildannotation und Vorschau einer horizontalen Komposition](store-assets/screenshot-real-1-composition-v1.5.0.png)
+![Scionos-Capture-Editor 1.5.2: Bildannotation und Vorschau einer horizontalen Komposition](store-assets/screenshot-real-1-composition-v1.5.2.png)
 
-*Echte Oberfläche der Version 1.5.0 mit lokalen Demo-Inhalten.*
+*Echte Oberfläche der Version 1.5.2 mit lokalen Demo-Inhalten.*
 
 ## Von der Webseite zum Dokument
 
@@ -65,7 +82,7 @@ Ein Scrollbereich lässt sich mit zwei Punkten oder per Tastatur festlegen. Er b
 <details>
 <summary>Auswahl und Einstellungen ansehen</summary>
 
-![Anpassbare Auswahl: Griffe, Koordinaten und Bestätigung vor der Aufnahme](store-assets/screenshot-real-4-selection-v1.5.0.png)
+![Anpassbare Auswahl: Griffe, Koordinaten und Bestätigung vor der Aufnahme](store-assets/screenshot-real-4-selection-v1.5.2.png)
 
 </details>
 
@@ -85,7 +102,7 @@ Im Editor können Sie unterstützte Annotationen auswählen und bearbeiten. Zeic
 <details>
 <summary>Export- und Layouteinstellungen ansehen</summary>
 
-![Exportdialog: PDF-Layout, Ränder, Ausrichtung und Seitennummerierung](store-assets/screenshot-real-3-export-v1.5.0.png)
+![Exportdialog: PDF-Layout, Ränder, Ausrichtung und Seitennummerierung](store-assets/screenshot-real-3-export-v1.5.2.png)
 
 </details>
 
@@ -95,7 +112,7 @@ Die Bibliothek bewahrt Projekte **nach ausdrücklichem Speichern** über das Sch
 
 Wählen Sie eine Aufbewahrungsdauer von **0, 7, 30 oder 90 Tagen** und ein Kontingent von **64 bis 1.024 MiB** — standardmäßig **256 MiB**. **0 Tage** bedeutet keine automatische Löschung nach Ablauf einer Frist. Mit einer portablen Datei behalten Sie eine separate Kopie außerhalb der Bibliothek.
 
-![Lokale Bibliothek: gespeicherte Projekte, Aktionen und Aufbewahrungseinstellungen](store-assets/screenshot-real-2-bibliotheque-v1.5.0.png)
+![Lokale Bibliothek: gespeicherte Projekte, Aktionen und Aufbewahrungseinstellungen](store-assets/screenshot-real-2-bibliotheque-v1.5.2.png)
 
 ## Datenschutz und Kontrolle über Ihre Daten
 
@@ -145,7 +162,9 @@ npm run verify
 
 Versionsabgleich für die GitHub-Veröffentlichung: `npm run version:sync -- 1.5.2`; in PowerShell: `npm.cmd run version:sync -- 1.5.2`. Dieser Befehl ändert auch Paketversionsdateien; nur im Rahmen ihrer abgestimmten Aktualisierung ausführen.
 
-<!-- local-package --> Validiertes lokales Archiv: `scionos-capture-v1.5.2.zip`, 35 Dateien. SHA-256: `d20d607afc0bdb4e8d942a04b770803ffa0215d311b657436c5388c023dd5d98`.
+Korrigiertes lokales Paket: `dist/scionos-capture-v1.5.2.zip`, 35 Dateien. Die Prüfsumme steht im [Store-Bericht](STORE_READINESS_1.5.2.md) und in der benachbarten `.sha256`-Datei; sie unterscheidet sich vom bestehenden GitHub-Archiv.
+
+<!-- local-package --> Lokales Archiv : `scionos-capture-v1.5.3.zip` · SHA-256 : `scionos-capture-v1.5.3.zip.sha256`.
 
 [Beitragen](CONTRIBUTING.de.md) · [Änderungen](CHANGELOG.de.md) · [Versionshinweise](RELEASE_NOTES.md) · [Problem melden](https://github.com/ScioNos/Scionos-Capture/issues) · [Sicherheitslücke melden](SECURITY.de.md)
 
@@ -153,4 +172,4 @@ Versionsabgleich für die GitHub-Veröffentlichung: `npm run version:sync -- 1.5
 
 Entwickelt von **eyelo SA, Schweiz**, unter der Marke **ScioNos**. [Website](https://scionos.ch) · [Kontakt](mailto:info@eyelo.ch) · [MIT-Lizenz](LICENSE)
 
-Validierung 1.5.2: `npm run verify:release` erfolgreich — 133 Unit-Tests, 126 Browsertests, je fünf Modi in Chrome 157.0.8103.79 und Edge 157.0.4341.60, drei Leistungswiederholungen und zehn PDF-Szenarien. Ergebnisse und Umgebung: [Abhängigkeitsprüfung und Validierung](DEPENDENCY_REVIEW_1.5.2.md).
+Prüfung dieses Kandidaten: 136 Unit-Tests und 136 Browsertests bestanden, fünf native Modi in Chrome und Edge, drei Leistungswiederholungen und zehn PDF-Szenarien. Details, Grenzen und endgültige Prüfsumme: [Store-Vorbereitung](STORE_READINESS_1.5.2.md).
