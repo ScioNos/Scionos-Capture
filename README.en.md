@@ -18,19 +18,23 @@
 
 ## 1.5.3 preparation — November 26, 2026
 
-**Local preparation, not published.** Final test validation is still in progress; results and limitations will be recorded in the [consolidation report](CONSOLIDATION_1.5.3.md). No GitHub release or Store submission is performed. Public 1.5.2 links and archives still refer to the existing publication.
+**Final local 1.5.3 qualification passed; unpublished version.** The complete run passes: 178 unit tests, 179 E2E tests, five native modes in Chrome 158.0.8127.37 and Edge 158.0.4370.33, three interruptions per browser, three performance repetitions and ten PDF scenarios. Linux checks also pass on the exact Node 22.22.0 and 24.8.0 minima (178 unit tests each). See the [consolidation report](RAPPORT_CONSOLIDATION_1.5.3.md). Remote CI, commit/PR and definitive archive remain pending; no GitHub publication or Store submission. Public 1.5.2 links are preserved.
+
+- Export cancellation: Cancel and Escape prevent publication even after snapshot creation starts, during PDF rasterization or image-only page bands; temporary URL cleanup and retry are covered by eight passing targeted scenarios.
 
 - Capture: check the active tab, window and navigation before and after acquisition, with a probe tied to `documentId`. The URL and title are fixed at the start of the session.
-- PDF: invalidate the text layer for DOM/CSSOM mutations, inaccessible CSS stylesheets, media changes or animations; exclude white-on-white text and omit text under blend modes or image backgrounds when visibility is uncertain (the invisible-on-white `SECRET_BLEND` regression was confirmed and fixed). These checks do not prove an absolute pixel/text match when a transient CSSOM change is restored between observations. Omission of text is preferred when uncertain; review the pixels and use a solid mask for secrets.
+- PDF: `captureVisibleTab` provides no evidence that captured pixels match the DOM. Even identical observed states before and after capture can miss a transient change, so all DOM-derived source text is omitted from native captures. User annotation text is rendered into pixels; titles, captions and page bands remain searchable outside image-only mode.
+- Image-only PDF: a Document panel option, translated into all four languages and saved with project settings. It removes searchable text layers and rasterizes headers and footers too. Visible pixels may still contain secrets; this mode does not replace a solid mask.
+- Projects: the manifest is limited to 1 MiB of UTF-8 JSON (including escapes), and the STORE ZIP archive to 128 MiB including headers and directory. Preflight rejects over-budget states before copies/snapshots; the codec also checks final encoded sizes. Undo/Redo annotation histories additionally share a total 1 MiB budget for raw UTF-8 JSON, with a per-state allowance. Composition history for titles and captions is also limited to 50 states and a shared 1 MiB of UTF-8 JSON; changes to PDF settings and source policy are checked before mutation.
 - Captures: a 180-second budget checked cooperatively at checkpoints, and at most 256 portions. This is not a preemptive interruption at 180 seconds; excessively long pages are rejected.
 - Resources: a cumulative 32-million-pixel budget includes originals retained after cropping; Undo/Redo remains bounded by this budget. At most two snapshots are in flight simultaneously, until export, clipboard copying or saving finishes. Canvas surfaces owned by these operations are reduced to 1 × 1 in `finally`, preserving input surfaces.
-- Annotations: 1,000 per image and 5,000 per document; 10,000 points per stroke and 100,000 per document. Global history is limited to 100 states, 100,000 points and 5,000 operations.
+- Annotations: 1,000 per image and 5,000 per document; 10,000 points per stroke and 100,000 per document. Global history is limited to 100 states, 100,000 points and 5,000 operations, in addition to the shared JSON budget.
 - Storage: remove the capture cache to avoid stale data across contexts; close abandoned IndexedDB connections. Transactional full deletion already present in the local tree is integrated and preserved, with complete rollback on failure.
 - Imports: strictly validate PNG `tRNS` transparency data. Project v1/v2 reading and v2 writing are retained. No new permission or telemetry.
 - Interface: fix toolbar overlap; annotation controls stay grouped in the same 56 px toolbar, without canvas shifts or drag offsets. Inert `historyRevision`, `historyConsolidation` and `redoOperations` state is removed.
 - Compatibility: manifest minimum Chrome/Edge 106 instead of 102; CSS `:has()` requires Chrome 105 and `documentId` requires Chrome 106. This minimum is identified by static analysis; the only attested native runs concern Chrome/Edge 158, with no demonstrated run on Chrome/Edge 106.
-- Tools: `@axe-core/playwright` 4.14.1, `html-validate` 11.22.1, `minimatch` override 11.0.9; remove the inactive `glob` override and update Actions. See the [dependency review](DEPENDENCY_REVIEW_1.5.3.md).
-- Library: bounded card and thumbnail reuse is implemented; performance gain measurement remains in progress. Batch processing targeted for 1.6 is not implemented.
+- Tools: `@axe-core/playwright` 4.14.1, `html-validate` 11.22.1, `minimatch` override 11.0.9; inactive `glob` override removed. Twelve compatible transitive updates applied; GitHub Actions pinned to commit SHAs. See the [dependency review](DEPENDENCY_REVIEW_1.5.3.md) and [transitive dependency review](DEPENDENCY_TRANSITIVES_1.5.3.md).
+- Library: bounded card and thumbnail reuse. Earlier comparative measurements and their limits are documented in the [report](RAPPORT_CONSOLIDATION_1.5.3.md); they do not establish a general speedup. Batch processing is not implemented.
 
 ## Version 1.5.2 — fixes and reliability
 
@@ -144,7 +148,7 @@ Chunks stay in local IndexedDB and are deleted after assembly or fifteen minutes
 - Animated, virtualized or endless content may remain incomplete. Some fixed or `sticky` elements may vary between sections.
 - The selector does not traverse iframe contents or closed shadow roots.
 - PNG, JPEG and WebP imports exceeding **16 million pixels** or **16,384 px per side** are rejected before decoding instead of being reduced. The total composition limit remains **32 million pixels**. Unsupported rotations, skews and perspective transforms are explicitly rejected.
-- Searchable PDF text is retained only when its visibility can be verified. Imported images and images restored from a project provide no reliable text layer; uncertain words are omitted from the text layer while the image is preserved.
+- For locally qualified 1.5.3, native captures provide no DOM-derived source text layer: the API does not prove its correspondence with the pixels. Imported images and reopened projects do not restore a reliable source text layer. User annotation text is rendered into pixels; titles, captions and page bands remain searchable outside “Image-only PDF” mode. This option is saved in project settings and rasterizes headers and footers too. The image remains present; protect confidential pixels with a solid mask, as blur is only a visual effect.
 - Apply or cancel pending edits before exporting.
 
 ## Develop and contribute
@@ -160,9 +164,9 @@ npm run verify
 
 `verify` checks syntax, lint, HTML, unit tests, translations, packaging and browser/accessibility regressions. `npm run test:native` tests all five modes in installed Chrome and Edge with real captures and disposable profiles, without using personal profiles. `npm run package` generates the archive and its checksum in `dist/`.
 
-Version sync for GitHub publication: `npm run version:sync -- 1.5.2`; in PowerShell: `npm.cmd run version:sync -- 1.5.2`. This command also changes package version files; run it only as part of their coordinated update.
+Version sync for GitHub publication: `npm run version:sync -- 1.5.3 --unreleased`; in PowerShell: `npm.cmd run version:sync -- 1.5.3 --unreleased`. This command also changes package version files; run it only as part of their coordinated update.
 
-Corrected local package: `dist/scionos-capture-v1.5.2.zip`, 35 files. The candidate checksum is recorded in [the Store report](STORE_READINESS_1.5.2.md) and the adjacent `.sha256` file; it differs from the existing GitHub archive.
+Historical local 1.5.2 package: `dist/scionos-capture-v1.5.2.zip`, 35 files. The candidate checksum is recorded in [the Store report](STORE_READINESS_1.5.2.md) and the adjacent `.sha256` file; it differs from the existing GitHub archive.
 
 <!-- local-package --> Local archive : `scionos-capture-v1.5.3.zip` · SHA-256 : `scionos-capture-v1.5.3.zip.sha256`.
 
@@ -172,4 +176,4 @@ Corrected local package: `dist/scionos-capture-v1.5.2.zip`, 35 files. The candid
 
 Developed by **eyelo SA, Switzerland**, under the **ScioNos** brand. [Website](https://scionos.ch) · [Contact](mailto:info@eyelo.ch) · [MIT License](LICENSE)
 
-Candidate validation: 136 unit tests and 136 browser tests passed, five native modes in Chrome and Edge, three performance repetitions and ten PDF scenarios. Details, limits and final checksum: [Store readiness](STORE_READINESS_1.5.2.md).
+Historical 1.5.2 validations: see the [dependency review](DEPENDENCY_REVIEW_1.5.2.md) and [corrected Store candidate report](STORE_READINESS_1.5.2.md). These results concern earlier states and do not qualify 1.5.3.

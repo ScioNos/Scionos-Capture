@@ -70,7 +70,7 @@ test('interactive duplication respects the imported annotation item limit', asyn
   } finally { await page.close(); }
 });
 
-test('history point budget evicts old states and bounds undo plus redo together', async () => {
+test('history byte and point budgets evict old states and bound undo plus redo together', async () => {
   const page = await context.newPage();
   try {
     await page.goto(origin + '/editor.html');
@@ -80,12 +80,21 @@ test('history point budget evicts old states and bounds undo plus redo together'
         input.value = String(width); input.dispatchEvent(new globalThis.Event('change', { bubbles: true }));
       }
     });
-    for (let count = 0; count < 10; count++) {
+    // The previous point-only bound allowed ten states (~1.6 MiB). The new
+    // shared byte bound admits six of these states, across undo and redo together.
+    const retainedStates = await page.evaluate(() => {
+      const state = [{ id: '00000000-0000-4000-8000-000000000000', kind: 'draw', width: 16,
+        color: '#000000', points: Array.from({ length: 10000 }, () => ({ x: 60, y: 60 })) }];
+      return Math.min(10, Math.floor(globalThis.ScionosCompositionUtils.LIMITS.manifestBytes /
+        (globalThis.ScionosCompositionUtils.jsonUtf8Bytes(state) + 128)));
+    });
+    expect(retainedStates).toBe(6);
+    for (let count = 0; count < retainedStates; count++) {
       await expect(page.locator('#btn-undo')).toBeEnabled();
       await page.locator('#btn-undo').click();
     }
     await expect(page.locator('#btn-undo')).toBeDisabled();
-    for (let count = 0; count < 10; count++) {
+    for (let count = 0; count < retainedStates; count++) {
       await expect(page.locator('#btn-redo')).toBeEnabled();
       await page.locator('#btn-redo').click();
     }

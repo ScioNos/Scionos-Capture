@@ -77,14 +77,19 @@
             let background = colorBytes('Canvas');
             for (let ancestor = element; ancestor; ancestor = ancestor.parentElement) {
               const style = styleFor(ancestor);
-              if (style.backgroundColor && opaqueColor(style.backgroundColor)) {
-                background = colorBytes(style.backgroundColor); break;
-              }
+              if (!style.backgroundColor) continue;
+              const color = colorBytes(style.backgroundColor);
+              // A translucent background is composited with every lower paint layer,
+              // not just the nearest opaque ancestor. Rounded/clipped boxes, root
+              // background propagation and color-space rounding make a 1px model
+              // insufficient proof. Omit this word rather than guess its contrast.
+              if (color[3] > 0 && color[3] < 255) { background = null; break; }
+              if (color[3] === 255) { background = color; break; }
             }
             backgroundCache.set(element, background);
           }
           const front = colorBytes(foreground), back = backgroundCache.get(element);
-          return front.slice(0, 3).some((value, index) => Math.abs(value - back[index]) > 1);
+          return Boolean(back) && front.slice(0, 3).some((value, index) => Math.abs(value - back[index]) > 1);
         };
         const root = surface.isDocument ? (document.body || document.documentElement) : surface.element;
         const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
@@ -592,6 +597,12 @@
         } catch { dirty = true; return null; }
       };
       const initialCss = cssFingerprint();
+      // captureVisibleTab is asynchronous and has no atomic DOM/render token.
+      // CSSOM/adoptedStyleSheets can change and revert in the page's MAIN world
+      // without an observable mutation in this isolated world. Even equal start
+      // and end states cannot attest what was painted in between. Until independent
+      // pixel/text evidence exists, native captures must omit all DOM-derived text.
+      const pixelTextAssociationVerified = false;
       const observer = typeof globalThis.MutationObserver === 'function' ? new globalThis.MutationObserver(consume) : null;
       observer?.observe(document.documentElement, { subtree: true, childList: true, attributes: true, characterData: true });
       // CSS animations and media can repaint without a DOM mutation.
@@ -610,7 +621,7 @@
         textIsStable() {
           if (observer) consume(observer.takeRecords());
           if (cssFingerprint() !== initialCss) dirty = true;
-          return !dirty;
+          return !dirty && pixelTextAssociationVerified;
         },
         close() { observer?.disconnect(); }
       };

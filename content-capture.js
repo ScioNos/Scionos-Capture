@@ -24,10 +24,10 @@
         throw error;
       }
       if (activeSession?.deadline && Date.now() > activeSession.deadline) {
-        throw new Error('Capture exceeded its time limit. Select a smaller region.');
+        throw new Error(text('captureDurationLimitError'));
       }
       if (activeSession?.cancelled) {
-        const error = new Error('Capture cancelled.');
+        const error = new Error(text('captureCancelledError'));
         error.name = 'AbortError';
         throw error;
       }
@@ -253,7 +253,7 @@
 
     async function captureRegionAttempt(surface, region, baseline, progress, bounded = true) {
       if (Math.ceil(region.width / baseline.viewportWidth) * Math.ceil(region.height / baseline.viewportHeight) > 256) {
-        throw new Error('Capture requires too many portions. Select a smaller region.');
+        throw new Error(text('capturePortionLimitError'));
       }
       const xs = Utils.buildRegionCapturePlan(region.x, region.width, baseline.viewportWidth, baseline.fullWidth);
       const ys = Utils.buildRegionCapturePlan(region.y, region.height, baseline.viewportHeight, baseline.fullHeight);
@@ -264,95 +264,106 @@
       const anchored = createAnchoredElementManager(surface);
       const blocks = { items: [], keys: new Set(), limited: false };
       const patches = [];
+      const ownedSurfaces = new Set(), tileImages = new Set();
       let canvas, context, bitmapSize;
       let outputScale = 1;
       let textUncertain = false;
       const geometry = surface.getCaptureRect();
-      for (let row = 0; row < ys.length; row += 1) {
-        for (let column = 0; column < xs.length; column += 1) {
-          checkpoint();
-          const xTile = xs[column], yTile = ys[row];
-          surface.scrollTo(xTile.scrollY, yTile.scrollY);
-          await waitForPaint();
-          await delay(140);
-          assertStableMetrics(surface, baseline, bounded ? region : null);
-          const actual = assertSurfacePosition(surface, { x: xTile.scrollY, y: yTile.scrollY });
-          const currentGeometry = surface.getCaptureRect();
-          if (Math.abs(currentGeometry.width - geometry.width) > 0.5 || Math.abs(currentGeometry.height - geometry.height) > 0.5) throw layoutChangedError();
-          const index = row * xs.length + column;
-          const percent = Math.round((index + 1) / (xs.length * ys.length) * 100);
-          const written = { x: region.x + xTile.destinationTop, y: region.y + yTile.destinationTop,
-            width: xTile.sourceHeight, height: yTile.sourceHeight };
-          updateProgress(progress, percent, outputScale < 0.9999);
-          let image, bottomPatches, guard;
-          try {
-            anchored.prepare(index, xs.length * ys.length, dom.surfaceRectToClient(surface, written), row === ys.length - 1);
-            progress.style.visibility = 'hidden';
-            guard = dom.createAcquisitionGuard(surface);
+      try {
+        for (let row = 0; row < ys.length; row += 1) {
+          for (let column = 0; column < xs.length; column += 1) {
+            checkpoint();
+            const xTile = xs[column], yTile = ys[row];
+            surface.scrollTo(xTile.scrollY, yTile.scrollY);
             await waitForPaint();
-            const response = await captureVisibleTab();
-            image = await loadImage(response.dataUrl);
-            guard.assertGeometry();
+            await delay(140);
             assertStableMetrics(surface, baseline, bounded ? region : null);
-            if (!textUncertain) collectTileText(blocks, surface, region, written);
-            if (!guard.textIsStable()) {
-              textUncertain = true; blocks.items = []; blocks.limited = true;
+            const actual = assertSurfacePosition(surface, { x: xTile.scrollY, y: yTile.scrollY });
+            const currentGeometry = surface.getCaptureRect();
+            if (Math.abs(currentGeometry.width - geometry.width) > 0.5 || Math.abs(currentGeometry.height - geometry.height) > 0.5) throw layoutChangedError();
+            const index = row * xs.length + column;
+            const percent = Math.round((index + 1) / (xs.length * ys.length) * 100);
+            const written = { x: region.x + xTile.destinationTop, y: region.y + yTile.destinationTop,
+              width: xTile.sourceHeight, height: yTile.sourceHeight };
+            updateProgress(progress, percent, outputScale < 0.9999);
+            let image, bottomPatches, guard;
+            try {
+              anchored.prepare(index, xs.length * ys.length, dom.surfaceRectToClient(surface, written), row === ys.length - 1);
+              progress.style.visibility = 'hidden';
+              guard = dom.createAcquisitionGuard(surface);
+              await waitForPaint();
+              const response = await captureVisibleTab();
+              image = await loadImage(response.dataUrl);
+              tileImages.add(image);
+              guard.assertGeometry();
+              assertStableMetrics(surface, baseline, bounded ? region : null);
+              if (!textUncertain) collectTileText(blocks, surface, region, written);
+              if (!guard.textIsStable()) {
+                textUncertain = true; blocks.items = []; blocks.limited = true;
+              }
+              bottomPatches = anchored.getBottomPatches();
+            } finally {
+              guard?.close();
+              progress.style.visibility = 'visible';
+              anchored.restore();
             }
-            bottomPatches = anchored.getBottomPatches();
-          } finally {
-            guard?.close();
-            progress.style.visibility = 'visible';
-            anchored.restore();
-          }
-          if (bitmapSize && (bitmapSize.width !== image.width || bitmapSize.height !== image.height)) throw layoutChangedError();
-          bitmapSize = { width: image.width, height: image.height };
-          const capture = getSurfaceCaptureCrop(surface, image);
-          if (!canvas) {
-            const dimensions = Utils.computeOutputDimensions(region.width, region.height, capture.scaleX, capture.scaleY);
-            canvas = document.createElement('canvas');
-            canvas.width = dimensions.width; canvas.height = dimensions.height;
-            context = canvas.getContext('2d', { alpha: false });
-            context.fillStyle = '#ffffff'; context.fillRect(0, 0, canvas.width, canvas.height);
-            outputScale = dimensions.scale;
-          }
-          const draw = (local, targetContext = context) => {
-            const sourceLeft = capture.crop.x + Math.round((local.x - actual.x) * capture.scaleX);
-            const sourceTop = capture.crop.y + Math.round((local.y - actual.y) * capture.scaleY);
-            const sourceRight = Math.min(capture.crop.x + capture.crop.width, capture.crop.x + Math.round((local.x + local.width - actual.x) * capture.scaleX));
-            const sourceBottom = Math.min(capture.crop.y + capture.crop.height, capture.crop.y + Math.round((local.y + local.height - actual.y) * capture.scaleY));
-            if (sourceLeft < capture.crop.x || sourceTop < capture.crop.y || sourceRight <= sourceLeft || sourceBottom <= sourceTop) throw new Error(text('fullScrollError'));
-            const destination = Utils.computeTileDestination({ ...local, x: local.x - region.x, y: local.y - region.y },
-              region.width, region.height, canvas.width, canvas.height);
-            targetContext.drawImage(image, sourceLeft, sourceTop, sourceRight - sourceLeft, sourceBottom - sourceTop,
-              destination.x, destination.y, destination.width, destination.height);
-            return destination;
-          };
-          draw(written);
-          for (const rect of bottomPatches) {
-            const start = dom.clientPointToSurface(surface, rect.left, rect.top);
-            const end = dom.clientPointToSurface(surface, rect.right, rect.bottom);
-            const left = Math.max(region.x, written.x, start.x), right = Math.min(region.x + region.width, written.x + written.width, end.x);
-            const top = Math.max(region.y, start.y), bottom = Math.min(region.y + region.height, end.y);
-            if (right <= left || bottom <= top) continue;
-            const local = { x: left, y: top, width: right - left, height: bottom - top };
-            // Keep just the patch, not a full screenshot/canvas for every tile.
-            const destination = Utils.computeTileDestination({ ...local, x: left - region.x, y: top - region.y }, region.width, region.height, canvas.width, canvas.height);
-            const patch = document.createElement('canvas'); patch.width = destination.width; patch.height = destination.height;
-            const viewportRect = dom.surfaceRectToClient(surface, local);
-            const sx = image.width / window.innerWidth, sy = image.height / window.innerHeight;
-            const sourceLeft = Math.round(viewportRect.left * sx), sourceTop = Math.round(viewportRect.top * sy);
-            const sourceRight = Math.round(viewportRect.right * sx), sourceBottom = Math.round(viewportRect.bottom * sy);
-            patch.getContext('2d').drawImage(image, sourceLeft, sourceTop, sourceRight - sourceLeft, sourceBottom - sourceTop, 0, 0, patch.width, patch.height);
-            patches.push({ patch, destination, bounds: { x: left - region.x, y: top - region.y, width: local.width, height: local.height } });
+            if (bitmapSize && (bitmapSize.width !== image.width || bitmapSize.height !== image.height)) throw layoutChangedError();
+            bitmapSize = { width: image.width, height: image.height };
+            const capture = getSurfaceCaptureCrop(surface, image);
+            if (!canvas) {
+              const dimensions = Utils.computeOutputDimensions(region.width, region.height, capture.scaleX, capture.scaleY);
+              canvas = document.createElement('canvas');
+              ownedSurfaces.add(canvas);
+              canvas.width = dimensions.width; canvas.height = dimensions.height;
+              context = canvas.getContext('2d', { alpha: false });
+              context.fillStyle = '#ffffff'; context.fillRect(0, 0, canvas.width, canvas.height);
+              outputScale = dimensions.scale;
+            }
+            const draw = (local, targetContext = context) => {
+              const sourceLeft = capture.crop.x + Math.round((local.x - actual.x) * capture.scaleX);
+              const sourceTop = capture.crop.y + Math.round((local.y - actual.y) * capture.scaleY);
+              const sourceRight = Math.min(capture.crop.x + capture.crop.width, capture.crop.x + Math.round((local.x + local.width - actual.x) * capture.scaleX));
+              const sourceBottom = Math.min(capture.crop.y + capture.crop.height, capture.crop.y + Math.round((local.y + local.height - actual.y) * capture.scaleY));
+              if (sourceLeft < capture.crop.x || sourceTop < capture.crop.y || sourceRight <= sourceLeft || sourceBottom <= sourceTop) throw new Error(text('fullScrollError'));
+              const destination = Utils.computeTileDestination({ ...local, x: local.x - region.x, y: local.y - region.y },
+                region.width, region.height, canvas.width, canvas.height);
+              targetContext.drawImage(image, sourceLeft, sourceTop, sourceRight - sourceLeft, sourceBottom - sourceTop,
+                destination.x, destination.y, destination.width, destination.height);
+              return destination;
+            };
+            draw(written);
+            for (const rect of bottomPatches) {
+              const start = dom.clientPointToSurface(surface, rect.left, rect.top);
+              const end = dom.clientPointToSurface(surface, rect.right, rect.bottom);
+              const left = Math.max(region.x, written.x, start.x), right = Math.min(region.x + region.width, written.x + written.width, end.x);
+              const top = Math.max(region.y, start.y), bottom = Math.min(region.y + region.height, end.y);
+              if (right <= left || bottom <= top) continue;
+              const local = { x: left, y: top, width: right - left, height: bottom - top };
+              // Keep just the patch, not a full screenshot/canvas for every tile.
+              const destination = Utils.computeTileDestination({ ...local, x: left - region.x, y: top - region.y }, region.width, region.height, canvas.width, canvas.height);
+              const patch = document.createElement('canvas'); ownedSurfaces.add(patch);
+              patch.width = destination.width; patch.height = destination.height;
+              const viewportRect = dom.surfaceRectToClient(surface, local);
+              const sx = image.width / window.innerWidth, sy = image.height / window.innerHeight;
+              const sourceLeft = Math.round(viewportRect.left * sx), sourceTop = Math.round(viewportRect.top * sy);
+              const sourceRight = Math.round(viewportRect.right * sx), sourceBottom = Math.round(viewportRect.bottom * sy);
+              patch.getContext('2d').drawImage(image, sourceLeft, sourceTop, sourceRight - sourceLeft, sourceBottom - sourceTop, 0, 0, patch.width, patch.height);
+              patches.push({ patch, destination, bounds: { x: left - region.x, y: top - region.y, width: local.width, height: local.height } });
+            }
+            image.src = ''; tileImages.delete(image);
           }
         }
+        for (const { patch, destination, bounds } of patches) {
+          context.drawImage(patch, destination.x, destination.y);
+          blocks.items = Utils.filterTextBlocksIntersectingBounds(blocks.items, bounds);
+        }
+        return await prepareCanvasForEditor(canvas, outputScale,
+          Utils.scaleTextBlocks(blocks.items, canvas.width / region.width, canvas.height / region.height), blocks.limited);
+      } finally {
+        // These allocations belong to this attempt, including partially drawn patches.
+        for (const image of tileImages) image.src = '';
+        for (const surface of ownedSurfaces) surface.width = surface.height = 1;
       }
-      for (const { patch, destination, bounds } of patches) {
-        context.drawImage(patch, destination.x, destination.y);
-        blocks.items = Utils.filterTextBlocksIntersectingBounds(blocks.items, bounds);
-      }
-      return prepareCanvasForEditor(canvas, outputScale,
-        Utils.scaleTextBlocks(blocks.items, canvas.width / region.width, canvas.height / region.height), blocks.limited);
     }
 
     function executeZoneCapture() {

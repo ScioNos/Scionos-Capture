@@ -157,6 +157,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'coordinateX', 'coordinateY', 'coordinateWidth', 'coordinateHeight',
         'btnScrollingTitle', 'tabChangedError', 'captureAlreadyRunning',
         'layoutChangedError', 'captureTooLargeError', 'unsupportedTransformError',
+        'captureDurationLimitError', 'capturePortionLimitError', 'captureCancelledError',
         'elementTitle', 'elementDesc', 'delayLabel', 'delayImmediate', 'delaySeconds',
         'selectionTitle', 'selectionCapture', 'selectionRestart', 'selectionCancel',
         'selectionParent', 'selectionChild', 'elementVisible', 'elementFull',

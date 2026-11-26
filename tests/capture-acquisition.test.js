@@ -37,8 +37,15 @@ test('acquisition guard rejects scrolling and moved surfaces after screenshot ac
   }
 });
 
-test('extension progress mutations do not discard otherwise stable text', () => {
+test('extension progress mutations preserve geometry but cannot attest native text association', () => {
   const h = guardHarness(), guard = h.dom.createAcquisitionGuard(h.surface);
   h.observers[0].records.push({ type: 'attributes', target: { closest: () => ({}) } });
-  assert.equal(guard.textIsStable(), true); guard.close();
+  guard.assertGeometry();
+  assert.equal(guard.textIsStable(), false); guard.close();
+});
+
+test('an unchanged document is insufficient evidence for native pixel and text association', () => {
+  const h = guardHarness(), guard = h.dom.createAcquisitionGuard(h.surface);
+  assert.equal(guard.textIsStable(), false);
+  guard.assertGeometry(); guard.close();
 });

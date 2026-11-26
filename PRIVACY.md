@@ -4,16 +4,20 @@
 
 ## Préparation 1.5.3 — 26 novembre 2026
 
-**Préparation locale, non publiée.** La validation finale des tests est encore en cours ; les résultats et limites seront consignés dans le [rapport de consolidation](CONSOLIDATION_1.5.3.md). Aucune release GitHub ni soumission Store n’est effectuée. Les liens publics 1.5.2 et leurs archives restent ceux de la publication existante.
+**Qualification locale finale 1.5.3 réussie, version non publiée.** La campagne complète passe : 178 tests unitaires, 179 E2E, cinq modes natifs dans Chrome 158.0.8127.37 et Edge 158.0.4370.33, trois interruptions par navigateur, trois répétitions de performance et dix scénarios PDF. Les contrôles Linux aux minima exacts Node 22.22.0 et 24.8.0 passent aussi (178 unitaires chacun). Voir le [rapport de consolidation](RAPPORT_CONSOLIDATION_1.5.3.md). CI distante, commit/PR et archive définitive restent à réaliser ; aucune publication GitHub ni soumission Store. Les liens publics 1.5.2 sont conservés.
+
+- Annulation des exports : Annuler et Échap arrêtent la publication du résultat même après le début du snapshot, pendant la rasterisation PDF ou les bandes image uniquement ; nettoyage des URL temporaires et nouvelle tentative couverts par huit scénarios ciblés réussis.
 
 Les contrôles d’identité de capture et les métadonnées figées au démarrage visent à éviter de mélanger des pages ou des documents. Le retrait du cache ne modifie pas la rétention locale ; IndexedDB reste la source faisant autorité. La fermeture des connexions abandonnées et la suppression totale transactionnelle déjà locale renforcent la cohérence du stockage. Les exports déjà enregistrés doivent toujours être supprimés séparément par l’utilisateur.
 
 - Capture : contrôles de l’onglet actif, de la fenêtre et de la navigation avant et après acquisition, avec sonde liée au `documentId`. L’URL et le titre sont figés au début de la session.
-- PDF : invalidation de la couche texte lors de mutations DOM/CSSOM, de feuilles CSS inaccessibles, de changements de média ou d’animations ; exclusion du texte blanc sur blanc et omission du texte sous modes de fusion ou fonds image lorsque sa visibilité est incertaine (régression `SECRET_BLEND` invisible sur fond blanc confirmée et corrigée). Ces contrôles ne prouvent pas une correspondance absolue pixels/texte lorsqu’un changement CSSOM transitoire est rétabli entre les observations. L’absence de texte est privilégiée en cas de doute ; vérifiez les pixels et utilisez un masque solide pour les secrets.
+- PDF : `captureVisibleTab` ne fournit aucune preuve de correspondance entre les pixels capturés et le DOM. Même si les états observés avant et après sont identiques, un changement transitoire peut échapper aux contrôles : toute couche source issue du DOM est donc omise des captures natives. Le texte des annotations utilisateur est rendu dans les pixels ; les titres, légendes et bandes de page restent recherchables hors mode image uniquement.
+- PDF image uniquement : option du panneau Document, traduite dans les quatre langues et conservée avec les paramètres du projet. Elle supprime les couches de texte recherchable et rasterise aussi les en-têtes et pieds de page. Les pixels visibles peuvent toujours contenir des secrets ; ce mode ne remplace pas un masque solide.
+- Projets : manifeste limité à 1 Mio de JSON UTF-8 (échappements inclus), archive ZIP STORE à 128 Mio, en-têtes et répertoire compris. Un précontrôle refuse les dépassements avant les copies/instantanés ; le codec contrôle aussi les tailles finales encodées. Les historiques d’annotations Annuler/Refaire partagent en plus un budget total de 1 Mio de JSON brut UTF-8, avec une réserve par état. L’historique de composition des titres et légendes est lui aussi limité à 50 états et 1 Mio de JSON UTF-8 partagé ; les changements de paramètres PDF et de politique des sources sont contrôlés avant mutation.
 - Stockage : cache de captures retiré pour éviter les données périmées entre contextes ; fermeture des connexions IndexedDB abandonnées. La suppression totale transactionnelle déjà présente dans l’arbre local est intégrée et préservée, avec annulation intégrale en cas d’échec.
 - Imports : validation stricte des données de transparence PNG `tRNS`. Lecture des projets v1/v2 et écriture v2 conservées. Aucune nouvelle permission ni télémétrie.
 
-Dernière mise à jour : 17 novembre 2026 — documentation version 1.5.2.
+Dernière mise à jour : 26 novembre 2026 — documentation de la 1.5.3 qualifiée localement.
 
 **Éditeur responsable :** eyelo SA (IDE : CHE-108.174.302), Vaud, Suisse — Marque **ScioNos** ([scionos.ch](https://scionos.ch)) — Contact : info@eyelo.ch
 
@@ -31,7 +35,7 @@ L’utilisateur peut supprimer les données stockées par l’extension depuis l
 
 Pour toute question de confidentialité : info@eyelo.ch. Pour une vulnérabilité, suivez exclusivement [SECURITY.md](SECURITY.md).
 
-La couche recherchable du PDF conserve uniquement les mots complets dont la visibilité est vérifiable. Les mots incertains sont omis de cette couche ; l’image capturée est conservée. Les anciens calques aux coordonnées non vérifiables sont également omis. Le masquage solide reste nécessaire pour protéger les pixels confidentiels ; le flou est seulement visuel.
+Pour la 1.5.3 qualifiée localement, les captures natives ne fournissent aucune couche de texte source issue du DOM : l’API ne prouve pas sa correspondance avec les pixels. Les images importées et restaurées d’un projet ne restaurent pas de couche source fiable. Le texte des annotations utilisateur est rendu dans les pixels ; les titres, légendes et bandes de page restent recherchables hors mode « PDF image uniquement ». Ce mode, conservé dans les paramètres du projet, rasterise aussi les en-têtes et pieds de page. L’image reste présente ; protégez ses pixels confidentiels par un masque solide, le flou étant seulement visuel.
 
 Appliquez ou annulez les modifications en attente avant tout export. Le flou reste un effet visuel ; utilisez un masque solide pour les secrets.
 

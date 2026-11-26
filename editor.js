@@ -111,19 +111,37 @@ document.addEventListener('DOMContentLoaded', async () => {
   function compositionHistoryState() {
     return { settings: { ...compositionSettings }, items: compositionItems.map(item => ({ id: item.id, title: item.title, caption: item.caption })) };
   }
+  let compositionHistorySequence = 0;
+  function budgetCompositionHistory(target, state) {
+    const U = globalThis.ScionosCompositionUtils;
+    state.bytes = U.jsonUtf8Bytes(state) + 64;
+    state.sequence = ++compositionHistorySequence;
+    target.push(state);
+    const entries = [compositionUndoStack, compositionRedoStack].flatMap(stack => stack.map(entry => ({ stack, entry })))
+      .sort((a, b) => a.entry.sequence - b.entry.sequence);
+    let bytes = entries.reduce((sum, value) => sum + value.entry.bytes, 0);
+    while (entries.length > 50 || bytes > RESOURCE_LIMITS.manifestBytes) {
+      const { stack, entry } = entries.shift();
+      stack.splice(stack.indexOf(entry), 1);
+      bytes -= entry.bytes;
+    }
+  }
   function rememberComposition() {
     const state = compositionHistoryState();
-    if (JSON.stringify(compositionUndoStack[compositionUndoStack.length - 1]) !== JSON.stringify(state)) compositionUndoStack.push(state);
-    if (compositionUndoStack.length > 50) compositionUndoStack.shift();
     compositionRedoStack.length = 0;
+    budgetCompositionHistory(compositionUndoStack, state);
   }
   function resetCompositionHistory() { compositionUndoStack.length = 0; compositionRedoStack.length = 0; }
   function restoreCompositionHistory(from, to) {
     if (!from.length || !allowDocumentAction()) return;
-    to.push(compositionHistoryState());
-    const state = from.pop();
+    const state = from[from.length - 1];
     const ordered = state.items.map(entry => compositionItems.find(item => item.id === entry.id));
     if (ordered.some(item => !item)) { resetCompositionHistory(); return; }
+    const candidates = ordered.map((item, index) => ({ ...item, title: state.items[index].title, caption: state.items[index].caption }));
+    if (!allowProjectEdit({ items: candidates, settings: state.settings })) return;
+    const current = compositionHistoryState();
+    from.pop();
+    budgetCompositionHistory(to, current);
     compositionItems.splice(0, compositionItems.length, ...ordered);
     state.items.forEach((entry, index) => { compositionItems[index].title = entry.title; compositionItems[index].caption = entry.caption; });
     Object.assign(compositionSettings, state.settings);
@@ -148,7 +166,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     es: { document: 'Documento', import: 'Importar imágenes', open: 'Abrir proyecto', save: 'Exportar proyecto', documentTitle: 'Título del documento', images: 'Imágenes', up: 'Subir', down: 'Bajar', remove: 'Eliminar', itemTitle: 'Título de la imagen', caption: 'Leyenda', layout: 'Composición', direction: 'Disposición', vertical: 'Vertical', horizontal: 'Horizontal', gap: 'Espaciado (px)', padding: 'Margen (px)', background: 'Fondo', numbered: 'Numerar imágenes', preview: 'Vista previa', export: 'Exportar', format: 'Formato', quality: 'Calidad (%)', pdfSettings: 'Presentación PDF', paper: 'Papel', orientation: 'Orientación', portrait: 'Vertical', landscape: 'Horizontal', pdfMargin: 'Márgenes (mm)', scale: 'Escala (%)', header: 'Encabezado: título, fuente y fecha', footer: 'Pie: número de página', cancel: 'Cancelar', empty: 'Importa imágenes PNG, JPEG o WebP, pega una imagen o abre un proyecto .scionos.', pending: 'Aplica o cancela la edición antes de continuar.', limit: 'Máximo 30 imágenes, 48 MiB por imagen y 128 MiB en total.', replace: '¿Reemplazar el documento? Se perderán los cambios sin guardar.', saved: 'Proyecto guardado en la biblioteca.', projectExportRequested: 'Descarga del proyecto solicitada; comprueba que el archivo se haya guardado.', failure: 'No se pudo completar: ', image: 'Imagen', loading: 'Procesando…', unsupported: 'Elige imágenes PNG, JPEG o WebP.', reduced: 'La imagen exportada se redujo para respetar los límites del navegador.', done: 'Exportación completada.' },
     de: { document: 'Dokument', import: 'Bilder importieren', open: 'Projekt öffnen', save: 'Projekt exportieren', documentTitle: 'Dokumenttitel', images: 'Bilder', up: 'Nach oben', down: 'Nach unten', remove: 'Entfernen', itemTitle: 'Bildtitel', caption: 'Bildunterschrift', layout: 'Zusammenstellung', direction: 'Anordnung', vertical: 'Vertikal', horizontal: 'Horizontal', gap: 'Abstand (px)', padding: 'Rand (px)', background: 'Hintergrund', numbered: 'Bilder nummerieren', preview: 'Vorschau', export: 'Exportieren', format: 'Format', quality: 'Qualität (%)', pdfSettings: 'PDF-Layout', paper: 'Papier', orientation: 'Ausrichtung', portrait: 'Hochformat', landscape: 'Querformat', pdfMargin: 'Ränder (mm)', scale: 'Maßstab (%)', header: 'Kopfzeile: Titel, Quelle und Datum', footer: 'Fußzeile: Seitenzahlen', cancel: 'Abbrechen', empty: 'PNG-, JPEG- oder WebP-Bilder importieren, ein Bild einfügen oder ein .scionos-Projekt öffnen.', pending: 'Die laufende Änderung zuerst anwenden oder abbrechen.', limit: 'Höchstens 30 Bilder, 48 MiB pro Bild und 128 MiB insgesamt.', replace: 'Dokument ersetzen? Nicht gespeicherte Änderungen gehen verloren.', saved: 'Projekt in der Bibliothek gespeichert.', projectExportRequested: 'Projektdownload angefordert; bitte prüfen, ob die Datei gespeichert wurde.', failure: 'Vorgang fehlgeschlagen: ', image: 'Bild', loading: 'Verarbeitung…', unsupported: 'Nur PNG-, JPEG- oder WebP-Bilder auswählen.', reduced: 'Das exportierte Bild wurde wegen der Browsergrenzen verkleinert.', done: 'Export abgeschlossen.' }
   };
-  const extraLabels = { fr: { fit: 'Ajuster à la largeur', source: 'Source', date: 'Date', pagination: 'Pagination' }, en: { fit: 'Fit to width', source: 'Source', date: 'Date', pagination: 'Page numbers' }, es: { fit: 'Ajustar al ancho', source: 'Fuente', date: 'Fecha', pagination: 'Paginación' }, de: { fit: 'An Breite anpassen', source: 'Quelle', date: 'Datum', pagination: 'Seitennummern' } };
+  const extraLabels = { fr: { imageOnly: 'PDF image uniquement', fit: 'Ajuster à la largeur', source: 'Source', date: 'Date', pagination: 'Pagination' }, en: { imageOnly: 'Image-only PDF', fit: 'Fit to width', source: 'Source', date: 'Date', pagination: 'Page numbers' }, es: { imageOnly: 'PDF solo imagen', fit: 'Ajustar al ancho', source: 'Fuente', date: 'Fecha', pagination: 'Paginación' }, de: { imageOnly: 'PDF nur als Bild', fit: 'An Breite anpassen', source: 'Quelle', date: 'Datum', pagination: 'Seitennummern' } };
   const projectLabels = {
     fr: { projectNotice: 'Le projet conserve les pixels et la composition. Les annotations sont aplaties ; leur historique n’est pas conservé après réouverture.', reduceBefore: 'La composition dépasse les limites d’une image exportable. Elle sera réduite de {from} à {to} pixels. Continuer ?', compositionUndo: 'Annuler la composition', compositionRedo: 'Rétablir la composition' },
     en: { projectNotice: 'The project saves pixels and composition. Annotations are flattened; their history is not kept after reopening.', reduceBefore: 'The composition exceeds exportable image limits. It will be reduced from {from} to {to} pixels. Continue?', compositionUndo: 'Undo composition', compositionRedo: 'Redo composition' },
@@ -163,7 +181,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     de: { sourcePolicy: 'Gespeicherte Quellen und Links', sourceSanitized: 'Links ohne Abfrageparameter und Fragmente', sourceNone: 'Quellen und Links ausschließen', sourceFull: 'Vollständige URLs', sourceHelp: 'Gilt für Projekte und Exporte. Pfade, Titel, Beschriftungen und Daten können weiterhin sensibel sein. Aus einem gespeicherten Projekt entfernte Angaben sind nicht wiederherstellbar.', imageDimensions: 'Ungültiges oder zu großes Bild: höchstens 16 Millionen Pixel und 16.384 Pixel pro Seite. Vor dem Import verkleinern.' }
   };
   const memoryLabels = { fr: 'La composition dépasse la limite mémoire de 32 millions de pixels. Réduisez les images ou retirez-en.', en: 'The composition exceeds the 32-million-pixel memory limit. Reduce or remove images.', es: 'La composición supera el límite de memoria de 32 millones de píxeles. Reduce o elimina imágenes.', de: 'Die Zusammenstellung überschreitet die Speichergrenze von 32 Millionen Pixeln. Bilder verkleinern oder entfernen.' };
-  const compositionText = key => key === 'historyNotice' ? (historyLabels[ScionosI18n.language] || historyLabels.en) : key === 'memoryLimit' ? (memoryLabels[ScionosI18n.language] || memoryLabels.en) : (sharingLabels[ScionosI18n.language] || sharingLabels.en)[key] || (projectLabels[ScionosI18n.language] || projectLabels.en)[key] || (extraLabels[ScionosI18n.language] || extraLabels.en)[key] || (copyLabels[ScionosI18n.language] || copyLabels.en)[key] || key;
+  const projectBudgetLabels = {
+    fr: 'Cette modification dépasse les limites du projet (manifeste JSON de 1 Mio, annotations ou archive ZIP de 128 Mio). Réduisez le texte, les tracés ou les images.',
+    en: 'This change exceeds project limits (1 MiB JSON manifest, annotations or 128 MiB ZIP archive). Reduce text, strokes or images.',
+    de: 'Diese Änderung überschreitet die Projektgrenzen (1 MiB JSON-Manifest, Anmerkungen oder 128 MiB ZIP-Archiv). Text, Linien oder Bilder reduzieren.',
+    es: 'Este cambio supera los límites del proyecto (manifiesto JSON de 1 MiB, anotaciones o archivo ZIP de 128 MiB). Reduce texto, trazos o imágenes.'
+  };
+  const compositionText = key => key === 'projectLimit' ? (projectBudgetLabels[ScionosI18n.language] || projectBudgetLabels.en) : key === 'historyNotice' ? (historyLabels[ScionosI18n.language] || historyLabels.en) : key === 'memoryLimit' ? (memoryLabels[ScionosI18n.language] || memoryLabels.en) : (sharingLabels[ScionosI18n.language] || sharingLabels.en)[key] || (projectLabels[ScionosI18n.language] || projectLabels.en)[key] || (extraLabels[ScionosI18n.language] || extraLabels.en)[key] || (copyLabels[ScionosI18n.language] || copyLabels.en)[key] || key;
 
   function markDocumentDirty() {
     documentDirty = true;
@@ -307,13 +331,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function makeSessionItem(bitmap, record, metadata = {}) {
     const surface = createSurface(bitmap.width, bitmap.height);
-    surface.getContext('2d').drawImage(bitmap, 0, 0);
     const thumbnail = document.createElement('canvas');
-    const thumbnailScale = Math.min(1, 220 / Math.max(bitmap.width, bitmap.height));
-    thumbnail.width = Math.max(1, Math.round(bitmap.width * thumbnailScale));
-    thumbnail.height = Math.max(1, Math.round(bitmap.height * thumbnailScale));
-    thumbnail.getContext('2d').drawImage(bitmap, 0, 0, thumbnail.width, thumbnail.height);
-    return { id: metadata.id || crypto.randomUUID(), title: metadata.title || '', caption: metadata.caption || '', thumbnail: thumbnail.toDataURL('image/png'), inputBytes: metadata.inputBytes || record.blob?.size || 0, baseImage: bitmap, operations: [], annotationUndo: [], annotationRedo: [], activeTextBlocks: record.textCoordinateSpace === 'bitmap' ? [...(record.textBlocks || [])] : [], committedSurface: surface, captureRecord: record, currentStepNumber: 1 };
+    try {
+      surface.getContext('2d').drawImage(bitmap, 0, 0);
+      const thumbnailScale = Math.min(1, 220 / Math.max(bitmap.width, bitmap.height));
+      thumbnail.width = Math.max(1, Math.round(bitmap.width * thumbnailScale));
+      thumbnail.height = Math.max(1, Math.round(bitmap.height * thumbnailScale));
+      thumbnail.getContext('2d').drawImage(bitmap, 0, 0, thumbnail.width, thumbnail.height);
+      return { id: metadata.id || crypto.randomUUID(), title: metadata.title || '', caption: metadata.caption || '', thumbnail: thumbnail.toDataURL('image/png'), inputBytes: metadata.inputBytes || record.blob?.size || 0, baseImage: bitmap, operations: [], annotationUndo: [], annotationRedo: [], activeTextBlocks: [], committedSurface: surface, captureRecord: record, currentStepNumber: 1 };
+    } catch (error) { surface.width = surface.height = 1; throw error; }
+    finally { thumbnail.width = thumbnail.height = 1; }
   }
 
   function updateItemThumbnail(item) {
@@ -323,8 +350,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const thumbnail = document.createElement('canvas');
     thumbnail.width = Math.max(1, Math.round(surface.width * scale));
     thumbnail.height = Math.max(1, Math.round(surface.height * scale));
-    thumbnail.getContext('2d').drawImage(surface, 0, 0, thumbnail.width, thumbnail.height);
-    item.thumbnail = thumbnail.toDataURL('image/png');
+    try {
+      thumbnail.getContext('2d').drawImage(surface, 0, 0, thumbnail.width, thumbnail.height);
+      item.thumbnail = thumbnail.toDataURL('image/png');
+    } finally { thumbnail.width = thumbnail.height = 1; }
   }
 
   async function importImages(files) {
@@ -362,10 +391,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             bitmap = resized;
             showToast(compositionText('reduced'));
           }
-          additions.push(makeSessionItem(bitmap, { blob: file, title: file.name || '', url: '', timestamp: Date.now(), scale: dimensions.scale, textBlocks: [], textCoordinateSpace: 'bitmap' }, { title: '', inputBytes: file.size }));
+          const entry = makeSessionItem(bitmap, { blob: file, title: file.name || '', url: '', timestamp: Date.now(), scale: dimensions.scale, textBlocks: [], textCoordinateSpace: 'bitmap' }, { title: '', inputBytes: file.size });
+          try {
+            entry.projectImageBytes = (await canvasPngBlob(entry.committedSurface)).size;
+            measureEditableProject({ items: [...compositionItems, ...additions, entry] });
+            additions.push(entry);
+          } catch (error) {
+            entry.committedSurface.width = entry.committedSurface.height = 1;
+            throw error;
+          }
         } catch (error) { bitmap?.close(); failures.push(`${file.name || compositionText('image')}: ${error.message}`); }
       }
       if (!additions.length) throw new Error(failures.join(' '));
+      if (!allowProjectEdit({ items: [...compositionItems, ...additions] })) throw new Error(compositionText('projectLimit'));
       if (failures.length) showToast(compositionText('failure') + failures.join(' '), true);
       persistActiveItem();
       compositionItems.push(...additions);
@@ -375,12 +413,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       markDocumentDirty();
     } catch (error) {
       additions.forEach(item => item.baseImage.close());
-      showToast(compositionText('failure') + error.message, true);
+      showToast(compositionText('failure') + operationErrorMessage(error), true);
     } finally { compositionBusy = false; refreshComposition(); }
   }
 
   function secureProjectSurface(item) {
     let surface = createSurface(item.baseImage.width, item.baseImage.height);
+    const apply = operation => {
+      const previous = surface;
+      surface = applyOperation(surface, operation);
+      if (surface !== previous) previous.width = previous.height = 1;
+    };
+    try {
     surface.getContext('2d').drawImage(item.baseImage, 0, 0);
     let annotations = [];
     const model = globalThis.ScionosAnnotationModel;
@@ -390,16 +434,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (operation.kind === 'censor') {
         const bounds = operationBounds(operation, surface.width, surface.height);
         annotations = annotations.filter(annotation => !intersects(model.bounds(annotation, { context: surface.getContext('2d') }), bounds));
-        surface = applyOperation(surface, operation);
+        apply(operation);
       } else if (operation.kind === 'crop') {
         // Flatten all prior annotations before cropping, preserving layer order and
         // ensuring removed pixels and text are absent from the portable file.
-        for (const annotation of annotations) surface = applyOperation(surface, annotation);
+        for (const annotation of annotations) apply(annotation);
         annotations = [];
-        surface = applyOperation(surface, operation);
+        apply(operation);
       } else annotations.push(operation);
     }
     return { surface, annotations };
+    } catch (error) { surface.width = surface.height = 1; throw error; }
   }
 
   function traceExport(stage, details = {}) {
@@ -423,6 +468,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function freezeComposition(mode) {
     if (!allowDocumentAction() || !compositionItems.length) return null;
     persistActiveItem();
+    if (mode !== 'export' && !allowProjectEdit()) return null;
     traceExport('freeze-start', { mode, items: compositionItems.length });
     const frozen = { items: [], settings: { ...compositionSettings }, title: compositionSettings.title,
       exportSettings: readPdfSettings(), revision: documentRevision, thumbnailSurface: null };
@@ -432,9 +478,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (mode === 'export') {
           const source = item.committedSurface;
           surface = createSurface(source.width, source.height);
-          surface.getContext('2d').drawImage(source, 0, 0);
+          try { surface.getContext('2d').drawImage(source, 0, 0); }
+          catch (error) { surface.width = surface.height = 1; throw error; }
         } else ({ surface, annotations } = secureProjectSurface(item));
-        frozen.items.push({ id: item.id, surface, annotations, width: surface.width, height: surface.height,
+        const frozenItem = { surface };
+        frozen.items.push(frozenItem);
+        Object.assign(frozenItem, { id: item.id, annotations, width: surface.width, height: surface.height,
           title: item.title, caption: item.caption, url: ScionosCaptureUtils.sanitizeSourceUrl(item.captureRecord.url || '', frozen.exportSettings.sourcePolicy),
           timestamp: item.captureRecord.timestamp || Date.now(), textBlocks: mode === 'export' ? item.activeTextBlocks.map(block => ({ ...block,
             url: ScionosCaptureUtils.sanitizeSourceUrl(block.url || '', frozen.exportSettings.sourcePolicy) })) : [] });
@@ -466,6 +515,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         surface.width = surface.height = 1;
       }
       const thumbnail = frozen.thumbnailSurface ? await canvasPngBlob(frozen.thumbnailSurface) : null;
+      if (mode !== 'export') globalThis.ScionosCompositionUtils.measureProject({ items,
+        settings: frozen.settings, title: frozen.title, exportSettings: frozen.exportSettings });
       traceExport('snapshot-ready', { mode });
       return { items, thumbnail, settings: frozen.settings, title: frozen.title, exportSettings: frozen.exportSettings, revision: frozen.revision };
     } finally { releaseFrozenSurfaces(frozen); }
@@ -488,7 +539,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const blob = await globalThis.ScionosCompositionUtils.encodeProject({ title: snapshot.title, settings: snapshot.settings, exportSettings: snapshot.exportSettings, items: snapshot.items.map(item => ({ id: item.id, blob: item.blob, annotations: item.annotations, title: item.title, caption: item.caption, url: item.url, timestamp: item.timestamp })) });
       downloadBlob(blob, 'scionos', snapshot.title);
       showToast(compositionText('projectExportRequested'));
-    } catch (error) { showToast(compositionText('failure') + error.message, true); }
+    } catch (error) { showToast(compositionText('failure') + operationErrorMessage(error), true); }
     finally { release(); }
   }
 
@@ -520,7 +571,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         showToast(compositionText('saved'));
       }
     } catch (error) {
-      if (librarySession === session) showToast(compositionText('failure') + error.message, true);
+      if (librarySession === session) showToast(compositionText('failure') + operationErrorMessage(error), true);
     }
   }
 
@@ -534,7 +585,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       for (const item of decoded.items) {
         const bitmap = await createImageBitmap(item.blob);
         const entry = makeSessionItem(bitmap, { blob: item.blob, title: item.title, url: item.url, timestamp: item.timestamp, scale: 1, textBlocks: [], textCoordinateSpace: 'bitmap' }, item);
-        entry.operations = (item.annotations || []).map(annotation => ({ ...annotation, id: annotation.id || crypto.randomUUID() }));
+        entry.operations = (item.annotations || []).map(annotation => ({ ...annotation }));
         let rendered = createSurface(bitmap.width, bitmap.height);
         rendered.getContext('2d').drawImage(bitmap, 0, 0);
         for (const annotation of entry.operations) rendered = applyOperation(rendered, annotation);
@@ -556,21 +607,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         else input.value = compositionSettings[key];
       }
       restorePdfSettings(decoded.exportSettings || {});
+      admittedExportSettings = readPdfSettings();
       documentRevision += 1;
       documentDirty = false;
       librarySession = { id: libraryMetadata?.id || null, revision: libraryMetadata?.revision ?? null, saves: Promise.resolve() };
       compositionBusy = false;
       selectCompositionItem(prepared[0]?.id);
-    } catch (error) { prepared.forEach(item => item.baseImage.close?.()); showToast(compositionText('failure') + error.message, true); }
+    } catch (error) { prepared.forEach(item => item.baseImage.close?.()); showToast(compositionText('failure') + operationErrorMessage(error), true); }
     finally { compositionBusy = false; refreshComposition(); }
   }
 
   function readPdfSettings() {
     const band = name => ({ enabled: byId(`pdf-${name}`).checked, title: byId(`pdf-${name}-title`).checked, source: byId(`pdf-${name}-source`).checked, date: byId(`pdf-${name}-date`).checked, pagination: byId(`pdf-${name}-pagination`).checked });
-    return { sourcePolicy: ScionosCaptureUtils.normalizeSourcePolicy(byId('source-policy').value), format: byId('pdf-paper').value, orientation: byId('pdf-orientation').value, marginsMm: Math.max(5, Math.min(30, Number(byId('pdf-margin').value) || 12)), scale: byId('pdf-fit').checked ? 'fit' : Math.max(25, Math.min(100, Number(byId('pdf-scale').value) || 100)), header: band('header'), footer: band('footer') };
+    return { imageOnly: byId('pdf-image-only').checked, sourcePolicy: ScionosCaptureUtils.normalizeSourcePolicy(byId('source-policy').value), format: byId('pdf-paper').value, orientation: byId('pdf-orientation').value, marginsMm: Math.max(5, Math.min(30, Number(byId('pdf-margin').value) || 12)), scale: byId('pdf-fit').checked ? 'fit' : Math.max(25, Math.min(100, Number(byId('pdf-scale').value) || 100)), header: band('header'), footer: band('footer') };
   }
 
   function restorePdfSettings(settings) {
+    byId('pdf-image-only').checked = settings.imageOnly === true;
     byId('source-policy').value = ScionosCaptureUtils.normalizeSourcePolicy(settings.sourcePolicy);
     if (['A4', 'Letter'].includes(settings.format)) byId('pdf-paper').value = settings.format;
     if (['portrait', 'landscape'].includes(settings.orientation)) byId('pdf-orientation').value = settings.orientation;
@@ -602,15 +655,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     byId('export-dialog').showModal();
   }
 
+  let activeExport = null;
+  function cancelCompositionExport() { activeExport?.abort(); }
   async function runCompositionExport(format) {
     const release = reserveSnapshot();
     if (!release) return;
+    const request = new globalThis.AbortController();
+    activeExport?.abort();
+    activeExport = request;
+    const checkpoint = () => { request.signal.throwIfAborted(); };
     const button = byId('export-confirm');
     button.disabled = true;
     byId('export-status').textContent = compositionText('loading');
     traceExport('export-start', { format });
     try {
       const snapshot = await snapshotComposition();
+      checkpoint();
       if (!snapshot) return;
       const exporter = globalThis.ScionosCompositionExport;
       if (['png', 'jpeg', 'webp'].includes(format)) {
@@ -619,20 +679,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (dimensions.reduced && !window.confirm(compositionText('reduceBefore').replace('{from}', `${Math.ceil(layout.width)} × ${Math.ceil(layout.height)}`).replace('{to}', `${dimensions.width} × ${dimensions.height}`))) { byId('export-status').textContent = ''; return; }
       }
       if (format === 'pdf') {
-        await exporter.print(snapshot, snapshot.exportSettings, byId('print-area'), ScionosI18n.language);
-      } else if (format === 'html') downloadBlob(await exporter.html(snapshot, ScionosI18n.language), 'html', snapshot.title);
-      else if (format === 'markdown') downloadBlob(await exporter.markdown(snapshot), 'zip', snapshot.title);
-      else {
+        await exporter.print(snapshot, { ...snapshot.exportSettings, signal: request.signal }, byId('print-area'), ScionosI18n.language);
+      } else if (format === 'html' || format === 'markdown') {
+        const blob = format === 'html' ? await exporter.html(snapshot, ScionosI18n.language) : await exporter.markdown(snapshot);
+        checkpoint();
+        downloadBlob(blob, format === 'html' ? 'html' : 'zip', snapshot.title);
+      } else {
         const quality = Math.max(10, Math.min(100, Number(byId('export-quality').value) || 90)) / 100;
         const result = await exporter.image(snapshot, format, quality);
+        checkpoint();
         downloadBlob(result.blob, format === 'jpeg' ? 'jpg' : format, snapshot.title);
         if (result.reduced) showToast(compositionText('reduced'));
       }
       byId('export-status').textContent = compositionText('done');
       byId('export-dialog').close();
       traceExport('dialog-close', { format });
-    } catch (error) { byId('export-status').textContent = compositionText('failure') + error.message; showToast(compositionText('failure') + error.message, true); }
-    finally { release(); button.disabled = false; }
+    } catch (error) {
+      if (error.name !== 'AbortError' && activeExport === request) {
+        byId('export-status').textContent = compositionText('failure') + operationErrorMessage(error);
+        showToast(compositionText('failure') + operationErrorMessage(error), true);
+      }
+    } finally {
+      release();
+      if (activeExport === request) { activeExport = null; button.disabled = false; }
+    }
   }
 
   function updateStepBadge() {
@@ -775,9 +845,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!record) return;
     notice.textContent = [
       record.scale < 0.9999 ? getI18nText('captureReducedNotice', { percent: Math.round(record.scale * 100) }) : '',
-      record.textLayerLimited || (record.textBlocks?.length && record.textCoordinateSpace !== 'bitmap')
+      record.textLayerLimited || record.textBlocks?.length
         ? getI18nText('textLayerLimitedNotice') : ''
     ].filter(Boolean).join(' ');
+  }
+
+  function operationErrorMessage(error) {
+    if (/(?:manifest|JSON|ZIP|project images|annotation.*(?:limit|points)).*(?:limit|exceed)|(?:limit|exceed).*(?:manifest|JSON|ZIP|annotation)/iu.test(error.message || '')) return getI18nText('projectResourceLimitError');
+    if (/PDF.*(?:budget|limit)|page limit/iu.test(error.message || '')) return getI18nText('pdfResourceLimitError');
+    return error.message;
   }
 
   function showToast(message, isError = false) {
@@ -813,8 +889,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!baseImage) return;
     let surface = createSurface(baseImage.width, baseImage.height);
     surface.getContext('2d').drawImage(baseImage, 0, 0);
-    let blocks = captureRecord?.textCoordinateSpace === 'bitmap' && Array.isArray(captureRecord.textBlocks)
-      ? [...captureRecord.textBlocks] : [];
+    // CaptureStore can contain records produced before the fail-closed policy.
+    // Bitmap coordinates alone never attest the association with captured pixels.
+    let blocks = [];
     operations.forEach(operation => {
       const crop = operation.kind === 'crop' ? normalizeCrop(operation, surface.width, surface.height) : null;
       surface = applyOperation(surface, operation);
@@ -882,6 +959,34 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function operationPoints(list) { return list.reduce((sum, operation) => sum + (operation.points?.length || 0), 0); }
 
+  // Mirror the portable form without allocating raster copies. A crop flattens
+  // preceding annotations; censor removal is deliberately overestimated here.
+  // PNG compression can change after editing, so the codec also checks actual
+  // encoded bytes before a save is admitted to storage or a download.
+  function measureEditableProject({ items = compositionItems, settings = compositionSettings, nextOperations = null, exportSettings = readPdfSettings() } = {}) {
+    const portable = items.map(item => {
+      let width = item.baseImage.width, height = item.baseImage.height, annotations = [];
+      const list = item.id === activeItemId ? (nextOperations || operations) : item.operations;
+      for (const operation of list) {
+        if (operation.kind === 'crop') {
+          const crop = normalizeCrop(operation, width, height);
+          width = crop.width; height = crop.height; annotations = [];
+        } else if (operation.kind !== 'censor') annotations.push(operation);
+      }
+      return { id: item.id, width, height, annotations, imageBytes: Math.max(1, item.projectImageBytes || item.inputBytes),
+        title: item.title, caption: item.caption,
+        url: ScionosCaptureUtils.sanitizeSourceUrl(item.captureRecord.url || '', exportSettings.sourcePolicy),
+        timestamp: item.captureRecord.timestamp || Date.now() };
+    });
+    return globalThis.ScionosCompositionUtils.measureProject({ title: settings.title, settings,
+      exportSettings, items: portable });
+  }
+
+  function allowProjectEdit(options) {
+    try { measureEditableProject(options); return true; }
+    catch { showToast(compositionText('projectLimit'), true); return false; }
+  }
+
   function allowOperations(next) {
     const others = compositionItems.filter(item => item.id !== activeItemId);
     const count = next.length + others.reduce((sum, item) => sum + item.operations.length, 0);
@@ -892,7 +997,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       showToast(compositionText('limit'), true);
       return false;
     }
-    return true;
+    try { globalThis.ScionosCompositionUtils.jsonUtf8Bytes(next, RESOURCE_LIMITS.manifestBytes - 128); }
+    catch { showToast(compositionText('projectLimit'), true); return false; }
+    return allowProjectEdit({ nextOperations: next });
   }
 
   // Bound all item histories together, including redo, before cloning another state.
@@ -901,15 +1008,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     for (const item of compositionItems) if (item.id !== activeItemId) stacks.push(item.annotationUndo, item.annotationRedo);
     const entries = stacks.flatMap(stack => stack.map(state => ({ stack, state })))
       .sort((a, b) => a.state.sequence - b.state.sequence);
+    const bytes = globalThis.ScionosCompositionUtils.jsonUtf8Bytes(operations) + 128;
+    let retainedBytes = bytes + entries.reduce((sum, entry) => sum + entry.state.bytes, 0);
     let points = operationPoints(operations) + entries.reduce((sum, entry) => sum + operationPoints(entry.state.operations), 0);
     let count = operations.length + entries.reduce((sum, entry) => sum + entry.state.operations.length, 0);
-    while (entries.length && (entries.length >= MAX_OPERATIONS || points > RESOURCE_LIMITS.pointsPerDocument || count > RESOURCE_LIMITS.annotationsPerDocument)) {
+    while (entries.length && (entries.length >= MAX_OPERATIONS || points > RESOURCE_LIMITS.pointsPerDocument || count > RESOURCE_LIMITS.annotationsPerDocument || retainedBytes > RESOURCE_LIMITS.manifestBytes)) {
       const { stack, state } = entries.shift();
       stack.splice(stack.indexOf(state), 1);
       points -= operationPoints(state.operations);
       count -= state.operations.length;
+      retainedBytes -= state.bytes;
     }
-    target.push({ operations: globalThis.structuredClone(operations), step: currentStepNumber, sequence: ++annotationHistorySequence });
+    target.push({ operations: globalThis.structuredClone(operations), step: currentStepNumber, sequence: ++annotationHistorySequence, bytes });
   }
 
   function recordAnnotationHistory() {
@@ -922,10 +1032,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       cancelDraft();
       return;
     }
+    if (!['crop', 'censor'].includes(operation.kind)) operation.id = operation.id || crypto.randomUUID();
     if (!allowOperations([...operations, operation])) { cancelDraft(); return; }
     recordAnnotationHistory();
     selectedAnnotation = -1;
-    if (!['crop', 'censor'].includes(operation.kind)) operation.id = operation.id || crypto.randomUUID();
     operations.push(operation);
     draftOperation = null;
     geometryPanel.hidden = true;
@@ -1252,6 +1362,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const deltaX = point.x - annotationDrag.point.x, deltaY = point.y - annotationDrag.point.y;
       const model = globalThis.ScionosAnnotationModel;
       const next = annotationDrag.handle ? model.resize(annotationDrag.original, annotationDrag.handle, point, { context }) : model.move(annotationDrag.original, deltaX, deltaY);
+      if (!allowOperations(operations.map((operation, index) => index === annotationDrag.index ? next : operation))) return;
       if (!annotationDrag.moved && Math.hypot(deltaX, deltaY) > 0.5) { recordAnnotationHistory(); annotationDrag.moved = true; }
       if (annotationDrag.moved) { operations[annotationDrag.index] = next; rebuildCommittedSurface(); markDocumentDirty(); }
       return;
@@ -1491,8 +1602,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   byId('annotation-duplicate').addEventListener('click', () => {
     if (selectedAnnotation < 0) return;
     const copy = globalThis.ScionosAnnotationModel.move(operations[selectedAnnotation], 10, 10);
+    copy.id = crypto.randomUUID();
     if (!allowOperations([...operations, copy])) return;
-    copy.id = crypto.randomUUID(); recordAnnotationHistory(); operations.push(copy); selectedAnnotation = operations.length - 1;
+    recordAnnotationHistory(); operations.push(copy); selectedAnnotation = operations.length - 1;
     rebuildCommittedSurface(); markDocumentDirty();
   });
   for (const property of ['color', 'width', 'text']) byId(`annotation-${property}`).addEventListener('change', event => {
@@ -1520,8 +1632,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   for (const key of ['title', 'direction', 'gap', 'padding', 'background', 'numbered']) {
     byId(`composition-${key}`).addEventListener('input', event => {
       const input = event.target;
+      const value = key === 'numbered' ? input.checked : ['gap', 'padding'].includes(key) ? Math.max(0, Math.min(200, Number(input.value) || 0)) : input.value;
+      if (compositionItems.length && !allowProjectEdit({ settings: { ...compositionSettings, [key]: value } })) {
+        if (key === 'numbered') input.checked = compositionSettings[key];
+        else input.value = compositionSettings[key];
+        return;
+      }
       rememberComposition();
-      compositionSettings[key] = key === 'numbered' ? input.checked : ['gap', 'padding'].includes(key) ? Math.max(0, Math.min(200, Number(input.value) || 0)) : input.value;
+      compositionSettings[key] = value;
       markDocumentDirty();
       refreshComposition();
     });
@@ -1530,8 +1648,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     byId(`item-${key}`).addEventListener('input', event => {
       const item = compositionItems.find(entry => entry.id === activeItemId);
       if (!item) return;
+      const value = event.target.value;
+      if (!allowProjectEdit({ items: compositionItems.map(entry => entry === item ? { ...entry, [key]: value } : entry) })) {
+        event.target.value = item[key]; return;
+      }
       rememberComposition();
-      item[key] = event.target.value;
+      item[key] = value;
       markDocumentDirty();
       refreshComposition();
     });
@@ -1573,17 +1695,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       const result = await globalThis.ScionosCompositionExport.image(snapshot, 'png', 1);
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': result.blob })]);
       showToast(getI18nText('copied'));
-    } catch (error) { showToast(compositionText('failure') + error.message, true); }
+    } catch (error) { showToast(compositionText('failure') + operationErrorMessage(error), true); }
     finally { release(); }
   });
-  byId('source-policy').addEventListener('change', markDocumentDirty);
-  byId('export-format').addEventListener('change', updateExportFields);
-  byId('export-confirm').addEventListener('click', () => { void runCompositionExport(byId('export-format').value); });
-  byId('export-cancel').addEventListener('click', () => byId('export-dialog').close());
-  byId('pdf-settings').addEventListener('change', () => {
+  let admittedExportSettings = readPdfSettings();
+  function acceptExportSettings() {
+    const candidate = readPdfSettings();
+    if (compositionItems.length && !allowProjectEdit({ exportSettings: candidate })) {
+      restorePdfSettings(admittedExportSettings); return;
+    }
+    admittedExportSettings = candidate;
     byId('pdf-scale').disabled = byId('pdf-fit').checked;
     markDocumentDirty();
-  });
+  }
+  byId('source-policy').addEventListener('change', acceptExportSettings);
+  byId('export-format').addEventListener('change', updateExportFields);
+  byId('export-confirm').addEventListener('click', () => { void runCompositionExport(byId('export-format').value); });
+  byId('export-cancel').addEventListener('click', () => { cancelCompositionExport(); byId('export-dialog').close(); });
+  byId('export-dialog').addEventListener('cancel', cancelCompositionExport);
+  byId('pdf-settings').addEventListener('change', acceptExportSettings);
   document.addEventListener('keydown', event => {
     const active = document.activeElement;
     const typing = active && (/^(INPUT|SELECT|TEXTAREA)$/.test(active.tagName) || active.isContentEditable);

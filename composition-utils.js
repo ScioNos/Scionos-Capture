@@ -39,6 +39,45 @@
     if (typeof value !== 'string' || value.length > max || hasControl(value, true)) fail(`Invalid ${name}`);
     return value;
   }
+  // Count JSON wire bytes one scalar at a time, without building the full JSON
+  // string or a second buffer for a document/history merely to check admission.
+  function jsonUtf8Bytes(value, maxBytes = Infinity) {
+    if (!(maxBytes === Infinity || Number.isSafeInteger(maxBytes) && maxBytes >= 0)) fail('Invalid JSON byte limit');
+    let total = 0;
+    const active = new Set();
+    const add = count => { total += count; if (total > maxBytes) fail('JSON size limit exceeded'); };
+    function visit(current, depth) {
+      if (depth > 128) fail('Invalid JSON depth');
+      if (current === null || typeof current !== 'object') {
+        const token = JSON.stringify(current);
+        if (token === undefined) fail('Invalid JSON value');
+        add(encoder.encode(token).length);
+        return;
+      }
+      if (active.has(current) || typeof current.toJSON === 'function') fail('Invalid JSON object');
+      active.add(current);
+      add(2);
+      if (Array.isArray(current)) {
+        for (let i = 0; i < current.length; i++) {
+          if (i) add(1);
+          const entry = current[i];
+          visit(entry === undefined || typeof entry === 'function' || typeof entry === 'symbol' ? null : entry, depth + 1);
+        }
+      } else {
+        let count = 0;
+        for (const key of Object.keys(current)) {
+          const entry = current[key];
+          if (entry === undefined || typeof entry === 'function' || typeof entry === 'symbol') continue;
+          if (count++) add(1);
+          add(encoder.encode(JSON.stringify(key)).length + 1);
+          visit(entry, depth + 1);
+        }
+      }
+      active.delete(current);
+    }
+    visit(value, 0);
+    return total;
+  }
   function boolean(value, fallback, name) {
     if (value === undefined) return fallback;
     if (typeof value !== 'boolean') fail(`Invalid ${name}`);
@@ -135,7 +174,7 @@
       const enabled = boolean(v.enabled, true, name);
       return { enabled, heightMm: enabled ? number(v.heightMm, 8, 0, 50, `${name} height`) : 0, ...Object.fromEntries(['title','source','date','pagination'].map(key => [key, boolean(v[key], key === 'pagination', `${name} ${key}`)])) };
     };
-    return { format, orientation, marginsMm, scale, header: band(value.header, 'header'), footer: band(value.footer, 'footer'), sourcePolicy: sourcePolicy(value.sourcePolicy) };
+    return { format, orientation, marginsMm, scale, header: band(value.header, 'header'), footer: band(value.footer, 'footer'), sourcePolicy: sourcePolicy(value.sourcePolicy), imageOnly: boolean(value.imageOnly, false, 'imageOnly') };
   }
   // scale:'fit' fits the width and paginates vertically; percentages use CSS 96dpi.
   // Numeric percentages may tile in both axes. Source rectangles share exact edges.
@@ -425,7 +464,47 @@
       return result;
     });
   }
+  function projectManifest(document, items) {
+    return { schemaVersion: 2, title: document.title, settings: document.settings, exportSettings: document.exportSettings, items };
+  }
+  function imagePath(index) { return `images/${String(index + 1).padStart(3, '0')}.png`; }
+  // Pure admission check for the editor before cloning/snapshotting. imageBytes
+  // permits checking a planned PNG without allocating a Blob of that size.
+  // Missing dimensions use their minimum serialized width; encodeProject performs
+  // an exact check again after validating the PNGs. Editor callers supply both.
+  function measureProject(document) {
+    object(document, 'project');
+    if (!Array.isArray(document.items) || !document.items.length || document.items.length > LIMITS.images) fail('Project requires 1–30 images');
+    const settings = normalizeSettings(document.settings), exportSettings = normalizeExportSettings(document.exportSettings);
+    const title = text(document.title, 1000, 'project title');
+    const ids = new Set(), budget = { annotations: 0, points: 0 };
+    let imageBytes = 0, overhead = 22 + 76 + 2 * encoder.encode('manifest.json').length;
+    const items = document.items.map((item, index) => {
+      const meta = metadata(item);
+      if (ids.has(meta.id)) fail('Duplicate item id');
+      ids.add(meta.id);
+      const width = number(item.width, 1, 1, LIMITS.imageDimension, 'image width');
+      const height = number(item.height, 1, 1, LIMITS.imageDimension, 'image height');
+      if (!Number.isSafeInteger(width) || !Number.isSafeInteger(height) || width * height > LIMITS.imagePixels) fail('Invalid image dimensions');
+      const size = item.blob instanceof Blob ? item.blob.size : item.imageBytes;
+      number(size, undefined, 1, LIMITS.imageBytes, 'image byte size');
+      if (!Number.isSafeInteger(size)) fail('Invalid image byte size');
+      imageBytes += size;
+      if (imageBytes > LIMITS.totalImageBytes) fail('Project images limit exceeded');
+      const annotations = normalizeAnnotations(item.annotations, item.width === undefined ? LIMITS.imageDimension : width, item.height === undefined ? LIMITS.imageDimension : height, budget);
+      const path = imagePath(index);
+      overhead += 76 + 2 * encoder.encode(path).length;
+      return { ...meta, width, height, annotations, url: sourceUrl(meta.url, exportSettings.sourcePolicy), path };
+    });
+    let manifestBytes;
+    try { manifestBytes = jsonUtf8Bytes(projectManifest({ title, settings, exportSettings }, items), LIMITS.manifestBytes); }
+    catch (error) { if (error.message === 'JSON size limit exceeded') fail('Manifest size limit exceeded'); throw error; }
+    const zipBytes = imageBytes + manifestBytes + overhead;
+    if (zipBytes > LIMITS.zipBytes) fail('ZIP size limit exceeded');
+    return { manifestBytes, zipBytes, imageBytes };
+  }
   async function encodeProject(document) {
+    measureProject(document);
     object(document, 'project');
     if (!Array.isArray(document.items) || !document.items.length || document.items.length > LIMITS.images) fail('Project requires 1–30 images');
     const settings = normalizeSettings(document.settings);
@@ -456,11 +535,13 @@
   function serializeProject(document) {
     const entries = [], items = document.items.map((item, i) => {
       const { bytes, ...meta } = item;
-      const path = `images/${String(i + 1).padStart(3, '0')}.png`;
+      const path = imagePath(i);
       entries.push({ name: path, data: bytes });
       return { ...meta, url: sourceUrl(meta.url, document.exportSettings.sourcePolicy), path };
     });
-    const manifest = { schemaVersion: 2, title: document.title, settings: document.settings, exportSettings: document.exportSettings, items };
+    const manifest = projectManifest(document, items);
+    try { jsonUtf8Bytes(manifest, LIMITS.manifestBytes); }
+    catch (error) { if (error.message === 'JSON size limit exceeded') fail('Manifest size limit exceeded'); throw error; }
     const manifestBytes = encoder.encode(JSON.stringify(manifest));
     if (manifestBytes.length > LIMITS.manifestBytes) fail('Manifest size limit exceeded');
     return new Blob([encodeZip([{ name: 'manifest.json', data: manifestBytes }, ...entries])], { type: 'application/x-scionos-project' });
@@ -514,5 +595,5 @@
     if (hasPolicy) document.exportSettings.sourcePolicy = policy;
     return serializeProject(document);
   }
-  return Object.freeze({ LIMITS, crc32, cleanPng, estimateTextLines, computeLayout, buildPagePlan, encodeZip, decodeZip, encodeProject, decodeProject, rewriteProjectMetadata });
+  return Object.freeze({ LIMITS, jsonUtf8Bytes, measureProject, crc32, cleanPng, estimateTextLines, computeLayout, buildPagePlan, encodeZip, decodeZip, encodeProject, decodeProject, rewriteProjectMetadata });
 });

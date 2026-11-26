@@ -18,19 +18,23 @@
 
 ## Vorbereitung von 1.5.3 — 26. November 2026
 
-**Lokale Vorbereitung, nicht veröffentlicht.** Die abschließende Testvalidierung läuft noch; Ergebnisse und Grenzen werden im [Konsolidierungsbericht](CONSOLIDATION_1.5.3.md) festgehalten. Es erfolgt weder eine GitHub-Veröffentlichung noch eine Store-Einreichung. Öffentliche Links und Archive von 1.5.2 verweisen weiterhin auf die bestehende Veröffentlichung.
+**Abschließende lokale Qualifizierung von 1.5.3 bestanden; unveröffentlichte Version.** Gesamtlauf bestanden: 178 Unit-Tests, 179 E2E-Tests, fünf native Modi in Chrome 158.0.8127.37 und Edge 158.0.4370.33, drei Unterbrechungen je Browser, drei Leistungswiederholungen und zehn PDF-Szenarien. Linux-Prüfungen bestehen auch mit den exakten Node-Mindestversionen 22.22.0 und 24.8.0 (je 178 Unit-Tests). Siehe [Konsolidierungsbericht](RAPPORT_CONSOLIDATION_1.5.3.md). Remote-CI, Commit/PR und endgültiges Archiv stehen noch aus; keine GitHub-Veröffentlichung oder Store-Einreichung. Öffentliche Links von 1.5.2 bleiben erhalten.
+
+- Exportabbruch: Abbrechen und Escape verhindern die Ausgabe auch nach Beginn der Momentaufnahme, während der PDF-Rasterung oder der Bildmodus-Seitenbänder; acht bestandene gezielte Szenarien prüfen temporäre URL-Bereinigung und erneuten Versuch.
 
 - Aufnahme: aktiven Tab, Fenster und Navigation vor und nach der Erfassung prüfen, mit einer an die `documentId` gebundenen Prüfung. URL und Titel werden zu Beginn der Sitzung festgelegt.
-- PDF: Textebene bei DOM-/CSSOM-Änderungen, unzugänglichen CSS-Stylesheets, Medienänderungen oder Animationen verwerfen; weißen Text auf weißem Hintergrund ausschließen und Text bei Mischmodi oder Bildhintergründen mit unklarer Sichtbarkeit weglassen (unsichtbare `SECRET_BLEND`-Regression auf Weiß bestätigt und korrigiert). Diese Prüfungen beweisen keine absolute Übereinstimmung von Pixeln und Text, wenn eine vorübergehende CSSOM-Änderung zwischen den Beobachtungen rückgängig gemacht wird. Im Zweifel wird Text bevorzugt weggelassen; Pixel prüfen und Geheimnisse deckend maskieren.
+- PDF: `captureVisibleTab` liefert keinen Nachweis, dass aufgenommene Pixel und DOM übereinstimmen. Selbst identische beobachtete Zustände vor und nach der Aufnahme können eine vorübergehende Änderung übersehen. Deshalb wird sämtlicher aus dem DOM abgeleiteter Quelltext bei nativen Aufnahmen weggelassen. Text in Benutzerannotationen wird als Pixel gerendert; Titel, Bildunterschriften sowie Kopf- und Fußzeilen bleiben außerhalb des reinen Bildmodus durchsuchbar.
+- PDF nur als Bild: Option im Bereich Dokument, in alle vier Sprachen übersetzt und mit den Projekteinstellungen gespeichert. Sie entfernt durchsuchbare Textebenen und rastert auch Kopf- und Fußzeilen. Sichtbare Pixel können weiterhin Geheimnisse enthalten; dieser Modus ersetzt keine deckende Maske.
+- Projekte: Manifest auf 1 MiB UTF-8-JSON (einschließlich Escape-Sequenzen), STORE-ZIP-Archiv auf 128 MiB einschließlich Headern und Verzeichnis begrenzt. Eine Vorprüfung lehnt Überschreitungen vor Kopien/Momentaufnahmen ab; der Codec prüft auch die endgültig kodierten Größen. Die Annotationsverläufe für Rückgängig/Wiederholen teilen zusätzlich ein Gesamtbudget von 1 MiB rohem UTF-8-JSON mit einer Reserve pro Zustand. Der Kompositionsverlauf für Titel und Bildunterschriften ist ebenfalls auf 50 Zustände und ein gemeinsames Budget von 1 MiB UTF-8-JSON begrenzt; Änderungen an PDF-Einstellungen und Quellenrichtlinie werden vor der Zustandsänderung geprüft.
 - Aufnahmen: Zeitbudget von 180 Sekunden, kooperativ an Kontrollpunkten geprüft, und höchstens 256 Teilaufnahmen. Dies ist keine präemptive Unterbrechung nach 180 Sekunden; zu lange Seiten werden abgelehnt.
 - Ressourcen: Das Gesamtbudget von 32 Millionen Pixeln umfasst nach einem Zuschnitt aufbewahrte Originale; Rückgängig/Wiederholen bleibt durch dieses Budget begrenzt. Höchstens zwei Momentaufnahmen sind gleichzeitig in Bearbeitung, bis Export, Kopieren in die Zwischenablage oder Speicherung abgeschlossen ist. Eigene Canvas-Flächen dieser Vorgänge werden in `finally` auf 1 × 1 verkleinert; Eingabeflächen bleiben erhalten.
-- Annotationen: 1.000 pro Bild und 5.000 pro Dokument; 10.000 Punkte pro Zeichenstrich und 100.000 pro Dokument. Der globale Verlauf ist auf 100 Zustände, 100.000 Punkte und 5.000 Operationen begrenzt.
+- Annotationen: 1.000 pro Bild und 5.000 pro Dokument; 10.000 Punkte pro Zeichenstrich und 100.000 pro Dokument. Der globale Verlauf ist auf 100 Zustände, 100.000 Punkte und 5.000 Operationen begrenzt, zusätzlich zum gemeinsamen JSON-Budget.
 - Speicherung: Aufnahme-Cache entfernen, um veraltete Daten zwischen Kontexten zu vermeiden; aufgegebene IndexedDB-Verbindungen schließen. Die im lokalen Arbeitsbaum bereits vorhandene transaktionale Gesamtlöschung wird integriert und beibehalten, mit vollständigem Rollback bei Fehlern.
 - Importe: strenge Validierung der PNG-Transparenzdaten `tRNS`. Projekte v1/v2 bleiben lesbar, geschrieben wird v2. Keine neue Berechtigung oder Telemetrie.
 - Oberfläche: Überlappung der Werkzeugleiste korrigiert; Annotationsbefehle bleiben in derselben 56 px hohen Leiste gruppiert, ohne Verschiebung der Zeichenfläche oder Versatz beim Ziehen. Inaktive Zustände `historyRevision`, `historyConsolidation` und `redoOperations` sind entfernt.
 - Kompatibilität: Manifest-Minimum Chrome/Edge 106 statt 102; CSS `:has()` benötigt Chrome 105 und `documentId` Chrome 106. Dieses Minimum wurde statisch ermittelt; die einzigen belegten nativen Ausführungen betreffen Chrome/Edge 158, ohne nachgewiesene Ausführung unter Chrome/Edge 106.
-- Werkzeuge: `@axe-core/playwright` 4.14.1, `html-validate` 11.22.1, `minimatch`-Override 11.0.9; inaktiven `glob`-Override entfernt und Actions aktualisiert. Siehe [Abhängigkeitsprüfung](DEPENDENCY_REVIEW_1.5.3.md).
-- Bibliothek: begrenzte Wiederverwendung von Karten und Miniaturen implementiert; Messung des Leistungsgewinns läuft noch. Die für 1.6 geplante Stapelverarbeitung ist nicht implementiert.
+- Werkzeuge: `@axe-core/playwright` 4.14.1, `html-validate` 11.22.1, `minimatch`-Override 11.0.9; inaktiven `glob`-Override entfernt. Zwölf kompatible transitive Aktualisierungen angewendet; GitHub Actions auf Commit-SHAs festgelegt. Siehe [Abhängigkeitsprüfung](DEPENDENCY_REVIEW_1.5.3.md) und [Prüfung der transitiven Abhängigkeiten](DEPENDENCY_TRANSITIVES_1.5.3.md).
+- Bibliothek: begrenzte Wiederverwendung von Karten und Miniaturen. Frühere Vergleichsmessungen und ihre Grenzen sind im [Bericht](RAPPORT_CONSOLIDATION_1.5.3.md) dokumentiert; sie belegen keine allgemeine Beschleunigung. Stapelverarbeitung ist nicht implementiert.
 
 ## Version 1.5.2 — Korrekturen und Zuverlässigkeit
 
@@ -144,7 +148,7 @@ Fragmente bleiben in der lokalen IndexedDB und werden nach dem Zusammensetzen od
 - Animierte, virtualisierte oder endlose Inhalte können unvollständig bleiben. Manche festen oder `sticky`-Elemente können zwischen den Abschnitten variieren.
 - Die Auswahl durchsucht weder iframe-Inhalte noch geschlossene Shadow Roots.
 - PNG-, JPEG- und WebP-Importe über **16 Millionen Pixel** oder **16.384 px pro Seite** werden vor dem Dekodieren abgelehnt statt verkleinert. Das Gesamtlimit der Komposition bleibt bei **32 Millionen Pixel**. Nicht unterstützte Drehungen, Scherungen und perspektivische Transformationen werden ausdrücklich abgelehnt.
-- Durchsuchbarer PDF-Text bleibt nur erhalten, wenn seine Sichtbarkeit überprüfbar ist. Importierte und aus einem Projekt wiederhergestellte Bilder liefern keine zuverlässige Textebene; unsichere Wörter werden aus der Textebene ausgelassen, das Bild bleibt erhalten.
+- In der lokal qualifizierten Version 1.5.3 liefern native Aufnahmen keine aus dem DOM abgeleitete Quelltextebene: Die API beweist deren Übereinstimmung mit den Pixeln nicht. Importierte Bilder und erneut geöffnete Projekte stellen keine zuverlässige Quelltextebene wieder her. Text in Benutzerannotationen wird als Pixel gerendert; Titel, Bildunterschriften sowie Kopf- und Fußzeilen bleiben außerhalb des Modus „PDF nur als Bild“ durchsuchbar. Diese Option wird in den Projekteinstellungen gespeichert und rastert auch Kopf- und Fußzeilen. Das Bild bleibt erhalten; vertrauliche Pixel müssen deckend maskiert werden, da Unschärfe nur ein visueller Effekt ist.
 - Übernehmen oder verwerfen Sie ausstehende Änderungen vor einem Export.
 
 ## Entwickeln und beitragen
@@ -160,9 +164,9 @@ npm run verify
 
 `verify` prüft Syntax, Lint, HTML, Unit-Tests, Übersetzungen, Paket und Browser-/Barrierefreiheitsregressionen. `npm run test:native` testet die fünf Modi in installiertem Chrome und Edge mit echten Aufnahmen und temporären Profilen, ohne persönliche Profile zu nutzen. `npm run package` erzeugt das Archiv und seine Prüfsumme in `dist/`.
 
-Versionsabgleich für die GitHub-Veröffentlichung: `npm run version:sync -- 1.5.2`; in PowerShell: `npm.cmd run version:sync -- 1.5.2`. Dieser Befehl ändert auch Paketversionsdateien; nur im Rahmen ihrer abgestimmten Aktualisierung ausführen.
+Versionsabgleich für die GitHub-Veröffentlichung: `npm run version:sync -- 1.5.3 --unreleased`; in PowerShell: `npm.cmd run version:sync -- 1.5.3 --unreleased`. Dieser Befehl ändert auch Paketversionsdateien; nur im Rahmen ihrer abgestimmten Aktualisierung ausführen.
 
-Korrigiertes lokales Paket: `dist/scionos-capture-v1.5.2.zip`, 35 Dateien. Die Prüfsumme steht im [Store-Bericht](STORE_READINESS_1.5.2.md) und in der benachbarten `.sha256`-Datei; sie unterscheidet sich vom bestehenden GitHub-Archiv.
+Historisches lokales Paket 1.5.2: `dist/scionos-capture-v1.5.2.zip`, 35 Dateien. Die Prüfsumme steht im [Store-Bericht](STORE_READINESS_1.5.2.md) und in der benachbarten `.sha256`-Datei; sie unterscheidet sich vom bestehenden GitHub-Archiv.
 
 <!-- local-package --> Lokales Archiv : `scionos-capture-v1.5.3.zip` · SHA-256 : `scionos-capture-v1.5.3.zip.sha256`.
 
@@ -172,4 +176,4 @@ Korrigiertes lokales Paket: `dist/scionos-capture-v1.5.2.zip`, 35 Dateien. Die P
 
 Entwickelt von **eyelo SA, Schweiz**, unter der Marke **ScioNos**. [Website](https://scionos.ch) · [Kontakt](mailto:info@eyelo.ch) · [MIT-Lizenz](LICENSE)
 
-Prüfung dieses Kandidaten: 136 Unit-Tests und 136 Browsertests bestanden, fünf native Modi in Chrome und Edge, drei Leistungswiederholungen und zehn PDF-Szenarien. Details, Grenzen und endgültige Prüfsumme: [Store-Vorbereitung](STORE_READINESS_1.5.2.md).
+Historische Prüfungen von 1.5.2: siehe [Abhängigkeitsprüfung](DEPENDENCY_REVIEW_1.5.2.md) und [Bericht zum korrigierten Store-Kandidaten](STORE_READINESS_1.5.2.md). Diese Ergebnisse betreffen frühere Arbeitsstände und qualifizieren 1.5.3 nicht.

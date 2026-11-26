@@ -1,5 +1,22 @@
 const { test, expect, chromium } = require('@playwright/test');
 const { frenchMessages, prepareFullPageHarness, startFullPageCapture, readOpenedCapture } = require('./helpers/capture');
+async function standaloneWords(page) {
+  return page.evaluate(() => {
+    const dom = globalThis.ScionosContentDom.create({ Utils: globalThis.ScionosCaptureUtils, text: key => key });
+    return dom.extractDomTextBlocks({ x: 0, y: 0, width: globalThis.innerWidth, height: globalThis.innerHeight }).map(block => block.text);
+  });
+}
+async function expectImageOnly(page) {
+  expect(await readOpenedCapture(page)).toMatchObject({ width: 800, height: 600 });
+  expect(await page.evaluate(() => ({ blocks: globalThis.__openedCapture.textBlocks, limited: globalThis.__openedCapture.textLayerLimited })))
+    .toEqual({ blocks: [], limited: true });
+  expect(await page.evaluate(async () => {
+    const image = new globalThis.Image(); image.src = globalThis.__openedCapture.dataUrl; await image.decode();
+    const canvas = document.createElement('canvas'); canvas.width = image.width; canvas.height = image.height;
+    const ctx = canvas.getContext('2d'); ctx.drawImage(image, 0, 0);
+    return [...ctx.getImageData(0, 0, 1, 1).data];
+  })).toEqual([0, 180, 220, 255]);
+}
 let browser;
 test.beforeAll(async () => { browser = await chromium.launch({ channel: 'chromium', headless: true }); });
 test.afterAll(async () => { await browser?.close(); });
@@ -39,11 +56,11 @@ test('post-acquisition DOM mutation removes searchable text from visible capture
   } finally { await page.close(); }
 });
 
-test('stable visible capture retains searchable text', async () => {
+test('stable DOM remains independently extractable while native capture keeps pixels only', async () => {
   const page = await fixture();
   try {
-    await startVisible(page); await readOpenedCapture(page);
-    expect(await page.evaluate(() => globalThis.__openedCapture.textBlocks.map(block => block.text))).toContain('PUBLIC_A');
+    expect(await standaloneWords(page)).toContain('PUBLIC_A');
+    await startVisible(page); await expectImageOnly(page);
   } finally { await page.close(); }
 });
 
@@ -90,7 +107,8 @@ test('mutated tile keeps pixels but discards the whole uncertain text layer', as
   const page = await fixture('<style>body{background:white}.secret{color:white}</style><p>PUBLIC_A</p><p class="secret">SECRET_WHITE</p>');
   try {
     await startVisible(page); await readOpenedCapture(page);
-    const words = await page.evaluate(() => globalThis.__openedCapture.textBlocks.map(block => block.text));
+    const words = await standaloneWords(page);
+    await expectImageOnly(page);
     expect(words).toContain('PUBLIC_A'); expect(words).not.toContain('SECRET_WHITE');
   } finally { await page.close(); }
 });
@@ -99,7 +117,8 @@ test('text with image backgrounds or blending is omitted when painted contrast i
   const page = await fixture('<style>body{background:white}.image{color:white;background-image:linear-gradient(white,white)}.blend{color:black;mix-blend-mode:screen}</style><p>PUBLIC_A</p><p class="image">SECRET_IMAGE</p><p class="blend">SECRET_BLEND</p>');
   try {
     await startVisible(page); await readOpenedCapture(page);
-    const words = await page.evaluate(() => globalThis.__openedCapture.textBlocks.map(block => block.text));
+    const words = await standaloneWords(page);
+    await expectImageOnly(page);
     expect(words).toContain('PUBLIC_A');
     expect(words).not.toContain('SECRET_IMAGE');
     expect(words).not.toContain('SECRET_BLEND');
@@ -121,6 +140,65 @@ test('CSSOM changes during acquisition invalidate the text layer without DOM mut
     expect(await page.evaluate(() => globalThis.__openedCapture.textLayerLimited)).toBe(true);
   } finally { await page.close(); }
 });
+
+test('semi-transparent backgrounds never expose text hidden by their effective composite', async () => {
+  const page = await fixture('<style>body{background:black}.one{background:rgb(255 255 255 / 50%);color:rgb(128 128 128)}.outer{background:rgb(255 255 255 / 50%)}.two{background:rgb(255 255 255 / 50%);color:rgb(192 192 192)}</style><p>PUBLIC_A</p><p class="one">SECRET_ALPHA</p><div class="outer"><p class="two">SECRET_LAYERS</p></div>');
+  try {
+    await startVisible(page); await readOpenedCapture(page);
+    const words = await standaloneWords(page);
+    await expectImageOnly(page);
+    expect(words).not.toContain('SECRET_ALPHA');
+    expect(words).not.toContain('SECRET_LAYERS');
+  } finally { await page.close(); }
+});
+
+// The harness supplies synthetic pixels: these cases verify fail-closed metadata,
+// restored state and absent DOM records, not compositor timing or Chrome world isolation.
+for (const change of ['cssom', 'adoption', 'canvas', 'font']) {
+  test('native capture omits text after a restored mutation-free paint source: ' + change, async () => {
+    const page = await fixture(change === 'cssom'
+      ? '<style>p{color:black}</style><p>PUBLIC_A</p>'
+      : '<p>PUBLIC_A</p>' + (change === 'canvas' ? '<canvas width="20" height="20"></canvas>' : ''));
+    try {
+      await page.evaluate(async change => {
+        let face;
+        if (change === 'font') {
+          face = new globalThis.FontFace('AcquisitionFixture', 'local("Arial"), local("Liberation Sans"), local("DejaVu Sans")');
+          await face.load();
+          document.querySelector('p').style.fontFamily = 'AcquisitionFixture, monospace';
+        }
+        const previous = globalThis.chrome.runtime.sendMessage;
+        globalThis.chrome.runtime.sendMessage = (message, callback) => {
+          if (message.action !== 'CAPTURE_VISIBLE_TAB') return previous(message, callback);
+          const observer = new globalThis.MutationObserver(() => {});
+          observer.observe(document.documentElement, { subtree: true, childList: true, attributes: true, characterData: true });
+          const adopted = document.adoptedStyleSheets;
+          const sheet = change === 'cssom' ? document.styleSheets[0] : new globalThis.CSSStyleSheet();
+          const initial = change === 'cssom' ? sheet.cssRules[0].style.color : null;
+          if (change === 'cssom') sheet.cssRules[0].style.color = 'white';
+          if (change === 'adoption') { sheet.replaceSync('p{color:white}'); document.adoptedStyleSheets = [...adopted, sheet]; }
+          if (change === 'canvas') document.querySelector('canvas').getContext('2d').fillRect(0, 0, 20, 20);
+          if (change === 'font') document.fonts.add(face);
+          return previous(message, response => {
+            if (change === 'cssom') sheet.cssRules[0].style.color = initial;
+            if (change === 'adoption') document.adoptedStyleSheets = adopted;
+            if (change === 'canvas') document.querySelector('canvas').getContext('2d').clearRect(0, 0, 20, 20);
+            if (change === 'font') document.fonts.delete(face);
+            globalThis.__paintMutationRecords = observer.takeRecords().length;
+            globalThis.__restoredPaintState = change === 'cssom' ? sheet.cssRules[0].style.color === initial
+              : change === 'adoption' ? document.adoptedStyleSheets.length === adopted.length
+                : change === 'font' ? !document.fonts.has(face) : true;
+            observer.disconnect(); callback(response);
+          });
+        };
+      }, change);
+      expect(await standaloneWords(page)).toContain('PUBLIC_A');
+      await startVisible(page); await expectImageOnly(page);
+      expect(await page.evaluate(() => globalThis.__paintMutationRecords)).toBe(0);
+      expect(await page.evaluate(() => globalThis.__restoredPaintState)).toBe(true);
+    } finally { await page.close(); }
+  });
+}
 
 test('capture portion limit rejects a long page before acquiring pixels and restores it', async () => {
   const page = await fixture('<style>html,body{margin:0;height:200000px}</style><p>PUBLIC_A</p>');

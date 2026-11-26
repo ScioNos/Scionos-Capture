@@ -444,7 +444,7 @@
     "message": "Édition & Formats d’export"
   },
   "helpEditorText": {
-    "message": "Annotez avec des flèches, textes, pastilles numérotées ou formes. Masquez les données sensibles avec le masquage solide (le flou reste purement visuel). Exportez en PNG haute fidélité, en PDF avec texte et hyperliens indexables, ou en rapport HTML interactif autonome."
+    "message": "Annotez avec des flèches, textes, pastilles numérotées ou formes. Masquez les données sensibles avec le masquage solide (le flou reste purement visuel). Exportez en PNG, PDF ou rapport HTML autonome. Le texte source de la page est omis du PDF. Les titres et légendes ajoutés peuvent rester recherchables ; PDF image uniquement désactive toute couche textuelle et les liens associés."
   },
   "helpShortcutsHeader": {
     "message": "Raccourcis clavier"
@@ -492,7 +492,22 @@
     "message": "Fermer l’aide"
   },
   "textLayerLimitedNotice": {
-    "message": "La couche recherchable du PDF est limitée aux textes dont la visibilité est vérifiable. Le rendu de l’image reste conservé."
+    "message": "Le texte source de la page est omis du PDF car sa correspondance avec les pixels capturés ne peut pas être attestée. L’image est conservée. Les titres et légendes ajoutés peuvent rester recherchables, sauf en mode PDF image uniquement."
+  },
+  "captureDurationLimitError": {
+    "message": "La capture a dépassé la limite de 180 secondes. Sélectionnez une zone plus petite, puis réessayez."
+  },
+  "capturePortionLimitError": {
+    "message": "La capture nécessite plus de 256 portions. Sélectionnez une zone plus petite, puis réessayez."
+  },
+  "captureCancelledError": {
+    "message": "Capture annulée."
+  },
+  "pdfResourceLimitError": {
+    "message": "Le PDF dépasse les limites de ressources. Réduisez la composition, les images ou le texte, puis réessayez."
+  },
+  "projectResourceLimitError": {
+    "message": "Le projet dépasse les limites de ressources : manifeste JSON de 1 Mio ou archive ZIP de 128 Mio. Réduisez le texte, les tracés ou les images, puis réessayez."
   },
   "exportPendingDraft": {
     "message": "Appliquez ou annulez la modification en cours avant d’exporter."

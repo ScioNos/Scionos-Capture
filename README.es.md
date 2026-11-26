@@ -18,19 +18,23 @@
 
 ## Preparación de 1.5.3 — 26 de noviembre de 2026
 
-**Preparación local, sin publicar.** La validación final de las pruebas sigue en curso; los resultados y límites se documentarán en el [informe de consolidación](CONSOLIDATION_1.5.3.md). No se realiza ninguna publicación en GitHub ni envío a la tienda. Los enlaces públicos y archivos de 1.5.2 siguen correspondiendo a la publicación existente.
+**Calificación local final de 1.5.3 superada; versión sin publicar.** Campaña completa superada: 178 pruebas unitarias, 179 E2E, cinco modos nativos en Chrome 158.0.8127.37 y Edge 158.0.4370.33, tres interrupciones por navegador, tres repeticiones de rendimiento y diez escenarios PDF. Los controles Linux también pasan con los mínimos exactos Node 22.22.0 y 24.8.0 (178 pruebas unitarias cada uno). Véase el [informe de consolidación](RAPPORT_CONSOLIDATION_1.5.3.md). CI remota, commit/PR y archivo definitivo siguen pendientes; sin publicación GitHub ni envío a la tienda. Se conservan los enlaces públicos de 1.5.2.
+
+- Cancelación de exportaciones: Cancelar y Escape impiden publicar el resultado incluso después de iniciar la instantánea, durante la rasterización PDF o las bandas solo imagen; ocho escenarios específicos superados cubren limpieza de URL temporales y reintento.
 
 - Captura: comprobaciones de pestaña activa, ventana y navegación antes y después de la adquisición, con una sonda vinculada al `documentId`. La URL y el título se fijan al inicio de la sesión.
-- PDF: invalidación de la capa de texto ante mutaciones DOM/CSSOM, hojas CSS inaccesibles, cambios de medios o animaciones; exclusión del texto blanco sobre blanco y omisión del texto con modos de fusión o fondos de imagen si su visibilidad es incierta (regresión `SECRET_BLEND` invisible sobre blanco confirmada y corregida). Estas comprobaciones no demuestran una correspondencia absoluta entre píxeles y texto cuando un cambio CSSOM transitorio se revierte entre observaciones. Ante la duda se prefiere omitir el texto; revisa los píxeles y usa una máscara sólida para secretos.
+- PDF: `captureVisibleTab` no aporta pruebas de correspondencia entre los píxeles capturados y el DOM. Incluso con estados observados idénticos antes y después puede pasar inadvertido un cambio transitorio, por lo que se omite todo texto fuente derivado del DOM en las capturas nativas. El texto de las anotaciones del usuario se representa en los píxeles; los títulos, leyendas y bandas de página siguen siendo buscables fuera del modo solo imagen.
+- PDF solo imagen: opción del panel Documento, traducida a los cuatro idiomas y guardada con los ajustes del proyecto. Elimina las capas de texto buscable y también rasteriza encabezados y pies de página. Los píxeles visibles aún pueden contener secretos; este modo no sustituye una máscara sólida.
+- Proyectos: manifiesto limitado a 1 MiB de JSON UTF-8 (incluidos los escapes) y archivo ZIP STORE a 128 MiB, con cabeceras y directorio incluidos. Una comprobación previa rechaza los excesos antes de copiar o crear instantáneas; el códec comprueba también los tamaños finales codificados. Los historiales de anotaciones Deshacer/Rehacer comparten además un presupuesto total de 1 MiB de JSON bruto UTF-8, con una reserva por estado. El historial de composición de títulos y leyendas también se limita a 50 estados y 1 MiB compartido de JSON UTF-8; los cambios de ajustes PDF y política de fuentes se comprueban antes de modificar el estado.
 - Capturas: presupuesto de 180 segundos comprobado de forma cooperativa en los puntos de control y un máximo de 256 porciones. No es una interrupción preventiva a los 180 segundos; las páginas demasiado largas se rechazan.
 - Recursos: el presupuesto acumulado de 32 millones de píxeles incluye los originales conservados tras recortar; Deshacer/Rehacer sigue limitado por ese presupuesto. Como máximo hay dos instantáneas simultáneas en curso hasta finalizar la exportación, la copia al portapapeles o el guardado. Los Canvas propios de estas operaciones se reducen a 1 × 1 en `finally`, conservando las superficies de entrada.
-- Anotaciones: 1.000 por imagen y 5.000 por documento; 10.000 puntos por trazo y 100.000 por documento. Historial global limitado a 100 estados, 100.000 puntos y 5.000 operaciones.
+- Anotaciones: 1.000 por imagen y 5.000 por documento; 10.000 puntos por trazo y 100.000 por documento. Historial global limitado a 100 estados, 100.000 puntos y 5.000 operaciones, además del presupuesto JSON compartido.
 - Almacenamiento: retirada de la caché de capturas para evitar datos obsoletos entre contextos; cierre de conexiones IndexedDB abandonadas. La eliminación total transaccional ya presente en el árbol local se integra y conserva, con reversión completa en caso de error.
 - Importaciones: validación estricta de los datos de transparencia PNG `tRNS`. Se conserva la lectura de proyectos v1/v2 y la escritura v2. Sin nuevos permisos ni telemetría.
 - Interfaz: corrección del solapamiento de la barra de herramientas; los controles de anotación permanecen agrupados en la misma barra de 56 px, sin desplazar el lienzo ni alterar el arrastre. Se retiran los estados inertes `historyRevision`, `historyConsolidation` y `redoOperations`.
 - Compatibilidad: mínimo del manifiesto Chrome/Edge 106 en lugar de 102; CSS `:has()` requiere Chrome 105 y `documentId` Chrome 106. Este mínimo se identifica mediante análisis estático; las únicas ejecuciones nativas acreditadas son en Chrome/Edge 158, sin ejecución demostrada en Chrome/Edge 106.
-- Herramientas: `@axe-core/playwright` 4.14.1, `html-validate` 11.22.1, override de `minimatch` 11.0.9; retirada del override inactivo de `glob` y actualización de Actions. Véase la [revisión de dependencias](DEPENDENCY_REVIEW_1.5.3.md).
-- Biblioteca: reutilización limitada de tarjetas y miniaturas implementada; medición de la mejora de rendimiento todavía en curso. El procesamiento por lotes previsto para 1.6 no está implementado.
+- Herramientas: `@axe-core/playwright` 4.14.1, `html-validate` 11.22.1, override de `minimatch` 11.0.9; override inactivo de `glob` retirado. Doce actualizaciones transitivas compatibles aplicadas; Actions de GitHub fijadas por SHA de commit. Véanse la [revisión de dependencias](DEPENDENCY_REVIEW_1.5.3.md) y la [revisión de transitivas](DEPENDENCY_TRANSITIVES_1.5.3.md).
+- Biblioteca: reutilización limitada de tarjetas y miniaturas. Las mediciones comparativas anteriores y sus límites constan en el [informe](RAPPORT_CONSOLIDATION_1.5.3.md); no demuestran una aceleración general. El procesamiento por lotes no está implementado.
 
 ## Versión 1.5.2 — correcciones y fiabilidad
 
@@ -47,7 +51,7 @@
 
 ![Editor de Scionos Capture 1.5.2: anotación de una imagen y vista previa de una composición horizontal](store-assets/screenshot-real-1-composition-v1.5.2.png)
 
-*Interfaz real de la versión 1.5.0, con contenido de demostración local.*
+*Interfaz real de la versión 1.5.2, con contenido de demostración local.*
 
 ## De la página web al documento
 
@@ -144,7 +148,7 @@ Los fragmentos permanecen en IndexedDB local y se eliminan tras el ensamblado o 
 - El contenido animado, virtualizado o sin fin puede quedar incompleto. Algunos elementos fijos o `sticky` pueden variar entre las partes.
 - El selector no recorre el interior de los iframes ni los shadow roots cerrados.
 - Las importaciones PNG, JPEG y WebP que superen **16 millones de píxeles** o **16.384 px por lado** se rechazan antes de decodificar, en vez de reducirse. El límite acumulado de composición sigue siendo de **32 millones de píxeles**. Las rotaciones, inclinaciones y transformaciones de perspectiva no compatibles se rechazan explícitamente.
-- El texto de búsqueda de un PDF solo se conserva cuando su visibilidad puede verificarse. Las imágenes importadas y restauradas de un proyecto no aportan una capa de texto fiable; las palabras inciertas se omiten de la capa textual, sin eliminar la imagen.
+- En la 1.5.3 calificada localmente, las capturas nativas no aportan una capa de texto fuente derivada del DOM: la API no demuestra su correspondencia con los píxeles. Las imágenes importadas y los proyectos reabiertos no restauran una capa fuente fiable. El texto de las anotaciones del usuario se representa en los píxeles; los títulos, leyendas y bandas de página siguen siendo buscables fuera del modo «PDF solo imagen». Esta opción se guarda en los ajustes del proyecto y también rasteriza encabezados y pies de página. La imagen permanece; protege los píxeles confidenciales con una máscara sólida, ya que el desenfoque es solo visual.
 - Aplica o cancela los cambios pendientes antes de exportar.
 
 ## Desarrollar y contribuir
@@ -160,9 +164,9 @@ npm run verify
 
 `verify` comprueba sintaxis, lint, HTML, pruebas unitarias, traducciones, paquete y regresiones del navegador y de accesibilidad. `npm run test:native` prueba los cinco modos en Chrome y Edge instalados con capturas reales y perfiles temporales, sin usar perfiles personales. `npm run package` genera el archivo comprimido y su suma de comprobación en `dist/`.
 
-Sincronización de versión para la publicación GitHub: `npm run version:sync -- 1.5.2`; en PowerShell: `npm.cmd run version:sync -- 1.5.2`. Este comando también modifica los archivos de versión del paquete; ejecútalo solo dentro de su actualización coordinada.
+Sincronización de versión para la publicación GitHub: `npm run version:sync -- 1.5.3 --unreleased`; en PowerShell: `npm.cmd run version:sync -- 1.5.3 --unreleased`. Este comando también modifica los archivos de versión del paquete; ejecútalo solo dentro de su actualización coordinada.
 
-Paquete local corregido: `dist/scionos-capture-v1.5.2.zip`, 35 archivos. La suma de esta candidata consta en [el informe](STORE_READINESS_1.5.2.md) y en el archivo `.sha256` adjunto; difiere del archivo GitHub existente.
+Paquete local histórico 1.5.2: `dist/scionos-capture-v1.5.2.zip`, 35 archivos. La suma de esta candidata consta en [el informe](STORE_READINESS_1.5.2.md) y en el archivo `.sha256` adjunto; difiere del archivo GitHub existente.
 
 <!-- local-package --> Archivo local : `scionos-capture-v1.5.3.zip` · SHA-256 : `scionos-capture-v1.5.3.zip.sha256`.
 
@@ -172,4 +176,4 @@ Paquete local corregido: `dist/scionos-capture-v1.5.2.zip`, 35 archivos. La suma
 
 Desarrollado por **eyelo SA, Suiza**, bajo la marca **ScioNos**. [Sitio web](https://scionos.ch) · [Contacto](mailto:info@eyelo.ch) · [Licencia MIT](LICENSE)
 
-Validación de esta candidata: 136 pruebas unitarias y 136 pruebas de navegador superadas, cinco modos nativos en Chrome y Edge, tres repeticiones de rendimiento y diez escenarios PDF. Detalles, límites y suma final: [preparación para la tienda](STORE_READINESS_1.5.2.md).
+Validaciones históricas de 1.5.2: véanse la [revisión de dependencias](DEPENDENCY_REVIEW_1.5.2.md) y el [informe de la candidata corregida para la tienda](STORE_READINESS_1.5.2.md). Estos resultados corresponden a estados anteriores y no califican la 1.5.3.
