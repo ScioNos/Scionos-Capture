@@ -50,12 +50,15 @@ f863e10d835425c9023cdb716f7f6bdaa5ce191f34982042417312a50a733d81
 
 `final-archive-verification.json` atteste CRC,allow-list exacte,absence de doublons et identité décompressée avec les sources. `final-qualification-source-hashes.json` identifie les sources qualifiées.
 
-## Validation distante restant à consigner
+## Validation distante et décision de revue
 
-Créer le nouveau commit sur la même branche, pousser sans force, créer/actualiser la PR vers main et recueillir tous les jobs GitHub Actions du dernier SHA. Corriger tout échec sur cette branche, sans merge. Les tests locaux ne remplacent pas cette preuve.
+Le commit applicatif `3352a1220f01fb1ae2ddb101730910529f1cd5ee` puis les compléments documentaires et de preuves sont poussés sur la même branche. La [PR nº1](https://github.com/ScioNos/Scionos-Capture/pull/1) est ouverte vers main, sans fusion. Les trois fichiers non suivis préexistants hors périmètre restent préservés.
 
-Opérations réalisées : commit `3352a1220f01fb1ae2ddb101730910529f1cd5ee` créé puis poussé sur `origin/consolidation/1.5.3`, SHA distant vérifié. Premier essai Git refusé403 avec le compte actif comeback01 ; push réussi avec le compte ScioNos déjà authentifié, sans changement global d’identité. [PR nº1](https://github.com/ScioNos/Scionos-Capture/pull/1) ouverte vers main. [Workflow45817507247](https://github.com/ScioNos/Scionos-Capture/actions/runs/45817507247) terminé sur ce SHA : filtre documentaire, Chromium E2E/accessibilité Linux et Windows scaling réussis ; Core22.22.0 échoué sur un lien vers une preuve dist ignorée, Core24.8.0 annulé fail-fast. Le suivi `pwsh-56da22fa829d47b7` a été recueilli. Correction :31preuves liées (1764004octets) préservées sous qualification/1.5.3, inventaire SHA-256, liens rapports corrigés ; verify:core0/178tests sans changement des validateurs. Commit complémentaire et sa CI restent à recueillir. Aucun merge/tag/release/Store.
+Premier run45817507247 : filtre,Chromium Linux et Windows scaling réussis ; Core22 échoué sur un lien vers une preuve dist ignorée, Core24 annulé fail-fast. Correction par versionnement des31preuves liées sous qualification/1.5.3 avec inventaireSHA256 et conservation des octets bruts via .gitattributes. Aucun test ou validateur affaibli.
 
-Reprise : tous les autres jobs de cette session ont été recueillis. Sources applicatives finales inchangées depuis qualification178unit/179E2E. Dernier ZIP175572octets/SHAf17b2c50… vérifié après documentation. Restant : collecter CI de3352a12, corriger échecs éventuels, actualiser rapport/README/notes et PR avec SHA/results exacts, commitdocs+push et vérifier CI dernierSHA ; vérifier archive sources identiques, publier livrables locaux via present, lire goal puis complete uniquement si objectif entièrement atteint.
+[Run45818859271](https://github.com/ScioNos/Scionos-Capture/actions/runs/45818859271) : **succès des cinq jobs sur81f7849c5afb66c02a9172b33fc47532bd3d49e8** : filtre,Core22.22.0,Core24.8.0,E2E/accessibilitéChromiumLinux,Windowsscaling. Les modifications applicatives et les fichiers de distribution sont identiques à la qualification locale178unit/179E2E. Le complément documentaire relatant ces résultats doit aussi conserver des contrôles verts sur la tête effective de la PR ; le résultat courant y est consultable sans inventer de SHA auto-référent dans le contenu du commit.
 
-Chrome/Edge106 ne sont pas exécutés ; compatibilité statique documentée et fallbacks préservés. Focus physique du bureau et dialogue d’impression humain non couverts par headless. Toute publication et toute fusion restent hors action autorisée.
+Les preuves locales sont collectées, le ZIP définitif175572octets et son SHA complet figurent ci-dessus. Aucun blocage applicatif restant identifié après qualification ; fusion et publication techniquement préparées sous réserve des contrôles de la tête effective et d’une validation humaine explicite de la fusion. Aucune fusion, aucun tag, aucune release GitHub ni Store.
+
+Chrome/Edge106 ne sont pas exécutés ; compatibilité statique documentée et fallbacks préservés. Focus physique du bureau et dialogue d’impression humain non couverts par headless.
+
