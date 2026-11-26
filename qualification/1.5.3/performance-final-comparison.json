@@ -1,0 +1,4805 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-11-26T09:36:26.444Z",
+  "configuration": {
+    "repeats": 3,
+    "images": [
+      1,
+      4
+    ],
+    "imageDimensions": [
+      1024,
+      1024
+    ],
+    "domRows": [
+      2000,
+      10000
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "heapSamplingIntervalMs": 25,
+    "fixture": "Deterministic synthetic RGBA gradients; no user page or document data.",
+    "limitations": [
+      "No forced GC; heap samples are observational and include instrumentation.",
+      "Counters count API calls and requested encoded pixels, not live canvas memory.",
+      "Timing includes Playwright/CDP overhead; no warmup or performance pass/fail thresholds.",
+      "Each root runs in a fresh temporary browser profile; baseline diagnostics may be unavailable."
+    ]
+  },
+  "runs": [
+    {
+      "label": "baseline",
+      "source": {
+        "root": "D:/Serveurs/Projet_ScioNos/Scionos-Capture/dist/consolidation-1.5.3/baseline",
+        "files": {
+          "manifest.json": "c5fd17ee274ee5000cf35e2833bb85c5df428e072fdee7618d549ad48a7f5e28",
+          "editor.js": "f5e36ccefd0350099ed17631e8e584cfcc683aed753d2912f67771a9e135392a",
+          "composition-export.js": "a86a00b18d7748e8f4fd4de97f5f4d5c8b03c452e497780e7668632cb783eb86",
+          "content-dom.js": "14e3b3f192a74c79fd6f6b95ce66ebf1cc6c60fe910b232cf68cddbd32ef1565",
+          "capture-utils.js": "c85f998f2f32bde194dd40b2321fc4424ab7449bb3b81731f093ccfed456a436"
+        }
+      },
+      "iterations": [
+        {
+          "index": 0,
+          "editor": [
+            {
+              "images": 1,
+              "imported": {
+                "durationMs": 208.74459999999988,
+                "counters": {
+                  "bitmapDecodeCalls": 1,
+                  "canvasCreated": 2,
+                  "drawImageCalls": 3,
+                  "computedStyleCalls": 1
+                },
+                "diagnostics": [],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 2511972,
+                    "allocatedBytes": 4788224
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 13472088,
+                    "allocatedBytes": 23535616
+                  },
+                  "samples": 4,
+                  "maxObservedUsedBytes": 23568048
+                },
+                "result": {
+                  "items": 1,
+                  "inputBytes": 862233,
+                  "width": 1024,
+                  "height": 1024
+                }
+              },
+              "exported": {
+                "durationMs": 406.76,
+                "counters": {
+                  "canvasCreated": 3,
+                  "drawImageCalls": 3,
+                  "canvasEncodeCalls": 1,
+                  "encodedPixelsRequested": 1048576,
+                  "canvasEncodeCompleted": 1,
+                  "encodedBytes": 55856
+                },
+                "diagnostics": [
+                  {
+                    "stage": "export-start",
+                    "at": 1795685787423,
+                    "format": "html"
+                  },
+                  {
+                    "stage": "freeze-start",
+                    "at": 1795685787437,
+                    "mode": "export",
+                    "items": 1
+                  },
+                  {
+                    "stage": "freeze-end",
+                    "at": 1795685787438,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685787438,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685787448,
+                    "bytes": 55856
+                  },
+                  {
+                    "stage": "snapshot-ready",
+                    "at": 1795685787448,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "prepare-start",
+                    "at": 1795685787449,
+                    "items": 1
+                  },
+                  {
+                    "stage": "prepare-end",
+                    "at": 1795685787487
+                  },
+                  {
+                    "stage": "dialog-close",
+                    "at": 1795685787489,
+                    "format": "html"
+                  }
+                ],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 13492540,
+                    "allocatedBytes": 23535616
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 15506876,
+                    "allocatedBytes": 31924224
+                  },
+                  "samples": 12,
+                  "maxObservedUsedBytes": 15506876
+                },
+                "result": {
+                  "format": "html",
+                  "outputBytes": 75397
+                }
+              }
+            },
+            {
+              "images": 4,
+              "imported": {
+                "durationMs": 308.1095,
+                "counters": {
+                  "bitmapDecodeCalls": 4,
+                  "canvasCreated": 8,
+                  "drawImageCalls": 9,
+                  "computedStyleCalls": 1
+                },
+                "diagnostics": [],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 17109936,
+                    "allocatedBytes": 36163584
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 9074228,
+                    "allocatedBytes": 11415552
+                  },
+                  "samples": 5,
+                  "maxObservedUsedBytes": 34985232
+                },
+                "result": {
+                  "items": 4,
+                  "inputBytes": 3451877,
+                  "width": 1024,
+                  "height": 1024
+                }
+              },
+              "exported": {
+                "durationMs": 339.08420000000024,
+                "counters": {
+                  "canvasCreated": 6,
+                  "drawImageCalls": 6,
+                  "canvasEncodeCalls": 4,
+                  "encodedPixelsRequested": 4194304,
+                  "canvasEncodeCompleted": 4,
+                  "encodedBytes": 225374
+                },
+                "diagnostics": [
+                  {
+                    "stage": "export-start",
+                    "at": 1795685788038,
+                    "format": "html"
+                  },
+                  {
+                    "stage": "freeze-start",
+                    "at": 1795685788040,
+                    "mode": "export",
+                    "items": 4
+                  },
+                  {
+                    "stage": "freeze-end",
+                    "at": 1795685788041,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685788041,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685788061,
+                    "bytes": 55856
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685788061,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685788106,
+                    "bytes": 56608
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685788106,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685788111,
+                    "bytes": 56572
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685788112,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685788119,
+                    "bytes": 56338
+                  },
+                  {
+                    "stage": "snapshot-ready",
+                    "at": 1795685788119,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "prepare-start",
+                    "at": 1795685788119,
+                    "items": 4
+                  },
+                  {
+                    "stage": "prepare-end",
+                    "at": 1795685788284
+                  },
+                  {
+                    "stage": "dialog-close",
+                    "at": 1795685788287,
+                    "format": "html"
+                  }
+                ],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 9092020,
+                    "allocatedBytes": 11415552
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 10657076,
+                    "allocatedBytes": 14340096
+                  },
+                  "samples": 10,
+                  "maxObservedUsedBytes": 11292024
+                },
+                "result": {
+                  "format": "html",
+                  "outputBytes": 301717
+                }
+              }
+            }
+          ],
+          "dom": [
+            {
+              "syntheticRows": 2000,
+              "domElements": 2003,
+              "positions": [
+                {
+                  "scrollFraction": 0,
+                  "extracted": {
+                    "durationMs": 56.27029999999968,
+                    "counters": {
+                      "elementRectCalls": 2005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 2093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 2003,
+                        "blocks": 123,
+                        "durationMs": 55
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2654196,
+                        "allocatedBytes": 3661824
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2318100,
+                        "allocatedBytes": 6623232
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 2654196
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 3.1094999999995707,
+                    "counters": {
+                      "elementRectCalls": 2004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 2003,
+                        "blocks": 0,
+                        "durationMs": 2
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2337924,
+                        "allocatedBytes": 6623232
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2455692,
+                        "allocatedBytes": 6623232
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 2455692
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 0.5,
+                  "extracted": {
+                    "durationMs": 38.73210000000017,
+                    "counters": {
+                      "elementRectCalls": 2005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 2093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 2003,
+                        "blocks": 123,
+                        "durationMs": 38
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2533440,
+                        "allocatedBytes": 6623232
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3611436,
+                        "allocatedBytes": 7933952
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 3611436
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 2.8254000000001724,
+                    "counters": {
+                      "elementRectCalls": 2004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 2003,
+                        "blocks": 0,
+                        "durationMs": 2
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3629244,
+                        "allocatedBytes": 7933952
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3727448,
+                        "allocatedBytes": 7933952
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 3727448
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 1,
+                  "extracted": {
+                    "durationMs": 25.34940000000006,
+                    "counters": {
+                      "elementRectCalls": 2005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 2093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 2003,
+                        "blocks": 123,
+                        "durationMs": 24
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3751608,
+                        "allocatedBytes": 7933952
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2625752,
+                        "allocatedBytes": 8196096
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 3751608
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 2.4944000000000415,
+                    "counters": {
+                      "elementRectCalls": 2004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 2003,
+                        "blocks": 0,
+                        "durationMs": 2
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2643636,
+                        "allocatedBytes": 8196096
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2739592,
+                        "allocatedBytes": 8196096
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 2739592
+                    },
+                    "result": {
+                      "bottomPatchCount": 1
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "syntheticRows": 10000,
+              "domElements": 10003,
+              "positions": [
+                {
+                  "scrollFraction": 0,
+                  "extracted": {
+                    "durationMs": 286.04119999999966,
+                    "counters": {
+                      "elementRectCalls": 10005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 10093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 10003,
+                        "blocks": 123,
+                        "durationMs": 284
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2656600,
+                        "allocatedBytes": 4710400
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4037400,
+                        "allocatedBytes": 8515584
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 4037400
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 11.637500000000273,
+                    "counters": {
+                      "elementRectCalls": 10004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 10003,
+                        "blocks": 0,
+                        "durationMs": 10
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4057224,
+                        "allocatedBytes": 8515584
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4462752,
+                        "allocatedBytes": 8515584
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 4462752
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 0.5,
+                  "extracted": {
+                    "durationMs": 208.05169999999998,
+                    "counters": {
+                      "elementRectCalls": 10005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 10093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 10003,
+                        "blocks": 123,
+                        "durationMs": 206
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4515684,
+                        "allocatedBytes": 8515584
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4678816,
+                        "allocatedBytes": 9515008
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 4678816
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 9.351599999999962,
+                    "counters": {
+                      "elementRectCalls": 10004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 10003,
+                        "blocks": 0,
+                        "durationMs": 8
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2935460,
+                        "allocatedBytes": 9515008
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3321872,
+                        "allocatedBytes": 9515008
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 3321872
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 1,
+                  "extracted": {
+                    "durationMs": 108.70049999999992,
+                    "counters": {
+                      "elementRectCalls": 10005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 10093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 10003,
+                        "blocks": 123,
+                        "durationMs": 108
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3380084,
+                        "allocatedBytes": 9515008
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 6292340,
+                        "allocatedBytes": 13979648
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 6292340
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 8.44150000000036,
+                    "counters": {
+                      "elementRectCalls": 10004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 10003,
+                        "blocks": 0,
+                        "durationMs": 7
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 6310148,
+                        "allocatedBytes": 13979648
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 6678848,
+                        "allocatedBytes": 13979648
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 6678848
+                    },
+                    "result": {
+                      "bottomPatchCount": 1
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "editor": [
+            {
+              "images": 1,
+              "imported": {
+                "durationMs": 78.55189999999993,
+                "counters": {
+                  "bitmapDecodeCalls": 1,
+                  "canvasCreated": 2,
+                  "drawImageCalls": 3,
+                  "computedStyleCalls": 1
+                },
+                "diagnostics": [],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 12431784,
+                    "allocatedBytes": 15458304
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 19160260,
+                    "allocatedBytes": 28270592
+                  },
+                  "samples": 4,
+                  "maxObservedUsedBytes": 30270016
+                },
+                "result": {
+                  "items": 1,
+                  "inputBytes": 862233,
+                  "width": 1024,
+                  "height": 1024
+                }
+              },
+              "exported": {
+                "durationMs": 160.12400000000025,
+                "counters": {
+                  "canvasCreated": 3,
+                  "drawImageCalls": 3,
+                  "canvasEncodeCalls": 1,
+                  "encodedPixelsRequested": 1048576,
+                  "canvasEncodeCompleted": 1,
+                  "encodedBytes": 55856
+                },
+                "diagnostics": [
+                  {
+                    "stage": "export-start",
+                    "at": 1795685789757,
+                    "format": "html"
+                  },
+                  {
+                    "stage": "freeze-start",
+                    "at": 1795685789760,
+                    "mode": "export",
+                    "items": 1
+                  },
+                  {
+                    "stage": "freeze-end",
+                    "at": 1795685789760,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685789760,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685789772,
+                    "bytes": 55856
+                  },
+                  {
+                    "stage": "snapshot-ready",
+                    "at": 1795685789772,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "prepare-start",
+                    "at": 1795685789772,
+                    "items": 1
+                  },
+                  {
+                    "stage": "prepare-end",
+                    "at": 1795685789810
+                  },
+                  {
+                    "stage": "dialog-close",
+                    "at": 1795685789811,
+                    "format": "html"
+                  }
+                ],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 19177368,
+                    "allocatedBytes": 28270592
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 20747168,
+                    "allocatedBytes": 36233216
+                  },
+                  "samples": 6,
+                  "maxObservedUsedBytes": 20747168
+                },
+                "result": {
+                  "format": "html",
+                  "outputBytes": 75397
+                }
+              }
+            },
+            {
+              "images": 4,
+              "imported": {
+                "durationMs": 324.98059999999987,
+                "counters": {
+                  "bitmapDecodeCalls": 4,
+                  "canvasCreated": 8,
+                  "drawImageCalls": 9,
+                  "computedStyleCalls": 1
+                },
+                "diagnostics": [],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 22499696,
+                    "allocatedBytes": 37707776
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 8425616,
+                    "allocatedBytes": 10891264
+                  },
+                  "samples": 5,
+                  "maxObservedUsedBytes": 37102832
+                },
+                "result": {
+                  "items": 4,
+                  "inputBytes": 3451877,
+                  "width": 1024,
+                  "height": 1024
+                }
+              },
+              "exported": {
+                "durationMs": 340.4454999999998,
+                "counters": {
+                  "canvasCreated": 6,
+                  "drawImageCalls": 6,
+                  "canvasEncodeCalls": 4,
+                  "encodedPixelsRequested": 4194304,
+                  "canvasEncodeCompleted": 4,
+                  "encodedBytes": 225374
+                },
+                "diagnostics": [
+                  {
+                    "stage": "export-start",
+                    "at": 1795685790324,
+                    "format": "html"
+                  },
+                  {
+                    "stage": "freeze-start",
+                    "at": 1795685790328,
+                    "mode": "export",
+                    "items": 4
+                  },
+                  {
+                    "stage": "freeze-end",
+                    "at": 1795685790329,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685790329,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685790349,
+                    "bytes": 55856
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685790349,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685790408,
+                    "bytes": 56608
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685790409,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685790416,
+                    "bytes": 56572
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685790416,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685790426,
+                    "bytes": 56338
+                  },
+                  {
+                    "stage": "snapshot-ready",
+                    "at": 1795685790426,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "prepare-start",
+                    "at": 1795685790427,
+                    "items": 4
+                  },
+                  {
+                    "stage": "prepare-end",
+                    "at": 1795685790581
+                  },
+                  {
+                    "stage": "dialog-close",
+                    "at": 1795685790584,
+                    "format": "html"
+                  }
+                ],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 8443380,
+                    "allocatedBytes": 10891264
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 9925144,
+                    "allocatedBytes": 13553664
+                  },
+                  "samples": 10,
+                  "maxObservedUsedBytes": 10636700
+                },
+                "result": {
+                  "format": "html",
+                  "outputBytes": 301717
+                }
+              }
+            }
+          ],
+          "dom": [
+            {
+              "syntheticRows": 2000,
+              "domElements": 2003,
+              "positions": [
+                {
+                  "scrollFraction": 0,
+                  "extracted": {
+                    "durationMs": 58.13919999999962,
+                    "counters": {
+                      "elementRectCalls": 2005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 2093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 2003,
+                        "blocks": 123,
+                        "durationMs": 57
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2654208,
+                        "allocatedBytes": 3661824
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2318392,
+                        "allocatedBytes": 6623232
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 2654208
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 4.967999999999847,
+                    "counters": {
+                      "elementRectCalls": 2004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 2003,
+                        "blocks": 0,
+                        "durationMs": 3
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2338216,
+                        "allocatedBytes": 6623232
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2455972,
+                        "allocatedBytes": 6623232
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 2455972
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 0.5,
+                  "extracted": {
+                    "durationMs": 40.19130000000041,
+                    "counters": {
+                      "elementRectCalls": 2005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 2093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 2003,
+                        "blocks": 123,
+                        "durationMs": 39
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2533732,
+                        "allocatedBytes": 6623232
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3611056,
+                        "allocatedBytes": 7933952
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 3611056
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 3.5023000000001048,
+                    "counters": {
+                      "elementRectCalls": 2004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 2003,
+                        "blocks": 0,
+                        "durationMs": 2
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3628864,
+                        "allocatedBytes": 7933952
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3726844,
+                        "allocatedBytes": 7933952
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 3726844
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 1,
+                  "extracted": {
+                    "durationMs": 25.096600000000763,
+                    "counters": {
+                      "elementRectCalls": 2005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 2093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 2003,
+                        "blocks": 123,
+                        "durationMs": 24
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3751004,
+                        "allocatedBytes": 7933952
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2592788,
+                        "allocatedBytes": 7933952
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 3751004
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 2.41609999999946,
+                    "counters": {
+                      "elementRectCalls": 2004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 2003,
+                        "blocks": 0,
+                        "durationMs": 2
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2610672,
+                        "allocatedBytes": 7933952
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2706508,
+                        "allocatedBytes": 7933952
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 2706508
+                    },
+                    "result": {
+                      "bottomPatchCount": 1
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "syntheticRows": 10000,
+              "domElements": 10003,
+              "positions": [
+                {
+                  "scrollFraction": 0,
+                  "extracted": {
+                    "durationMs": 344.4454999999998,
+                    "counters": {
+                      "elementRectCalls": 10005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 10093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 10003,
+                        "blocks": 123,
+                        "durationMs": 343
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2505676,
+                        "allocatedBytes": 4448256
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4034980,
+                        "allocatedBytes": 8728576
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 4034980
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 9.945600000000013,
+                    "counters": {
+                      "elementRectCalls": 10004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 10003,
+                        "blocks": 0,
+                        "durationMs": 8
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4054908,
+                        "allocatedBytes": 8728576
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4460516,
+                        "allocatedBytes": 8990720
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 4460516
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 0.5,
+                  "extracted": {
+                    "durationMs": 177.96569999999974,
+                    "counters": {
+                      "elementRectCalls": 10005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 10093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 10003,
+                        "blocks": 123,
+                        "durationMs": 177
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4513944,
+                        "allocatedBytes": 8990720
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 5862072,
+                        "allocatedBytes": 13455360
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 5862072
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 9.561599999999999,
+                    "counters": {
+                      "elementRectCalls": 10004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 10003,
+                        "blocks": 0,
+                        "durationMs": 9
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 5879880,
+                        "allocatedBytes": 13455360
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 6266008,
+                        "allocatedBytes": 13455360
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 6266008
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 1,
+                  "extracted": {
+                    "durationMs": 111.9421999999995,
+                    "counters": {
+                      "elementRectCalls": 10005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 10093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 10003,
+                        "blocks": 123,
+                        "durationMs": 111
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 6323532,
+                        "allocatedBytes": 13455360
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 7084968,
+                        "allocatedBytes": 13725696
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 7084968
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 8.741100000000188,
+                    "counters": {
+                      "elementRectCalls": 10004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 10003,
+                        "blocks": 0,
+                        "durationMs": 8
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 7102776,
+                        "allocatedBytes": 13725696
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 7471472,
+                        "allocatedBytes": 13725696
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 7471472
+                    },
+                    "result": {
+                      "bottomPatchCount": 1
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "editor": [
+            {
+              "images": 1,
+              "imported": {
+                "durationMs": 75.49279999999999,
+                "counters": {
+                  "bitmapDecodeCalls": 1,
+                  "canvasCreated": 2,
+                  "drawImageCalls": 3,
+                  "computedStyleCalls": 1
+                },
+                "diagnostics": [],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 11700436,
+                    "allocatedBytes": 14934016
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 18428980,
+                    "allocatedBytes": 27484160
+                  },
+                  "samples": 4,
+                  "maxObservedUsedBytes": 29538788
+                },
+                "result": {
+                  "items": 1,
+                  "inputBytes": 862233,
+                  "width": 1024,
+                  "height": 1024
+                }
+              },
+              "exported": {
+                "durationMs": 125.45170000000053,
+                "counters": {
+                  "canvasCreated": 3,
+                  "drawImageCalls": 3,
+                  "canvasEncodeCalls": 1,
+                  "encodedPixelsRequested": 1048576,
+                  "canvasEncodeCompleted": 1,
+                  "encodedBytes": 55856
+                },
+                "diagnostics": [
+                  {
+                    "stage": "export-start",
+                    "at": 1795685792038,
+                    "format": "html"
+                  },
+                  {
+                    "stage": "freeze-start",
+                    "at": 1795685792043,
+                    "mode": "export",
+                    "items": 1
+                  },
+                  {
+                    "stage": "freeze-end",
+                    "at": 1795685792043,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685792043,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685792055,
+                    "bytes": 55856
+                  },
+                  {
+                    "stage": "snapshot-ready",
+                    "at": 1795685792055,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "prepare-start",
+                    "at": 1795685792055,
+                    "items": 1
+                  },
+                  {
+                    "stage": "prepare-end",
+                    "at": 1795685792091
+                  },
+                  {
+                    "stage": "dialog-close",
+                    "at": 1795685792092,
+                    "format": "html"
+                  }
+                ],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 18446072,
+                    "allocatedBytes": 27484160
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 20017980,
+                    "allocatedBytes": 35446784
+                  },
+                  "samples": 5,
+                  "maxObservedUsedBytes": 20017980
+                },
+                "result": {
+                  "format": "html",
+                  "outputBytes": 75397
+                }
+              }
+            },
+            {
+              "images": 4,
+              "imported": {
+                "durationMs": 325.09869999999955,
+                "counters": {
+                  "bitmapDecodeCalls": 4,
+                  "canvasCreated": 8,
+                  "drawImageCalls": 9,
+                  "computedStyleCalls": 1
+                },
+                "diagnostics": [],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 21769028,
+                    "allocatedBytes": 36659200
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 37923296,
+                    "allocatedBytes": 59953152
+                  },
+                  "samples": 5,
+                  "maxObservedUsedBytes": 37923296
+                },
+                "result": {
+                  "items": 4,
+                  "inputBytes": 3451877,
+                  "width": 1024,
+                  "height": 1024
+                }
+              },
+              "exported": {
+                "durationMs": 343.6858000000002,
+                "counters": {
+                  "canvasCreated": 6,
+                  "drawImageCalls": 6,
+                  "canvasEncodeCalls": 4,
+                  "encodedPixelsRequested": 4194304,
+                  "canvasEncodeCompleted": 4,
+                  "encodedBytes": 225374
+                },
+                "diagnostics": [
+                  {
+                    "stage": "export-start",
+                    "at": 1795685792571,
+                    "format": "html"
+                  },
+                  {
+                    "stage": "freeze-start",
+                    "at": 1795685792575,
+                    "mode": "export",
+                    "items": 4
+                  },
+                  {
+                    "stage": "freeze-end",
+                    "at": 1795685792576,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685792576,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685792589,
+                    "bytes": 55856
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685792589,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685792640,
+                    "bytes": 56608
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685792640,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685792654,
+                    "bytes": 56572
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685792654,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685792666,
+                    "bytes": 56338
+                  },
+                  {
+                    "stage": "snapshot-ready",
+                    "at": 1795685792666,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "prepare-start",
+                    "at": 1795685792666,
+                    "items": 4
+                  },
+                  {
+                    "stage": "prepare-end",
+                    "at": 1795685792823
+                  },
+                  {
+                    "stage": "dialog-close",
+                    "at": 1795685792825,
+                    "format": "html"
+                  }
+                ],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 9231208,
+                    "allocatedBytes": 10891264
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 11222116,
+                    "allocatedBytes": 14340096
+                  },
+                  "samples": 12,
+                  "maxObservedUsedBytes": 11222116
+                },
+                "result": {
+                  "format": "html",
+                  "outputBytes": 301717
+                }
+              }
+            }
+          ],
+          "dom": [
+            {
+              "syntheticRows": 2000,
+              "domElements": 2003,
+              "positions": [
+                {
+                  "scrollFraction": 0,
+                  "extracted": {
+                    "durationMs": 53.35270000000037,
+                    "counters": {
+                      "elementRectCalls": 2005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 2093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 2003,
+                        "blocks": 123,
+                        "durationMs": 52
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2654208,
+                        "allocatedBytes": 3661824
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2285364,
+                        "allocatedBytes": 6623232
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 2654208
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 2.998000000000502,
+                    "counters": {
+                      "elementRectCalls": 2004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 2003,
+                        "blocks": 0,
+                        "durationMs": 3
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2305188,
+                        "allocatedBytes": 6623232
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2422808,
+                        "allocatedBytes": 6623232
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 2422808
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 0.5,
+                  "extracted": {
+                    "durationMs": 37.100000000000364,
+                    "counters": {
+                      "elementRectCalls": 2005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 2093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 2003,
+                        "blocks": 123,
+                        "durationMs": 36
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2500512,
+                        "allocatedBytes": 6623232
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3579248,
+                        "allocatedBytes": 7933952
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 3579248
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 2.464999999999236,
+                    "counters": {
+                      "elementRectCalls": 2004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 2003,
+                        "blocks": 0,
+                        "durationMs": 2
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3597056,
+                        "allocatedBytes": 7933952
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3695152,
+                        "allocatedBytes": 7933952
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 3695152
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 1,
+                  "extracted": {
+                    "durationMs": 25.14469999999983,
+                    "counters": {
+                      "elementRectCalls": 2005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 2093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 2003,
+                        "blocks": 123,
+                        "durationMs": 24
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3719312,
+                        "allocatedBytes": 7933952
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2593028,
+                        "allocatedBytes": 8196096
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 3719312
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 2.3810999999996056,
+                    "counters": {
+                      "elementRectCalls": 2004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 2003,
+                        "blocks": 0,
+                        "durationMs": 2
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2610912,
+                        "allocatedBytes": 8196096
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2706868,
+                        "allocatedBytes": 8196096
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 2706868
+                    },
+                    "result": {
+                      "bottomPatchCount": 1
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "syntheticRows": 10000,
+              "domElements": 10003,
+              "positions": [
+                {
+                  "scrollFraction": 0,
+                  "extracted": {
+                    "durationMs": 267.7007000000003,
+                    "counters": {
+                      "elementRectCalls": 10005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 10093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 10003,
+                        "blocks": 123,
+                        "durationMs": 266
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2518172,
+                        "allocatedBytes": 4710400
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4180032,
+                        "allocatedBytes": 8515584
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 4180032
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 9.126400000000103,
+                    "counters": {
+                      "elementRectCalls": 10004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 10003,
+                        "blocks": 0,
+                        "durationMs": 8
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4199856,
+                        "allocatedBytes": 8515584
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4605324,
+                        "allocatedBytes": 8515584
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 4605324
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 0.5,
+                  "extracted": {
+                    "durationMs": 197.3137999999999,
+                    "counters": {
+                      "elementRectCalls": 10005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 10093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 10003,
+                        "blocks": 123,
+                        "durationMs": 196
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4658268,
+                        "allocatedBytes": 8515584
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4663828,
+                        "allocatedBytes": 9515008
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 4663828
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 8.503999999999905,
+                    "counters": {
+                      "elementRectCalls": 10004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 10003,
+                        "blocks": 0,
+                        "durationMs": 7
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2927516,
+                        "allocatedBytes": 9515008
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3313924,
+                        "allocatedBytes": 9515008
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 3313924
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 1,
+                  "extracted": {
+                    "durationMs": 106.58740000000034,
+                    "counters": {
+                      "elementRectCalls": 10005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 10093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 10003,
+                        "blocks": 123,
+                        "durationMs": 106
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3372136,
+                        "allocatedBytes": 9515008
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 6315348,
+                        "allocatedBytes": 13979648
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 6315348
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 8.319400000000314,
+                    "counters": {
+                      "elementRectCalls": 10004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 10003,
+                        "blocks": 0,
+                        "durationMs": 8
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 6333156,
+                        "allocatedBytes": 13979648
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 6701852,
+                        "allocatedBytes": 13979648
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 6701852
+                    },
+                    "result": {
+                      "bottomPatchCount": 1
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "browserVersion": "159.0.8154.6",
+      "summary": [
+        {
+          "images": 1,
+          "importMedianMs": 78.55189999999993,
+          "htmlExportMedianMs": 160.12400000000025,
+          "htmlEncodeCalls": [
+            1,
+            1,
+            1
+          ],
+          "htmlCanvasCreated": [
+            3,
+            3,
+            3
+          ],
+          "htmlHeapMaxObservedUsedBytes": [
+            15506876,
+            20747168,
+            20017980
+          ]
+        },
+        {
+          "images": 4,
+          "importMedianMs": 324.98059999999987,
+          "htmlExportMedianMs": 340.4454999999998,
+          "htmlEncodeCalls": [
+            4,
+            4,
+            4
+          ],
+          "htmlCanvasCreated": [
+            6,
+            6,
+            6
+          ],
+          "htmlHeapMaxObservedUsedBytes": [
+            11292024,
+            10636700,
+            11222116
+          ]
+        }
+      ]
+    },
+    {
+      "label": "current",
+      "source": {
+        "root": "D:\\Serveurs\\Projet_ScioNos\\Scionos-Capture",
+        "files": {
+          "manifest.json": "1eb778a299e212649db462a36acf55c0255a03310bcece7ddf6c4d417f3f7984",
+          "editor.js": "c43dfe8e8fd5a1643828a900b2b5ed33d427c9c41abfd6a9029d857149c62b19",
+          "composition-export.js": "a86a00b18d7748e8f4fd4de97f5f4d5c8b03c452e497780e7668632cb783eb86",
+          "content-dom.js": "6f656b8a9a20a230a3bd0f986cb4cf3aae6ac912e50f421469838290963d4d1a",
+          "capture-utils.js": "c85f998f2f32bde194dd40b2321fc4424ab7449bb3b81731f093ccfed456a436"
+        }
+      },
+      "iterations": [
+        {
+          "index": 0,
+          "editor": [
+            {
+              "images": 1,
+              "imported": {
+                "durationMs": 290.1461999999992,
+                "counters": {
+                  "bitmapDecodeCalls": 1,
+                  "canvasCreated": 2,
+                  "drawImageCalls": 3,
+                  "computedStyleCalls": 1
+                },
+                "diagnostics": [],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 2514868,
+                    "allocatedBytes": 4263936
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 13474816,
+                    "allocatedBytes": 23011328
+                  },
+                  "samples": 3,
+                  "maxObservedUsedBytes": 23570948
+                },
+                "result": {
+                  "items": 1,
+                  "inputBytes": 862233,
+                  "width": 1024,
+                  "height": 1024
+                }
+              },
+              "exported": {
+                "durationMs": 230.5056999999997,
+                "counters": {
+                  "canvasCreated": 3,
+                  "drawImageCalls": 3,
+                  "canvasEncodeCalls": 1,
+                  "encodedPixelsRequested": 1048576,
+                  "canvasEncodeCompleted": 1,
+                  "encodedBytes": 55856
+                },
+                "diagnostics": [
+                  {
+                    "stage": "export-start",
+                    "at": 1795685795157,
+                    "format": "html"
+                  },
+                  {
+                    "stage": "freeze-start",
+                    "at": 1795685795180,
+                    "mode": "export",
+                    "items": 1
+                  },
+                  {
+                    "stage": "freeze-end",
+                    "at": 1795685795180,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685795180,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685795190,
+                    "bytes": 55856
+                  },
+                  {
+                    "stage": "snapshot-ready",
+                    "at": 1795685795190,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "prepare-start",
+                    "at": 1795685795190,
+                    "items": 1
+                  },
+                  {
+                    "stage": "prepare-end",
+                    "at": 1795685795234
+                  },
+                  {
+                    "stage": "dialog-close",
+                    "at": 1795685795237,
+                    "format": "html"
+                  }
+                ],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 13495268,
+                    "allocatedBytes": 23011328
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 15511744,
+                    "allocatedBytes": 31399936
+                  },
+                  "samples": 8,
+                  "maxObservedUsedBytes": 15511744
+                },
+                "result": {
+                  "format": "html",
+                  "outputBytes": 75397
+                }
+              }
+            },
+            {
+              "images": 4,
+              "imported": {
+                "durationMs": 287.6162000000004,
+                "counters": {
+                  "bitmapDecodeCalls": 4,
+                  "canvasCreated": 8,
+                  "drawImageCalls": 9,
+                  "computedStyleCalls": 1
+                },
+                "diagnostics": [],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 17114924,
+                    "allocatedBytes": 36687872
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 9078228,
+                    "allocatedBytes": 11415552
+                  },
+                  "samples": 5,
+                  "maxObservedUsedBytes": 34989160
+                },
+                "result": {
+                  "items": 4,
+                  "inputBytes": 3451877,
+                  "width": 1024,
+                  "height": 1024
+                }
+              },
+              "exported": {
+                "durationMs": 391.95679999999993,
+                "counters": {
+                  "canvasCreated": 6,
+                  "drawImageCalls": 6,
+                  "canvasEncodeCalls": 4,
+                  "encodedPixelsRequested": 4194304,
+                  "canvasEncodeCompleted": 4,
+                  "encodedBytes": 225374
+                },
+                "diagnostics": [
+                  {
+                    "stage": "export-start",
+                    "at": 1795685795754,
+                    "format": "html"
+                  },
+                  {
+                    "stage": "freeze-start",
+                    "at": 1795685795756,
+                    "mode": "export",
+                    "items": 4
+                  },
+                  {
+                    "stage": "freeze-end",
+                    "at": 1795685795757,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685795757,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685795772,
+                    "bytes": 55856
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685795772,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685795835,
+                    "bytes": 56608
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685795835,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685795846,
+                    "bytes": 56572
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685795846,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685795870,
+                    "bytes": 56338
+                  },
+                  {
+                    "stage": "snapshot-ready",
+                    "at": 1795685795871,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "prepare-start",
+                    "at": 1795685795871,
+                    "items": 4
+                  },
+                  {
+                    "stage": "prepare-end",
+                    "at": 1795685796056
+                  },
+                  {
+                    "stage": "dialog-close",
+                    "at": 1795685796060,
+                    "format": "html"
+                  }
+                ],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 9096020,
+                    "allocatedBytes": 11415552
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 8873128,
+                    "allocatedBytes": 12767232
+                  },
+                  "samples": 11,
+                  "maxObservedUsedBytes": 10899060
+                },
+                "result": {
+                  "format": "html",
+                  "outputBytes": 301717
+                }
+              }
+            }
+          ],
+          "dom": [
+            {
+              "syntheticRows": 2000,
+              "domElements": 2003,
+              "positions": [
+                {
+                  "scrollFraction": 0,
+                  "extracted": {
+                    "durationMs": 120.37699999999859,
+                    "counters": {
+                      "elementRectCalls": 2005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 2093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 2003,
+                        "blocks": 123,
+                        "durationMs": 119
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2596876,
+                        "allocatedBytes": 3543040
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2335700,
+                        "allocatedBytes": 6885376
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 2596876
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 2.8024999999997817,
+                    "counters": {
+                      "elementRectCalls": 2004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 2003,
+                        "blocks": 0,
+                        "durationMs": 2
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2355524,
+                        "allocatedBytes": 6885376
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2473304,
+                        "allocatedBytes": 6885376
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 2473304
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 0.5,
+                  "extracted": {
+                    "durationMs": 45.036300000001575,
+                    "counters": {
+                      "elementRectCalls": 2005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 2093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 2003,
+                        "blocks": 123,
+                        "durationMs": 44
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2556324,
+                        "allocatedBytes": 6885376
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3709660,
+                        "allocatedBytes": 8196096
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 3709660
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 4.291699999999764,
+                    "counters": {
+                      "elementRectCalls": 2004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 2003,
+                        "blocks": 0,
+                        "durationMs": 3
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3727468,
+                        "allocatedBytes": 8196096
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3825564,
+                        "allocatedBytes": 8196096
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 3825564
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 1,
+                  "extracted": {
+                    "durationMs": 27.35410000000047,
+                    "counters": {
+                      "elementRectCalls": 2005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 2093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 2003,
+                        "blocks": 123,
+                        "durationMs": 27
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3849724,
+                        "allocatedBytes": 8196096
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2877104,
+                        "allocatedBytes": 8196096
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 3849724
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 3.0656999999991967,
+                    "counters": {
+                      "elementRectCalls": 2004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 2003,
+                        "blocks": 0,
+                        "durationMs": 2
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2894912,
+                        "allocatedBytes": 8196096
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2991084,
+                        "allocatedBytes": 8196096
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 2991084
+                    },
+                    "result": {
+                      "bottomPatchCount": 1
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "syntheticRows": 10000,
+              "domElements": 10003,
+              "positions": [
+                {
+                  "scrollFraction": 0,
+                  "extracted": {
+                    "durationMs": 281.9454999999998,
+                    "counters": {
+                      "elementRectCalls": 10005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 10093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 10003,
+                        "blocks": 123,
+                        "durationMs": 280
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2504320,
+                        "allocatedBytes": 4853760
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4040764,
+                        "allocatedBytes": 8523776
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 4040764
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 10.088900000000649,
+                    "counters": {
+                      "elementRectCalls": 10004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 10003,
+                        "blocks": 0,
+                        "durationMs": 8
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4060624,
+                        "allocatedBytes": 8523776
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4465988,
+                        "allocatedBytes": 8523776
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 4465988
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 0.5,
+                  "extracted": {
+                    "durationMs": 199.122800000001,
+                    "counters": {
+                      "elementRectCalls": 10005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 10093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 10003,
+                        "blocks": 123,
+                        "durationMs": 198
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4518932,
+                        "allocatedBytes": 8523776
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4864228,
+                        "allocatedBytes": 10039296
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 4864228
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 8.8054000000011,
+                    "counters": {
+                      "elementRectCalls": 10004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 10003,
+                        "blocks": 0,
+                        "durationMs": 8
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4882412,
+                        "allocatedBytes": 10039296
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 5269080,
+                        "allocatedBytes": 10301440
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 5269080
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 1,
+                  "extracted": {
+                    "durationMs": 113.4343000000008,
+                    "counters": {
+                      "elementRectCalls": 10005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 10093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 10003,
+                        "blocks": 123,
+                        "durationMs": 113
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 5327056,
+                        "allocatedBytes": 10563584
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 6325212,
+                        "allocatedBytes": 14503936
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 6325212
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 8.819499999999607,
+                    "counters": {
+                      "elementRectCalls": 10004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 10003,
+                        "blocks": 0,
+                        "durationMs": 7
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 6343020,
+                        "allocatedBytes": 14503936
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 6711736,
+                        "allocatedBytes": 14503936
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 6711736
+                    },
+                    "result": {
+                      "bottomPatchCount": 1
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "editor": [
+            {
+              "images": 1,
+              "imported": {
+                "durationMs": 74.1298999999999,
+                "counters": {
+                  "bitmapDecodeCalls": 1,
+                  "canvasCreated": 2,
+                  "drawImageCalls": 3,
+                  "computedStyleCalls": 1
+                },
+                "diagnostics": [],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 10641772,
+                    "allocatedBytes": 13099008
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 19587020,
+                    "allocatedBytes": 28655616
+                  },
+                  "samples": 3,
+                  "maxObservedUsedBytes": 29798208
+                },
+                "result": {
+                  "items": 1,
+                  "inputBytes": 862233,
+                  "width": 1024,
+                  "height": 1024
+                }
+              },
+              "exported": {
+                "durationMs": 148.54370000000017,
+                "counters": {
+                  "canvasCreated": 3,
+                  "drawImageCalls": 3,
+                  "canvasEncodeCalls": 1,
+                  "encodedPixelsRequested": 1048576,
+                  "canvasEncodeCompleted": 1,
+                  "encodedBytes": 55856
+                },
+                "diagnostics": [
+                  {
+                    "stage": "export-start",
+                    "at": 1795685797622,
+                    "format": "html"
+                  },
+                  {
+                    "stage": "freeze-start",
+                    "at": 1795685797625,
+                    "mode": "export",
+                    "items": 1
+                  },
+                  {
+                    "stage": "freeze-end",
+                    "at": 1795685797625,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685797625,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685797640,
+                    "bytes": 55856
+                  },
+                  {
+                    "stage": "snapshot-ready",
+                    "at": 1795685797640,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "prepare-start",
+                    "at": 1795685797640,
+                    "items": 1
+                  },
+                  {
+                    "stage": "prepare-end",
+                    "at": 1795685797678
+                  },
+                  {
+                    "stage": "dialog-close",
+                    "at": 1795685797679,
+                    "format": "html"
+                  }
+                ],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 19604128,
+                    "allocatedBytes": 28655616
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 21175008,
+                    "allocatedBytes": 36712448
+                  },
+                  "samples": 6,
+                  "maxObservedUsedBytes": 21175008
+                },
+                "result": {
+                  "format": "html",
+                  "outputBytes": 75397
+                }
+              }
+            },
+            {
+              "images": 4,
+              "imported": {
+                "durationMs": 294.83799999999974,
+                "counters": {
+                  "bitmapDecodeCalls": 4,
+                  "canvasCreated": 8,
+                  "drawImageCalls": 9,
+                  "computedStyleCalls": 1
+                },
+                "diagnostics": [],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 22930312,
+                    "allocatedBytes": 37568512
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 9204656,
+                    "allocatedBytes": 11415552
+                  },
+                  "samples": 5,
+                  "maxObservedUsedBytes": 40943780
+                },
+                "result": {
+                  "items": 4,
+                  "inputBytes": 3451877,
+                  "width": 1024,
+                  "height": 1024
+                }
+              },
+              "exported": {
+                "durationMs": 329.1293999999998,
+                "counters": {
+                  "canvasCreated": 6,
+                  "drawImageCalls": 6,
+                  "canvasEncodeCalls": 4,
+                  "encodedPixelsRequested": 4194304,
+                  "canvasEncodeCompleted": 4,
+                  "encodedBytes": 225374
+                },
+                "diagnostics": [
+                  {
+                    "stage": "export-start",
+                    "at": 1795685798138,
+                    "format": "html"
+                  },
+                  {
+                    "stage": "freeze-start",
+                    "at": 1795685798141,
+                    "mode": "export",
+                    "items": 4
+                  },
+                  {
+                    "stage": "freeze-end",
+                    "at": 1795685798142,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685798142,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685798161,
+                    "bytes": 55856
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685798161,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685798223,
+                    "bytes": 56608
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685798223,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685798230,
+                    "bytes": 56572
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685798230,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685798239,
+                    "bytes": 56338
+                  },
+                  {
+                    "stage": "snapshot-ready",
+                    "at": 1795685798239,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "prepare-start",
+                    "at": 1795685798239,
+                    "items": 4
+                  },
+                  {
+                    "stage": "prepare-end",
+                    "at": 1795685798386
+                  },
+                  {
+                    "stage": "dialog-close",
+                    "at": 1795685798389,
+                    "format": "html"
+                  }
+                ],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 9221816,
+                    "allocatedBytes": 11415552
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 9040024,
+                    "allocatedBytes": 11980800
+                  },
+                  "samples": 11,
+                  "maxObservedUsedBytes": 9339736
+                },
+                "result": {
+                  "format": "html",
+                  "outputBytes": 301717
+                }
+              }
+            }
+          ],
+          "dom": [
+            {
+              "syntheticRows": 2000,
+              "domElements": 2003,
+              "positions": [
+                {
+                  "scrollFraction": 0,
+                  "extracted": {
+                    "durationMs": 54.72600000000057,
+                    "counters": {
+                      "elementRectCalls": 2005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 2093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 2003,
+                        "blocks": 123,
+                        "durationMs": 53
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2596888,
+                        "allocatedBytes": 3543040
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2335820,
+                        "allocatedBytes": 6885376
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 2596888
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 2.992000000000189,
+                    "counters": {
+                      "elementRectCalls": 2004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 2003,
+                        "blocks": 0,
+                        "durationMs": 2
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2355644,
+                        "allocatedBytes": 6885376
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2473312,
+                        "allocatedBytes": 6885376
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 2473312
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 0.5,
+                  "extracted": {
+                    "durationMs": 46.16710000000057,
+                    "counters": {
+                      "elementRectCalls": 2005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 2093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 2003,
+                        "blocks": 123,
+                        "durationMs": 46
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2556420,
+                        "allocatedBytes": 6885376
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3737744,
+                        "allocatedBytes": 7933952
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 3737744
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 2.8365000000012515,
+                    "counters": {
+                      "elementRectCalls": 2004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 2003,
+                        "blocks": 0,
+                        "durationMs": 2
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3755552,
+                        "allocatedBytes": 7933952
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3853764,
+                        "allocatedBytes": 7933952
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 3853764
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 1,
+                  "extracted": {
+                    "durationMs": 27.995999999999185,
+                    "counters": {
+                      "elementRectCalls": 2005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 2093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 2003,
+                        "blocks": 123,
+                        "durationMs": 27
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3877924,
+                        "allocatedBytes": 7933952
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2902836,
+                        "allocatedBytes": 8196096
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 3877924
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 2.8214000000007218,
+                    "counters": {
+                      "elementRectCalls": 2004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 2003,
+                        "blocks": 0,
+                        "durationMs": 3
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2920644,
+                        "allocatedBytes": 8196096
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3016708,
+                        "allocatedBytes": 8196096
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 3016708
+                    },
+                    "result": {
+                      "bottomPatchCount": 1
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "syntheticRows": 10000,
+              "domElements": 10003,
+              "positions": [
+                {
+                  "scrollFraction": 0,
+                  "extracted": {
+                    "durationMs": 277.6952000000001,
+                    "counters": {
+                      "elementRectCalls": 10005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 10093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 10003,
+                        "blocks": 123,
+                        "durationMs": 276
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2526968,
+                        "allocatedBytes": 4853760
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4068732,
+                        "allocatedBytes": 8523776
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 4068732
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 9.85660000000098,
+                    "counters": {
+                      "elementRectCalls": 10004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 10003,
+                        "blocks": 0,
+                        "durationMs": 9
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4088556,
+                        "allocatedBytes": 8523776
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4494144,
+                        "allocatedBytes": 8523776
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 4494144
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 0.5,
+                  "extracted": {
+                    "durationMs": 206.22839999999997,
+                    "counters": {
+                      "elementRectCalls": 10005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 10093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 10003,
+                        "blocks": 123,
+                        "durationMs": 206
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4547088,
+                        "allocatedBytes": 8523776
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4885928,
+                        "allocatedBytes": 9515008
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 4885928
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 9.322400000000926,
+                    "counters": {
+                      "elementRectCalls": 10004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 10003,
+                        "blocks": 0,
+                        "durationMs": 9
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4904112,
+                        "allocatedBytes": 9515008
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 5290592,
+                        "allocatedBytes": 9777152
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 5290592
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 1,
+                  "extracted": {
+                    "durationMs": 115.09159999999974,
+                    "counters": {
+                      "elementRectCalls": 10005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 10093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 10003,
+                        "blocks": 123,
+                        "durationMs": 114
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 5348756,
+                        "allocatedBytes": 9777152
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 6327836,
+                        "allocatedBytes": 13717504
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 6327836
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 8.412000000000262,
+                    "counters": {
+                      "elementRectCalls": 10004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 10003,
+                        "blocks": 0,
+                        "durationMs": 7
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 6345644,
+                        "allocatedBytes": 13717504
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 6714348,
+                        "allocatedBytes": 13717504
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 6714348
+                    },
+                    "result": {
+                      "bottomPatchCount": 1
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "editor": [
+            {
+              "images": 1,
+              "imported": {
+                "durationMs": 85.23329999999987,
+                "counters": {
+                  "bitmapDecodeCalls": 1,
+                  "canvasCreated": 2,
+                  "drawImageCalls": 3,
+                  "computedStyleCalls": 1
+                },
+                "diagnostics": [],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 10808800,
+                    "allocatedBytes": 12836864
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 19749008,
+                    "allocatedBytes": 28655616
+                  },
+                  "samples": 3,
+                  "maxObservedUsedBytes": 29963772
+                },
+                "result": {
+                  "items": 1,
+                  "inputBytes": 862233,
+                  "width": 1024,
+                  "height": 1024
+                }
+              },
+              "exported": {
+                "durationMs": 170.33979999999974,
+                "counters": {
+                  "canvasCreated": 3,
+                  "drawImageCalls": 3,
+                  "canvasEncodeCalls": 1,
+                  "encodedPixelsRequested": 1048576,
+                  "canvasEncodeCompleted": 1,
+                  "encodedBytes": 55856
+                },
+                "diagnostics": [
+                  {
+                    "stage": "export-start",
+                    "at": 1795685799789,
+                    "format": "html"
+                  },
+                  {
+                    "stage": "freeze-start",
+                    "at": 1795685799792,
+                    "mode": "export",
+                    "items": 1
+                  },
+                  {
+                    "stage": "freeze-end",
+                    "at": 1795685799792,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685799792,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685799805,
+                    "bytes": 55856
+                  },
+                  {
+                    "stage": "snapshot-ready",
+                    "at": 1795685799805,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "prepare-start",
+                    "at": 1795685799805,
+                    "items": 1
+                  },
+                  {
+                    "stage": "prepare-end",
+                    "at": 1795685799855
+                  },
+                  {
+                    "stage": "dialog-close",
+                    "at": 1795685799857,
+                    "format": "html"
+                  }
+                ],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 19766100,
+                    "allocatedBytes": 28655616
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 21338548,
+                    "allocatedBytes": 36712448
+                  },
+                  "samples": 6,
+                  "maxObservedUsedBytes": 21338548
+                },
+                "result": {
+                  "format": "html",
+                  "outputBytes": 75397
+                }
+              }
+            },
+            {
+              "images": 4,
+              "imported": {
+                "durationMs": 309.96790000000146,
+                "counters": {
+                  "bitmapDecodeCalls": 4,
+                  "canvasCreated": 8,
+                  "drawImageCalls": 9,
+                  "computedStyleCalls": 1
+                },
+                "diagnostics": [],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 23082608,
+                    "allocatedBytes": 38092800
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 8467772,
+                    "allocatedBytes": 10891264
+                  },
+                  "samples": 5,
+                  "maxObservedUsedBytes": 38297680
+                },
+                "result": {
+                  "items": 4,
+                  "inputBytes": 3451877,
+                  "width": 1024,
+                  "height": 1024
+                }
+              },
+              "exported": {
+                "durationMs": 340.84269999999924,
+                "counters": {
+                  "canvasCreated": 6,
+                  "drawImageCalls": 6,
+                  "canvasEncodeCalls": 4,
+                  "encodedPixelsRequested": 4194304,
+                  "canvasEncodeCompleted": 4,
+                  "encodedBytes": 225374
+                },
+                "diagnostics": [
+                  {
+                    "stage": "export-start",
+                    "at": 1795685800354,
+                    "format": "html"
+                  },
+                  {
+                    "stage": "freeze-start",
+                    "at": 1795685800359,
+                    "mode": "export",
+                    "items": 4
+                  },
+                  {
+                    "stage": "freeze-end",
+                    "at": 1795685800359,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685800359,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685800377,
+                    "bytes": 55856
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685800378,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685800431,
+                    "bytes": 56608
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685800431,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685800439,
+                    "bytes": 56572
+                  },
+                  {
+                    "stage": "encode-start",
+                    "at": 1795685800439,
+                    "width": 1024,
+                    "height": 1024
+                  },
+                  {
+                    "stage": "encode-end",
+                    "at": 1795685800448,
+                    "bytes": 56338
+                  },
+                  {
+                    "stage": "snapshot-ready",
+                    "at": 1795685800448,
+                    "mode": "export"
+                  },
+                  {
+                    "stage": "prepare-start",
+                    "at": 1795685800448,
+                    "items": 4
+                  },
+                  {
+                    "stage": "prepare-end",
+                    "at": 1795685800601
+                  },
+                  {
+                    "stage": "dialog-close",
+                    "at": 1795685800605,
+                    "format": "html"
+                  }
+                ],
+                "heap": {
+                  "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                  "before": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 8484932,
+                    "allocatedBytes": 10891264
+                  },
+                  "after": {
+                    "method": "CDP Runtime.getHeapUsage",
+                    "usedBytes": 9040220,
+                    "allocatedBytes": 11980800
+                  },
+                  "samples": 12,
+                  "maxObservedUsedBytes": 9539200
+                },
+                "result": {
+                  "format": "html",
+                  "outputBytes": 301717
+                }
+              }
+            }
+          ],
+          "dom": [
+            {
+              "syntheticRows": 2000,
+              "domElements": 2003,
+              "positions": [
+                {
+                  "scrollFraction": 0,
+                  "extracted": {
+                    "durationMs": 65.28050000000076,
+                    "counters": {
+                      "elementRectCalls": 2005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 2093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 2003,
+                        "blocks": 123,
+                        "durationMs": 64
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 1606508,
+                        "allocatedBytes": 3477504
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2050892,
+                        "allocatedBytes": 5574656
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 2050892
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 3.325200000001132,
+                    "counters": {
+                      "elementRectCalls": 2004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 2003,
+                        "blocks": 0,
+                        "durationMs": 3
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2070552,
+                        "allocatedBytes": 5574656
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2188448,
+                        "allocatedBytes": 5574656
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 2188448
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 0.5,
+                  "extracted": {
+                    "durationMs": 41.23459999999977,
+                    "counters": {
+                      "elementRectCalls": 2005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 2093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 2003,
+                        "blocks": 123,
+                        "durationMs": 40
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2271756,
+                        "allocatedBytes": 5574656
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 1726632,
+                        "allocatedBytes": 5312512
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 2271756
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 2.475399999999354,
+                    "counters": {
+                      "elementRectCalls": 2004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 2003,
+                        "blocks": 0,
+                        "durationMs": 2
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 1745164,
+                        "allocatedBytes": 5312512
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 1844072,
+                        "allocatedBytes": 5312512
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 1844072
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 1,
+                  "extracted": {
+                    "durationMs": 26.354699999999866,
+                    "counters": {
+                      "elementRectCalls": 2005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 2093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 2003,
+                        "blocks": 123,
+                        "durationMs": 26
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 1868524,
+                        "allocatedBytes": 5312512
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2921172,
+                        "allocatedBytes": 6361088
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 2921172
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 3.1598999999987427,
+                    "counters": {
+                      "elementRectCalls": 2004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 2003,
+                        "blocks": 0,
+                        "durationMs": 2
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2938980,
+                        "allocatedBytes": 6361088
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 3035044,
+                        "allocatedBytes": 6361088
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 3035044
+                    },
+                    "result": {
+                      "bottomPatchCount": 1
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "syntheticRows": 10000,
+              "domElements": 10003,
+              "positions": [
+                {
+                  "scrollFraction": 0,
+                  "extracted": {
+                    "durationMs": 277.8171999999995,
+                    "counters": {
+                      "elementRectCalls": 10005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 10093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 10003,
+                        "blocks": 123,
+                        "durationMs": 276
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 2599280,
+                        "allocatedBytes": 4853760
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4134992,
+                        "allocatedBytes": 8523776
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 4134992
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 10.137300000000323,
+                    "counters": {
+                      "elementRectCalls": 10004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 10003,
+                        "blocks": 0,
+                        "durationMs": 9
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4154816,
+                        "allocatedBytes": 8523776
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4560168,
+                        "allocatedBytes": 8523776
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 4560168
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 0.5,
+                  "extracted": {
+                    "durationMs": 194.65240000000085,
+                    "counters": {
+                      "elementRectCalls": 10005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 10093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 10003,
+                        "blocks": 123,
+                        "durationMs": 194
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4613112,
+                        "allocatedBytes": 8523776
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4826392,
+                        "allocatedBytes": 8728576
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 4826392
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 8.842800000000352,
+                    "counters": {
+                      "elementRectCalls": 10004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 10003,
+                        "blocks": 0,
+                        "durationMs": 8
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 4844576,
+                        "allocatedBytes": 8728576
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 5231256,
+                        "allocatedBytes": 9252864
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 5231256
+                    },
+                    "result": {
+                      "bottomPatchCount": 0
+                    }
+                  }
+                },
+                {
+                  "scrollFraction": 1,
+                  "extracted": {
+                    "durationMs": 104.3744000000006,
+                    "counters": {
+                      "elementRectCalls": 10005,
+                      "canvasCreated": 1,
+                      "computedStyleCalls": 10093
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "text:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "text:end",
+                        "elements": 10003,
+                        "blocks": 123,
+                        "durationMs": 104
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 5289168,
+                        "allocatedBytes": 9252864
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 6283448,
+                        "allocatedBytes": 13193216
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 6283448
+                    },
+                    "result": {
+                      "blockCount": 123,
+                      "limited": true
+                    }
+                  },
+                  "anchored": {
+                    "durationMs": 8.386800000000221,
+                    "counters": {
+                      "elementRectCalls": 10004,
+                      "computedStyleCalls": 45
+                    },
+                    "diagnostics": [
+                      {
+                        "stage": "anchored:start",
+                        "elements": 0,
+                        "blocks": 0,
+                        "durationMs": 0
+                      },
+                      {
+                        "stage": "anchored:end",
+                        "elements": 10003,
+                        "blocks": 0,
+                        "durationMs": 7
+                      }
+                    ],
+                    "heap": {
+                      "scope": "JavaScript heap in this page target only; excludes canvas backing stores, decoded pixels, GPU, process RSS and browser total memory. Sampled maximum is not a guaranteed peak.",
+                      "before": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 6301256,
+                        "allocatedBytes": 13193216
+                      },
+                      "after": {
+                        "method": "CDP Runtime.getHeapUsage",
+                        "usedBytes": 6669960,
+                        "allocatedBytes": 13193216
+                      },
+                      "samples": 2,
+                      "maxObservedUsedBytes": 6669960
+                    },
+                    "result": {
+                      "bottomPatchCount": 1
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "browserVersion": "159.0.8154.6",
+      "summary": [
+        {
+          "images": 1,
+          "importMedianMs": 85.23329999999987,
+          "htmlExportMedianMs": 170.33979999999974,
+          "htmlEncodeCalls": [
+            1,
+            1,
+            1
+          ],
+          "htmlCanvasCreated": [
+            3,
+            3,
+            3
+          ],
+          "htmlHeapMaxObservedUsedBytes": [
+            15511744,
+            21175008,
+            21338548
+          ]
+        },
+        {
+          "images": 4,
+          "importMedianMs": 294.83799999999974,
+          "htmlExportMedianMs": 340.84269999999924,
+          "htmlEncodeCalls": [
+            4,
+            4,
+            4
+          ],
+          "htmlCanvasCreated": [
+            6,
+            6,
+            6
+          ],
+          "htmlHeapMaxObservedUsedBytes": [
+            10899060,
+            9339736,
+            9539200
+          ]
+        }
+      ]
+    }
+  ],
+  "comparison": [
+    {
+      "images": 1,
+      "htmlExportMedianDeltaMs": 10.21579999999949,
+      "htmlExportMedianRatio": 1.0637993055382047
+    },
+    {
+      "images": 4,
+      "htmlExportMedianDeltaMs": 0.39719999999942956,
+      "htmlExportMedianRatio": 1.0011667065653664
+    }
+  ]
+}

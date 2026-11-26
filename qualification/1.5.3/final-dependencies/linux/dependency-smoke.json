@@ -1,0 +1,42 @@
+{
+  "date": "2026-11-26T10:31:40.699Z",
+  "platform": "linux",
+  "node": "v24.22.3",
+  "status": "passed",
+  "zip": {
+    "names": [
+      "café.txt",
+      "espace et é/naïve.txt",
+      "日本語/画像-😀.txt"
+    ],
+    "utf8": true,
+    "contentsVerified": true
+  },
+  "braces": true,
+  "tar": {
+    "names": [
+      "café.txt",
+      "espace et é/naïve.txt",
+      "日本語/画像-😀.txt"
+    ],
+    "contentsVerified": true
+  },
+  "canvas": {
+    "version": "1.2.1",
+    "pngBytes": 2773,
+    "width": 320,
+    "height": 120
+  },
+  "pdf": {
+    "pages": 1,
+    "text": true,
+    "nativeCanvasFactory": true,
+    "renderedWidth": 600,
+    "renderedHeight": 240,
+    "pngBytes": 10412
+  },
+  "limitations": [
+    "Bare native bindings are not executed on Node.",
+    "No Linux execution is implied by the Windows result."
+  ]
+}

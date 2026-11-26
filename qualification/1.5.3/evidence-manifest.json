@@ -1,0 +1,192 @@
+{
+  "recordedAt": "2026-11-26T12:19:19.580Z",
+  "purpose": "Committed evidence linked by final 1.5.3 reports; local dist retains complete working logs.",
+  "files": [
+    {
+      "path": "qualification/1.5.3/final-dependencies/engines.json",
+      "source": "dist/consolidation-1.5.3/final-dependencies/engines.json",
+      "bytes": 214,
+      "sha256": "9ee2558a2ce4bc19e6396e51dff10a6d0f50d93df7d7b3baff146cf3b07fd77c"
+    },
+    {
+      "path": "qualification/1.5.3/final-dependencies/registry-verified.json",
+      "source": "dist/consolidation-1.5.3/final-dependencies/registry-verified.json",
+      "bytes": 12108,
+      "sha256": "3d7d6927b27ccf65a69ccf619574ea7014d7a6108291068eca14647858670666"
+    },
+    {
+      "path": "qualification/1.5.3/final-dependencies/dependency-smoke.json",
+      "source": "dist/consolidation-1.5.3/final-dependencies/dependency-smoke.json",
+      "bytes": 845,
+      "sha256": "98bf8469ccbfed9cfce80fee453171917c589ecd12c263bf933cc57eca57a76d"
+    },
+    {
+      "path": "qualification/1.5.3/final-dependencies/linux/dependency-smoke.json",
+      "source": "dist/consolidation-1.5.3/final-dependencies/linux/dependency-smoke.json",
+      "bytes": 845,
+      "sha256": "3884320dec131ca3966f7ce526984c46e1dae76b1700b3c32c1e11f37da01061"
+    },
+    {
+      "path": "qualification/1.5.3/final-linux/qualified-2/qualification-summary.json",
+      "source": "dist/consolidation-1.5.3/final-linux/qualified-2/qualification-summary.json",
+      "bytes": 4801,
+      "sha256": "fd9f089e37da33356e174776b8fd280e71e688089243a2bbb7ec497771cda279"
+    },
+    {
+      "path": "qualification/1.5.3/final-dependencies/actions-verified.json",
+      "source": "dist/consolidation-1.5.3/final-dependencies/actions-verified.json",
+      "bytes": 5875,
+      "sha256": "740ab53f4534aacd14f0b37812804aea277e4c8b0d506498027614309c02cc8c"
+    },
+    {
+      "path": "qualification/1.5.3/final-dependencies/actions-compatibility.json",
+      "source": "dist/consolidation-1.5.3/final-dependencies/actions-compatibility.json",
+      "bytes": 82350,
+      "sha256": "c2b9f3a84f15057ecd8b0596761cfcaed1067e7294d9b0c0b2b0a85eba4c8517"
+    },
+    {
+      "path": "qualification/1.5.3/final-dependencies/npm-ci.log",
+      "source": "dist/consolidation-1.5.3/final-dependencies/npm-ci.log",
+      "bytes": 151,
+      "sha256": "a708659b1d78acf9be4de3935036a5d05031865708bac651cc478eb95914add5"
+    },
+    {
+      "path": "qualification/1.5.3/final-dependencies/command-status.json",
+      "source": "dist/consolidation-1.5.3/final-dependencies/command-status.json",
+      "bytes": 111,
+      "sha256": "904dea46c9b4030afc04727ce8dc5c2cb084bc94e78453bef0b8b768db9b2d24"
+    },
+    {
+      "path": "qualification/1.5.3/final-dependencies/npm-ls-all.json",
+      "source": "dist/consolidation-1.5.3/final-dependencies/npm-ls-all.json",
+      "bytes": 38870,
+      "sha256": "df168039478dc6344da6a1bda28bf5e7e6f33967388897405eef6d9f716268ac"
+    },
+    {
+      "path": "qualification/1.5.3/final-dependencies/npm-audit.json",
+      "source": "dist/consolidation-1.5.3/final-dependencies/npm-audit.json",
+      "bytes": 385,
+      "sha256": "34b22e6b731ebb78118efdca2c20787e86149e1a1b341b3d7f5d5e72b8bbe36a"
+    },
+    {
+      "path": "qualification/1.5.3/final-dependencies/npm-outdated.json",
+      "source": "dist/consolidation-1.5.3/final-dependencies/npm-outdated.json",
+      "bytes": 12848,
+      "sha256": "47876b6a69a26349f3df4cfc580645305e01f308f206fa6c1baa5850272e7521"
+    },
+    {
+      "path": "qualification/1.5.3/final-dependencies/html-validate.log",
+      "source": "dist/consolidation-1.5.3/final-dependencies/html-validate.log",
+      "bytes": 122,
+      "sha256": "f22ae31ea3ace17018b1c37adf322d973ff79bc5ad7273c670c67f6ec473dcda"
+    },
+    {
+      "path": "qualification/1.5.3/final-dependencies/package-validation.log",
+      "source": "dist/consolidation-1.5.3/final-dependencies/package-validation.log",
+      "bytes": 852,
+      "sha256": "eb7f6f92fd055c532ba7d2e198c772059c657fd975ef1cff3e22668fbddf5300"
+    },
+    {
+      "path": "qualification/1.5.3/final-dependencies/linux-check.log",
+      "source": "dist/consolidation-1.5.3/final-dependencies/linux-check.log",
+      "bytes": 3168,
+      "sha256": "2c7fb935f517b2e06830bc85a50d8fda223e6bb8747164f4d5ef408a3c201735"
+    },
+    {
+      "path": "qualification/1.5.3/final-dependencies/ci-check.json",
+      "source": "dist/consolidation-1.5.3/final-dependencies/ci-check.json",
+      "bytes": 1304,
+      "sha256": "60cc8734b699e2c70e2ffa24cc01471bb4aece35a29159df44c5411f80ea7752"
+    },
+    {
+      "path": "qualification/1.5.3/outdated-final.json",
+      "source": "dist/consolidation-1.5.3/outdated-final.json",
+      "bytes": 17863,
+      "sha256": "17acc4ce5d7522a3f274c0003c6a38c9529cc62d2484553c144e03d21e3913e5"
+    },
+    {
+      "path": "qualification/1.5.3/final-dependencies/changelogs-reverified.json",
+      "source": "dist/consolidation-1.5.3/final-dependencies/changelogs-reverified.json",
+      "bytes": 28234,
+      "sha256": "028222f9c3abc5cc7594871348c74ea3a620ea32db0a8dc9d0f138d7345c3172"
+    },
+    {
+      "path": "qualification/1.5.3/transitives-changelogs.json",
+      "source": "dist/consolidation-1.5.3/transitives-changelogs.json",
+      "bytes": 318662,
+      "sha256": "975df0628ab926f3546b1bf8502ebaf2622a4cf60f70e1949763730efc2dcd32"
+    },
+    {
+      "path": "qualification/1.5.3/transitives-migrations.json",
+      "source": "dist/consolidation-1.5.3/transitives-migrations.json",
+      "bytes": 57968,
+      "sha256": "72a351a52c4705c587140389ea83a5da73f2584b6eebfe8485cc92ccf854b464"
+    },
+    {
+      "path": "qualification/1.5.3/transitives-release-notes.json",
+      "source": "dist/consolidation-1.5.3/transitives-release-notes.json",
+      "bytes": 97229,
+      "sha256": "99e3cc5c4bbe6c62a3a80e47b99930281e3b0814914d6704886cf92f6036d566"
+    },
+    {
+      "path": "qualification/1.5.3/transitives-audit.json",
+      "source": "dist/consolidation-1.5.3/transitives-audit.json",
+      "bytes": 241460,
+      "sha256": "a40606b9563adbb1c2735bdc2c78d9ad790442d5097c2f2f22c9bf2b637ea848"
+    },
+    {
+      "path": "qualification/1.5.3/final-dependencies/lock-changes.json",
+      "source": "dist/consolidation-1.5.3/final-dependencies/lock-changes.json",
+      "bytes": 2415,
+      "sha256": "46fd97e9befb5478aa5e1596487b9511c925f067c1c952ed3a96cb4c1c0f74b7"
+    },
+    {
+      "path": "qualification/1.5.3/final-dependencies/parents.json",
+      "source": "dist/consolidation-1.5.3/final-dependencies/parents.json",
+      "bytes": 26286,
+      "sha256": "d8e6f76c999b4a618c192371e7eb25eb343438aba1e0153b99032acd1e9566c5"
+    },
+    {
+      "path": "qualification/1.5.3/qualified-verify-release.log",
+      "source": "dist/consolidation-1.5.3/qualified-verify-release.log",
+      "bytes": 42793,
+      "sha256": "acd5cb3ea11306d3af7bb72ec5c49faaaa42328dedbf7512765eec49181c9336"
+    },
+    {
+      "path": "qualification/1.5.3/final-qualification-verify-release.log",
+      "source": "dist/consolidation-1.5.3/final-qualification-verify-release.log",
+      "bytes": 44029,
+      "sha256": "b68bd9bba69607b86f96a6524d25ad67fe013147cbc794950d3090dd2da3895b"
+    },
+    {
+      "path": "qualification/1.5.3/final-qualified-performance-comparison.json",
+      "source": "dist/consolidation-1.5.3/final-qualified-performance-comparison.json",
+      "bytes": 192150,
+      "sha256": "678724dd7bd600090cfc5ab23299dd991538840d1129baa05ecca0f34b5e40d0"
+    },
+    {
+      "path": "qualification/1.5.3/final-qualified-memory-comparison.json",
+      "source": "dist/consolidation-1.5.3/final-qualified-memory-comparison.json",
+      "bytes": 168916,
+      "sha256": "485df57da3ae4bdb0bc48e76097c2d7b63c0f1149945983a6b90b5f6bb00ee02"
+    },
+    {
+      "path": "qualification/1.5.3/performance-final-comparison.json",
+      "source": "dist/consolidation-1.5.3/performance-final-comparison.json",
+      "bytes": 185621,
+      "sha256": "159cd5084aa5386c7c298993015bece6556bcddd4b030fbe117c86cf85c864ba"
+    },
+    {
+      "path": "qualification/1.5.3/resource-memory-final-comparison.json",
+      "source": "dist/consolidation-1.5.3/resource-memory-final-comparison.json",
+      "bytes": 168958,
+      "sha256": "b3d5b18b66be93e68795ff740007d8ae1f54403207aff2811d766dbdee634fe4"
+    },
+    {
+      "path": "qualification/1.5.3/final-archive-verification.json",
+      "source": "dist/consolidation-1.5.3/final-archive-verification.json",
+      "bytes": 6571,
+      "sha256": "1eede78cbafaa8c1b9888ecb3ea603cb11b7aa04bd210a63c394aef582f558a2"
+    }
+  ]
+}

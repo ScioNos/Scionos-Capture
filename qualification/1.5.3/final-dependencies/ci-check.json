@@ -1,0 +1,68 @@
+{
+  "date": "2026-11-26T10:35:38.966Z",
+  "syntax": "passed",
+  "immutableActionPins": true,
+  "nodeMinima": [
+    "22.22.0",
+    "24.8.0"
+  ],
+  "osSeparatedBrowserCaches": true,
+  "linuxSystemDepsOnCacheHit": true,
+  "coreAlwaysRuns": true,
+  "results": [
+    {
+      "name": "unicode markdown",
+      "event": "push",
+      "expected": true,
+      "status": "passed"
+    },
+    {
+      "name": "code",
+      "event": "push",
+      "expected": false,
+      "status": "passed"
+    },
+    {
+      "name": "mixed",
+      "event": "push",
+      "expected": false,
+      "status": "passed"
+    },
+    {
+      "name": "empty",
+      "event": "push",
+      "expected": false,
+      "status": "passed"
+    },
+    {
+      "name": "first push",
+      "event": "push",
+      "expected": false,
+      "status": "passed"
+    },
+    {
+      "name": "unknown SHA",
+      "event": "push",
+      "expected": false,
+      "status": "passed"
+    },
+    {
+      "name": "code renamed Markdown",
+      "event": "push",
+      "expected": false,
+      "status": "passed"
+    },
+    {
+      "name": "deleted Markdown",
+      "event": "push",
+      "expected": true,
+      "status": "passed"
+    },
+    {
+      "name": "PR merge-base",
+      "event": "pull_request",
+      "expected": true,
+      "status": "passed"
+    }
+  ]
+}

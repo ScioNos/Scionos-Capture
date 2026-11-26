@@ -49,7 +49,7 @@ Le découpage capture/DOM/transfert/stockage/composition est conservé. Les éta
 
 ## Validation : états intermédiaires et campagne finale
 
-La campagne [qualified-verify-release.log](dist/consolidation-1.5.3/qualified-verify-release.log) a réussi avec :
+La campagne [qualified-verify-release.log](qualification/1.5.3/qualified-verify-release.log) a réussi avec :
 
 - 178 tests unitaires et 171 tests E2E ;
 - cinq modes de capture native dans Chrome 158.0.8127.37 et Edge 158.0.4370.33 ;
@@ -58,7 +58,7 @@ La campagne [qualified-verify-release.log](dist/consolidation-1.5.3/qualified-ve
 
 **Cette campagne précède le dernier correctif d’annulation des exports.** Elle constitue une preuve intermédiaire, pas la qualification de l’état final. Les quatre reproductions PNG/PDF par Annuler/Échap après le début du snapshot échouaient avant ce correctif. Les huit scénarios ciblés passent après correction, avec annulation pendant la rasterisation et les bandes image uniquement, nettoyage des URL et nouvelle tentative. Les régressions ciblées duplication/admission fractionnaire ont également passé leurs quatre scénarios, dont les deux scénarios préexistants.
 
-La campagne [final-qualification-verify-release.log](dist/consolidation-1.5.3/final-qualification-verify-release.log) **est terminée avec code 0** : **178 tests unitaires et 179 E2E réussis**, cinq modes natifs dans Chrome 158.0.8127.37 et Edge 158.0.4370.33 avec les contrôles de pixels à 100 %, trois interruptions par navigateur, trois répétitions de performance et dix scénarios PDF. Les sources sont restées inchangées depuis le correctif d’annulation. Cette campagne remplace les 171 E2E intermédiaires comme preuve de qualification locale finale. Elle ne constitue pas une attestation de CI distante ni de distribution définitive.
+La campagne [final-qualification-verify-release.log](qualification/1.5.3/final-qualification-verify-release.log) **est terminée avec code 0** : **178 tests unitaires et 179 E2E réussis**, cinq modes natifs dans Chrome 158.0.8127.37 et Edge 158.0.4370.33 avec les contrôles de pixels à 100 %, trois interruptions par navigateur, trois répétitions de performance et dix scénarios PDF. Les sources sont restées inchangées depuis le correctif d’annulation. Cette campagne remplace les 171 E2E intermédiaires comme preuve de qualification locale finale. Elle ne constitue pas une attestation de CI distante ni de distribution définitive.
 
 Les validations antérieures à 151 tests unitaires et 155 E2E, ainsi que les contrôles Linux/Windows sous Node 24.22.3, restent des preuves historiques d’états précédents. Elles ne remplacent pas une validation de l’état final après les changements de sources et de verrou. Les erreurs intentionnelles des fixtures stockage/quota et les essais diagnostiques échoués ne sont pas comptés comme succès.
 
@@ -68,7 +68,7 @@ Les tests natifs utilisent des profils jetables, des pages loopback et de vrais 
 
 Les deux bancs ont été exécutés séquentiellement après la campagne complète, avec pour référence une extraction Git exacte de `03d87f2fad4c05c1742f29f89c9aff6ddff3a9e7`. Les sources mesurées sont identifiées par leurs SHA-256 dans les rapports ; les deux racines du banc mémoire indiquent `sourceStable: true`.
 
-[Performance éditeur/DOM](dist/consolidation-1.5.3/final-qualified-performance-comparison.json), Windows, Chromium 159, trois répétitions, médianes et fixtures PNG 1024 × 1024 :
+[Performance éditeur/DOM](qualification/1.5.3/final-qualified-performance-comparison.json), Windows, Chromium 159, trois répétitions, médianes et fixtures PNG 1024 × 1024 :
 
 | Parcours | Référence 03d87f2 | Sources qualifiées | Lecture |
 |---|---:|---:|---|
@@ -79,7 +79,7 @@ Les deux bancs ont été exécutés séquentiellement après la campagne complè
 
 L’export HTML conserve un encodage PNG par image et respectivement trois/six Canvas pour une/quatre images. L’encodage supplémentaire à l’import mesure le PNG réellement portable, notamment après JPEG/WebP ; il sert l’admission au budget, sans optimisation spéculative.
 
-[Mémoire processus](dist/consolidation-1.5.3/final-qualified-memory-comparison.json), une répétition, un prélèvement après chaque étape, mêmes fixtures 1600 × 1200 et bibliothèque synthétique :
+[Mémoire processus](qualification/1.5.3/final-qualified-memory-comparison.json), une répétition, un prélèvement après chaque étape, mêmes fixtures 1600 × 1200 et bibliothèque synthétique :
 
 | Prélèvement | Référence | Sources qualifiées |
 |---|---:|---:|
@@ -100,7 +100,7 @@ Le banc PDF final passe dix scénarios : le rendu réel proche de 32 millions de
 
 Les rapports enregistrent les SHA-256 des sources mesurées. Environnement : Windows, Chromium 159.0.8154.6, profils jetables distincts et fixtures synthétiques. Les deux bancs de référence ont été exécutés séquentiellement, sans chevauchement ; les premiers rapports concurrents restent diagnostiques.
 
-Médianes de trois répétitions avec PNG 1024 × 1024 : [comparaison historique éditeur/DOM](dist/consolidation-1.5.3/performance-final-comparison.json).
+Médianes de trois répétitions avec PNG 1024 × 1024 : [comparaison historique éditeur/DOM](qualification/1.5.3/performance-final-comparison.json).
 
 | Parcours | Avant historique | Après historique | Lecture limitée à ce banc |
 |---|---:|---:|---|
@@ -111,7 +111,7 @@ Médianes de trois répétitions avec PNG 1024 × 1024 : [comparaison historique
 
 Un encodage PNG par image et le nombre de Canvas sont inchangés dans ce banc. Aucune optimisation générale d’encodage n’en est déduite.
 
-Une répétition et un prélèvement après chaque étape, miniatures PNG 96 × 64, blobs projets fictifs de 1 Kio jamais ouverts : [comparaison historique mémoire](dist/consolidation-1.5.3/resource-memory-final-comparison.json).
+Une répétition et un prélèvement après chaque étape, miniatures PNG 96 × 64, blobs projets fictifs de 1 Kio jamais ouverts : [comparaison historique mémoire](qualification/1.5.3/resource-memory-final-comparison.json).
 
 | Parcours | Avant historique | Après historique | Écart observé |
 |---|---:|---:|---:|
@@ -139,7 +139,7 @@ L’[audit complémentaire des transitives](DEPENDENCY_TRANSITIVES_1.5.3.md) est
 
 Actions GitHub : checkout 7.0.1, setup-node 7.1.0, cache 6.1.0 et upload-artifact 7.0.2, désormais **épinglées par SHA de commit**. Les runners Linux/Windows sont conservés. Les changements documentaires seuls sautent les navigateurs, mais verify:core reste prévu sur les deux minima Node. Permissions contents:read et aucune publication automatique ; une exécution locale ne constitue pas une preuve de succès de la CI distante.
 
-Node déclaré : `^22.22.0 || >=24.8.0`. Les deux minima exacts ont été exécutés sous Linux : **Node 22.22.0 avec npm 10.9.4**, puis **Node 24.8.0 avec npm 11.6.0**. Chaque environnement a réussi npm ci et verify:core avec code 0, dont **178/178 tests unitaires**. Les sources sont montées en lecture seule et le réseau est déconnecté pour la validation après installation. Le [résumé Linux qualified-2](dist/consolidation-1.5.3/final-linux/qualified-2/qualification-summary.json) conserve les empreintes des instantanés de sources et des preuves ; son digest d’instantané est `659d9e04e5726de671f909c0a4975fa5ac2b7c32b0e9a2fe44c93cd1c0349d97`. Les documents ont été actualisés après ce prélèvement ; les artefacts générés durant ces contrôles ne sont pas présentés comme l’archive définitive. Aucun navigateur Linux ni Chrome/Edge 106 n’est attesté par ces contrôles.
+Node déclaré : `^22.22.0 || >=24.8.0`. Les deux minima exacts ont été exécutés sous Linux : **Node 22.22.0 avec npm 10.9.4**, puis **Node 24.8.0 avec npm 11.6.0**. Chaque environnement a réussi npm ci et verify:core avec code 0, dont **178/178 tests unitaires**. Les sources sont montées en lecture seule et le réseau est déconnecté pour la validation après installation. Le [résumé Linux qualified-2](qualification/1.5.3/final-linux/qualified-2/qualification-summary.json) conserve les empreintes des instantanés de sources et des preuves ; son digest d’instantané est `659d9e04e5726de671f909c0a4975fa5ac2b7c32b0e9a2fe44c93cd1c0349d97`. Les documents ont été actualisés après ce prélèvement ; les artefacts générés durant ces contrôles ne sont pas présentés comme l’archive définitive. Aucun navigateur Linux ni Chrome/Edge 106 n’est attesté par ces contrôles.
 
 Chrome/Edge 106 reste le minimum déclaré : documentId exige Chrome 106 et CSS :has() Chrome 105. AbortSignal.throwIfAborted, utilisé pour l’annulation coopérative, est disponible depuis Chrome 100 et n’élève donc pas ce minimum. Les API getContexts, checkVisibility et roundRect gardent leurs détections ou replis. Les exécutions natives attestées ici concernent les navigateurs 158 ; Chromium 159 a servi aux mesures historiques. Aucun test sur Chrome/Edge 106 n’est revendiqué.
 
@@ -159,6 +159,8 @@ ZIP définitif local : `dist/scionos-capture-v1.5.3.zip`, **175 572 octets, 35 f
 f17b2c50df2cc6b21254a6a893ddb48a5339ba369ee2d1ca3592fc7dbadb1b34
 ```
 
-[Attestation indépendante de l’archive](dist/consolidation-1.5.3/final-archive-verification.json) : CRC de chaque entrée, allow-list exacte, aucune entrée supplémentaire ou dupliquée, taille décompressée et contenu octet pour octet identiques aux sources. Le fichier `.sha256` adjacent correspond. Le ZIP n’est pas publié sur GitHub ou dans un Store.
+[Attestation indépendante de l’archive](qualification/1.5.3/final-archive-verification.json) : CRC de chaque entrée, allow-list exacte, aucune entrée supplémentaire ou dupliquée, taille décompressée et contenu octet pour octet identiques aux sources. Le fichier `.sha256` adjacent correspond. Le ZIP n’est pas publié sur GitHub ou dans un Store.
 
-La qualification locale permet de préparer la PR. Le commit, le push, la PR et les jobs GitHub Actions du dernier SHA restent à attester après leur exécution. **La fusion et la publication ne sont pas encore déclarées prêtes tant que cette validation distante n’est pas recueillie.** Aucune fusion, aucun tag, aucune release et aucune soumission Store ne sont autorisés par ce travail.
+Le commit applicatif qualifié `3352a1220f01fb1ae2ddb101730910529f1cd5ee` a été poussé et la [PR nº1](https://github.com/ScioNos/Scionos-Capture/pull/1) est ouverte vers main. Le [premier workflow distant](https://github.com/ScioNos/Scionos-Capture/actions/runs/45817507247) a réussi les jobs **Chromium E2E/accessibilité Linux** et **Windows scaling**, ainsi que le filtrage documentaire. Core Node22.22.0 a échoué sur un lien Markdown pointant vers une preuve locale ignorée dans dist ; Node24.8.0 a été annulé par fail-fast. Les sources et tests applicatifs n’étaient pas en échec sur ce run.
+
+Correction : les preuves effectivement liées par les quatre rapports sont désormais versionnées sous `qualification/1.5.3`, avec inventaire SHA-256 et liens corrigés. Aucun test, validateur ni règle de CI n’est supprimé ou affaibli. Une nouvelle exécution du dernier commit doit confirmer tous les jobs avant décision finale ; le SHA et l’état réels sont consultables dans la PR. **La publication n’est pas effectuée et la fusion attend la validation explicite de l’utilisateur.** Aucun tag, aucune release et aucune soumission Store dans ce travail.

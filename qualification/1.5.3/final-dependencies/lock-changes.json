@@ -1,0 +1,121 @@
+[
+  {
+    "path": "node_modules/@napi-rs/canvas",
+    "before": "1.1.1",
+    "after": "1.2.1"
+  },
+  {
+    "path": "node_modules/@napi-rs/canvas-android-arm64",
+    "before": "1.1.1",
+    "after": "1.2.1"
+  },
+  {
+    "path": "node_modules/@napi-rs/canvas-darwin-arm64",
+    "before": "1.1.1",
+    "after": "1.2.1"
+  },
+  {
+    "path": "node_modules/@napi-rs/canvas-darwin-x64",
+    "before": "1.1.1",
+    "after": "1.2.1"
+  },
+  {
+    "path": "node_modules/@napi-rs/canvas-linux-arm-gnueabihf",
+    "before": "1.1.1",
+    "after": "1.2.1"
+  },
+  {
+    "path": "node_modules/@napi-rs/canvas-linux-arm64-gnu",
+    "before": "1.1.1",
+    "after": "1.2.1"
+  },
+  {
+    "path": "node_modules/@napi-rs/canvas-linux-arm64-musl",
+    "before": "1.1.1",
+    "after": "1.2.1"
+  },
+  {
+    "path": "node_modules/@napi-rs/canvas-linux-riscv64-gnu",
+    "before": "1.1.1",
+    "after": "1.2.1"
+  },
+  {
+    "path": "node_modules/@napi-rs/canvas-linux-x64-gnu",
+    "before": "1.1.1",
+    "after": "1.2.1"
+  },
+  {
+    "path": "node_modules/@napi-rs/canvas-linux-x64-musl",
+    "before": "1.1.1",
+    "after": "1.2.1"
+  },
+  {
+    "path": "node_modules/@napi-rs/canvas-win32-arm64-msvc",
+    "before": "1.1.1",
+    "after": "1.2.1"
+  },
+  {
+    "path": "node_modules/@napi-rs/canvas-win32-x64-msvc",
+    "before": "1.1.1",
+    "after": "1.2.1"
+  },
+  {
+    "path": "node_modules/@types/estree",
+    "before": "1.0.10",
+    "after": "1.0.11"
+  },
+  {
+    "path": "node_modules/b4a",
+    "before": "1.8.1",
+    "after": "1.9.0"
+  },
+  {
+    "path": "node_modules/bare-events",
+    "before": "2.9.1",
+    "after": "2.9.2"
+  },
+  {
+    "path": "node_modules/bare-fs",
+    "before": "4.8.0",
+    "after": "4.8.7"
+  },
+  {
+    "path": "node_modules/bare-path",
+    "before": "3.1.1",
+    "after": "3.1.3"
+  },
+  {
+    "path": "node_modules/bare-stream",
+    "before": "2.13.3",
+    "after": "2.13.4"
+  },
+  {
+    "path": "node_modules/bare-url",
+    "before": "2.5.2",
+    "after": "2.5.8"
+  },
+  {
+    "path": "node_modules/brace-expansion",
+    "before": "5.0.13",
+    "after": "5.1.0"
+  },
+  {
+    "path": "node_modules/semver",
+    "before": "7.8.5",
+    "after": "7.8.6"
+  },
+  {
+    "path": "node_modules/streamx",
+    "before": "2.28.0",
+    "after": "2.28.1"
+  },
+  {
+    "path": "node_modules/tar-stream",
+    "before": "3.2.0",
+    "after": "3.3.0"
+  },
+  {
+    "path": "node_modules/bare-buffer",
+    "after": "3.7.3"
+  }
+]

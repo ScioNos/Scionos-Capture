@@ -53,7 +53,7 @@ Les guides dialog et content-based-styling ont été consultés avec l’outil d
 
 ## Node : contraintes et environnement réellement disponible
 
-La [preuve des engines du verrou final](dist/consolidation-1.5.3/final-dependencies/engines.json) vérifie statiquement les contraintes Node des **152 entrées installables** pour **22.22.0, 24.8.0 et 26.13.1**, sans échec. Le projet reprend le minimum de HTML-Validate ; les dépendances directes, leurs engines et les intégrités vérifiées figurent dans la [preuve registre](dist/consolidation-1.5.3/final-dependencies/registry-verified.json).
+La [preuve des engines du verrou final](qualification/1.5.3/final-dependencies/engines.json) vérifie statiquement les contraintes Node des **152 entrées installables** pour **22.22.0, 24.8.0 et 26.13.1**, sans échec. Le projet reprend le minimum de HTML-Validate ; les dépendances directes, leurs engines et les intégrités vérifiées figurent dans la [preuve registre](qualification/1.5.3/final-dependencies/registry-verified.json).
 
 Les scripts propres au projet utilisent les modules node:fs[/promises], path, url, crypto, child_process, http, os, timers[/promises], perf_hooks, zlib, util et le lanceur node:test. Le parcours examiné ne dépend pas de fs.glob, de registerHooks ou d’un module node:sqlite. Le SQLite employé par CodeGraph est celui de cet outil externe, pas une exigence de l’extension ou du script de tests du projet. Les paquets pdfjs-dist/canvas sont des outils de développement et de qualification, sans ajout de dépendance runtime dans le paquet de l’extension.
 
@@ -67,7 +67,7 @@ Constat local, par `nvm list`, `docker images`, `docker run --rm --pull=never <i
 | Chrome Windows | **158.0.8127.37** | Le binaire présent ne valide pas Chrome 106. |
 | Edge Windows | **158.0.4370.33** | Le binaire présent ne valide pas Edge 106. |
 
-La campagne dépendances antérieure à cette sous-tâche a déjà exécuté un npm ci et un smoke PDF/archives sous Windows Node 26.13.1 et dans Linux Node 24.22.3 : [Windows](dist/consolidation-1.5.3/final-dependencies/dependency-smoke.json), [Linux](dist/consolidation-1.5.3/final-dependencies/linux/dependency-smoke.json). **Ces exécutions ne deviennent pas des tests des minima Node par comparaison semver.** Aucune nouvelle campagne d’installation ou de tests applicatifs n’a été lancée dans la présente revue.
+La campagne dépendances antérieure à cette sous-tâche a déjà exécuté un npm ci et un smoke PDF/archives sous Windows Node 26.13.1 et dans Linux Node 24.22.3 : [Windows](qualification/1.5.3/final-dependencies/dependency-smoke.json), [Linux](qualification/1.5.3/final-dependencies/linux/dependency-smoke.json). **Ces exécutions ne deviennent pas des tests des minima Node par comparaison semver.** Aucune nouvelle campagne d’installation ou de tests applicatifs n’a été lancée dans la présente revue.
 
 ## Commandes utiles pour la qualification du parent
 
@@ -83,7 +83,7 @@ Pour contrôler les **minima exacts**, il faudra rendre disponibles les binaires
 
 Après cette revue, les deux images officielles exactes ont été téléchargées et exécutées dans des copies isolées du snapshot `qualified-2`. **Node 22.22.0 / npm 10.9.4 et Node 24.8.0 / npm 11.6.0 réussissent chacun npm ci puis verify:core complet, avec 178/178 tests unitaires**, syntaxe, ESLint, HTML-Validate, validation et packaging de 35 fichiers. Core a été exécuté réseau déconnecté, avec 2 Gio, 2 CPU et 256 PID ; aucune installation hôte ni navigateur Linux dans cette passe. Les constats de disponibilité et commandes non exécutées des sections précédentes décrivent l’état de la revue initiale, pas le résultat de ce complément.
 
-La [synthèse du snapshot et des résultats](dist/consolidation-1.5.3/final-linux/qualified-2/qualification-summary.json) contient les empreintes et limites. Les deux archives du snapshot ont la même taille de 175 572 octets et le même SHA-256 `09c06d5dca2c0d56550904a77bc246717b4aa4ebe5bf335f40fc25ec1a82827f` ; cela n’atteste pas encore le ZIP Windows définitif. Les tests navigateur 106 restent non exécutés.
+La [synthèse du snapshot et des résultats](qualification/1.5.3/final-linux/qualified-2/qualification-summary.json) contient les empreintes et limites. Les deux archives du snapshot ont la même taille de 175 572 octets et le même SHA-256 `09c06d5dca2c0d56550904a77bc246717b4aa4ebe5bf335f40fc25ec1a82827f` ; cela n’atteste pas encore le ZIP Windows définitif. Les tests navigateur 106 restent non exécutés.
 
 Le correctif final d’annulation emploie `AbortController` et `AbortSignal.throwIfAborted()` (Chrome 100, antérieur au minimum 106) ; il conserve les contrôles après les attentes et avant les téléchargements ou l’impression. La primitive ne préempte pas un encodeur Canvas déjà démarré : son résultat est ignoré et ses surfaces sont nettoyées à sa terminaison. Voir [les données MDN AbortSignal](https://raw.githubusercontent.com/mdn/browser-compat-data/main/api/AbortSignal.json).
 

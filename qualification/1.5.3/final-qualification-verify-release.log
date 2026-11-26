@@ -1,0 +1,442 @@
+npm notice run scionos-capture@1.5.3 verify:release
+npm notice run npm run verify && npm run test:native && npm run test:native:acquisition && npm run test:performance && npm run test:performance:pdf
+npm notice run scionos-capture@1.5.3 verify
+npm notice run npm run verify:core && npm run test:e2e
+npm notice run scionos-capture@1.5.3 verify:core
+npm notice run npm run check && npm run lint && npm test && npm run validate && npm run package
+npm notice run scionos-capture@1.5.3 check
+npm notice run node --check background.js && node --check capture-utils.js && node --check capture-content-utils.js && node --check capture-store.js && node --check content-dom.js && node --check content-transfer.js && node --check content-selection.js && node --check content-capture.js && node --check content.js && node --check editor-operations.js && node --check composition-utils.js && node --check composition-export.js && node --check annotation-model.js && node --check editor.js && node --check library.js && node --check help.js && node --check i18n.js && node --check popup.js
+npm notice run scionos-capture@1.5.3 lint
+npm notice run eslint . && html-validate popup.html editor.html library.html help.html
+npm notice run scionos-capture@1.5.3 test
+npm notice run node scripts/test.mjs
+✔ supports editor annotation shapes and excludes masks and crops (0.5981ms)
+✔ bounds use matching measured text lines and padding (0.7129ms)
+✔ selection geometry finds nearest handle and is in canvas coordinates (0.1747ms)
+✔ hit tests use paths, shapes and topmost ordering (0.8357ms)
+✔ move and resize are immutable and repeatable from the original (0.374ms)
+✔ resize supports text, steps, arrows and does not mirror across anchors (0.1842ms)
+✔ visible capture queue preserves 550ms start cadence after concurrent requests and quota failures (10.8659ms)
+✔ visible capture queue rechecks the active tab after waiting (2.0865ms)
+✔ capture rejects active-tab changes during the native acquisition (1.437ms)
+✔ capture rejects window focus and tab switch-return during acquisition (5.0331ms)
+✔ capture probes the sending document and rejects its disappearance (2.2365ms)
+✔ capture rejects navigation even when the original URL is restored during acquisition (2.0077ms)
+✔ library retention reconciles at wake-up and reschedules without deleting future projects (2.4189ms)
+✔ real library expiry purge removes only due projects from both stores (9.58ms)
+✔ library expiry failure schedules a retry and leaves temporary capture cleanup operational (3.5428ms)
+✔ service worker persists a chunked PNG, opens the editor, keeps it after acknowledgement until the editor closes (9.0941ms)
+✔ service worker bounds transfer text metadata and strips invalid entries (3.2357ms)
+✔ concurrent transfer appends are serialized and duplicate payloads cannot overwrite (3.4834ms)
+✔ service worker rejects out-of-order chunks (3.0366ms)
+✔ active editors survive expiry and wake-up, including a lost session mapping (4.1207ms)
+✔ worker startup restores open editor mappings from extension contexts without tab URL permission (3.9442ms)
+✔ wake-up expires orphan captures and discards stale mappings (4.9031ms)
+✔ early alarms reschedule captures and refreshed transfers instead of deleting them (2.846ms)
+✔ leaving an editor makes its expired capture eligible for orphan cleanup (15.4294ms)
+Library project expiry failed: Error: database unavailable
+    at Object.purgeExpiredLibraryProjects (D:\Serveurs\Projet_ScioNos\Scionos-Capture\tests\background.test.js:240:59)
+    at background.js:114:26
+    at async Promise.all (index 1)
+    at async background.js:134:5
+Library project expiry failed: Error: database unavailable
+    at Object.purgeExpiredLibraryProjects (D:\Serveurs\Projet_ScioNos\Scionos-Capture\tests\background.test.js:240:59)
+    at background.js:114:26
+    at async Promise.all (index 1)
+    at async background.js:134:5
+    at async TestContext.<anonymous> (D:\Serveurs\Projet_ScioNos\Scionos-Capture\tests\background.test.js:247:3)
+    at async Test.run (node:internal/test_runner/test:1409:7)
+    at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+✔ acquisition guard discards text after a mutation even when content changes back (2.7856ms)
+✔ acquisition guard rejects scrolling and moved surfaces after screenshot acquisition (1.4666ms)
+✔ extension progress mutations preserve geometry but cannot attest native text association (0.5448ms)
+✔ an unchanged document is insufficient evidence for native pixel and text association (0.9121ms)
+✔ closes an IndexedDB connection opened after a blocked request was rejected (2.7828ms)
+✔ closes an IndexedDB connection when transaction creation throws (1.9326ms)
+✔ temporary captures observe updates and deletion from another extension context (27.3294ms)
+✔ mutating a caller-owned capture cannot change the persisted record (3.2856ms)
+✔ stores, lists, reads and deletes a capture record (10.155ms)
+✔ purges only records older than the requested TTL (2.8369ms)
+✔ persists ordered transfer chunks and cleans them atomically (4.1385ms)
+✔ appends a chunk and advances transfer metadata in one transaction (1.715ms)
+✔ purges expired transfer metadata and chunks (1.0154ms)
+✔ returns stored captures and drops them on deletion (0.5407ms)
+✔ keeps multiple captures readable without retaining a local record cache (2.8999ms)
+✔ applies versioned migrations sequentially (0.3184ms)
+✔ upgrades an actual v2 database while preserving temporary data (4.1228ms)
+✔ library stores metadata separately and provides revision-checked atomic updates and duplication (4.7485ms)
+✔ delete all removes both library stores and preserves configuration and temporary captures (2.8944ms)
+✔ delete all rejects changed, missing and added projects without deleting any survivor (2.2482ms)
+✔ delete all rolls back successful deletes in both stores when the transaction aborts (2.2468ms)
+✔ concurrent updates with the same revision allow exactly one writer (2.9872ms)
+✔ library quota is configured, enforced atomically, and includes thumbnails (29.6824ms)
+✔ retention and purge affect only expired library projects, never temporary captures or transfers (1.4299ms)
+✔ region surfaces release on none and the next attempt can succeed (5.6016ms)
+✔ region surfaces release on refused and the next attempt can succeed (1.3674ms)
+✔ region surfaces release on cancelled and the next attempt can succeed (1.2317ms)
+✔ region surfaces release on encoding and the next attempt can succeed (1.2579ms)
+✔ a patch whose drawing throws is released before it enters the patch list (1.4191ms)
+✔ region assembly remains live until asynchronous preparation settles (1.5451ms)
+✔ composition failed render releases allocated canvas after noContext and allows retry (2.7926ms)
+✔ composition failed render releases allocated canvas after decodeFailure and allows retry (1.1296ms)
+✔ composition failed render releases allocated canvas after drawFailure and allows retry (1.0505ms)
+✔ normalizes only the explicit source policy enum (2.1018ms)
+✔ source URL policies strip credentials always and retain historical full links (0.3492ms)
+✔ reads PNG IHDR synchronously without applying editor source budgets (1.8403ms)
+✔ rejects PNG truncations, signatures, invalid IHDR fields and corrupted CRC (0.5361ms)
+✔ reads PNG eXIf before IDAT in either byte order and ignores late orientation like Chromium (1.036ms)
+✔ rejects corrupt PNG eXIf and chunk lengths without reading compressed pixels (49.5905ms)
+✔ reads JPEG SOF marker variants and both EXIF byte orders with oriented bitmap dimensions (0.9931ms)
+✔ rejects corrupt JPEG segment lengths, incomplete frames and malformed EXIF (0.6205ms)
+✔ skips large JPEG APP/ICC segments by length and ignores compressed bytes after SOS (5.124ms)
+✔ reads WebP VP8, VP8L and VP8X dimensions including boundary values (1.1567ms)
+✔ reads animated WebP canvas dimensions and validates bounded nested frame chunks (0.3695ms)
+✔ rejects WebP truncations, RIFF/chunk length errors, unsupported types and bad frame headers (0.7042ms)
+✔ requires matching supported MIME and byte input and exposes identical global/CommonJS helpers (0.2393ms)
+✔ includes the exact final scroll position without skipping the bottom of a page (0.1789ms)
+✔ uses one screenshot position when the page fits the viewport (0.051ms)
+✔ builds a two-dimensional grid including exact right and bottom edges (0.125ms)
+✔ normalizes a scrolling region inside the locked viewport and document (0.1149ms)
+✔ plans exact partial first and last slices for a long scrolling area (0.1316ms)
+✔ uses one partial screenshot when a scrolling area fits the viewport (0.0681ms)
+✔ keeps normal output dimensions and supports asymmetric capture scales (0.1242ms)
+✔ preserves a scrolling region at DPR 2 when it stays within Canvas limits (0.0554ms)
+✔ caps output images to the configured pixel budget (0.0736ms)
+✔ caps an extremely wide canvas below the browser-safe dimension (0.0584ms)
+✔ rejects browser internal pages before injecting the content script (0.2821ms)
+✔ escapes HTML special characters correctly (0.089ms)
+✔ sanitizes URLs safely to prevent javascript: or malicious protocol injection (0.0835ms)
+✔ HTML report applies source policy consistently to link text and title (14.9741ms)
+✔ builds a standalone HTML report with embedded image and safe metadata (0.6705ms)
+✔ excludes classic Windows scrollbars while preserving fractional DPR scaling (0.1716ms)
+✔ maps tile destinations from written CSS bounds and reaches the output edges at fractional DPR (0.1499ms)
+✔ filters searchable blocks intersecting opaque annotation bounds (0.1447ms)
+✔ computes a bounded adaptive reduction for oversized PNG payloads (0.0713ms)
+✔ sanitizes titles into safe and valid filenames (0.3481ms)
+✔ computes arrow points accurately for vector arrows (0.1509ms)
+✔ filters text blocks intersecting censored bounds to preserve privacy (0.0948ms)
+✔ shifts and crops text blocks during image cropping (0.1307ms)
+✔ renders linked text blocks as anchors in the searchable layer (0.165ms)
+✔ escapes text and drops unsafe protocols in the searchable layer (0.0527ms)
+✔ returns an empty layer without dimensions or blocks (0.0347ms)
+✔ builds a filesystem-safe local timestamp with minute precision (0.1144ms)
+✔ truncates filenames on code-point boundaries without lone surrogates (0.2389ms)
+✔ keeps short captures on a single print page (0.1342ms)
+✔ slices tall captures into contiguous portrait pages (0.0672ms)
+✔ falls back to a single print page beyond the page cap (0.067ms)
+✔ discards partially cropped words rather than retaining their hidden characters (0.0533ms)
+✔ keeps censor bounds and text aligned after DPR conversion and reduction (0.2415ms)
+✔ exposes the identical frozen CommonJS and global API (3.1348ms)
+✔ vertical layout harmonizes width without enlargement and reserves all text (0.6701ms)
+✔ horizontal layout harmonizes height, preserves aspect ratio and aligns tops (0.2167ms)
+✔ text estimator wraps long words, Unicode, blank lines and explicit newlines (0.7876ms)
+✔ layout has defined empty result and rejects invalid/unbounded values (0.2288ms)
+✔ fit page plan fills page width and partitions long image with exact shared edges (0.3566ms)
+✔ percentage pagination tiles both axes without gaps and obeys paper/orientation (0.3349ms)
+✔ page plan enforces 200 pages and valid printable area (0.6618ms)
+✔ STORE ZIP roundtrips Unicode names, empty files and exact bytes (1.278ms)
+✔ ZIP rejects traversal, ambiguous/unsafe paths and duplicates (0.7057ms)
+✔ ZIP rejects corrupted content, headers, flags, methods, offsets and truncation (2.196ms)
+✔ ZIP decode rejects duplicate names, traversal and invalid UTF-8 supplied externally (0.5034ms)
+✔ project roundtrip returns validated image dimensions and only allowed data (19.7839ms)
+✔ import never restores unverified text layers or metadata even from injected manifest (3.4959ms)
+✔ project rejects invalid schema, absent/unreferenced images and dimension lies (5.503ms)
+✔ project rejects non PNG, CRC corruption, malformed compressed data and scanlines (5.7191ms)
+✔ PNG rejects transparency referencing missing palette entries or out-of-range samples (2.4519ms)
+✔ project validates canvas dimension and pixel limits before inflating PNG (727.4042ms)
+✔ schema 2 roundtrips supported annotations and strips extra fields (2.6298ms)
+✔ moved and duplicated annotations beyond every image edge survive a real project roundtrip (4.6925ms)
+✔ off-image annotation coordinates have finite bounded margins on save and import (4.5551ms)
+✔ schema 1 migration ignores any annotations and never restores unverified text (1.0121ms)
+✔ schema 2 refuses unsupported or malformed annotations on save and import (7.7319ms)
+✔ optional UUID annotation identifiers roundtrip and duplicates are refused per item (3.3446ms)
+✔ annotation and point budgets bound work on save and import (3.9973ms)
+✔ source policy enum is normalized on page plans, save and import without a schema change (4.7278ms)
+✔ source policies normalize HTTP(S), remove credentials and never mutate the input model (4.9099ms)
+✔ decode retains complete normalized source URLs in memory regardless of archive policy (3.6493ms)
+✔ metadata rewrite updates both title locations, preserves annotations and exact rendering PNG bytes (1.7766ms)
+✔ metadata rewrite preserves an omitted policy but explicit undefined sanitizes even full library archives (3.8923ms)
+✔ metadata rewrite validates strict changes allowlist and exports no validation bypass API (1.02ms)
+✔ metadata rewrite migrates schema 1 to 2 and normalizes archive image locations (1.5155ms)
+✔ metadata rewrite rejects corrupt ZIP, manifests, PNGs, annotations and unsupported source URLs (2.694ms)
+✔ metadata rewrite inflates each PNG exactly once through a standalone VM codec (5.1141ms)
+✔ project validates image count, blob sizes, IDs, metadata and credentials (27.5229ms)
+✔ text visibility and style caches are shared within one extraction and renewed for every tile (5.0449ms)
+✔ text privacy checks continue rejecting masks, pseudo content, overlaps and failed hit tests (4.8709ms)
+✔ anchored manager reevaluates fixed and sticky styles for every prepare (0.9984ms)
+✔ diagnostics are opt-in, bounded, paired and contain only counts and timings (13.5756ms)
+✔ bounded selections tolerate appended feed content but full-page captures remain strict (1.5029ms)
+✔ bounded selections still reject shrinking content, viewport changes and insufficient bounds (1.2118ms)
+✔ the stabilization deadline bounds inner scroll loops on very tall pages (2.2089ms)
+✔ temporary resized capture surfaces release after encoding success (3.7252ms)
+✔ temporary resized capture surfaces release after encoding failure (1.4399ms)
+✔ successive payload reductions release every owned surface when still oversized (1.3681ms)
+✔ cancellation during a rate-limit delay prevents another screenshot request (2.5661ms)
+✔ cancellation during a chunk transfer aborts storage and never completes the editor (3.445ms)
+✔ blur releases its temporary source and restores context after success (8.5341ms)
+✔ blur releases its temporary source and restores context after temporary (1.0257ms)
+✔ blur releases its temporary source and restores context after context (0.8979ms)
+✔ blur releases its temporary source and restores context after target (0.7666ms)
+✔ blur releases its temporary source and restores context after clip (0.6684ms)
+✔ failed crop releases its destination after temporary and preserves caller input (1.3304ms)
+✔ failed crop releases its destination after context and preserves caller input (0.5278ms)
+✔ solid censor restores target state after drawing fails without allocating a source (0.7303ms)
+✔ content-script message keys are all covered by the popup bundle (2.3422ms)
+✔ privacy notices and resource refusals have complete translations with consistent numeric limits (1.7813ms)
+✔ manifest, locale catalogs, icons and referenced files are valid (54.534ms)
+✔ manifest policy allows only the current permission set and local CSP (1.2872ms)
+✔ manifest policy rejects remote CSP and unsafe evaluation across scopes (0.5387ms)
+✔ PNG dimensions require a complete PNG signature and IHDR header (0.6309ms)
+✔ version sync rejects a missing or malformed lockfile before changing package.json (20.0948ms)
+✔ version sync updates all version files after validating a complete lockfile (28.8448ms)
+✔ unreleased synchronization preserves published links and history and is idempotent (99.4041ms)
+✔ Markdown validation checks relative files and anchors including local ignored documents (23.5959ms)
+✔ JSON budget counts exact UTF8 and JSON escaping without changing state (1.2066ms)
+✔ project preflight exactly matches manifest UTF8 and STORE ZIP including imageOnly (15.4292ms)
+✔ oversized UTF8 annotations are rejected before reading image blobs (9.3583ms)
+✔ preflight includes STORE overhead even if images alone fit their quota (0.7251ms)
+✔ manifest accepts the exact byte limit and rejects the next ASCII byte (76.1773ms)
+✔ STORE ZIP preflight accepts its exact byte boundary and rejects one extra byte (0.7835ms)
+✔ JSON byte counter supports DAGs, sparse arrays, numbers and rejects invalid budgets (0.2437ms)
+✔ imageOnly defaults false for legacy settings and rejects non booleans (3.0865ms)
+✔ accepts Chrome-compatible extension versions (1.6191ms)
+✔ rejects versions that Chrome cannot install (0.5417ms)
+ℹ tests 178
+ℹ suites 0
+ℹ pass 178
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1007.5805
+npm notice run scionos-capture@1.5.3 validate
+npm notice run node scripts/validate-package.mjs
+Package validation passed: 4 locales, 194 keys, 49 references; 41 Markdown documents, 420 local links.
+npm notice run scionos-capture@1.5.3 package
+npm notice run node scripts/package.mjs
+Created dist/scionos-capture-v1.5.3.zip (35 files)
+npm notice run scionos-capture@1.5.3 test:e2e
+npm notice run playwright test
+
+Running 179 tests using 1 worker
+
+(node:9532) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/179] tests\e2e\accessibility.spec.js:31:1 › popup has an accessible language menu and no serious axe violations
+[2/179] tests\e2e\accessibility.spec.js:44:1 › full-page capture assembles a long document and restores its position
+[3/179] tests\e2e\accessibility.spec.js:64:1 › full-page capture detects and crops an internal vertical scroll surface
+[4/179] tests\e2e\accessibility.spec.js:82:1 › full-page capture assembles a wide and tall internal scroll surface
+[5/179] tests\e2e\accessibility.spec.js:103:1 › full-page capture reports when the selected surface cannot scroll
+[6/179] tests\e2e\accessibility.spec.js:128:1 › @windows-scaling keeps fractional-DPR geometry and deduplicates sticky headers
+[7/179] tests\e2e\accessibility.spec.js:166:1 › scrolling-area capture targets and restores an internal container
+[8/179] tests\e2e\accessibility.spec.js:190:1 › scrolling-area cancellation and restart restore nested scroll state and inline priority
+[9/179] tests\e2e\accessibility.spec.js:241:1 › scrolling-area capture targets a chat dock container on a long scrollable page without scrolling background
+[10/179] tests\e2e\accessibility.spec.js:280:1 › zone capture crops a static visible selection
+[11/179] tests\e2e\accessibility.spec.js:304:1 › zone capture uses viewport pixels when classic scrollbars reduce the content box
+[12/179] tests\e2e\accessibility.spec.js:326:1 › zone capture auto-scrolls an internal container and stitches the region
+[13/179] tests\e2e\accessibility.spec.js:359:1 › scrolling-area overlay supports pointer, keyboard and exact multi-screen capture
+[14/179] tests\e2e\accessibility.spec.js:506:1 › selection adjustment requires confirmation and supports keyboard movement and handle resizing
+[15/179] tests\e2e\accessibility.spec.js:531:1 › delayed capture can be cancelled before any screenshot and releases its session
+[16/179] tests\e2e\accessibility.spec.js:547:1 › editor empty state remains accessible at a narrow viewport
+[17/179] tests\e2e\accessibility.spec.js:556:1 › editor zoom, crop, undo and redo keep the complete canvas reachable
+[18/179] tests\e2e\accessibility.spec.js:598:1 › editor highlighter draws a translucent stroke with undo support
+[19/179] tests\e2e\annotation-security.spec.js:122:1 › mask plus crop and later annotations keep project-v2 pixels and exports free of removed secrets
+[20/179] tests\e2e\annotation-security.spec.js:206:1 › crop makes earlier annotations nonselectable while solid masks hide intersecting annotations
+[21/179] tests\e2e\annotation-security.spec.js:244:1 › annotation controls remain accessible in four supported interface languages
+[22/179] tests\e2e\capture-acquisition.spec.js:50:1 › post-acquisition DOM mutation removes searchable text from visible capture
+[23/179] tests\e2e\capture-acquisition.spec.js:59:1 › stable DOM remains independently extractable while native capture keeps pixels only
+[24/179] tests\e2e\capture-acquisition.spec.js:67:1 › source title is fixed when the session begins
+[25/179] tests\e2e\capture-acquisition.spec.js:75:1 › SPA navigation during acquisition aborts and releases the session
+[26/179] tests\e2e\capture-acquisition.spec.js:86:1 › scroll during tile acquisition aborts instead of assembling stale coordinates
+[27/179] tests\e2e\capture-acquisition.spec.js:97:1 › mutated tile keeps pixels but discards the whole uncertain text layer
+[28/179] tests\e2e\capture-acquisition.spec.js:106:2 › white-on-white text is excluded while contrasted text survives
+[29/179] tests\e2e\capture-acquisition.spec.js:116:1 › text with image backgrounds or blending is omitted when painted contrast is uncertain
+[30/179] tests\e2e\capture-acquisition.spec.js:128:1 › CSSOM changes during acquisition invalidate the text layer without DOM mutations
+[31/179] tests\e2e\capture-acquisition.spec.js:144:1 › semi-transparent backgrounds never expose text hidden by their effective composite
+[32/179] tests\e2e\capture-acquisition.spec.js:158:3 › native capture omits text after a restored mutation-free paint source: cssom
+[33/179] tests\e2e\capture-acquisition.spec.js:158:3 › native capture omits text after a restored mutation-free paint source: adoption
+[34/179] tests\e2e\capture-acquisition.spec.js:158:3 › native capture omits text after a restored mutation-free paint source: canvas
+[35/179] tests\e2e\capture-acquisition.spec.js:158:3 › native capture omits text after a restored mutation-free paint source: font
+[36/179] tests\e2e\capture-acquisition.spec.js:203:1 › capture portion limit rejects a long page before acquiring pixels and restores it
+[37/179] tests\e2e\capture-acquisition.spec.js:217:1 › capture duration limit discards late pixels and releases the session for retry
+[38/179] tests\e2e\capture-restoration.spec.js:8:43 › failed anchored preparation restores original inline visibility (absent)
+[39/179] tests\e2e\capture-restoration.spec.js:8:43 › failed anchored preparation restores original inline visibility (visible)
+[40/179] tests\e2e\composition.spec.js:172:1 › popup exposes help text, installed version and a working empty composition entry
+[41/179] tests\e2e\composition.spec.js:192:1 › memory imports reorder and export both orientations with unchanged image proportions
+[42/179] tests\e2e\composition.spec.js:220:1 › project round trip preserves ordered metadata, PDF settings and permanently flattened solid masks
+[43/179] tests\e2e\composition.spec.js:273:1 › invalid imports preserve the document and pending masks block destructive or exporting actions
+[44/179] tests\e2e\composition.spec.js:293:1 › long composition prints real multiple PDF pages with visible header, pagination and final image band
+[45/179] tests\e2e\composition.spec.js:328:1 › composition exports never embed credentials from the captured source URL
+[46/179] tests\e2e\composition.spec.js:349:1 › image-only PDF contains raster pages and bands but no searchable text or link annotations
+[47/179] tests\e2e\composition.spec.js:384:1 › composition PDF omits inherited source text and keeps explicit metadata after redaction
+[48/179] tests\e2e\export-cancellation.spec.js:20:3 › button cancels pending png export during snapshot without side effects and permits retry
+[49/179] tests\e2e\export-cancellation.spec.js:20:3 › Escape cancels pending png export during snapshot without side effects and permits retry
+[50/179] tests\e2e\export-cancellation.spec.js:20:3 › button cancels pending pdf export during snapshot without side effects and permits retry
+[51/179] tests\e2e\export-cancellation.spec.js:20:3 › Escape cancels pending pdf export during snapshot without side effects and permits retry
+[52/179] tests\e2e\export-cancellation.spec.js:20:3 › button cancels pending pdf export during page raster without side effects and permits retry
+[53/179] tests\e2e\export-cancellation.spec.js:20:3 › Escape cancels pending pdf export during page raster without side effects and permits retry
+[54/179] tests\e2e\export-cancellation.spec.js:20:3 › button cancels pending pdf export during header raster after page URL creation without side effects and permits retry
+[55/179] tests\e2e\export-cancellation.spec.js:20:3 › Escape cancels pending pdf export during header raster after page URL creation without side effects and permits retry
+[56/179] tests\e2e\legacy-text.spec.js:34:1 › legacy bitmap-coordinate text absent from pixels cannot reappear in PDF or through undo and redo
+[57/179] tests\e2e\library-project.spec.js:219:1 › v2 project keeps editable annotations and burns masks into the saved image
+[58/179] tests\e2e\library-project.spec.js:252:1 › reopened multi-image project thumbnails include editable annotations
+[59/179] tests\e2e\library-project.spec.js:283:1 › moving an annotation near a canvas edge survives save and reopen
+[60/179] tests\e2e\library-project.spec.js:310:69 › interrupted annotation drag is finalized on pointercancel
+[61/179] tests\e2e\library-project.spec.js:310:69 › interrupted annotation drag is finalized on lostpointercapture
+[62/179] tests\e2e\library-project.spec.js:338:49 › active annotation drag is finalized before image change
+[63/179] tests\e2e\library-project.spec.js:338:49 › active annotation drag is finalized before tool change
+[64/179] tests\e2e\library-project.spec.js:338:49 › active annotation drag is finalized before undo change
+[65/179] tests\e2e\library-project.spec.js:376:1 › portable project download request does not mark editor saved
+[66/179] tests\e2e\library-project.spec.js:395:1 › v1 flattened project opens safely and saves as a v2 project
+[67/179] tests\e2e\library-project.spec.js:411:1 › library saves, searches, renames, duplicates, opens and deletes a project
+[68/179] tests\e2e\library-project.spec.js:450:1 › library settings validate quota and keep selected retention across reload
+[69/179] tests\e2e\library-rendering.spec.js:58:1 › search and unchanged refresh preserve DOM and thumbnail URLs without invoking actions
+[70/179] tests\e2e\library-rendering.spec.js:99:1 › hidden cards are reenabled after busy refresh and invalidated on external revision or deletion
+[71/179] tests\e2e\library-rendering.spec.js:132:1 › cache retains at most 1000 detached cards and never limits visible projects
+[72/179] tests\e2e\library-save-order.spec.js:93:1 › overlapping saves keep click order and freeze each requested snapshot
+[73/179] tests\e2e\library-save-order.spec.js:128:1 › overlapping first saves create one library project
+[74/179] tests\e2e\library-save-order.spec.js:146:1 › a suspended save stays with its original document after opening another project
+[75/179] tests\e2e\library-save-order.spec.js:177:1 › an encoder failure does not block the next queued save
+[76/179] tests\e2e\library.spec.js:33:1 › library searches, renames, duplicates, exports, and removes real projects
+[77/179] tests\e2e\library.spec.js:67:1 › library preferences, expiration choice and confirmed clear work
+[78/179] tests\e2e\library.spec.js:94:1 › library stays accessible on a narrow screen
+[79/179] tests\e2e\project-admission.spec.js:14:1 › normal duplication assigns a unique UUID before admission and roundtrips both annotations
+[80/179] tests\e2e\project-admission.spec.js:51:1 › fractional drag exceeding manifest bytes is refused before geometry and history change
+[81/179] tests\e2e\project-admission.spec.js:105:1 › UTF-8 manifest budget refuses duplication before history mutation and permits recovery
+[82/179] tests\e2e\project-admission.spec.js:149:1 › near-limit imported annotations remain saveable and metadata growth is refused atomically
+[83/179] tests\e2e\reliability.spec.js:77:3 › real pixels retain one fixed header and the last content band
+[84/179] tests\e2e\reliability.spec.js:77:3 › real pixels retain one sticky header and the last content band
+[85/179] tests\e2e\reliability.spec.js:77:3 › real pixels retain one dynamic header and the last content band
+[86/179] tests\e2e\reliability.spec.js:77:3 › real pixels retain one below-fold header and the last content band
+[87/179] tests\e2e\reliability.spec.js:98:1 › zero-height fixed portal retains its cookie banner once at the bottom
+[88/179] tests\e2e\reliability.spec.js:108:1 › scrolling region deduplicates a header that becomes fixed after scrolling
+[89/179] tests\e2e\reliability.spec.js:120:1 › document auto-scroll selection completes and restores its starting position
+[90/179] tests\e2e\reliability.spec.js:133:1 › selected capture retains real pixels when a feed appends content during capture
+[91/179] tests\e2e\reliability.spec.js:157:1 › element capture picks a block and waits for adjustment confirmation before capturing real pixels
+[92/179] tests\e2e\reliability.spec.js:174:1 › element capture includes the whole chosen scrolling container
+[93/179] tests\e2e\reliability.spec.js:189:1 › element parent choice survives returning the pointer to its child
+[94/179] tests\e2e\reliability.spec.js:201:1 › element moved during countdown fails without capturing stale coordinates
+[95/179] tests\e2e\reliability.spec.js:213:1 › element parent keeps its header when it contains a scrolling descendant
+[96/179] tests\e2e\reliability.spec.js:226:1 › scrolling adjustment locks horizontal geometry while retaining vertical editing
+[97/179] tests\e2e\reliability.spec.js:242:1 › adjustment dragging accumulates fractional deltas on scaled surfaces
+[98/179] tests\e2e\reliability.spec.js:257:1 › delayed visible capture waits before acquisition and rejects unsupported delays
+[99/179] tests\e2e\reliability.spec.js:271:1 › inner-surface text is collected in surface coordinates and covered text is omitted
+[100/179] tests\e2e\reliability.spec.js:296:3 › @windows-scaling real visible and selected pixels keep text aligned at DPR 1
+[101/179] tests\e2e\reliability.spec.js:296:3 › @windows-scaling real visible and selected pixels keep text aligned at DPR 1.25
+[102/179] tests\e2e\reliability.spec.js:296:3 › @windows-scaling real visible and selected pixels keep text aligned at DPR 1.5
+[103/179] tests\e2e\reliability.spec.js:296:3 › @windows-scaling real visible and selected pixels keep text aligned at DPR 2
+[104/179] tests\e2e\reliability.spec.js:393:1 › standalone painted snapshots preserve redaction, crop geometry and PDF text contracts
+[105/179] tests\e2e\reliability.spec.js:461:1 › long source URLs cannot expand the editor grid or move the image offscreen
+[106/179] tests\e2e\reliability.spec.js:475:1 › text entry stays focused, native undo preserves image history, and redo advances steps
+[107/179] tests\e2e\reliability.spec.js:494:1 › annotations stay editable beyond 100 operations without flattening
+[108/179] tests\e2e\reliability.spec.js:512:3 › generated PDF excludes masked text after crop and undo/redo at scale 1
+[109/179] tests\e2e\reliability.spec.js:512:3 › generated PDF excludes masked text after crop and undo/redo at scale 1.25
+[110/179] tests\e2e\reliability.spec.js:512:3 › generated PDF excludes masked text after crop and undo/redo at scale 1.5
+[111/179] tests\e2e\reliability.spec.js:512:3 › generated PDF excludes masked text after crop and undo/redo at scale 2
+[112/179] tests\e2e\reliability.spec.js:529:1 › generated PDF excludes outside and partially cropped words through repeated crops
+[113/179] tests\e2e\reliability.spec.js:544:1 › legacy captures with unverified text coordinates export an image-only PDF
+[114/179] tests\e2e\reliability.spec.js:553:1 › real two-dimensional assembly preserves every color band across final overlapping tiles
+[115/179] tests\e2e\reliability.spec.js:570:1 › text metadata follows an actual canvas dimension reduction
+[116/179] tests\e2e\reliability.spec.js:583:1 › covered and transparent DOM secrets are absent from the generated PDF
+[117/179] tests\e2e\reliability.spec.js:597:1 › filled opaque shapes retain raster undo and redo while inherited PDF text stays omitted
+[118/179] tests\e2e\reliability.spec.js:629:3 › full-page and scrolling captures have no uncovered edge pixels at DPR 1.25
+[119/179] tests\e2e\reliability.spec.js:629:3 › full-page and scrolling captures have no uncovered edge pixels at DPR 1.5
+[120/179] tests\e2e\reliability.spec.js:654:1 › an open capture remains mapped and loadable after its service worker restarts
+[121/179] tests\e2e\reliability.spec.js:697:1 › wide sticky headers retain both columns and appear only on the first row
+[122/179] tests\e2e\reliability.spec.js:713:1 › PDF text remains censored with more than 100 editable annotations
+[123/179] tests\e2e\reliability.spec.js:732:1 › undo during asynchronous PDF encoding cannot mix masked pixels with original text
+[124/179] tests\e2e\reliability.spec.js:771:1 › descendant covers cannot leak text into a generated PDF
+[125/179] tests\e2e\reliability.spec.js:785:1 › fast freehand masks cover every segment and single clicks across undo and redo
+[126/179] tests\e2e\reliability.spec.js:802:1 › all exports reject a pending mask without cancelling the preview
+[127/179] tests\e2e\reliability.spec.js:826:1 › horizontal selected capture retains its last color band without stretching
+[128/179] tests\e2e\reliability.spec.js:842:1 › inner auto-scroll moves up and down at its own edges without scrolling the page
+[129/179] tests\e2e\reliability.spec.js:853:1 › vertical scrolling selection freezes its horizontal origin after the first point
+[130/179] tests\e2e\reliability.spec.js:861:1 › a footer taller than the final strip is fully retained once
+[131/179] tests\e2e\reliability.spec.js:868:2 › selection works over an existing modal: START_ZONE_CAPTURE
+[132/179] tests\e2e\reliability.spec.js:868:2 › selection works over an existing modal: START_SCROLLING_ZONE_CAPTURE
+[133/179] tests\e2e\reliability.spec.js:877:1 › cancellation keeps the lock until a delayed capture finishes and ignores its pixels
+[134/179] tests\e2e\reliability.spec.js:893:2 › @windows-scaling transformed internal surface retains dimensions and interior pixels at DPR 1
+[135/179] tests\e2e\reliability.spec.js:893:2 › @windows-scaling transformed internal surface retains dimensions and interior pixels at DPR 1.25
+[136/179] tests\e2e\reliability.spec.js:893:2 › @windows-scaling transformed internal surface retains dimensions and interior pixels at DPR 1.5
+[137/179] tests\e2e\reliability.spec.js:893:2 › @windows-scaling transformed internal surface retains dimensions and interior pixels at DPR 2
+[138/179] tests\e2e\reliability.spec.js:911:1 › print output removes URL credentials from visible source text and links
+[139/179] tests\e2e\reliability.spec.js:923:1 › HTML report embeds one image and exposes correct zoom and the bottom edge
+[140/179] tests\e2e\reliability.spec.js:939:1 › blurred freehand paths include the segment between distant points
+[141/179] tests\e2e\reliability.spec.js:951:1 › independent text assembly stops after the global block cap while pixels still complete
+[142/179] tests\e2e\reliability.spec.js:961:1 › HTML final size uses encoded bytes rather than string length
+[143/179] tests\e2e\reliability.spec.js:976:2 › unsupported rotations fail explicitly and release the capture session: START_FULL_PAGE_CAPTURE
+[144/179] tests\e2e\reliability.spec.js:976:2 › unsupported rotations fail explicitly and release the capture session: START_ZONE_CAPTURE
+[145/179] tests\e2e\reliability.spec.js:976:2 › unsupported rotations fail explicitly and release the capture session: START_SCROLLING_ZONE_CAPTURE
+[146/179] tests\e2e\reliability.spec.js:988:1 › left scrollbar gutters share the same viewport origin for selection and visible text
+[147/179] tests\e2e\resource-budgets.spec.js:42:1 › cropped originals still reserve admission pixels and undo stays within the budget
+[148/179] tests\e2e\resource-budgets.spec.js:61:1 › interactive duplication respects the imported annotation item limit
+[149/179] tests\e2e\resource-budgets.spec.js:73:1 › history byte and point budgets evict old states and bound undo plus redo together
+[150/179] tests\e2e\resource-budgets.spec.js:105:1 › interactive strokes stop at the same point limit as project imports
+[151/179] tests\e2e\resource-budgets.spec.js:133:1 › two click snapshots are retained through storage and a third is refused before freeze
+[152/179] tests\e2e\selection-pointers.spec.js:49:3 › adjustment tracks its pointer through foreign events and pointerup
+[153/179] tests\e2e\selection-pointers.spec.js:49:3 › adjustment tracks its pointer through foreign events and pointercancel
+[154/179] tests\e2e\selection-pointers.spec.js:49:3 › adjustment tracks its pointer through foreign events and lostpointercapture
+[155/179] tests\e2e\selection-pointers.spec.js:77:3 › zone ignores secondary pointers and stops auto-scroll on pointercancel
+[156/179] tests\e2e\selection-pointers.spec.js:77:3 › zone ignores secondary pointers and stops auto-scroll on lostpointercapture
+[157/179] tests\e2e\selection-pointers.spec.js:96:1 › scrolling drag ignores foreign releases and completes with the active pointer
+[158/179] tests\e2e\selection-pointers.spec.js:113:3 › scrolling pointercancel resets the drag and preserves two clicks and keyboard scrolling
+[159/179] tests\e2e\selection-pointers.spec.js:113:3 › scrolling lostpointercapture resets the drag and preserves two clicks and keyboard scrolling
+[160/179] tests\e2e\sharing-import.spec.js:120:3 › source policy sanitized governs project, HTML, Markdown and PDF sources and links
+[161/179] tests\e2e\sharing-import.spec.js:120:3 › source policy none governs project, HTML, Markdown and PDF sources and links
+[162/179] tests\e2e\sharing-import.spec.js:120:3 › source policy full governs project, HTML, Markdown and PDF sources and links
+[163/179] tests\e2e\sharing-import.spec.js:160:1 › library export sanitizes legacy full URLs while a dirty editor and stored archive remain unchanged
+[164/179] tests\e2e\sharing-import.spec.js:192:1 › oversized PNG headers reject before createImageBitmap and preserve an existing document
+[165/179] tests\e2e\sharing-import.spec.js:211:1 › valid Canvas JPEG and WebP imports retain dimensions and visible pixels
+[166/179] tests\e2e\sharing-import.spec.js:225:1 › JPEG EXIF orientation 6 imports with rotated bitmap dimensions
+[167/179] tests\e2e\sharing-import.spec.js:241:3 › PNG eXIf orientation 6 before IDAT matches the browser bitmap dimensions
+[168/179] tests\e2e\sharing-import.spec.js:241:3 › PNG eXIf orientation 6 after IDAT matches the browser bitmap dimensions
+[169/179] tests\e2e\sharing-import.spec.js:264:1 › PDF print refuses cumulative raster pixels before allocating page canvases
+[170/179] tests\e2e\sharing-import.spec.js:288:1 › PDF print revokes earlier pages when cumulative encoded bytes exceed budget
+[171/179] tests\e2e\sharing-import.spec.js:332:1 › print replacement and repeated cleanup revoke each owned URL exactly once
+[172/179] tests\e2e\sharing-import.spec.js:357:1 › overlapping print rendering keeps the newer job alive after the older rejection
+[173/179] tests\e2e\sharing-import.spec.js:397:1 › second snapshot encoder failure releases surfaces and the next export recovers
+[174/179] tests\e2e\sharing-import.spec.js:424:1 › gated multi-image project snapshot preserves click-time pixels and leaves later edits dirty
+[175/179] tests\e2e\sharing-import.spec.js:467:1 › HTML and project encode N images once and library adds only one small thumbnail
+[176/179] tests\e2e\snapshot-resources.spec.js:19:4 › snapshot releases owned canvases after thumbnail copy fails and permits retry
+[177/179] tests\e2e\snapshot-resources.spec.js:19:4 › snapshot releases owned canvases after project initial copy fails and permits retry
+[178/179] tests\e2e\snapshot-resources.spec.js:19:4 › snapshot releases owned canvases after project crop after its source copy fails and permits retry
+[179/179] tests\e2e\snapshot-resources.spec.js:19:4 › snapshot releases owned canvases after export initial copy fails and permits retry
+  179 passed (5.0m)
+npm notice run scionos-capture@1.5.3 test:native
+npm notice run node scripts/native-capture-smoke.mjs
+chrome visible: 800×600, all pixels verified
+chrome full: 1000×650, all pixels verified
+chrome zone: 300×250, all pixels verified
+chrome scrolling: 300×900, all pixels verified
+chrome element: 300×250, all pixels verified
+chrome version: 158.0.8127.37
+msedge visible: 800×600, all pixels verified
+msedge full: 1000×650, all pixels verified
+msedge zone: 300×250, all pixels verified
+msedge scrolling: 300×900, all pixels verified
+msedge element: 300×250, all pixels verified
+msedge version: 158.0.4370.33
+npm notice run scionos-capture@1.5.3 test:native:acquisition
+npm notice run node scripts/native-acquisition-smoke.mjs
+chrome: passed 158.0.8127.37 (3/3)
+msedge: passed 158.0.4370.33 (3/3)
+npm notice run scionos-capture@1.5.3 test:performance
+npm notice run node scripts/performance-smoke.mjs
+current: repetition 1/3 completed
+current: repetition 2/3 completed
+current: repetition 3/3 completed
+Synthetic performance report: D:\Serveurs\Projet_ScioNos\Scionos-Capture\dist\performance-smoke.json
+npm notice run scionos-capture@1.5.3 test:performance:pdf
+npm notice run node scripts/pdf-performance-smoke.mjs
+uniform-1: 226.2 ms; 6 pages; 19372 PNG bytes; passed
+uniform-4: 212.6 ms; 23 pages; 77417 PNG bytes; passed
+uniform-10: 471.1 ms; 58 pages; 193657 PNG bytes; passed
+noise-1: 221.4 ms; 6 pages; 2182523 PNG bytes; passed
+noise-4: 624.3 ms; 23 pages; 8714675 PNG bytes; passed
+noise-10: 2413.7 ms; 58 pages; 21789062 PNG bytes; passed
+near-32M-real: 4010.6 ms; 12 pages; 676168 PNG bytes; passed
+over-32M-preflight: 2.5 ms; 0 pages; 0 PNG bytes; passed
+over-128MiB-controlled: 80.4 ms; 0 pages; 0 PNG bytes; passed
+encoder-error-cleanup: 71.4 ms; 0 pages; 0 PNG bytes; passed
+Synthetic PDF performance report: D:\Serveurs\Projet_ScioNos\Scionos-Capture\dist\consolidation-1.5.3\pdf-performance.json

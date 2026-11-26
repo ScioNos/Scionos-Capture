@@ -1,0 +1,46 @@
+[
+  {
+    "name": "checkout",
+    "tag": "v7.0.1",
+    "sha": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+    "releaseUrl": "https://github.com/actions/checkout/releases/tag/v7.0.1",
+    "published": "2026-07-20T15:10:05Z",
+    "draft": false,
+    "prerelease": false,
+    "commitVerified": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+    "releaseBody": "## What's Changed\r\n* skip running unsafe pr check if input is default by @aiqiaoy in https://github.com/actions/checkout/pull/2518\r\n* trim only ascii whitespace for branch by @aiqiaoy in https://github.com/actions/checkout/pull/2521\r\n* escape values passed to --unset by @aiqiaoy in https://github.com/actions/checkout/pull/2530\r\n* Various dependency updates \r\n\r\n**Full Changelog**: https://github.com/actions/checkout/compare/v7...v7.0.1"
+  },
+  {
+    "name": "setup-node",
+    "tag": "v7.1.0",
+    "sha": "949feb2413d6458794dcd2491c4babbbce0c15c1",
+    "releaseUrl": "https://github.com/actions/setup-node/releases/tag/v7.1.0",
+    "published": "2026-10-08T02:52:34Z",
+    "draft": false,
+    "prerelease": false,
+    "commitVerified": "949feb2413d6458794dcd2491c4babbbce0c15c1",
+    "releaseBody": "## What's Changed\r\n\r\n### Enhancements:\r\n* Add support for mise.toml file by @gperdomor in https://github.com/actions/setup-node/pull/1421\r\n* Support absolute paths in node-version-file by @v-mahabaleshwars in https://github.com/actions/setup-node/pull/1633\r\n\r\n### Bug fixes:\r\n*  Add Node version validation and manifest fetch retry by @v-jitenderpalsingh in https://github.com/actions/setup-node/pull/1580\r\n\r\n### Documentation updates:\r\n* README.md: bump actions/checkout to latest version 7 by @deining in https://github.com/actions/setup-node/pull/1578\r\n* docs: add V7 ESM migration and NODE_AUTH_TOKEN behavior change by @v-gowridurgad in https://github.com/actions/setup-node/pull/1593\r\n* Fixed cache recommendation syntax by @SubJunk in https://github.com/actions/setup-node/pull/1603\r\n\r\n### Dependency updates:\r\n*  Update workflow pins and migrate Node matrices to modern versions by @v-HarithaVattikuti in https://github.com/actions/setup-node/pull/1583\r\n* Upgrade  @actions/cache to 6.2.0 by @philip-gai in https://github.com/actions/setup-node/pull/1584\r\n* Pin @types/node to v24 by @v-priyagupta108 in https://github.com/actions/setup-node/pull/1585\r\n* Override brace-expansion to 5.0.8 by @v-priyagupta108 with @Copilot in https://github.com/actions/setup-node/pull/1599\r\n* Upgrade  actions/checkout from 7.0.0 to 7.0.1 by @dependabot in https://github.com/actions/setup-node/pull/1598\r\n* Upgrade  prettier from 3.8.4 to 3.9.6 by @dependabot in https://github.com/actions/setup-node/pull/1590\r\n* Upgrade  @vercel/ncc from 0.44.0 to 0.45.0 by @dependabot in https://github.com/actions/setup-node/pull/1610\r\n* Upgrade  pnpm/action-setup from 6.0.9 to 6.0.10 by @dependabot in https://github.com/actions/setup-node/pull/1602\r\n* Upgrade  baseline-browser-mapping from 2.10.38 to 2.11.22 by @dependabot in https://github.com/actions/setup-node/pull/1629\r\n* Upgrade @types/semver from 7.7.1 to 7.8.0 by @dependabot in https://github.com/actions/setup-node/pull/1616\r\n* Upgrade @typescript-eslint/parser from 8.62.0 to 8.70.0 by @dependabot in https://github.com/actions/setup-node/pull/1615\r\n* Upgrade pnpm/action-setup from 6.0.10 to 6.1.0 by @dependabot in https://github.com/actions/setup-node/pull/1631\r\n* Upgrade jest-each from 30.4.1 to 30.5.2 by @dependabot in https://github.com/actions/setup-node/pull/1636\r\n* Upgrade eslint-plugin-n from 18.1.0 to 18.3.0 by @dependabot in https://github.com/actions/setup-node/pull/1638\r\n* Update dependencies and add license files by @v-HarithaVattikuti in https://github.com/actions/setup-node/pull/1642\r\n* Upgrade eslint from 10.5.0 to 10.11.0 and package.json from 7.0.0 to 7.1.0 by @dependabot in https://github.com/actions/setup-node/pull/1635\r\n\r\n\r\n\r\n## New Contributors\r\n* @v-jitenderpalsingh made their first contribution in https://github.com/actions/setup-node/pull/1580\r\n* @philip-gai made their first contribution in https://github.com/actions/setup-node/pull/1584\r\n* @gperdomor made their first contribution in https://github.com/actions/setup-node/pull/1421\r\n* @SubJunk made their first contribution in https://github.com/actions/setup-node/pull/1603\r\n\r\n**Full Changelog**: https://github.com/actions/setup-node/compare/v7.0.0...v7.1.0"
+  },
+  {
+    "name": "cache",
+    "tag": "v6.1.0",
+    "sha": "55cc8345863c7cc4c66a329aec7e433d2d1c52a9",
+    "releaseUrl": "https://github.com/actions/cache/releases/tag/v6.1.0",
+    "published": "2026-06-26T19:17:06Z",
+    "draft": false,
+    "prerelease": false,
+    "commitVerified": "55cc8345863c7cc4c66a329aec7e433d2d1c52a9",
+    "releaseBody": "## What's Changed\r\n* Bump @actions/cache to v6.1.0 - handle read-only cache access by @jasongin in https://github.com/actions/cache/pull/1768\r\n\r\n\r\n**Full Changelog**: https://github.com/actions/cache/compare/v6...v6.1.0"
+  },
+  {
+    "name": "upload-artifact",
+    "tag": "v7.0.2",
+    "sha": "cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+    "releaseUrl": "https://github.com/actions/upload-artifact/releases/tag/v7.0.2",
+    "published": "2026-10-07T10:08:14Z",
+    "draft": false,
+    "prerelease": false,
+    "commitVerified": "cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+    "releaseBody": "## What's Changed\r\n- Improves artifact download retries when the service returns HTTP 429 (rate limiting), including honoring valid Retry-After headers.\r\n- Updates @actions/artifact to v6.3.1.\r\n\r\n\r\n## New Contributors\r\n* @tunc-d made their first contribution in https://github.com/actions/upload-artifact/pull/821\r\n\r\n**Full Changelog**: https://github.com/actions/upload-artifact/compare/v7.0.1...v7.0.2"
+  }
+]
